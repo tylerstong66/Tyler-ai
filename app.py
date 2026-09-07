@@ -28,10 +28,50 @@ def webhook():
 
     data = request.get_json(silent=True) or {}
 
+    action = data.get("action")
+
+    if not action:
+        return jsonify({
+            "success": False,
+            "error": "Missing action"
+        }), 400
+
+    if action == "email":
+        to = data.get("to")
+        subject = data.get("subject")
+        message = data.get("message")
+
+        if not to or not subject or not message:
+            return jsonify({
+                "success": False,
+                "error": "Email action requires to, subject, and message"
+            }), 400
+
+        payload = {
+            "action": "email",
+            "data": {
+                "to": to,
+                "subject": subject,
+                "message": message
+            }
+        }
+
+    elif action == "test":
+        payload = {
+            "action": "test",
+            "message": data.get("message", "Tyler AI test")
+        }
+
+    else:
+        return jsonify({
+            "success": False,
+            "error": f"Unknown action: {action}"
+        }), 400
+
     try:
         response = requests.post(
             N8N_WEBHOOK_URL,
-            json=data,
+            json=payload,
             timeout=60
         )
 
