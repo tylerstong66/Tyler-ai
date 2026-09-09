@@ -69,6 +69,7 @@ def call_groq(messages, temperature=0.3):
 # ==================================================
 
 def supabase_headers():
+
     if not SUPABASE_KEY:
         raise RuntimeError("SUPABASE_KEY is not configured")
 
@@ -106,7 +107,7 @@ def save_memory(memory_text, category="general", importance=5):
     return response.json()
 
 
-def get_memories(limit=10):
+def get_memories(limit=20):
 
     if not SUPABASE_URL:
         raise RuntimeError("SUPABASE_URL is not configured")
@@ -131,7 +132,7 @@ def get_memories(limit=10):
     return response.json()
 
 
-def memory_context(limit=10):
+def memory_context(limit=12):
 
     memories = get_memories(limit)
 
@@ -141,6 +142,7 @@ def memory_context(limit=10):
     lines = []
 
     for item in memories:
+
         lines.append(
             f"- [{item.get('category', 'general')}] "
             f"{item.get('memories', '')} "
@@ -149,6 +151,33 @@ def memory_context(limit=10):
 
     return "\n".join(lines)
 
+
+def memory_already_exists(memory_text):
+
+    try:
+
+        memories = get_memories(50)
+
+        target = memory_text.strip().lower()
+
+        for item in memories:
+
+            existing = str(
+                item.get("memories", "")
+            ).strip().lower()
+
+            if existing == target:
+                return True
+
+        return False
+
+    except Exception:
+        return False
+
+
+# ==================================================
+# EXPLICIT MEMORY
+# ==================================================
 
 def wants_to_remember(message):
 
@@ -170,22 +199,30 @@ def wants_to_remember(message):
 def create_memory_from_request(user_message):
 
     prompt = f"""
-The user asked Tyler AI to remember something.
+The user explicitly asked Tyler AI to remember something.
 
 User message:
 {user_message}
 
-Extract the useful long-term fact or preference.
+Extract the useful long-term information.
 
 Return ONLY valid JSON:
 
 {{
   "memory": "concise memory",
-  "category": "preference, project, person, task, goal, or general",
-  "importance": 1
+  "category": "preference, project, person, task, goal, career, or general",
+  "importance": 5
 }}
 
 Importance must be an integer from 1 to 10.
+
+Never store:
+- passwords
+- API keys
+- authentication tokens
+- credit card numbers
+- banking credentials
+- private security information
 
 Do not include markdown.
 """
@@ -208,23 +245,191 @@ Do not include markdown.
     )
 
     try:
+
         result = json.loads(raw)
 
-        importance = int(result.get("importance", 5))
-        importance = max(1, min(10, importance))
+        importance = int(
+            result.get("importance", 5)
+        )
+
+        importance = max(
+            1,
+            min(10, importance)
+        )
 
         return {
-            "memory": result.get("memory", user_message),
-            "category": result.get("category", "general"),
+            "memory": result.get(
+                "memory",
+                user_message
+            ),
+            "category": result.get(
+                "category",
+                "general"
+            ),
             "importance": importance
         }
 
     except Exception:
+
         return {
             "memory": user_message,
             "category": "general",
             "importance": 5
         }
+
+
+# ==================================================
+# AUTOMATIC MEMORY DETECTION
+# ==================================================
+
+def analyze_for_automatic_memory(user_message):
+
+    prompt = f"""
+Decide whether this user message contains information
+worth saving in long-term memory for Tyler AI.
+
+User message:
+{user_message}
+
+Save durable information such as:
+- stable preferences
+- long-term goals
+- important projects
+- ongoing plans
+- career direction
+- recurring workflows
+- important decisions
+- useful personal context that will help future responses
+
+Do NOT save:
+- casual conversation
+- one-time questions
+- temporary instructions
+- news requests
+- search queries
+- email commands
+- passwords
+- API keys
+- tokens
+- financial account credentials
+- authentication information
+- highly sensitive secrets
+
+Return ONLY valid JSON.
+
+If it should NOT be saved:
+
+{{
+  "save": false
+}}
+
+If it SHOULD be saved:
+
+{{
+  "save": true,
+  "memory": "concise durable fact",
+  "category": "preference, project, person, task, goal, career, or general",
+  "importance": 5
+}}
+
+Importance must be 1 through 10.
+"""
+
+    raw = call_groq(
+        [
+            {
+                "role": "system",
+                "content": (
+                    "You are the memory manager for Tyler AI. "
+                    "Be selective. Only durable useful information "
+                    "should become long-term memory."
+                )
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.1
+    )
+
+    try:
+
+        result = json.loads(raw)
+
+        if not result.get("save"):
+            return None
+
+        memory_text = str(
+            result.get("memory", "")
+        ).strip()
+
+        if not memory_text:
+            return None
+
+        importance = int(
+            result.get("importance", 5)
+        )
+
+        importance = max(
+            1,
+            min(10, importance)
+        )
+
+        return {
+            "memory": memory_text,
+            "category": result.get(
+                "category",
+                "general"
+            ),
+            "importance": importance
+        }
+
+    except Exception:
+        return None
+
+
+def maybe_save_automatic_memory(user_message):
+
+    try:
+
+        candidate = analyze_for_automatic_memory(
+            user_message
+        )
+
+        if not candidate:
+            return None
+
+        if memory_already_exists(
+            candidate["memory"]
+        ):
+            return {
+                "saved": False,
+                "reason": "duplicate",
+                "memory": candidate["memory"]
+            }
+
+        save_memory(
+            candidate["memory"],
+            candidate["category"],
+            candidate["importance"]
+        )
+
+        return {
+            "saved": True,
+            "memory": candidate["memory"],
+            "category": candidate["category"],
+            "importance": candidate["importance"]
+        }
+
+    except Exception as e:
+
+        print(
+            "Automatic memory error:",
+            str(e)
+        )
+
+        return None
 
 
 # ==================================================
@@ -234,13 +439,17 @@ Do not include markdown.
 def web_search(query):
 
     if not TAVILY_API_KEY:
-        raise RuntimeError("TAVILY_API_KEY is not configured")
+        raise RuntimeError(
+            "TAVILY_API_KEY is not configured"
+        )
 
     response = requests.post(
         "https://api.tavily.com/search",
         headers={
-            "Authorization": f"Bearer {TAVILY_API_KEY}",
-            "Content-Type": "application/json"
+            "Authorization":
+                f"Bearer {TAVILY_API_KEY}",
+            "Content-Type":
+                "application/json"
         },
         json={
             "query": query,
@@ -258,7 +467,11 @@ def web_search(query):
 
     sources = []
 
-    for item in result.get("results", []):
+    for item in result.get(
+        "results",
+        []
+    ):
+
         sources.append({
             "title": item.get("title"),
             "url": item.get("url"),
@@ -266,7 +479,10 @@ def web_search(query):
         })
 
     return {
-        "answer": result.get("answer", ""),
+        "answer": result.get(
+            "answer",
+            ""
+        ),
         "sources": sources
     }
 
@@ -278,9 +494,11 @@ def web_search(query):
 def send_to_n8n(payload):
 
     if not N8N_WEBHOOK_URL:
+
         return {
             "success": False,
-            "error": "N8N_WEBHOOK_URL is not configured"
+            "error":
+                "N8N_WEBHOOK_URL is not configured"
         }, 500
 
     try:
@@ -293,8 +511,10 @@ def send_to_n8n(payload):
 
         return {
             "success": response.ok,
-            "status_code": response.status_code,
-            "n8n_response": response.text
+            "status_code":
+                response.status_code,
+            "n8n_response":
+                response.text
         }, response.status_code
 
     except requests.RequestException as e:
@@ -323,7 +543,10 @@ def wants_email(message):
         "email me the"
     ]
 
-    return any(trigger in text for trigger in triggers)
+    return any(
+        trigger in text
+        for trigger in triggers
+    )
 
 
 def wants_research(message):
@@ -343,14 +566,20 @@ def wants_research(message):
         "find out"
     ]
 
-    return any(trigger in text for trigger in triggers)
+    return any(
+        trigger in text
+        for trigger in triggers
+    )
 
 
 # ==================================================
 # RESEARCH SUMMARY
 # ==================================================
 
-def create_research_summary(user_message, research):
+def create_research_summary(
+    user_message,
+    research
+):
 
     source_text = ""
 
@@ -358,6 +587,7 @@ def create_research_summary(user_message, research):
         research["sources"],
         start=1
     ):
+
         source_text += f"""
 SOURCE {index}
 Title: {source.get("title")}
@@ -409,7 +639,10 @@ Rules:
 # EMAIL CREATION
 # ==================================================
 
-def create_email_from_content(user_request, content):
+def create_email_from_content(
+    user_request,
+    content
+):
 
     prompt = f"""
 The user requested:
@@ -467,8 +700,10 @@ Do not include markdown fences.
     except json.JSONDecodeError:
 
         return {
-            "subject": "Message from Tyler AI",
-            "message": content
+            "subject":
+                "Message from Tyler AI",
+            "message":
+                content
         }
 
 
@@ -482,21 +717,34 @@ def home():
     return jsonify({
         "name": "Tyler AI",
         "status": "online",
-        "groq_connected": bool(GROQ_API_KEY),
-        "tavily_connected": bool(TAVILY_API_KEY),
-        "n8n_connected": bool(N8N_WEBHOOK_URL),
-        "memory_connected": bool(
-            SUPABASE_URL and SUPABASE_KEY
-        ),
-        "secured": bool(TYLER_API_KEY),
-        "default_email_configured": bool(
-            TYLER_DEFAULT_EMAIL
-        ),
+
+        "groq_connected":
+            bool(GROQ_API_KEY),
+
+        "tavily_connected":
+            bool(TAVILY_API_KEY),
+
+        "n8n_connected":
+            bool(N8N_WEBHOOK_URL),
+
+        "memory_connected":
+            bool(
+                SUPABASE_URL
+                and SUPABASE_KEY
+            ),
+
+        "secured":
+            bool(TYLER_API_KEY),
+
+        "default_email_configured":
+            bool(TYLER_DEFAULT_EMAIL),
+
         "tools": [
             "chat",
             "web_research",
             "email",
-            "long_term_memory"
+            "long_term_memory",
+            "automatic_memory"
         ]
     })
 
@@ -521,6 +769,7 @@ def health():
 def memories_route():
 
     if not authorized():
+
         return jsonify({
             "success": False,
             "error": "Unauthorized"
@@ -528,7 +777,7 @@ def memories_route():
 
     try:
 
-        memories = get_memories(25)
+        memories = get_memories(50)
 
         return jsonify({
             "success": True,
@@ -545,7 +794,7 @@ def memories_route():
 
 
 # ==================================================
-# CHAT + TOOL USE
+# CHAT
 # ==================================================
 
 @app.route("/chat", methods=["POST"])
@@ -558,9 +807,16 @@ def chat():
             "error": "Unauthorized"
         }), 401
 
-    data = request.get_json(silent=True) or {}
+    data = (
+        request.get_json(
+            silent=True
+        )
+        or {}
+    )
 
-    user_message = data.get("message")
+    user_message = data.get(
+        "message"
+    )
 
     if not user_message:
 
@@ -571,30 +827,41 @@ def chat():
 
 
     # ==================================================
-    # SAVE MEMORY
+    # EXPLICIT MEMORY
     # ==================================================
 
-    if wants_to_remember(user_message):
+    if wants_to_remember(
+        user_message
+    ):
 
         try:
 
-            memory = create_memory_from_request(
-                user_message
+            memory = (
+                create_memory_from_request(
+                    user_message
+                )
             )
 
-            save_memory(
-                memory["memory"],
-                memory["category"],
-                memory["importance"]
-            )
+            if not memory_already_exists(
+                memory["memory"]
+            ):
+
+                save_memory(
+                    memory["memory"],
+                    memory["category"],
+                    memory["importance"]
+                )
 
             return jsonify({
                 "success": True,
                 "type": "memory",
                 "action": "saved",
-                "memory": memory["memory"],
-                "category": memory["category"],
-                "importance": memory["importance"]
+                "memory":
+                    memory["memory"],
+                "category":
+                    memory["category"],
+                "importance":
+                    memory["importance"]
             })
 
         except Exception as e:
@@ -605,8 +872,24 @@ def chat():
             }), 500
 
 
-    email_requested = wants_email(user_message)
-    research_requested = wants_research(user_message)
+    email_requested = wants_email(
+        user_message
+    )
+
+    research_requested = wants_research(
+        user_message
+    )
+
+
+    # ==================================================
+    # AUTOMATIC MEMORY CHECK
+    # ==================================================
+
+    automatic_memory = (
+        maybe_save_automatic_memory(
+            user_message
+        )
+    )
 
 
     # ==================================================
@@ -617,16 +900,16 @@ def chat():
 
         try:
 
-            research = web_search(user_message)
-
-            summary = create_research_summary(
-                user_message,
-                research
+            research = web_search(
+                user_message
             )
 
-            # ------------------------------------------
-            # RESEARCH + EMAIL
-            # ------------------------------------------
+            summary = (
+                create_research_summary(
+                    user_message,
+                    research
+                )
+            )
 
             if email_requested:
 
@@ -634,65 +917,74 @@ def chat():
 
                     return jsonify({
                         "success": False,
-                        "error": (
-                            "TYLER_DEFAULT_EMAIL "
-                            "is not configured"
-                        )
+                        "error":
+                            "TYLER_DEFAULT_EMAIL is not configured"
                     }), 500
 
-                email = create_email_from_content(
-                    user_message,
-                    summary
+                email = (
+                    create_email_from_content(
+                        user_message,
+                        summary
+                    )
                 )
 
                 payload = {
                     "action": "email",
                     "data": {
-                        "to": TYLER_DEFAULT_EMAIL,
-                        "subject": email["subject"],
-                        "message": email["message"]
+                        "to":
+                            TYLER_DEFAULT_EMAIL,
+                        "subject":
+                            email["subject"],
+                        "message":
+                            email["message"]
                     }
                 }
 
-                n8n_result, status_code = send_to_n8n(
-                    payload
+                n8n_result, status_code = (
+                    send_to_n8n(payload)
                 )
 
-                if not n8n_result.get("success"):
+                if not n8n_result.get(
+                    "success"
+                ):
 
                     return jsonify({
                         "success": False,
                         "type": "action",
-                        "action": "research_and_email",
-                        "error": n8n_result
+                        "action":
+                            "research_and_email",
+                        "error":
+                            n8n_result
                     }), status_code
 
                 return jsonify({
                     "success": True,
                     "type": "action",
-                    "action": "research_and_email",
-                    "message": (
-                        "Research completed and "
-                        "email sent successfully."
-                    ),
-                    "to": TYLER_DEFAULT_EMAIL,
-                    "subject": email["subject"],
-                    "research_summary": summary,
-                    "sources": research["sources"]
+                    "action":
+                        "research_and_email",
+                    "message":
+                        "Research completed and email sent successfully.",
+                    "to":
+                        TYLER_DEFAULT_EMAIL,
+                    "subject":
+                        email["subject"],
+                    "research_summary":
+                        summary,
+                    "sources":
+                        research["sources"],
+                    "automatic_memory":
+                        automatic_memory
                 })
-
-
-            # ------------------------------------------
-            # RESEARCH ONLY
-            # ------------------------------------------
 
             return jsonify({
                 "success": True,
                 "type": "research",
                 "reply": summary,
-                "sources": research["sources"]
+                "sources":
+                    research["sources"],
+                "automatic_memory":
+                    automatic_memory
             })
-
 
         except Exception as e:
 
@@ -712,15 +1004,15 @@ def chat():
 
             return jsonify({
                 "success": False,
-                "error": (
-                    "TYLER_DEFAULT_EMAIL "
-                    "is not configured"
-                )
+                "error":
+                    "TYLER_DEFAULT_EMAIL is not configured"
             }), 500
 
         try:
 
-            context = memory_context(10)
+            context = memory_context(
+                12
+            )
 
             email_content = f"""
 User request:
@@ -730,42 +1022,54 @@ Relevant long-term memory:
 {context}
 """
 
-            email = create_email_from_content(
-                user_message,
-                email_content
+            email = (
+                create_email_from_content(
+                    user_message,
+                    email_content
+                )
             )
 
             payload = {
                 "action": "email",
                 "data": {
-                    "to": TYLER_DEFAULT_EMAIL,
-                    "subject": email["subject"],
-                    "message": email["message"]
+                    "to":
+                        TYLER_DEFAULT_EMAIL,
+                    "subject":
+                        email["subject"],
+                    "message":
+                        email["message"]
                 }
             }
 
-            n8n_result, status_code = send_to_n8n(
-                payload
+            n8n_result, status_code = (
+                send_to_n8n(payload)
             )
 
-            if not n8n_result.get("success"):
+            if not n8n_result.get(
+                "success"
+            ):
 
                 return jsonify({
                     "success": False,
                     "type": "action",
                     "action": "email",
-                    "error": n8n_result
+                    "error":
+                        n8n_result
                 }), status_code
 
             return jsonify({
                 "success": True,
                 "type": "action",
                 "action": "email",
-                "message": "Email sent successfully.",
-                "to": TYLER_DEFAULT_EMAIL,
-                "subject": email["subject"]
+                "message":
+                    "Email sent successfully.",
+                "to":
+                    TYLER_DEFAULT_EMAIL,
+                "subject":
+                    email["subject"],
+                "automatic_memory":
+                    automatic_memory
             })
-
 
         except Exception as e:
 
@@ -781,7 +1085,9 @@ Relevant long-term memory:
 
     try:
 
-        context = memory_context(10)
+        context = memory_context(
+            12
+        )
 
         reply = call_groq(
             [
@@ -791,25 +1097,29 @@ Relevant long-term memory:
 You are Tyler AI.
 
 You currently have these real tools:
+
 1. Live web research
 2. Email
 3. Persistent long-term memory
-4. General reasoning and conversation
+4. Automatic memory
+5. General reasoning
 
 Long-term memory:
+
 {context}
 
-Use memory only when relevant to the user's request.
+Use memory only when relevant.
 
-Never claim you performed an external action unless
-the application actually executed it.
+Never claim you performed an external action
+unless the application actually executed it.
 
 Be practical, concise, and useful.
 """
                 },
                 {
                     "role": "user",
-                    "content": user_message
+                    "content":
+                        user_message
                 }
             ]
         )
@@ -817,9 +1127,10 @@ Be practical, concise, and useful.
         return jsonify({
             "success": True,
             "type": "reply",
-            "reply": reply
+            "reply": reply,
+            "automatic_memory":
+                automatic_memory
         })
-
 
     except Exception as e:
 
@@ -843,7 +1154,12 @@ def webhook():
             "error": "Unauthorized"
         }), 401
 
-    data = request.get_json(silent=True) or {}
+    data = (
+        request.get_json(
+            silent=True
+        )
+        or {}
+    )
 
     if not data.get("action"):
 
@@ -852,9 +1168,13 @@ def webhook():
             "error": "Missing action"
         }), 400
 
-    result, status_code = send_to_n8n(data)
+    result, status_code = (
+        send_to_n8n(data)
+    )
 
-    return jsonify(result), status_code
+    return jsonify(
+        result
+    ), status_code
 
 
 # ==================================================
