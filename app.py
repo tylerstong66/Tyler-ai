@@ -5,8 +5,8 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 N8N_WEBHOOK_URL = os.environ.get("N8N_WEBHOOK_URL")
-
 TYLER_API_KEY = os.environ.get("TYLER_API_KEY")
+
 
 @app.route("/", methods=["GET"])
 def home():
@@ -16,19 +16,22 @@ def home():
         "n8n_connected": bool(N8N_WEBHOOK_URL)
     })
 
+
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "healthy"})
 
+
 @app.route("/webhook", methods=["POST"])
 def webhook():
-        provided_key = request.headers.get("X-Tyler-Key")
+    provided_key = request.headers.get("X-Tyler-Key")
 
     if not TYLER_API_KEY or provided_key != TYLER_API_KEY:
         return jsonify({
             "success": False,
             "error": "Unauthorized"
         }), 401
+
     if not N8N_WEBHOOK_URL:
         return jsonify({
             "success": False,
@@ -95,6 +98,7 @@ def webhook():
             "success": False,
             "error": str(e)
         }), 502
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
