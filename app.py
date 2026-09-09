@@ -65,7 +65,7 @@ def call_groq(messages, temperature=0.3):
 
 
 # ==================================================
-# SUPABASE MEMORY
+# SUPABASE
 # ==================================================
 
 def supabase_headers():
@@ -114,9 +114,6 @@ def update_memory(
     importance=5
 ):
 
-    if not SUPABASE_URL:
-        raise RuntimeError("SUPABASE_URL is not configured")
-
     response = requests.patch(
         f"{SUPABASE_URL}/rest/v1/memories",
         headers={
@@ -145,22 +142,16 @@ def update_memory(
 
 def get_memories(limit=50):
 
-    if not SUPABASE_URL:
-        raise RuntimeError("SUPABASE_URL is not configured")
-
     response = requests.get(
         f"{SUPABASE_URL}/rest/v1/memories",
         headers=supabase_headers(),
         params={
-            "select": (
-                "id,created_at,memories,"
-                "category,importance"
-            ),
-            "order": (
-                "importance.desc,"
-                "created_at.desc"
-            ),
-            "limit": limit
+            "select":
+                "id,created_at,memories,category,importance",
+            "order":
+                "importance.desc,created_at.desc",
+            "limit":
+                limit
         },
         timeout=30
     )
@@ -189,8 +180,7 @@ def memory_context(limit=12):
             f"- ID {item.get('id')} "
             f"[{item.get('category', 'general')}] "
             f"{item.get('memories', '')} "
-            f"(importance "
-            f"{item.get('importance', 5)})"
+            f"(importance {item.get('importance', 5)})"
         )
 
     return "\n".join(lines)
@@ -220,7 +210,7 @@ def wants_to_remember(message):
     )
 
 
-def create_memory_from_request(user_message):
+def extract_memory(user_message):
 
     prompt = f"""
 The user explicitly asked Tyler AI to remember something.
@@ -228,7 +218,7 @@ The user explicitly asked Tyler AI to remember something.
 User message:
 {user_message}
 
-Extract the useful durable information.
+Extract the durable useful information.
 
 Return ONLY valid JSON:
 
@@ -238,27 +228,23 @@ Return ONLY valid JSON:
   "importance": 5
 }}
 
-Importance must be an integer from 1 to 10.
+Importance must be 1 through 10.
 
-Do not store:
+Never store:
 - passwords
 - API keys
 - authentication tokens
 - credit card numbers
 - banking credentials
-- private security information
-
-Do not include markdown.
+- security secrets
 """
 
     raw = call_groq(
         [
             {
                 "role": "system",
-                "content": (
-                    "You extract concise long-term "
-                    "memories for an AI assistant."
-                )
+                "content":
+                    "You extract safe, useful long-term memories."
             },
             {
                 "role": "user",
@@ -282,15 +268,12 @@ Do not include markdown.
         )
 
         return {
-            "memory": result.get(
-                "memory",
-                user_message
-            ),
-            "category": result.get(
-                "category",
-                "general"
-            ),
-            "importance": importance
+            "memory":
+                result.get("memory", user_message),
+            "category":
+                result.get("category", "general"),
+            "importance":
+                importance
         }
 
     except Exception:
@@ -303,35 +286,32 @@ Do not include markdown.
 
 
 # ==================================================
-# AUTOMATIC MEMORY DETECTION
+# AUTOMATIC MEMORY
 # ==================================================
 
 def analyze_for_automatic_memory(user_message):
 
     prompt = f"""
-Decide whether this user message contains durable
-information worth saving in long-term memory.
+Determine whether this message contains durable
+information worth saving in Tyler AI long-term memory.
 
-User message:
+MESSAGE:
 {user_message}
 
-Save useful information such as:
+Good memory candidates include:
 - stable preferences
 - long-term goals
 - important projects
-- ongoing plans
 - career direction
 - recurring workflows
-- important decisions
-- durable personal context
+- durable decisions
+- ongoing plans
 
 Do NOT save:
-- casual conversation
-- one-time questions
-- temporary instructions
-- search queries
-- news requests
-- email commands
+- casual questions
+- temporary requests
+- news/search requests
+- email instructions
 - passwords
 - API keys
 - tokens
@@ -339,15 +319,15 @@ Do NOT save:
 - authentication information
 - private secrets
 
-Return ONLY valid JSON.
+Return ONLY JSON.
 
-If it should NOT be saved:
+No memory:
 
 {{
   "save": false
 }}
 
-If it SHOULD be saved:
+Save memory:
 
 {{
   "save": true,
@@ -355,18 +335,14 @@ If it SHOULD be saved:
   "category": "preference, project, person, task, goal, career, or general",
   "importance": 5
 }}
-
-Importance must be between 1 and 10.
 """
 
     raw = call_groq(
         [
             {
                 "role": "system",
-                "content": (
-                    "You are the memory manager "
-                    "for Tyler AI. Be selective."
-                )
+                "content":
+                    "You are Tyler AI's selective memory manager."
             },
             {
                 "role": "user",
@@ -400,12 +376,12 @@ Importance must be between 1 and 10.
         )
 
         return {
-            "memory": memory_text,
-            "category": result.get(
-                "category",
-                "general"
-            ),
-            "importance": importance
+            "memory":
+                memory_text,
+            "category":
+                result.get("category", "general"),
+            "importance":
+                importance
         }
 
     except Exception:
@@ -413,25 +389,23 @@ Importance must be between 1 and 10.
 
 
 # ==================================================
-# MEMORY MERGE / UPDATE DECISION
+# MEMORY CREATE / UPDATE / SKIP
 # ==================================================
 
 def decide_memory_action(candidate):
 
-    existing_memories = get_memories(50)
+    existing = get_memories(50)
 
-    if not existing_memories:
+    if not existing:
 
         return {
             "action": "create",
-            "memory": candidate["memory"],
-            "category": candidate["category"],
-            "importance": candidate["importance"]
+            **candidate
         }
 
     existing_text = ""
 
-    for item in existing_memories:
+    for item in existing:
 
         existing_text += f"""
 ID: {item.get("id")}
@@ -441,78 +415,70 @@ MEMORY: {item.get("memories")}
 """
 
     prompt = f"""
-Tyler AI has a new candidate memory.
+NEW CANDIDATE MEMORY:
 
-NEW MEMORY:
+Memory:
 {candidate["memory"]}
 
-NEW CATEGORY:
+Category:
 {candidate["category"]}
 
-NEW IMPORTANCE:
+Importance:
 {candidate["importance"]}
 
-Existing memories:
+EXISTING MEMORIES:
+
 {existing_text}
 
-Choose exactly one action:
+Choose one:
 
-1. "create"
-Use when the new memory is genuinely new.
+CREATE
+Use if this is genuinely new information.
 
-2. "update"
-Use when an existing memory refers to the same topic
-but the new information is more current, more specific,
-or meaningfully improves it.
+UPDATE
+Use if an existing memory covers the same subject
+and the new information improves or changes it.
 
-3. "skip"
-Use when the same information is already adequately stored.
+SKIP
+Use if the information is already adequately stored.
 
-Return ONLY valid JSON.
+Return ONLY JSON.
 
-For CREATE:
+CREATE:
 
 {{
   "action": "create",
-  "memory": "final memory text",
+  "memory": "final memory",
   "category": "category",
   "importance": 5
 }}
 
-For UPDATE:
+UPDATE:
 
 {{
   "action": "update",
-  "id": 123,
-  "memory": "merged or updated final memory text",
+  "id": 2,
+  "memory": "merged final memory",
   "category": "category",
   "importance": 5
 }}
 
-For SKIP:
+SKIP:
 
 {{
   "action": "skip",
   "reason": "already covered"
 }}
 
-Rules:
-- Never overwrite an unrelated memory.
-- Prefer update over create when two memories clearly
-  represent the same evolving preference, goal, or project.
-- Preserve useful older information when merging.
-- Importance must be 1 through 10.
+Never overwrite an unrelated memory.
 """
 
     raw = call_groq(
         [
             {
                 "role": "system",
-                "content": (
-                    "You manage long-term AI memory. "
-                    "Avoid duplicates and safely merge "
-                    "related memories."
-                )
+                "content":
+                    "You safely manage and deduplicate AI memory."
             },
             {
                 "role": "user",
@@ -535,10 +501,11 @@ Rules:
 
             return {
                 "action": "skip",
-                "reason": result.get(
-                    "reason",
-                    "already covered"
-                )
+                "reason":
+                    result.get(
+                        "reason",
+                        "already covered"
+                    )
             }
 
         if action == "update":
@@ -547,16 +514,14 @@ Rules:
 
             valid_ids = {
                 item.get("id")
-                for item in existing_memories
+                for item in existing
             }
 
             if memory_id not in valid_ids:
 
                 return {
                     "action": "create",
-                    "memory": candidate["memory"],
-                    "category": candidate["category"],
-                    "importance": candidate["importance"]
+                    **candidate
                 }
 
             importance = int(
@@ -574,15 +539,18 @@ Rules:
             return {
                 "action": "update",
                 "id": memory_id,
-                "memory": result.get(
-                    "memory",
-                    candidate["memory"]
-                ),
-                "category": result.get(
-                    "category",
-                    candidate["category"]
-                ),
-                "importance": importance
+                "memory":
+                    result.get(
+                        "memory",
+                        candidate["memory"]
+                    ),
+                "category":
+                    result.get(
+                        "category",
+                        candidate["category"]
+                    ),
+                "importance":
+                    importance
             }
 
         importance = int(
@@ -599,24 +567,25 @@ Rules:
 
         return {
             "action": "create",
-            "memory": result.get(
-                "memory",
-                candidate["memory"]
-            ),
-            "category": result.get(
-                "category",
-                candidate["category"]
-            ),
-            "importance": importance
+            "memory":
+                result.get(
+                    "memory",
+                    candidate["memory"]
+                ),
+            "category":
+                result.get(
+                    "category",
+                    candidate["category"]
+                ),
+            "importance":
+                importance
         }
 
     except Exception:
 
         return {
             "action": "create",
-            "memory": candidate["memory"],
-            "category": candidate["category"],
-            "importance": candidate["importance"]
+            **candidate
         }
 
 
@@ -626,20 +595,19 @@ def process_memory_candidate(candidate):
         candidate
     )
 
-    action = decision.get("action")
-
-    if action == "skip":
+    if decision["action"] == "skip":
 
         return {
             "saved": False,
             "action": "skip",
-            "reason": decision.get(
-                "reason",
-                "already covered"
-            )
+            "reason":
+                decision.get(
+                    "reason",
+                    "already covered"
+                )
         }
 
-    if action == "update":
+    if decision["action"] == "update":
 
         update_memory(
             decision["id"],
@@ -651,10 +619,14 @@ def process_memory_candidate(candidate):
         return {
             "saved": True,
             "action": "update",
-            "id": decision["id"],
-            "memory": decision["memory"],
-            "category": decision["category"],
-            "importance": decision["importance"]
+            "id":
+                decision["id"],
+            "memory":
+                decision["memory"],
+            "category":
+                decision["category"],
+            "importance":
+                decision["importance"]
         }
 
     save_memory(
@@ -666,22 +638,21 @@ def process_memory_candidate(candidate):
     return {
         "saved": True,
         "action": "create",
-        "memory": decision["memory"],
-        "category": decision["category"],
-        "importance": decision["importance"]
+        "memory":
+            decision["memory"],
+        "category":
+            decision["category"],
+        "importance":
+            decision["importance"]
     }
 
 
-def maybe_save_automatic_memory(
-    user_message
-):
+def maybe_save_automatic_memory(user_message):
 
     try:
 
-        candidate = (
-            analyze_for_automatic_memory(
-                user_message
-            )
+        candidate = analyze_for_automatic_memory(
+            user_message
         )
 
         if not candidate:
@@ -702,7 +673,7 @@ def maybe_save_automatic_memory(
 
 
 # ==================================================
-# TAVILY WEB SEARCH
+# TAVILY SEARCH
 # ==================================================
 
 def web_search(query):
@@ -742,22 +713,87 @@ def web_search(query):
     ):
 
         sources.append({
-            "title": item.get("title"),
-            "url": item.get("url"),
-            "content": item.get("content")
+            "title":
+                item.get("title"),
+            "url":
+                item.get("url"),
+            "content":
+                item.get("content")
         })
 
     return {
-        "answer": result.get(
-            "answer",
-            ""
-        ),
-        "sources": sources
+        "answer":
+            result.get("answer", ""),
+        "sources":
+            sources
     }
 
 
+def summarize_research(
+    user_request,
+    research
+):
+
+    source_text = ""
+
+    for index, source in enumerate(
+        research["sources"],
+        start=1
+    ):
+
+        source_text += f"""
+SOURCE {index}
+
+TITLE:
+{source.get("title")}
+
+URL:
+{source.get("url")}
+
+CONTENT:
+{source.get("content")}
+"""
+
+    prompt = f"""
+USER GOAL:
+
+{user_request}
+
+LIVE SEARCH RESULT:
+
+{research["answer"]}
+
+SOURCES:
+
+{source_text}
+
+Produce a useful research result.
+
+Rules:
+- Use the supplied sources.
+- Do not invent information.
+- Explain uncertainty where appropriate.
+- Include useful URLs when relevant.
+"""
+
+    return call_groq(
+        [
+            {
+                "role": "system",
+                "content":
+                    "You are Tyler AI's research analyst."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.2
+    )
+
+
 # ==================================================
-# N8N
+# N8N / EMAIL
 # ==================================================
 
 def send_to_n8n(payload):
@@ -779,7 +815,8 @@ def send_to_n8n(payload):
         )
 
         return {
-            "success": response.ok,
+            "success":
+                response.ok,
             "status_code":
                 response.status_code,
             "n8n_response":
@@ -794,154 +831,31 @@ def send_to_n8n(payload):
         }, 502
 
 
-# ==================================================
-# INTENT DETECTION
-# ==================================================
-
-def wants_email(message):
-
-    text = message.lower()
-
-    triggers = [
-        "email me",
-        "send me an email",
-        "send an email to me",
-        "email this to me",
-        "email that to me",
-        "email me a",
-        "email me the"
-    ]
-
-    return any(
-        trigger in text
-        for trigger in triggers
-    )
-
-
-def wants_research(message):
-
-    text = message.lower()
-
-    triggers = [
-        "research",
-        "search the web",
-        "search online",
-        "look online",
-        "look up",
-        "latest",
-        "current news",
-        "latest news",
-        "find information",
-        "find out"
-    ]
-
-    return any(
-        trigger in text
-        for trigger in triggers
-    )
-
-
-# ==================================================
-# RESEARCH SUMMARY
-# ==================================================
-
-def create_research_summary(
-    user_message,
-    research
-):
-
-    source_text = ""
-
-    for index, source in enumerate(
-        research["sources"],
-        start=1
-    ):
-
-        source_text += f"""
-SOURCE {index}
-Title: {source.get("title")}
-URL: {source.get("url")}
-Content: {source.get("content")}
-"""
+def create_email(subject_goal, content):
 
     prompt = f"""
-The user asked:
+Create an email from the following material.
 
-{user_message}
+GOAL:
+{subject_goal}
 
-Live web search returned:
-
-Tavily answer:
-{research["answer"]}
-
-Sources:
-{source_text}
-
-Create a useful, concise research report.
-
-Rules:
-- Base the response on supplied live results.
-- Do not invent facts.
-- Mention uncertainty when appropriate.
-- Include a short Sources section with URLs.
-"""
-
-    return call_groq(
-        [
-            {
-                "role": "system",
-                "content": (
-                    "You are Tyler AI. "
-                    "You analyze live web research."
-                )
-            },
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ],
-        temperature=0.2
-    )
-
-
-# ==================================================
-# EMAIL CREATION
-# ==================================================
-
-def create_email_from_content(
-    user_request,
-    content
-):
-
-    prompt = f"""
-The user requested:
-
-{user_request}
-
-Here is the content to use:
-
+CONTENT:
 {content}
-
-Create an email.
 
 Return ONLY valid JSON:
 
 {{
-  "subject": "short subject",
-  "message": "email body"
+  "subject": "short useful subject",
+  "message": "complete email body"
 }}
-
-Do not include markdown fences.
 """
 
     raw = call_groq(
         [
             {
                 "role": "system",
-                "content": (
-                    "You are Tyler AI. "
-                    "Create concise useful emails."
-                )
+                "content":
+                    "You create concise professional emails."
             },
             {
                 "role": "user",
@@ -956,17 +870,19 @@ Do not include markdown fences.
         result = json.loads(raw)
 
         return {
-            "subject": result.get(
-                "subject",
-                "Message from Tyler AI"
-            ),
-            "message": result.get(
-                "message",
-                content
-            )
+            "subject":
+                result.get(
+                    "subject",
+                    "Message from Tyler AI"
+                ),
+            "message":
+                result.get(
+                    "message",
+                    content
+                )
         }
 
-    except json.JSONDecodeError:
+    except Exception:
 
         return {
             "subject":
@@ -974,6 +890,454 @@ Do not include markdown fences.
             "message":
                 content
         }
+
+
+def send_email(subject_goal, content):
+
+    if not TYLER_DEFAULT_EMAIL:
+
+        raise RuntimeError(
+            "TYLER_DEFAULT_EMAIL is not configured"
+        )
+
+    email = create_email(
+        subject_goal,
+        content
+    )
+
+    payload = {
+        "action": "email",
+        "data": {
+            "to":
+                TYLER_DEFAULT_EMAIL,
+            "subject":
+                email["subject"],
+            "message":
+                email["message"]
+        }
+    }
+
+    result, status_code = send_to_n8n(
+        payload
+    )
+
+    if not result.get("success"):
+
+        raise RuntimeError(
+            f"Email action failed: {result}"
+        )
+
+    return {
+        "sent": True,
+        "to":
+            TYLER_DEFAULT_EMAIL,
+        "subject":
+            email["subject"]
+    }
+
+
+# ==================================================
+# TYLER PLANNER
+# ==================================================
+
+def create_plan(user_message, memories):
+
+    prompt = f"""
+You are the planning system for Tyler AI.
+
+USER REQUEST:
+
+{user_message}
+
+RELEVANT LONG-TERM MEMORY:
+
+{memories}
+
+Tyler currently has these executable tools:
+
+1. research_web
+   Searches the live internet.
+
+2. reason
+   Analyzes, compares, ranks, summarizes, or decides
+   using available information.
+
+3. send_email
+   Sends an email to the user's configured address.
+
+Your job is to create the smallest useful plan required
+to satisfy the user's request.
+
+Return ONLY valid JSON.
+
+Format:
+
+{{
+  "goal": "short description of the user's goal",
+  "steps": [
+    {{
+      "tool": "research_web",
+      "instruction": "specific instruction"
+    }},
+    {{
+      "tool": "reason",
+      "instruction": "specific analysis to perform"
+    }},
+    {{
+      "tool": "send_email",
+      "instruction": "what should be emailed"
+    }}
+  ]
+}}
+
+Rules:
+
+- Use only the listed tools.
+- Do not invent tools.
+- Do not add email unless the user asked to email something.
+- Use research_web when current internet information is needed.
+- Use reason for analysis, rankings, synthesis, comparisons,
+  recommendations, or normal conversational responses.
+- A simple question may need only one reason step.
+- A complex request may require multiple steps.
+- Maximum 6 steps.
+"""
+
+    raw = call_groq(
+        [
+            {
+                "role": "system",
+                "content":
+                    "You are Tyler AI Planner. "
+                    "Create executable, minimal plans."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.1
+    )
+
+    try:
+
+        plan = json.loads(raw)
+
+        steps = plan.get(
+            "steps",
+            []
+        )
+
+        allowed_tools = {
+            "research_web",
+            "reason",
+            "send_email"
+        }
+
+        cleaned_steps = []
+
+        for step in steps[:6]:
+
+            tool = step.get("tool")
+
+            if tool not in allowed_tools:
+                continue
+
+            cleaned_steps.append({
+                "tool":
+                    tool,
+                "instruction":
+                    str(
+                        step.get(
+                            "instruction",
+                            ""
+                        )
+                    )
+            })
+
+        if not cleaned_steps:
+
+            cleaned_steps = [
+                {
+                    "tool": "reason",
+                    "instruction":
+                        user_message
+                }
+            ]
+
+        return {
+            "goal":
+                plan.get(
+                    "goal",
+                    user_message
+                ),
+            "steps":
+                cleaned_steps
+        }
+
+    except Exception:
+
+        return {
+            "goal":
+                user_message,
+            "steps": [
+                {
+                    "tool": "reason",
+                    "instruction":
+                        user_message
+                }
+            ]
+        }
+
+
+# ==================================================
+# REASONING TOOL
+# ==================================================
+
+def reasoning_step(
+    user_message,
+    instruction,
+    memory_text,
+    working_context
+):
+
+    prompt = f"""
+ORIGINAL USER REQUEST:
+
+{user_message}
+
+CURRENT STEP:
+
+{instruction}
+
+LONG-TERM MEMORY:
+
+{memory_text}
+
+RESULTS FROM PREVIOUS STEPS:
+
+{working_context}
+
+Perform the requested reasoning step.
+
+Be practical and concrete.
+Do not claim you performed external actions.
+"""
+
+    return call_groq(
+        [
+            {
+                "role": "system",
+                "content":
+                    "You are Tyler AI's reasoning engine."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.25
+    )
+
+
+# ==================================================
+# PLAN EXECUTOR
+# ==================================================
+
+def execute_plan(
+    user_message,
+    plan,
+    memory_text
+):
+
+    results = []
+
+    working_context = ""
+
+    for number, step in enumerate(
+        plan["steps"],
+        start=1
+    ):
+
+        tool = step["tool"]
+
+        instruction = step["instruction"]
+
+        # ------------------------------------------
+        # WEB RESEARCH
+        # ------------------------------------------
+
+        if tool == "research_web":
+
+            research = web_search(
+                instruction
+            )
+
+            research_summary = summarize_research(
+                instruction,
+                research
+            )
+
+            step_result = {
+                "step":
+                    number,
+                "tool":
+                    tool,
+                "instruction":
+                    instruction,
+                "result":
+                    research_summary,
+                "sources":
+                    research["sources"]
+            }
+
+            results.append(
+                step_result
+            )
+
+            working_context += f"""
+
+STEP {number} RESEARCH RESULT:
+
+{research_summary}
+"""
+
+        # ------------------------------------------
+        # REASON
+        # ------------------------------------------
+
+        elif tool == "reason":
+
+            reasoning = reasoning_step(
+                user_message,
+                instruction,
+                memory_text,
+                working_context
+            )
+
+            step_result = {
+                "step":
+                    number,
+                "tool":
+                    tool,
+                "instruction":
+                    instruction,
+                "result":
+                    reasoning
+            }
+
+            results.append(
+                step_result
+            )
+
+            working_context += f"""
+
+STEP {number} REASONING RESULT:
+
+{reasoning}
+"""
+
+        # ------------------------------------------
+        # EMAIL
+        # ------------------------------------------
+
+        elif tool == "send_email":
+
+            if not working_context.strip():
+
+                content = user_message
+
+            else:
+
+                content = working_context
+
+            email_result = send_email(
+                instruction,
+                content
+            )
+
+            step_result = {
+                "step":
+                    number,
+                "tool":
+                    tool,
+                "instruction":
+                    instruction,
+                "result":
+                    email_result
+            }
+
+            results.append(
+                step_result
+            )
+
+            working_context += f"""
+
+STEP {number} EMAIL RESULT:
+
+Email sent to {email_result["to"]}
+Subject: {email_result["subject"]}
+"""
+
+    return {
+        "results":
+            results,
+        "working_context":
+            working_context
+    }
+
+
+# ==================================================
+# FINAL RESPONSE
+# ==================================================
+
+def create_final_response(
+    user_message,
+    plan,
+    execution
+):
+
+    prompt = f"""
+USER REQUEST:
+
+{user_message}
+
+PLAN:
+
+{json.dumps(plan, indent=2)}
+
+EXECUTION RESULTS:
+
+{execution["working_context"]}
+
+Give the user the final answer.
+
+Rules:
+
+- Clearly answer the original request.
+- Mention completed external actions only if they
+  actually appear in the execution results.
+- If research was performed, summarize the useful findings.
+- If email was sent, say that it was sent.
+- Do not expose internal planning prompts.
+- Be concise but useful.
+"""
+
+    return call_groq(
+        [
+            {
+                "role": "system",
+                "content":
+                    "You are Tyler AI. "
+                    "Report the outcome of completed work."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.25
+    )
 
 
 # ==================================================
@@ -984,8 +1348,11 @@ Do not include markdown fences.
 def home():
 
     return jsonify({
-        "name": "Tyler AI",
-        "status": "online",
+        "name":
+            "Tyler AI",
+
+        "status":
+            "online",
 
         "groq_connected":
             bool(GROQ_API_KEY),
@@ -1002,14 +1369,15 @@ def home():
                 and SUPABASE_KEY
             ),
 
+        "planner_enabled":
+            True,
+
         "secured":
             bool(TYLER_API_KEY),
 
-        "default_email_configured":
-            bool(TYLER_DEFAULT_EMAIL),
-
         "tools": [
-            "chat",
+            "planner",
+            "reason",
             "web_research",
             "email",
             "long_term_memory",
@@ -1032,7 +1400,7 @@ def health():
 
 
 # ==================================================
-# MEMORY ENDPOINT
+# MEMORIES
 # ==================================================
 
 @app.route("/memories", methods=["GET"])
@@ -1051,8 +1419,10 @@ def memories_route():
 
         return jsonify({
             "success": True,
-            "count": len(memories),
-            "memories": memories
+            "count":
+                len(memories),
+            "memories":
+                memories
         })
 
     except Exception as e:
@@ -1077,12 +1447,9 @@ def chat():
             "error": "Unauthorized"
         }), 401
 
-    data = (
-        request.get_json(
-            silent=True
-        )
-        or {}
-    )
+    data = request.get_json(
+        silent=True
+    ) or {}
 
     user_message = data.get(
         "message"
@@ -1096,9 +1463,9 @@ def chat():
         }), 400
 
 
-    # ==================================================
+    # ----------------------------------------------
     # EXPLICIT MEMORY
-    # ==================================================
+    # ----------------------------------------------
 
     if wants_to_remember(
         user_message
@@ -1106,13 +1473,11 @@ def chat():
 
         try:
 
-            candidate = (
-                create_memory_from_request(
-                    user_message
-                )
+            candidate = extract_memory(
+                user_message
             )
 
-            result = (
+            memory_result = (
                 process_memory_candidate(
                     candidate
                 )
@@ -1121,7 +1486,8 @@ def chat():
             return jsonify({
                 "success": True,
                 "type": "memory",
-                "memory_result": result
+                "memory_result":
+                    memory_result
             })
 
         except Exception as e:
@@ -1132,18 +1498,9 @@ def chat():
             }), 500
 
 
-    email_requested = wants_email(
-        user_message
-    )
-
-    research_requested = wants_research(
-        user_message
-    )
-
-
-    # ==================================================
+    # ----------------------------------------------
     # AUTOMATIC MEMORY
-    # ==================================================
+    # ----------------------------------------------
 
     automatic_memory = (
         maybe_save_automatic_memory(
@@ -1152,257 +1509,111 @@ def chat():
     )
 
 
-    # ==================================================
-    # RESEARCH
-    # ==================================================
-
-    if research_requested:
-
-        try:
-
-            research = web_search(
-                user_message
-            )
-
-            summary = (
-                create_research_summary(
-                    user_message,
-                    research
-                )
-            )
-
-            if email_requested:
-
-                if not TYLER_DEFAULT_EMAIL:
-
-                    return jsonify({
-                        "success": False,
-                        "error":
-                            "TYLER_DEFAULT_EMAIL is not configured"
-                    }), 500
-
-                email = (
-                    create_email_from_content(
-                        user_message,
-                        summary
-                    )
-                )
-
-                payload = {
-                    "action": "email",
-                    "data": {
-                        "to":
-                            TYLER_DEFAULT_EMAIL,
-                        "subject":
-                            email["subject"],
-                        "message":
-                            email["message"]
-                    }
-                }
-
-                n8n_result, status_code = (
-                    send_to_n8n(payload)
-                )
-
-                if not n8n_result.get(
-                    "success"
-                ):
-
-                    return jsonify({
-                        "success": False,
-                        "type": "action",
-                        "action":
-                            "research_and_email",
-                        "error":
-                            n8n_result
-                    }), status_code
-
-                return jsonify({
-                    "success": True,
-                    "type": "action",
-                    "action":
-                        "research_and_email",
-                    "message":
-                        "Research completed and email sent successfully.",
-                    "to":
-                        TYLER_DEFAULT_EMAIL,
-                    "subject":
-                        email["subject"],
-                    "research_summary":
-                        summary,
-                    "sources":
-                        research["sources"],
-                    "automatic_memory":
-                        automatic_memory
-                })
-
-            return jsonify({
-                "success": True,
-                "type": "research",
-                "reply": summary,
-                "sources":
-                    research["sources"],
-                "automatic_memory":
-                    automatic_memory
-            })
-
-        except Exception as e:
-
-            return jsonify({
-                "success": False,
-                "error": str(e)
-            }), 500
-
-
-    # ==================================================
-    # EMAIL ONLY
-    # ==================================================
-
-    if email_requested:
-
-        if not TYLER_DEFAULT_EMAIL:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "TYLER_DEFAULT_EMAIL is not configured"
-            }), 500
-
-        try:
-
-            context = memory_context(
-                12
-            )
-
-            email_content = f"""
-User request:
-{user_message}
-
-Long-term memory:
-{context}
-"""
-
-            email = (
-                create_email_from_content(
-                    user_message,
-                    email_content
-                )
-            )
-
-            payload = {
-                "action": "email",
-                "data": {
-                    "to":
-                        TYLER_DEFAULT_EMAIL,
-                    "subject":
-                        email["subject"],
-                    "message":
-                        email["message"]
-                }
-            }
-
-            n8n_result, status_code = (
-                send_to_n8n(payload)
-            )
-
-            if not n8n_result.get(
-                "success"
-            ):
-
-                return jsonify({
-                    "success": False,
-                    "type": "action",
-                    "action": "email",
-                    "error":
-                        n8n_result
-                }), status_code
-
-            return jsonify({
-                "success": True,
-                "type": "action",
-                "action": "email",
-                "message":
-                    "Email sent successfully.",
-                "to":
-                    TYLER_DEFAULT_EMAIL,
-                "subject":
-                    email["subject"],
-                "automatic_memory":
-                    automatic_memory
-            })
-
-        except Exception as e:
-
-            return jsonify({
-                "success": False,
-                "error": str(e)
-            }), 500
-
-
-    # ==================================================
-    # NORMAL CHAT WITH MEMORY
-    # ==================================================
+    # ----------------------------------------------
+    # GET MEMORY CONTEXT
+    # ----------------------------------------------
 
     try:
 
-        context = memory_context(
+        memory_text = memory_context(
             12
         )
 
-        reply = call_groq(
-            [
-                {
-                    "role": "system",
-                    "content": f"""
-You are Tyler AI.
+    except Exception:
 
-You currently have these real capabilities:
-
-1. Live web research
-2. Email
-3. Persistent long-term memory
-4. Automatic memory creation
-5. Memory merging and updating
-6. General reasoning
-
-Long-term memory:
-
-{context}
-
-Use memory only when relevant.
-
-Never claim you performed an external action
-unless the application actually executed it.
-
-Be practical, concise, and useful.
-"""
-                },
-                {
-                    "role": "user",
-                    "content":
-                        user_message
-                }
-            ]
+        memory_text = (
+            "Long-term memory temporarily unavailable."
         )
 
-        return jsonify({
-            "success": True,
-            "type": "reply",
-            "reply": reply,
-            "automatic_memory":
-                automatic_memory
-        })
+
+    # ----------------------------------------------
+    # CREATE PLAN
+    # ----------------------------------------------
+
+    try:
+
+        plan = create_plan(
+            user_message,
+            memory_text
+        )
 
     except Exception as e:
 
         return jsonify({
             "success": False,
-            "error": str(e)
+            "error":
+                f"Planner failed: {str(e)}"
         }), 500
 
 
+    # ----------------------------------------------
+    # EXECUTE PLAN
+    # ----------------------------------------------
+
+    try:
+
+        execution = execute_plan(
+            user_message,
+            plan,
+            memory_text
+        )
+
+    except Exception as e:
+
+        return jsonify({
+            "success": False,
+            "plan":
+                plan,
+            "error":
+                f"Plan execution failed: {str(e)}"
+        }), 500
+
+
+    # ----------------------------------------------
+    # FINAL RESPONSE
+    # ----------------------------------------------
+
+    try:
+
+        final_reply = create_final_response(
+            user_message,
+            plan,
+            execution
+        )
+
+    except Exception:
+
+        final_reply = (
+            execution["working_context"]
+        )
+
+
+    return jsonify({
+        "success":
+            True,
+
+        "type":
+            "planned_execution",
+
+        "goal":
+            plan["goal"],
+
+        "plan":
+            plan["steps"],
+
+        "execution":
+            execution["results"],
+
+        "reply":
+            final_reply,
+
+        "automatic_memory":
+            automatic_memory
+    })
+
+
 # ==================================================
-# DIRECT N8N ACTION ENDPOINT
+# DIRECT N8N WEBHOOK
 # ==================================================
 
 @app.route("/webhook", methods=["POST"])
@@ -1415,12 +1626,9 @@ def webhook():
             "error": "Unauthorized"
         }), 401
 
-    data = (
-        request.get_json(
-            silent=True
-        )
-        or {}
-    )
+    data = request.get_json(
+        silent=True
+    ) or {}
 
     if not data.get("action"):
 
@@ -1429,8 +1637,8 @@ def webhook():
             "error": "Missing action"
         }), 400
 
-    result, status_code = (
-        send_to_n8n(data)
+    result, status_code = send_to_n8n(
+        data
     )
 
     return jsonify(
@@ -1454,4 +1662,4 @@ if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
         port=port
-            )
+        )
