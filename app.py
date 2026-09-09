@@ -15,6 +15,9 @@ GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY")
 TYLER_DEFAULT_EMAIL = os.environ.get("TYLER_DEFAULT_EMAIL")
 
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+
 
 # ==================================================
 # SECURITY
@@ -59,6 +62,169 @@ def call_groq(messages, temperature=0.3):
         raise RuntimeError(str(result))
 
     return result["choices"][0]["message"]["content"].strip()
+
+
+# ==================================================
+# SUPABASE MEMORY
+# ==================================================
+
+def supabase_headers():
+    if not SUPABASE_KEY:
+        raise RuntimeError("SUPABASE_KEY is not configured")
+
+    return {
+        "apikey": SUPABASE_KEY,
+        "Content-Type": "application/json"
+    }
+
+
+def save_memory(memory_text, category="general", importance=5):
+
+    if not SUPABASE_URL:
+        raise RuntimeError("SUPABASE_URL is not configured")
+
+    response = requests.post(
+        f"{SUPABASE_URL}/rest/v1/memories",
+        headers={
+            **supabase_headers(),
+            "Prefer": "return=representation"
+        },
+        json={
+            "memories": memory_text,
+            "category": category,
+            "importance": importance
+        },
+        timeout=30
+    )
+
+    if not response.ok:
+        raise RuntimeError(
+            f"Supabase save failed: "
+            f"{response.status_code} {response.text}"
+        )
+
+    return response.json()
+
+
+def get_memories(limit=10):
+
+    if not SUPABASE_URL:
+        raise RuntimeError("SUPABASE_URL is not configured")
+
+    response = requests.get(
+        f"{SUPABASE_URL}/rest/v1/memories",
+        headers=supabase_headers(),
+        params={
+            "select": "id,created_at,memories,category,importance",
+            "order": "importance.desc,created_at.desc",
+            "limit": limit
+        },
+        timeout=30
+    )
+
+    if not response.ok:
+        raise RuntimeError(
+            f"Supabase read failed: "
+            f"{response.status_code} {response.text}"
+        )
+
+    return response.json()
+
+
+def memory_context(limit=10):
+
+    memories = get_memories(limit)
+
+    if not memories:
+        return "No saved long-term memories yet."
+
+    lines = []
+
+    for item in memories:
+        lines.append(
+            f"- [{item.get('category', 'general')}] "
+            f"{item.get('memories', '')} "
+            f"(importance {item.get('importance', 5)})"
+        )
+
+    return "\n".join(lines)
+
+
+def wants_to_remember(message):
+
+    text = message.lower()
+
+    triggers = [
+        "remember that",
+        "remember this",
+        "save this",
+        "save that",
+        "add this to memory",
+        "store this",
+        "don't forget"
+    ]
+
+    return any(trigger in text for trigger in triggers)
+
+
+def create_memory_from_request(user_message):
+
+    prompt = f"""
+The user asked Tyler AI to remember something.
+
+User message:
+{user_message}
+
+Extract the useful long-term fact or preference.
+
+Return ONLY valid JSON:
+
+{{
+  "memory": "concise memory",
+  "category": "preference, project, person, task, goal, or general",
+  "importance": 1
+}}
+
+Importance must be an integer from 1 to 10.
+
+Do not include markdown.
+"""
+
+    raw = call_groq(
+        [
+            {
+                "role": "system",
+                "content": (
+                    "You extract concise long-term memories "
+                    "for an AI assistant."
+                )
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.1
+    )
+
+    try:
+        result = json.loads(raw)
+
+        importance = int(result.get("importance", 5))
+        importance = max(1, min(10, importance))
+
+        return {
+            "memory": result.get("memory", user_message),
+            "category": result.get("category", "general"),
+            "importance": importance
+        }
+
+    except Exception:
+        return {
+            "memory": user_message,
+            "category": "general",
+            "importance": 5
+        }
 
 
 # ==================================================
@@ -188,8 +354,10 @@ def create_research_summary(user_message, research):
 
     source_text = ""
 
-    for index, source in enumerate(research["sources"], start=1):
-
+    for index, source in enumerate(
+        research["sources"],
+        start=1
+    ):
         source_text += f"""
 SOURCE {index}
 Title: {source.get("title")}
@@ -213,10 +381,10 @@ Sources:
 Create a useful, concise research report.
 
 Rules:
-- Base the response on the supplied live search results.
+- Base the response on supplied live results.
 - Do not invent facts.
 - Mention uncertainty when appropriate.
-- Include a short Sources section with the URLs.
+- Include a short Sources section with URLs.
 """
 
     return call_groq(
@@ -225,7 +393,7 @@ Rules:
                 "role": "system",
                 "content": (
                     "You are Tyler AI. "
-                    "You analyze live web research and produce clear reports."
+                    "You analyze live web research."
                 )
             },
             {
@@ -270,7 +438,7 @@ Do not include markdown fences.
                 "role": "system",
                 "content": (
                     "You are Tyler AI. "
-                    "Create concise, useful emails."
+                    "Create concise useful emails."
                 )
             },
             {
@@ -317,12 +485,18 @@ def home():
         "groq_connected": bool(GROQ_API_KEY),
         "tavily_connected": bool(TAVILY_API_KEY),
         "n8n_connected": bool(N8N_WEBHOOK_URL),
+        "memory_connected": bool(
+            SUPABASE_URL and SUPABASE_KEY
+        ),
         "secured": bool(TYLER_API_KEY),
-        "default_email_configured": bool(TYLER_DEFAULT_EMAIL),
+        "default_email_configured": bool(
+            TYLER_DEFAULT_EMAIL
+        ),
         "tools": [
             "chat",
             "web_research",
-            "email"
+            "email",
+            "long_term_memory"
         ]
     })
 
@@ -337,6 +511,37 @@ def health():
     return jsonify({
         "status": "healthy"
     })
+
+
+# ==================================================
+# MEMORY ENDPOINT
+# ==================================================
+
+@app.route("/memories", methods=["GET"])
+def memories_route():
+
+    if not authorized():
+        return jsonify({
+            "success": False,
+            "error": "Unauthorized"
+        }), 401
+
+    try:
+
+        memories = get_memories(25)
+
+        return jsonify({
+            "success": True,
+            "count": len(memories),
+            "memories": memories
+        })
+
+    except Exception as e:
+
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
 
 
 # ==================================================
@@ -363,6 +568,41 @@ def chat():
             "success": False,
             "error": "Missing message"
         }), 400
+
+
+    # ==================================================
+    # SAVE MEMORY
+    # ==================================================
+
+    if wants_to_remember(user_message):
+
+        try:
+
+            memory = create_memory_from_request(
+                user_message
+            )
+
+            save_memory(
+                memory["memory"],
+                memory["category"],
+                memory["importance"]
+            )
+
+            return jsonify({
+                "success": True,
+                "type": "memory",
+                "action": "saved",
+                "memory": memory["memory"],
+                "category": memory["category"],
+                "importance": memory["importance"]
+            })
+
+        except Exception as e:
+
+            return jsonify({
+                "success": False,
+                "error": str(e)
+            }), 500
 
 
     email_requested = wants_email(user_message)
@@ -480,9 +720,19 @@ def chat():
 
         try:
 
+            context = memory_context(10)
+
+            email_content = f"""
+User request:
+{user_message}
+
+Relevant long-term memory:
+{context}
+"""
+
             email = create_email_from_content(
                 user_message,
-                user_message
+                email_content
             )
 
             payload = {
@@ -526,25 +776,33 @@ def chat():
 
 
     # ==================================================
-    # NORMAL CHAT
+    # NORMAL CHAT WITH MEMORY
     # ==================================================
 
     try:
+
+        context = memory_context(10)
 
         reply = call_groq(
             [
                 {
                     "role": "system",
-                    "content": """
+                    "content": f"""
 You are Tyler AI.
 
 You currently have these real tools:
 1. Live web research
 2. Email
-3. General reasoning and conversation
+3. Persistent long-term memory
+4. General reasoning and conversation
+
+Long-term memory:
+{context}
+
+Use memory only when relevant to the user's request.
 
 Never claim you performed an external action unless
-the application actually executed that action.
+the application actually executed it.
 
 Be practical, concise, and useful.
 """
