@@ -1,26 +1,28 @@
-import os
+ import os
 import json
 import requests
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# --------------------------------------------------
+# ==================================================
 # ENVIRONMENT VARIABLES
-# --------------------------------------------------
+# ==================================================
 
 N8N_WEBHOOK_URL = os.environ.get("N8N_WEBHOOK_URL")
 TYLER_API_KEY = os.environ.get("TYLER_API_KEY")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY")
 TYLER_DEFAULT_EMAIL = os.environ.get("TYLER_DEFAULT_EMAIL")
 
 
-# --------------------------------------------------
-# HELPERS
-# --------------------------------------------------
+# ==================================================
+# SECURITY
+# ==================================================
 
 def authorized():
     provided_key = request.headers.get("X-Tyler-Key")
+
     return bool(
         TYLER_API_KEY
         and provided_key
@@ -28,7 +30,12 @@ def authorized():
     )
 
 
+# ==================================================
+# GROQ
+# ==================================================
+
 def call_groq(messages, temperature=0.3):
+
     if not GROQ_API_KEY:
         raise RuntimeError("GROQ_API_KEY is not configured")
 
@@ -43,7 +50,7 @@ def call_groq(messages, temperature=0.3):
             "temperature": temperature,
             "messages": messages
         },
-        timeout=60
+        timeout=90
     )
 
     result = response.json()
@@ -54,7 +61,56 @@ def call_groq(messages, temperature=0.3):
     return result["choices"][0]["message"]["content"].strip()
 
 
+# ==================================================
+# TAVILY WEB SEARCH
+# ==================================================
+
+def web_search(query):
+
+    if not TAVILY_API_KEY:
+        raise RuntimeError("TAVILY_API_KEY is not configured")
+
+    response = requests.post(
+        "https://api.tavily.com/search",
+        headers={
+            "Authorization": f"Bearer {TAVILY_API_KEY}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "query": query,
+            "search_depth": "basic",
+            "include_answer": True,
+            "max_results": 5
+        },
+        timeout=60
+    )
+
+    result = response.json()
+
+    if not response.ok:
+        raise RuntimeError(str(result))
+
+    sources = []
+
+    for item in result.get("results", []):
+        sources.append({
+            "title": item.get("title"),
+            "url": item.get("url"),
+            "content": item.get("content")
+        })
+
+    return {
+        "answer": result.get("answer", ""),
+        "sources": sources
+    }
+
+
+# ==================================================
+# N8N
+# ==================================================
+
 def send_to_n8n(payload):
+
     if not N8N_WEBHOOK_URL:
         return {
             "success": False,
@@ -62,6 +118,7 @@ def send_to_n8n(payload):
         }, 500
 
     try:
+
         response = requests.post(
             N8N_WEBHOOK_URL,
             json=payload,
@@ -75,13 +132,19 @@ def send_to_n8n(payload):
         }, response.status_code
 
     except requests.RequestException as e:
+
         return {
             "success": False,
             "error": str(e)
         }, 502
 
 
-def is_email_me_request(message):
+# ==================================================
+# INTENT DETECTION
+# ==================================================
+
+def wants_email(message):
+
     text = message.lower()
 
     triggers = [
@@ -89,124 +152,338 @@ def is_email_me_request(message):
         "send me an email",
         "send an email to me",
         "email this to me",
-        "email that to me"
+        "email that to me",
+        "email me a",
+        "email me the"
     ]
 
     return any(trigger in text for trigger in triggers)
 
 
-def create_email_from_request(user_message):
-    system_prompt = """
-You are Tyler AI.
+def wants_research(message):
 
-The user wants you to send them an email.
+    text = message.lower()
 
-Create a concise email based on the user's request.
+    triggers = [
+        "research",
+        "search the web",
+        "search online",
+        "look online",
+        "look up",
+        "latest",
+        "current news",
+        "latest news",
+        "find information",
+        "find out"
+    ]
 
-Return ONLY valid JSON in this exact structure:
+    return any(trigger in text for trigger in triggers)
 
-{
-  "subject": "email subject",
+
+# ==================================================
+# RESEARCH SUMMARY
+# ==================================================
+
+def create_research_summary(user_message, research):
+
+    source_text = ""
+
+    for index, source in enumerate(research["sources"], start=1):
+
+        source_text += f"""
+SOURCE {index}
+Title: {source.get("title")}
+URL: {source.get("url")}
+Content: {source.get("content")}
+"""
+
+    prompt = f"""
+The user asked:
+
+{user_message}
+
+Live web search returned:
+
+Tavily answer:
+{research["answer"]}
+
+Sources:
+{source_text}
+
+Create a useful, concise research report.
+
+Rules:
+- Base the response on the supplied live search results.
+- Do not invent facts.
+- Mention uncertainty when appropriate.
+- Include a short Sources section with the URLs.
+"""
+
+    return call_groq(
+        [
+            {
+                "role": "system",
+                "content": (
+                    "You are Tyler AI. "
+                    "You analyze live web research and produce clear reports."
+                )
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.2
+    )
+
+
+# ==================================================
+# EMAIL CREATION
+# ==================================================
+
+def create_email_from_content(user_request, content):
+
+    prompt = f"""
+The user requested:
+
+{user_request}
+
+Here is the content to use:
+
+{content}
+
+Create an email.
+
+Return ONLY valid JSON:
+
+{{
+  "subject": "short subject",
   "message": "email body"
-}
+}}
 
-Do not include markdown.
-Do not include explanations.
-Do not say you cannot send email.
+Do not include markdown fences.
 """
 
     raw = call_groq(
         [
             {
                 "role": "system",
-                "content": system_prompt
+                "content": (
+                    "You are Tyler AI. "
+                    "Create concise, useful emails."
+                )
             },
             {
                 "role": "user",
-                "content": user_message
+                "content": prompt
             }
         ],
         temperature=0.2
     )
 
     try:
+
         result = json.loads(raw)
 
         return {
-            "subject": result.get("subject", "Message from Tyler AI"),
-            "message": result.get("message", raw)
+            "subject": result.get(
+                "subject",
+                "Message from Tyler AI"
+            ),
+            "message": result.get(
+                "message",
+                content
+            )
         }
 
     except json.JSONDecodeError:
+
         return {
             "subject": "Message from Tyler AI",
-            "message": raw
+            "message": content
         }
 
 
-# --------------------------------------------------
+# ==================================================
 # HOME
-# --------------------------------------------------
+# ==================================================
 
 @app.route("/", methods=["GET"])
 def home():
+
     return jsonify({
         "name": "Tyler AI",
         "status": "online",
         "groq_connected": bool(GROQ_API_KEY),
+        "tavily_connected": bool(TAVILY_API_KEY),
         "n8n_connected": bool(N8N_WEBHOOK_URL),
         "secured": bool(TYLER_API_KEY),
-        "default_email_configured": bool(TYLER_DEFAULT_EMAIL)
+        "default_email_configured": bool(TYLER_DEFAULT_EMAIL),
+        "tools": [
+            "chat",
+            "web_research",
+            "email"
+        ]
     })
 
 
-# --------------------------------------------------
+# ==================================================
 # HEALTH
-# --------------------------------------------------
+# ==================================================
 
 @app.route("/health", methods=["GET"])
 def health():
+
     return jsonify({
         "status": "healthy"
     })
 
 
-# --------------------------------------------------
+# ==================================================
 # CHAT + TOOL USE
-# --------------------------------------------------
+# ==================================================
 
 @app.route("/chat", methods=["POST"])
 def chat():
 
     if not authorized():
+
         return jsonify({
             "success": False,
             "error": "Unauthorized"
         }), 401
 
     data = request.get_json(silent=True) or {}
+
     user_message = data.get("message")
 
     if not user_message:
+
         return jsonify({
             "success": False,
             "error": "Missing message"
         }), 400
 
-    # --------------------------------------------------
-    # EMAIL ME TOOL
-    # --------------------------------------------------
 
-    if is_email_me_request(user_message):
+    email_requested = wants_email(user_message)
+    research_requested = wants_research(user_message)
 
-        if not TYLER_DEFAULT_EMAIL:
+
+    # ==================================================
+    # RESEARCH
+    # ==================================================
+
+    if research_requested:
+
+        try:
+
+            research = web_search(user_message)
+
+            summary = create_research_summary(
+                user_message,
+                research
+            )
+
+            # ------------------------------------------
+            # RESEARCH + EMAIL
+            # ------------------------------------------
+
+            if email_requested:
+
+                if not TYLER_DEFAULT_EMAIL:
+
+                    return jsonify({
+                        "success": False,
+                        "error": (
+                            "TYLER_DEFAULT_EMAIL "
+                            "is not configured"
+                        )
+                    }), 500
+
+                email = create_email_from_content(
+                    user_message,
+                    summary
+                )
+
+                payload = {
+                    "action": "email",
+                    "data": {
+                        "to": TYLER_DEFAULT_EMAIL,
+                        "subject": email["subject"],
+                        "message": email["message"]
+                    }
+                }
+
+                n8n_result, status_code = send_to_n8n(
+                    payload
+                )
+
+                if not n8n_result.get("success"):
+
+                    return jsonify({
+                        "success": False,
+                        "type": "action",
+                        "action": "research_and_email",
+                        "error": n8n_result
+                    }), status_code
+
+                return jsonify({
+                    "success": True,
+                    "type": "action",
+                    "action": "research_and_email",
+                    "message": (
+                        "Research completed and "
+                        "email sent successfully."
+                    ),
+                    "to": TYLER_DEFAULT_EMAIL,
+                    "subject": email["subject"],
+                    "research_summary": summary,
+                    "sources": research["sources"]
+                })
+
+
+            # ------------------------------------------
+            # RESEARCH ONLY
+            # ------------------------------------------
+
+            return jsonify({
+                "success": True,
+                "type": "research",
+                "reply": summary,
+                "sources": research["sources"]
+            })
+
+
+        except Exception as e:
+
             return jsonify({
                 "success": False,
-                "error": "TYLER_DEFAULT_EMAIL is not configured"
+                "error": str(e)
+            }), 500
+
+
+    # ==================================================
+    # EMAIL ONLY
+    # ==================================================
+
+    if email_requested:
+
+        if not TYLER_DEFAULT_EMAIL:
+
+            return jsonify({
+                "success": False,
+                "error": (
+                    "TYLER_DEFAULT_EMAIL "
+                    "is not configured"
+                )
             }), 500
 
         try:
-            email = create_email_from_request(user_message)
+
+            email = create_email_from_content(
+                user_message,
+                user_message
+            )
 
             payload = {
                 "action": "email",
@@ -217,9 +494,12 @@ def chat():
                 }
             }
 
-            n8n_result, status_code = send_to_n8n(payload)
+            n8n_result, status_code = send_to_n8n(
+                payload
+            )
 
             if not n8n_result.get("success"):
+
                 return jsonify({
                     "success": False,
                     "type": "action",
@@ -236,33 +516,37 @@ def chat():
                 "subject": email["subject"]
             })
 
+
         except Exception as e:
+
             return jsonify({
                 "success": False,
                 "error": str(e)
             }), 500
 
-    # --------------------------------------------------
-    # NORMAL AI CHAT
-    # --------------------------------------------------
+
+    # ==================================================
+    # NORMAL CHAT
+    # ==================================================
 
     try:
+
         reply = call_groq(
             [
                 {
                     "role": "system",
                     "content": """
-You are Tyler AI, a practical AI assistant.
+You are Tyler AI.
 
-You can currently:
-- answer questions
-- reason through problems
-- help plan tasks
-- generate content
-- send an email to the user when they explicitly ask you to email them
+You currently have these real tools:
+1. Live web research
+2. Email
+3. General reasoning and conversation
 
-Never claim you completed an external action unless the application actually executed it.
-Be concise, useful, and action-oriented.
+Never claim you performed an external action unless
+the application actually executed that action.
+
+Be practical, concise, and useful.
 """
                 },
                 {
@@ -278,21 +562,24 @@ Be concise, useful, and action-oriented.
             "reply": reply
         })
 
+
     except Exception as e:
+
         return jsonify({
             "success": False,
             "error": str(e)
         }), 500
 
 
-# --------------------------------------------------
+# ==================================================
 # DIRECT N8N ACTION ENDPOINT
-# --------------------------------------------------
+# ==================================================
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
 
     if not authorized():
+
         return jsonify({
             "success": False,
             "error": "Unauthorized"
@@ -301,6 +588,7 @@ def webhook():
     data = request.get_json(silent=True) or {}
 
     if not data.get("action"):
+
         return jsonify({
             "success": False,
             "error": "Missing action"
@@ -311,12 +599,18 @@ def webhook():
     return jsonify(result), status_code
 
 
-# --------------------------------------------------
+# ==================================================
 # START SERVER
-# --------------------------------------------------
+# ==================================================
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
+
+    port = int(
+        os.environ.get(
+            "PORT",
+            10000
+        )
+    )
 
     app.run(
         host="0.0.0.0",
