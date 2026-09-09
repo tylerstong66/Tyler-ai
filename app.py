@@ -107,7 +107,43 @@ def save_memory(memory_text, category="general", importance=5):
     return response.json()
 
 
-def get_memories(limit=20):
+def update_memory(
+    memory_id,
+    memory_text,
+    category="general",
+    importance=5
+):
+
+    if not SUPABASE_URL:
+        raise RuntimeError("SUPABASE_URL is not configured")
+
+    response = requests.patch(
+        f"{SUPABASE_URL}/rest/v1/memories",
+        headers={
+            **supabase_headers(),
+            "Prefer": "return=representation"
+        },
+        params={
+            "id": f"eq.{memory_id}"
+        },
+        json={
+            "memories": memory_text,
+            "category": category,
+            "importance": importance
+        },
+        timeout=30
+    )
+
+    if not response.ok:
+        raise RuntimeError(
+            f"Supabase update failed: "
+            f"{response.status_code} {response.text}"
+        )
+
+    return response.json()
+
+
+def get_memories(limit=50):
 
     if not SUPABASE_URL:
         raise RuntimeError("SUPABASE_URL is not configured")
@@ -116,8 +152,14 @@ def get_memories(limit=20):
         f"{SUPABASE_URL}/rest/v1/memories",
         headers=supabase_headers(),
         params={
-            "select": "id,created_at,memories,category,importance",
-            "order": "importance.desc,created_at.desc",
+            "select": (
+                "id,created_at,memories,"
+                "category,importance"
+            ),
+            "order": (
+                "importance.desc,"
+                "created_at.desc"
+            ),
             "limit": limit
         },
         timeout=30
@@ -144,35 +186,14 @@ def memory_context(limit=12):
     for item in memories:
 
         lines.append(
-            f"- [{item.get('category', 'general')}] "
+            f"- ID {item.get('id')} "
+            f"[{item.get('category', 'general')}] "
             f"{item.get('memories', '')} "
-            f"(importance {item.get('importance', 5)})"
+            f"(importance "
+            f"{item.get('importance', 5)})"
         )
 
     return "\n".join(lines)
-
-
-def memory_already_exists(memory_text):
-
-    try:
-
-        memories = get_memories(50)
-
-        target = memory_text.strip().lower()
-
-        for item in memories:
-
-            existing = str(
-                item.get("memories", "")
-            ).strip().lower()
-
-            if existing == target:
-                return True
-
-        return False
-
-    except Exception:
-        return False
 
 
 # ==================================================
@@ -193,7 +214,10 @@ def wants_to_remember(message):
         "don't forget"
     ]
 
-    return any(trigger in text for trigger in triggers)
+    return any(
+        trigger in text
+        for trigger in triggers
+    )
 
 
 def create_memory_from_request(user_message):
@@ -204,19 +228,19 @@ The user explicitly asked Tyler AI to remember something.
 User message:
 {user_message}
 
-Extract the useful long-term information.
+Extract the useful durable information.
 
 Return ONLY valid JSON:
 
 {{
-  "memory": "concise memory",
+  "memory": "concise durable memory",
   "category": "preference, project, person, task, goal, career, or general",
   "importance": 5
 }}
 
 Importance must be an integer from 1 to 10.
 
-Never store:
+Do not store:
 - passwords
 - API keys
 - authentication tokens
@@ -232,8 +256,8 @@ Do not include markdown.
             {
                 "role": "system",
                 "content": (
-                    "You extract concise long-term memories "
-                    "for an AI assistant."
+                    "You extract concise long-term "
+                    "memories for an AI assistant."
                 )
             },
             {
@@ -285,13 +309,13 @@ Do not include markdown.
 def analyze_for_automatic_memory(user_message):
 
     prompt = f"""
-Decide whether this user message contains information
-worth saving in long-term memory for Tyler AI.
+Decide whether this user message contains durable
+information worth saving in long-term memory.
 
 User message:
 {user_message}
 
-Save durable information such as:
+Save useful information such as:
 - stable preferences
 - long-term goals
 - important projects
@@ -299,21 +323,21 @@ Save durable information such as:
 - career direction
 - recurring workflows
 - important decisions
-- useful personal context that will help future responses
+- durable personal context
 
 Do NOT save:
 - casual conversation
 - one-time questions
 - temporary instructions
-- news requests
 - search queries
+- news requests
 - email commands
 - passwords
 - API keys
 - tokens
-- financial account credentials
+- banking credentials
 - authentication information
-- highly sensitive secrets
+- private secrets
 
 Return ONLY valid JSON.
 
@@ -332,7 +356,7 @@ If it SHOULD be saved:
   "importance": 5
 }}
 
-Importance must be 1 through 10.
+Importance must be between 1 and 10.
 """
 
     raw = call_groq(
@@ -340,9 +364,8 @@ Importance must be 1 through 10.
             {
                 "role": "system",
                 "content": (
-                    "You are the memory manager for Tyler AI. "
-                    "Be selective. Only durable useful information "
-                    "should become long-term memory."
+                    "You are the memory manager "
+                    "for Tyler AI. Be selective."
                 )
             },
             {
@@ -389,38 +412,284 @@ Importance must be 1 through 10.
         return None
 
 
-def maybe_save_automatic_memory(user_message):
+# ==================================================
+# MEMORY MERGE / UPDATE DECISION
+# ==================================================
+
+def decide_memory_action(candidate):
+
+    existing_memories = get_memories(50)
+
+    if not existing_memories:
+
+        return {
+            "action": "create",
+            "memory": candidate["memory"],
+            "category": candidate["category"],
+            "importance": candidate["importance"]
+        }
+
+    existing_text = ""
+
+    for item in existing_memories:
+
+        existing_text += f"""
+ID: {item.get("id")}
+CATEGORY: {item.get("category")}
+IMPORTANCE: {item.get("importance")}
+MEMORY: {item.get("memories")}
+"""
+
+    prompt = f"""
+Tyler AI has a new candidate memory.
+
+NEW MEMORY:
+{candidate["memory"]}
+
+NEW CATEGORY:
+{candidate["category"]}
+
+NEW IMPORTANCE:
+{candidate["importance"]}
+
+Existing memories:
+{existing_text}
+
+Choose exactly one action:
+
+1. "create"
+Use when the new memory is genuinely new.
+
+2. "update"
+Use when an existing memory refers to the same topic
+but the new information is more current, more specific,
+or meaningfully improves it.
+
+3. "skip"
+Use when the same information is already adequately stored.
+
+Return ONLY valid JSON.
+
+For CREATE:
+
+{{
+  "action": "create",
+  "memory": "final memory text",
+  "category": "category",
+  "importance": 5
+}}
+
+For UPDATE:
+
+{{
+  "action": "update",
+  "id": 123,
+  "memory": "merged or updated final memory text",
+  "category": "category",
+  "importance": 5
+}}
+
+For SKIP:
+
+{{
+  "action": "skip",
+  "reason": "already covered"
+}}
+
+Rules:
+- Never overwrite an unrelated memory.
+- Prefer update over create when two memories clearly
+  represent the same evolving preference, goal, or project.
+- Preserve useful older information when merging.
+- Importance must be 1 through 10.
+"""
+
+    raw = call_groq(
+        [
+            {
+                "role": "system",
+                "content": (
+                    "You manage long-term AI memory. "
+                    "Avoid duplicates and safely merge "
+                    "related memories."
+                )
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.1
+    )
 
     try:
 
-        candidate = analyze_for_automatic_memory(
-            user_message
+        result = json.loads(raw)
+
+        action = result.get(
+            "action",
+            "create"
+        )
+
+        if action == "skip":
+
+            return {
+                "action": "skip",
+                "reason": result.get(
+                    "reason",
+                    "already covered"
+                )
+            }
+
+        if action == "update":
+
+            memory_id = result.get("id")
+
+            valid_ids = {
+                item.get("id")
+                for item in existing_memories
+            }
+
+            if memory_id not in valid_ids:
+
+                return {
+                    "action": "create",
+                    "memory": candidate["memory"],
+                    "category": candidate["category"],
+                    "importance": candidate["importance"]
+                }
+
+            importance = int(
+                result.get(
+                    "importance",
+                    candidate["importance"]
+                )
+            )
+
+            importance = max(
+                1,
+                min(10, importance)
+            )
+
+            return {
+                "action": "update",
+                "id": memory_id,
+                "memory": result.get(
+                    "memory",
+                    candidate["memory"]
+                ),
+                "category": result.get(
+                    "category",
+                    candidate["category"]
+                ),
+                "importance": importance
+            }
+
+        importance = int(
+            result.get(
+                "importance",
+                candidate["importance"]
+            )
+        )
+
+        importance = max(
+            1,
+            min(10, importance)
+        )
+
+        return {
+            "action": "create",
+            "memory": result.get(
+                "memory",
+                candidate["memory"]
+            ),
+            "category": result.get(
+                "category",
+                candidate["category"]
+            ),
+            "importance": importance
+        }
+
+    except Exception:
+
+        return {
+            "action": "create",
+            "memory": candidate["memory"],
+            "category": candidate["category"],
+            "importance": candidate["importance"]
+        }
+
+
+def process_memory_candidate(candidate):
+
+    decision = decide_memory_action(
+        candidate
+    )
+
+    action = decision.get("action")
+
+    if action == "skip":
+
+        return {
+            "saved": False,
+            "action": "skip",
+            "reason": decision.get(
+                "reason",
+                "already covered"
+            )
+        }
+
+    if action == "update":
+
+        update_memory(
+            decision["id"],
+            decision["memory"],
+            decision["category"],
+            decision["importance"]
+        )
+
+        return {
+            "saved": True,
+            "action": "update",
+            "id": decision["id"],
+            "memory": decision["memory"],
+            "category": decision["category"],
+            "importance": decision["importance"]
+        }
+
+    save_memory(
+        decision["memory"],
+        decision["category"],
+        decision["importance"]
+    )
+
+    return {
+        "saved": True,
+        "action": "create",
+        "memory": decision["memory"],
+        "category": decision["category"],
+        "importance": decision["importance"]
+    }
+
+
+def maybe_save_automatic_memory(
+    user_message
+):
+
+    try:
+
+        candidate = (
+            analyze_for_automatic_memory(
+                user_message
+            )
         )
 
         if not candidate:
             return None
 
-        if memory_already_exists(
-            candidate["memory"]
-        ):
-            return {
-                "saved": False,
-                "reason": "duplicate",
-                "memory": candidate["memory"]
-            }
-
-        save_memory(
-            candidate["memory"],
-            candidate["category"],
-            candidate["importance"]
+        return process_memory_candidate(
+            candidate
         )
-
-        return {
-            "saved": True,
-            "memory": candidate["memory"],
-            "category": candidate["category"],
-            "importance": candidate["importance"]
-        }
 
     except Exception as e:
 
@@ -744,7 +1013,8 @@ def home():
             "web_research",
             "email",
             "long_term_memory",
-            "automatic_memory"
+            "automatic_memory",
+            "memory_merge_update"
         ]
     })
 
@@ -836,32 +1106,22 @@ def chat():
 
         try:
 
-            memory = (
+            candidate = (
                 create_memory_from_request(
                     user_message
                 )
             )
 
-            if not memory_already_exists(
-                memory["memory"]
-            ):
-
-                save_memory(
-                    memory["memory"],
-                    memory["category"],
-                    memory["importance"]
+            result = (
+                process_memory_candidate(
+                    candidate
                 )
+            )
 
             return jsonify({
                 "success": True,
                 "type": "memory",
-                "action": "saved",
-                "memory":
-                    memory["memory"],
-                "category":
-                    memory["category"],
-                "importance":
-                    memory["importance"]
+                "memory_result": result
             })
 
         except Exception as e:
@@ -882,7 +1142,7 @@ def chat():
 
 
     # ==================================================
-    # AUTOMATIC MEMORY CHECK
+    # AUTOMATIC MEMORY
     # ==================================================
 
     automatic_memory = (
@@ -1018,7 +1278,7 @@ def chat():
 User request:
 {user_message}
 
-Relevant long-term memory:
+Long-term memory:
 {context}
 """
 
@@ -1096,13 +1356,14 @@ Relevant long-term memory:
                     "content": f"""
 You are Tyler AI.
 
-You currently have these real tools:
+You currently have these real capabilities:
 
 1. Live web research
 2. Email
 3. Persistent long-term memory
-4. Automatic memory
-5. General reasoning
+4. Automatic memory creation
+5. Memory merging and updating
+6. General reasoning
 
 Long-term memory:
 
@@ -1193,4 +1454,4 @@ if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
         port=port
-    )
+            )
