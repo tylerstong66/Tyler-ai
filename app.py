@@ -1,12 +1,13 @@
 import os
 import re
+import json
 import requests
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
 # =========================================================
-# ENVIRONMENT VARIABLES
+# CONFIG
 # =========================================================
 
 N8N_WEBHOOK_URL = os.environ.get("N8N_WEBHOOK_URL")
@@ -14,6 +15,7 @@ TYLER_API_KEY = os.environ.get("TYLER_API_KEY")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY")
 TYLER_DEFAULT_EMAIL = os.environ.get("TYLER_DEFAULT_EMAIL")
+
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
@@ -28,12 +30,55 @@ GROQ_MODEL = os.environ.get(
 # =========================================================
 
 def authorized():
-    provided = request.headers.get("X-Tyler-Key")
+    supplied = request.headers.get("X-Tyler-Key")
 
     return bool(
         TYLER_API_KEY
-        and provided
-        and provided == TYLER_API_KEY
+        and supplied
+        and supplied == TYLER_API_KEY
+    )
+
+
+# =========================================================
+# HELPERS
+# =========================================================
+
+def parse_json_object(text):
+    text = str(text).strip()
+
+    text = re.sub(
+        r"^```(?:json)?\s*",
+        "",
+        text,
+        flags=re.IGNORECASE
+    )
+
+    text = re.sub(
+        r"\s*```$",
+        "",
+        text
+    )
+
+    start = text.find("{")
+    end = text.rfind("}")
+
+    if start == -1 or end == -1:
+        raise ValueError("No JSON object found")
+
+    return json.loads(
+        text[start:end + 1]
+    )
+
+
+def clamp(value, low, high):
+    try:
+        value = int(value)
+    except Exception:
+        value = low
+
+    return max(
+        low,
+        min(high, value)
     )
 
 
@@ -44,20 +89,25 @@ def authorized():
 def call_groq(
     system_prompt,
     user_prompt,
-    max_tokens=900,
+    max_tokens=700,
     temperature=0.2
 ):
     if not GROQ_API_KEY:
-        raise RuntimeError("GROQ_API_KEY is not configured")
+        raise RuntimeError(
+            "GROQ_API_KEY is not configured"
+        )
 
     response = requests.post(
         "https://api.groq.com/openai/v1/chat/completions",
         headers={
-            "Authorization": f"Bearer {GROQ_API_KEY}",
-            "Content-Type": "application/json",
+            "Authorization":
+                f"Bearer {GROQ_API_KEY}",
+            "Content-Type":
+                "application/json",
         },
         json={
-            "model": GROQ_MODEL,
+            "model":
+                GROQ_MODEL,
             "messages": [
                 {
                     "role": "system",
@@ -68,8 +118,10 @@ def call_groq(
                     "content": user_prompt,
                 },
             ],
-            "temperature": temperature,
-            "max_tokens": max_tokens,
+            "temperature":
+                temperature,
+            "max_tokens":
+                max_tokens,
         },
         timeout=90,
     )
@@ -78,26 +130,36 @@ def call_groq(
         result = response.json()
     except Exception:
         raise RuntimeError(
-            f"Groq returned {response.status_code}: "
+            f"Groq returned "
+            f"{response.status_code}: "
             f"{response.text[:500]}"
         )
 
     if not response.ok:
-        raise RuntimeError(
-            result.get("error", {}).get(
-                "message",
-                str(result)
-            )
+        error = result.get(
+            "error",
+            {}
         )
 
+        if isinstance(error, dict):
+            message = error.get(
+                "message",
+                str(error)
+            )
+        else:
+            message = str(error)
+
+        raise RuntimeError(message)
+
     return (
-        result["choices"][0]["message"]["content"]
+        result["choices"][0]
+        ["message"]["content"]
         .strip()
     )
 
 
 # =========================================================
-# SUPABASE MEMORY
+# SUPABASE
 # =========================================================
 
 def supabase_headers():
@@ -107,13 +169,16 @@ def supabase_headers():
         )
 
     return {
-        "apikey": SUPABASE_KEY,
-        "Authorization": f"Bearer {SUPABASE_KEY}",
-        "Content-Type": "application/json",
+        "apikey":
+            SUPABASE_KEY,
+        "Authorization":
+            f"Bearer {SUPABASE_KEY}",
+        "Content-Type":
+            "application/json",
     }
 
 
-def get_memories(limit=8):
+def get_memories(limit=20):
     if not SUPABASE_URL:
         return []
 
@@ -122,10 +187,12 @@ def get_memories(limit=8):
         headers=supabase_headers(),
         params={
             "select":
-                "id,created_at,memories,category,importance",
+                "id,created_at,memories,"
+                "category,importance",
             "order":
                 "importance.desc,created_at.desc",
-            "limit": limit,
+            "limit":
+                limit,
         },
         timeout=30,
     )
@@ -140,36 +207,8 @@ def get_memories(limit=8):
     return response.json()
 
 
-def memory_context(limit=6):
-    try:
-        memories = get_memories(limit)
-    except Exception:
-        return "No memory context available."
-
-    if not memories:
-        return "No saved long-term memories."
-
-    lines = []
-
-    for item in memories:
-        text = str(
-            item.get("memories", "")
-        )[:350]
-
-        category = item.get(
-            "category",
-            "general"
-        )
-
-        lines.append(
-            f"- [{category}] {text}"
-        )
-
-    return "\n".join(lines)
-
-
 def save_memory(
-    memory_text,
+    text,
     category="general",
     importance=5
 ):
@@ -182,12 +221,20 @@ def save_memory(
         f"{SUPABASE_URL}/rest/v1/memories",
         headers={
             **supabase_headers(),
-            "Prefer": "return=representation",
+            "Prefer":
+                "return=representation",
         },
         json={
-            "memories": memory_text,
-            "category": category,
-            "importance": importance,
+            "memories":
+                text,
+            "category":
+                category,
+            "importance":
+                clamp(
+                    importance,
+                    1,
+                    10
+                ),
         },
         timeout=30,
     )
@@ -202,55 +249,100 @@ def save_memory(
     return response.json()
 
 
+def memory_exists(text):
+    target = (
+        str(text)
+        .strip()
+        .lower()
+    )
+
+    try:
+        for item in get_memories(40):
+            existing = (
+                str(
+                    item.get(
+                        "memories",
+                        ""
+                    )
+                )
+                .strip()
+                .lower()
+            )
+
+            if existing == target:
+                return True
+    except Exception:
+        pass
+
+    return False
+
+
+def compact_memory_context(limit=6):
+    try:
+        memories = get_memories(limit)
+    except Exception:
+        return ""
+
+    lines = []
+
+    for item in memories:
+        memory = str(
+            item.get(
+                "memories",
+                ""
+            )
+        )[:280]
+
+        category = item.get(
+            "category",
+            "general"
+        )
+
+        lines.append(
+            f"- [{category}] {memory}"
+        )
+
+    return "\n".join(lines)
+
+
 # =========================================================
-# SIMPLE ROUTING
-# No Groq call is required to decide what tool to use.
+# MEMORY SAFETY
 # =========================================================
 
-def wants_research(message):
-    text = message.lower()
+def looks_sensitive(text):
+    lower = text.lower()
 
-    triggers = [
-        "research",
-        "search the web",
-        "look up",
-        "find the latest",
-        "latest ",
-        "right now",
-        "current ",
-        "today",
-        "recent ",
-        "developments",
-        "news",
+    blocked_terms = [
+        "password",
+        "api key",
+        "apikey",
+        "secret key",
+        "access token",
+        "auth token",
+        "bearer token",
+        "credit card",
+        "cvv",
+        "social security",
+        "ssn",
+        "bank account",
+        "routing number",
+        "private key",
     ]
 
     return any(
-        trigger in text
-        for trigger in triggers
+        term in lower
+        for term in blocked_terms
     )
 
 
-def wants_email(message):
-    text = message.lower()
+# =========================================================
+# EXPLICIT MEMORY COMMANDS
+# =========================================================
 
-    triggers = [
-        "email me",
-        "send me an email",
-        "email the",
-        "send the results",
-        "send results",
-    ]
+def explicit_memory_request(message):
+    lower = message.lower()
 
-    return any(
-        trigger in text
-        for trigger in triggers
-    )
-
-
-def wants_memory_save(message):
-    text = message.lower()
-
-    triggers = [
+    phrases = [
         "remember that",
         "remember this",
         "save this to memory",
@@ -261,20 +353,15 @@ def wants_memory_save(message):
     ]
 
     return any(
-        trigger in text
-        for trigger in triggers
+        phrase in lower
+        for phrase in phrases
     )
 
 
-# =========================================================
-# DIRECT MEMORY SAVING
-# No Groq call.
-# =========================================================
+def clean_explicit_memory(message):
+    text = message.strip()
 
-def clean_memory_text(message):
-    cleaned = message.strip()
-
-    prefixes = [
+    patterns = [
         r"^remember that\s+",
         r"^remember this[:\s]+",
         r"^save this to memory[:\s]+",
@@ -284,50 +371,60 @@ def clean_memory_text(message):
         r"^do not forget(?: that)?\s+",
     ]
 
-    for pattern in prefixes:
-        cleaned = re.sub(
+    for pattern in patterns:
+        text = re.sub(
             pattern,
             "",
-            cleaned,
-            flags=re.IGNORECASE,
+            text,
+            flags=re.IGNORECASE
         )
 
-    return cleaned.strip()
+    return text.strip()
 
 
-def infer_memory_category(text):
+def guess_memory_category(text):
     lower = text.lower()
 
     if any(
-        word in lower
-        for word in [
-            "goal",
-            "want to become",
-            "want tyler",
-        ]
-    ):
-        return "goal"
-
-    if any(
-        word in lower
-        for word in [
-            "prefer",
+        x in lower
+        for x in [
             "favorite",
             "favourite",
-            "like ",
+            "prefer",
+            "i like",
         ]
     ):
         return "preference"
 
     if any(
-        word in lower
-        for word in [
+        x in lower
+        for x in [
+            "goal",
+            "my goal",
+            "want to become",
+        ]
+    ):
+        return "goal"
+
+    if any(
+        x in lower
+        for x in [
             "project",
             "building",
             "tyler ai",
         ]
     ):
         return "project"
+
+    if any(
+        x in lower
+        for x in [
+            "job",
+            "career",
+            "work",
+        ]
+    ):
+        return "career"
 
     return "general"
 
@@ -351,10 +448,14 @@ def web_search(query):
                 "application/json",
         },
         json={
-            "query": query,
-            "search_depth": "basic",
-            "include_answer": True,
-            "max_results": 3,
+            "query":
+                query,
+            "search_depth":
+                "basic",
+            "include_answer":
+                True,
+            "max_results":
+                3,
         },
         timeout=60,
     )
@@ -369,7 +470,9 @@ def web_search(query):
         )
 
     if not response.ok:
-        raise RuntimeError(str(result))
+        raise RuntimeError(
+            str(result)
+        )
 
     sources = []
 
@@ -381,16 +484,22 @@ def web_search(query):
         sources.append(
             {
                 "title":
-                    item.get("title", ""),
+                    item.get(
+                        "title",
+                        ""
+                    ),
                 "url":
-                    item.get("url", ""),
+                    item.get(
+                        "url",
+                        ""
+                    ),
                 "content":
                     str(
                         item.get(
                             "content",
                             ""
                         )
-                    )[:450],
+                    )[:400],
             }
         )
 
@@ -401,46 +510,40 @@ def web_search(query):
                     "answer",
                     ""
                 )
-            )[:900],
+            )[:800],
         "sources":
             sources,
     }
 
 
-# =========================================================
-# RESEARCH PROMPT BUILDER
-# =========================================================
+def compact_research(research):
+    pieces = []
 
-def compact_research_text(research):
-    parts = []
-
-    answer = research.get(
-        "answer",
-        ""
-    )
-
-    if answer:
-        parts.append(
+    if research.get("answer"):
+        pieces.append(
             "SEARCH SUMMARY:\n"
-            + answer
+            + research["answer"]
         )
 
     for index, source in enumerate(
-        research.get("sources", []),
+        research.get(
+            "sources",
+            []
+        ),
         start=1
     ):
-        parts.append(
+        pieces.append(
             f"\nSOURCE {index}\n"
-            f"Title: {source.get('title', '')}\n"
-            f"URL: {source.get('url', '')}\n"
-            f"Info: {source.get('content', '')}"
+            f"{source.get('title', '')}\n"
+            f"{source.get('url', '')}\n"
+            f"{source.get('content', '')}"
         )
 
-    return "\n".join(parts)
+    return "\n".join(pieces)
 
 
 # =========================================================
-# N8N
+# N8N / EMAIL
 # =========================================================
 
 def send_to_n8n(payload):
@@ -465,114 +568,465 @@ def send_to_n8n(payload):
     return response.text
 
 
-def send_email(body, subject="Tyler AI Research Results"):
+def send_email(
+    body,
+    subject="Tyler AI Results"
+):
     if not TYLER_DEFAULT_EMAIL:
         raise RuntimeError(
-            "TYLER_DEFAULT_EMAIL is not configured"
+            "TYLER_DEFAULT_EMAIL "
+            "is not configured"
         )
 
-    payload = {
-        "action": "email",
-        "data": {
-            "to": TYLER_DEFAULT_EMAIL,
-            "subject": subject,
-            "message": body,
-        },
-    }
-
-    response = send_to_n8n(payload)
+    result = send_to_n8n(
+        {
+            "action": "email",
+            "data": {
+                "to":
+                    TYLER_DEFAULT_EMAIL,
+                "subject":
+                    subject,
+                "message":
+                    body,
+            },
+        }
+    )
 
     return {
-        "sent": True,
-        "to": TYLER_DEFAULT_EMAIL,
-        "subject": subject,
-        "n8n_response": response[:300],
+        "sent":
+            True,
+        "to":
+            TYLER_DEFAULT_EMAIL,
+        "subject":
+            subject,
+        "n8n_response":
+            result[:300],
     }
 
 
 # =========================================================
-# ONE-CALL RESEARCH ENGINE
+# FALLBACK LOCAL ROUTER
+# Used if AI router is unavailable/rate-limited.
 # =========================================================
 
-def research_and_answer(
-    user_message,
-    memories
-):
-    research = web_search(
-        user_message
+def fallback_route(message):
+    lower = message.lower()
+
+    research_words = [
+        "research",
+        "latest",
+        "current",
+        "today",
+        "news",
+        "look up",
+        "search",
+        "right now",
+        "recent",
+        "development",
+    ]
+
+    email_words = [
+        "email me",
+        "email the",
+        "send me an email",
+        "send the results",
+        "email the results",
+    ]
+
+    memory_words = [
+        "remember",
+        "based on what you know about me",
+        "my favorite",
+        "my goal",
+        "what do i prefer",
+    ]
+
+    use_research = any(
+        word in lower
+        for word in research_words
     )
 
-    research_text = compact_research_text(
-        research
+    send_mail = any(
+        word in lower
+        for word in email_words
     )
 
+    use_memory = any(
+        word in lower
+        for word in memory_words
+    )
+
+    return {
+        "goal":
+            message[:180],
+
+        "use_memory":
+            use_memory,
+
+        "use_research":
+            use_research,
+
+        "research_query":
+            message,
+
+        "save_memory":
+            False,
+
+        "memory_text":
+            "",
+
+        "memory_category":
+            "general",
+
+        "memory_importance":
+            5,
+
+        "send_email":
+            send_mail,
+
+        "analysis_instruction":
+            "Answer the user's request directly.",
+            
+        "router":
+            "fallback-local",
+    }
+
+
+# =========================================================
+# TOOL ROUTER V2
+# =========================================================
+
+def tool_router(message):
     prompt = f"""
 USER REQUEST:
-{user_message}
+{message}
 
-RELEVANT LONG-TERM MEMORY:
-{memories}
+Choose which Tyler AI tools are actually needed.
 
-CURRENT WEB RESEARCH:
-{research_text}
+Available capabilities:
 
-Complete the user's request using the research above.
+1. read_memory
+Use saved long-term user context.
 
-Requirements:
-- Identify the most important findings.
-- Explain why they matter.
-- Rank them when appropriate.
-- Clearly identify which matters most if asked.
-- Do not invent current facts.
-- Be concise but useful.
-- Include the source URLs supplied above at the end.
+2. research_web
+Search current internet information.
+
+3. save_memory
+Store durable preferences, goals, projects,
+or other useful long-term information.
+
+4. reason
+Analyze and answer.
+
+5. send_email
+Email the finished result.
+
+Return ONLY compact JSON:
+
+{{
+  "goal": "short goal",
+  "use_memory": false,
+  "use_research": false,
+  "research_query": "",
+  "save_memory": false,
+  "memory_text": "",
+  "memory_category": "general",
+  "memory_importance": 5,
+  "send_email": false,
+  "analysis_instruction": "what the final answer should accomplish"
+}}
+
+Rules:
+
+- Use research only when current information is needed.
+- Email only if the user asks for an email.
+- Save memory only for durable useful information.
+- Never save passwords, API keys, tokens,
+  banking credentials, or security secrets.
+- Do not save a normal one-time question.
+- Reading memory is appropriate when personal context
+  could materially improve the answer.
+- Keep research_query short.
+- memory_importance must be 1 through 10.
 """
 
-    reply = call_groq(
+    raw = call_groq(
         system_prompt=(
-            "You are Tyler AI, an autonomous personal "
-            "research and reasoning assistant. "
-            "Turn supplied web research into a clear, "
-            "accurate final answer."
+            "You are Tyler AI Tool Router. "
+            "Choose the minimum tools necessary. "
+            "Output JSON only."
         ),
         user_prompt=prompt,
-        max_tokens=900,
-        temperature=0.2,
+        max_tokens=300,
+        temperature=0.0,
     )
 
-    return reply, research
+    route = parse_json_object(
+        raw
+    )
+
+    return {
+        "goal":
+            str(
+                route.get(
+                    "goal",
+                    message
+                )
+            )[:250],
+
+        "use_memory":
+            bool(
+                route.get(
+                    "use_memory",
+                    False
+                )
+            ),
+
+        "use_research":
+            bool(
+                route.get(
+                    "use_research",
+                    False
+                )
+            ),
+
+        "research_query":
+            str(
+                route.get(
+                    "research_query",
+                    ""
+                )
+            )[:400],
+
+        "save_memory":
+            bool(
+                route.get(
+                    "save_memory",
+                    False
+                )
+            ),
+
+        "memory_text":
+            str(
+                route.get(
+                    "memory_text",
+                    ""
+                )
+            )[:600],
+
+        "memory_category":
+            str(
+                route.get(
+                    "memory_category",
+                    "general"
+                )
+            )[:50],
+
+        "memory_importance":
+            clamp(
+                route.get(
+                    "memory_importance",
+                    5
+                ),
+                1,
+                10
+            ),
+
+        "send_email":
+            bool(
+                route.get(
+                    "send_email",
+                    False
+                )
+            ),
+
+        "analysis_instruction":
+            str(
+                route.get(
+                    "analysis_instruction",
+                    "Answer the user's request."
+                )
+            )[:500],
+
+        "router":
+            "groq-v2",
+    }
 
 
 # =========================================================
-# ONE-CALL NORMAL CHAT
+# FINAL REASONING
 # =========================================================
 
-def normal_answer(
+def build_final_answer(
     user_message,
-    memories
+    route,
+    memory_text="",
+    research_text=""
 ):
     prompt = f"""
-USER:
+ORIGINAL REQUEST:
 {user_message}
 
-LONG-TERM MEMORY:
-{memories}
+GOAL:
+{route["goal"]}
 
-Answer the user's request directly and practically.
-Do not mention memory unless relevant.
-Keep the response focused.
+INSTRUCTION:
+{route["analysis_instruction"]}
+
+MEMORY CONTEXT:
+{memory_text if memory_text else "None needed."}
+
+WEB RESEARCH:
+{research_text if research_text else "No web research used."}
+
+Give the user the completed result.
+
+Rules:
+- Answer the request directly.
+- Use memory only when relevant.
+- Use supplied research for current facts.
+- Do not invent web research.
+- If comparing or ranking, make the conclusion clear.
+- Do not mention internal routing.
+- Keep the answer useful and reasonably concise.
 """
 
     return call_groq(
         system_prompt=(
-            "You are Tyler AI, a capable personal "
-            "assistant designed to help Tyler reason, "
-            "plan and complete tasks."
+            "You are Tyler AI, an autonomous personal "
+            "assistant. Synthesize tool results into "
+            "the final useful answer."
         ),
         user_prompt=prompt,
-        max_tokens=700,
-        temperature=0.3,
+        max_tokens=850,
+        temperature=0.2,
     )
+
+
+# =========================================================
+# ROUTE EXECUTION
+# =========================================================
+
+def execute_route(
+    message,
+    route
+):
+    memory_text = ""
+    research = None
+    research_text = ""
+    memory_result = None
+    email_result = None
+
+    # READ MEMORY
+    if route["use_memory"]:
+        memory_text = (
+            compact_memory_context(6)
+        )
+
+    # RESEARCH WEB
+    if route["use_research"]:
+        query = (
+            route["research_query"]
+            or message
+        )
+
+        research = web_search(
+            query
+        )
+
+        research_text = (
+            compact_research(
+                research
+            )
+        )
+
+    # SAVE MEMORY
+    if (
+        route["save_memory"]
+        and route["memory_text"]
+    ):
+        candidate = (
+            route["memory_text"]
+            .strip()
+        )
+
+        if looks_sensitive(candidate):
+            memory_result = {
+                "saved": False,
+                "reason":
+                    "Sensitive information "
+                    "was not stored."
+            }
+
+        elif memory_exists(candidate):
+            memory_result = {
+                "saved": False,
+                "reason":
+                    "Memory already exists."
+            }
+
+        else:
+            saved = save_memory(
+                candidate,
+                route[
+                    "memory_category"
+                ],
+                route[
+                    "memory_importance"
+                ],
+            )
+
+            memory_result = {
+                "saved": True,
+                "memory":
+                    candidate,
+                "category":
+                    route[
+                        "memory_category"
+                    ],
+                "importance":
+                    route[
+                        "memory_importance"
+                    ],
+                "database_result":
+                    saved,
+            }
+
+    # FINAL REASONING
+    reply = build_final_answer(
+        message,
+        route,
+        memory_text,
+        research_text,
+    )
+
+    # EMAIL
+    if route["send_email"]:
+        email_result = send_email(
+            reply,
+            "Tyler AI Results"
+        )
+
+    return {
+        "reply":
+            reply,
+
+        "memory_result":
+            memory_result,
+
+        "email_result":
+            email_result,
+
+        "sources":
+            (
+                research.get(
+                    "sources",
+                    []
+                )
+                if research
+                else []
+            ),
+    }
 
 
 # =========================================================
@@ -583,35 +1037,55 @@ Keep the response focused.
 def home():
     return jsonify(
         {
-            "name": "Tyler AI",
-            "status": "online",
-            "version": "1.2-ultra-lean",
-            "secured": bool(
-                TYLER_API_KEY
-            ),
-            "groq_connected": bool(
-                GROQ_API_KEY
-            ),
-            "tavily_connected": bool(
-                TAVILY_API_KEY
-            ),
-            "n8n_connected": bool(
-                N8N_WEBHOOK_URL
-            ),
-            "memory_connected": bool(
-                SUPABASE_URL
-                and SUPABASE_KEY
-            ),
-            "routing": "local",
+            "name":
+                "Tyler AI",
+
+            "status":
+                "online",
+
+            "version":
+                "2.0-tool-router",
+
+            "secured":
+                bool(
+                    TYLER_API_KEY
+                ),
+
+            "groq_connected":
+                bool(
+                    GROQ_API_KEY
+                ),
+
+            "tavily_connected":
+                bool(
+                    TAVILY_API_KEY
+                ),
+
+            "n8n_connected":
+                bool(
+                    N8N_WEBHOOK_URL
+                ),
+
+            "memory_connected":
+                bool(
+                    SUPABASE_URL
+                    and SUPABASE_KEY
+                ),
+
             "tools": [
-                "chat",
-                "web_research",
-                "email",
-                "long_term_memory",
+                "read_memory",
+                "research_web",
+                "save_memory",
+                "reason",
+                "send_email",
             ],
         }
     )
 
+
+# =========================================================
+# HEALTH
+# =========================================================
 
 @app.route(
     "/health",
@@ -620,9 +1094,10 @@ def home():
 def health():
     return jsonify(
         {
-            "status": "healthy",
+            "status":
+                "healthy",
             "version":
-                "1.2-ultra-lean",
+                "2.0-tool-router",
         }
     )
 
@@ -640,26 +1115,34 @@ def memories_route():
         return jsonify(
             {
                 "success": False,
-                "error": "Unauthorized",
+                "error":
+                    "Unauthorized",
             }
         ), 401
 
     try:
-        items = get_memories(50)
+        items = get_memories(
+            50
+        )
 
         return jsonify(
             {
-                "success": True,
-                "count": len(items),
-                "memories": items,
+                "success":
+                    True,
+                "count":
+                    len(items),
+                "memories":
+                    items,
             }
         )
 
     except Exception as e:
         return jsonify(
             {
-                "success": False,
-                "error": str(e),
+                "success":
+                    False,
+                "error":
+                    str(e),
             }
         ), 500
 
@@ -677,40 +1160,48 @@ def chat():
         return jsonify(
             {
                 "success": False,
-                "error": "Unauthorized",
+                "error":
+                    "Unauthorized",
             }
         ), 401
 
-    data = request.get_json(
-        silent=True
-    ) or {}
+    data = (
+        request.get_json(
+            silent=True
+        )
+        or {}
+    )
 
-    user_message = str(
+    message = str(
         data.get(
             "message",
             ""
         )
     ).strip()
 
-    if not user_message:
+    if not message:
         return jsonify(
             {
                 "success": False,
-                "error": "Missing message",
+                "error":
+                    "Missing message",
             }
         ), 400
 
-    # ---------------------------------------------
+
+    # =====================================================
     # EXPLICIT MEMORY
     # ZERO GROQ CALLS
-    # ---------------------------------------------
+    # =====================================================
 
-    if wants_memory_save(
-        user_message
+    if explicit_memory_request(
+        message
     ):
         try:
-            memory = clean_memory_text(
-                user_message
+            memory = (
+                clean_explicit_memory(
+                    message
+                )
             )
 
             if not memory:
@@ -718,8 +1209,41 @@ def chat():
                     "No memory text found."
                 )
 
+            if looks_sensitive(
+                memory
+            ):
+                return jsonify(
+                    {
+                        "success":
+                            False,
+                        "type":
+                            "memory",
+                        "error":
+                            "Sensitive information "
+                            "will not be stored.",
+                    }
+                ), 400
+
+            if memory_exists(
+                memory
+            ):
+                return jsonify(
+                    {
+                        "success":
+                            True,
+                        "type":
+                            "memory",
+                        "saved":
+                            False,
+                        "reason":
+                            "Memory already exists.",
+                        "groq_calls":
+                            0,
+                    }
+                )
+
             category = (
-                infer_memory_category(
+                guess_memory_category(
                     memory
                 )
             )
@@ -727,138 +1251,140 @@ def chat():
             saved = save_memory(
                 memory,
                 category,
-                7,
+                7
             )
 
             return jsonify(
                 {
-                    "success": True,
-                    "type": "memory",
-                    "saved": True,
-                    "category": category,
-                    "memory": memory,
-                    "database_result": saved,
-                    "groq_calls": 0,
+                    "success":
+                        True,
+                    "type":
+                        "memory",
+                    "saved":
+                        True,
+                    "memory":
+                        memory,
+                    "category":
+                        category,
+                    "groq_calls":
+                        0,
+                    "database_result":
+                        saved,
                 }
             )
 
         except Exception as e:
             return jsonify(
                 {
-                    "success": False,
-                    "type": "memory",
-                    "error": str(e),
+                    "success":
+                        False,
+                    "type":
+                        "memory",
+                    "error":
+                        str(e),
                 }
             ), 500
 
-    # ---------------------------------------------
-    # LOAD SMALL MEMORY CONTEXT
-    # ---------------------------------------------
 
-    memories = memory_context(6)
+    # =====================================================
+    # TOOL ROUTER
+    # =====================================================
 
-    # ---------------------------------------------
-    # RESEARCH
-    # ONE GROQ CALL
-    # ---------------------------------------------
-
-    if wants_research(
-        user_message
-    ):
-        try:
-            reply, research = (
-                research_and_answer(
-                    user_message,
-                    memories,
-                )
-            )
-
-            email_result = None
-
-            if wants_email(
-                user_message
-            ):
-                email_result = (
-                    send_email(
-                        reply,
-                        "Tyler AI Research Results",
-                    )
-                )
-
-            return jsonify(
-                {
-                    "success": True,
-                    "type":
-                        "research_execution",
-                    "reply": reply,
-                    "email_result":
-                        email_result,
-                    "sources":
-                        research.get(
-                            "sources",
-                            []
-                        ),
-                    "groq_calls": 1,
-                    "planner":
-                        "local-routing",
-                }
-            )
-
-        except Exception as e:
-            return jsonify(
-                {
-                    "success": False,
-                    "type":
-                        "research_execution",
-                    "error": str(e),
-                }
-            ), 500
-
-    # ---------------------------------------------
-    # NORMAL CHAT
-    # ONE GROQ CALL
-    # ---------------------------------------------
+    router_calls = 0
 
     try:
-        reply = normal_answer(
-            user_message,
-            memories,
+        route = tool_router(
+            message
         )
 
-        email_result = None
+        router_calls = 1
 
-        if wants_email(
-            user_message
-        ):
-            email_result = send_email(
-                reply,
-                "Tyler AI Results",
-            )
+    except Exception as router_error:
+        print(
+            "Router fallback:",
+            str(router_error)
+        )
 
-        return jsonify(
-            {
-                "success": True,
-                "type": "reply",
-                "reply": reply,
-                "email_result":
-                    email_result,
-                "groq_calls": 1,
-                "planner":
-                    "local-routing",
-            }
+        route = fallback_route(
+            message
+        )
+
+
+    # =====================================================
+    # EXECUTE
+    # =====================================================
+
+    try:
+        result = execute_route(
+            message,
+            route
         )
 
     except Exception as e:
         return jsonify(
             {
-                "success": False,
-                "error": str(e),
+                "success":
+                    False,
+                "type":
+                    "tool_execution",
+                "route":
+                    route,
+                "error":
+                    str(e),
+                "router_calls":
+                    router_calls,
             }
         ), 500
 
 
+    return jsonify(
+        {
+            "success":
+                True,
+
+            "type":
+                "tool_execution",
+
+            "version":
+                "2.0-tool-router",
+
+            "route":
+                route,
+
+            "reply":
+                result[
+                    "reply"
+                ],
+
+            "memory_result":
+                result[
+                    "memory_result"
+                ],
+
+            "email_result":
+                result[
+                    "email_result"
+                ],
+
+            "sources":
+                result[
+                    "sources"
+                ],
+
+            "router_calls":
+                router_calls,
+
+            "answer_calls":
+                1,
+
+            "total_groq_calls":
+                router_calls + 1,
+        }
+    )
+
+
 # =========================================================
-# N8N WEBHOOK PASS-THROUGH
+# DIRECT N8N PASS-THROUGH
 # =========================================================
 
 @app.route(
@@ -869,20 +1395,29 @@ def webhook():
     if not authorized():
         return jsonify(
             {
-                "success": False,
-                "error": "Unauthorized",
+                "success":
+                    False,
+                "error":
+                    "Unauthorized",
             }
         ), 401
 
-    data = request.get_json(
-        silent=True
-    ) or {}
+    data = (
+        request.get_json(
+            silent=True
+        )
+        or {}
+    )
 
-    if not data.get("action"):
+    if not data.get(
+        "action"
+    ):
         return jsonify(
             {
-                "success": False,
-                "error": "Missing action",
+                "success":
+                    False,
+                "error":
+                    "Missing action",
             }
         ), 400
 
@@ -893,7 +1428,8 @@ def webhook():
 
         return jsonify(
             {
-                "success": True,
+                "success":
+                    True,
                 "n8n_response":
                     result[:500],
             }
@@ -902,8 +1438,10 @@ def webhook():
     except Exception as e:
         return jsonify(
             {
-                "success": False,
-                "error": str(e),
+                "success":
+                    False,
+                "error":
+                    str(e),
             }
         ), 500
 
@@ -923,4 +1461,4 @@ if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
         port=port,
-            )
+    )
