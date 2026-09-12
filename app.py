@@ -43,7 +43,7 @@ def authorized():
 
 
 # =========================================================
-# GENERAL HELPERS
+# HELPERS
 # =========================================================
 
 def clamp(value, low, high):
@@ -52,10 +52,7 @@ def clamp(value, low, high):
     except Exception:
         value = low
 
-    return max(
-        low,
-        min(high, value)
-    )
+    return max(low, min(high, value))
 
 
 def normalize_text(value):
@@ -89,10 +86,10 @@ def parse_json_object(text):
     )
 
     try:
-        result = json.loads(text)
+        parsed = json.loads(text)
 
-        if isinstance(result, dict):
-            return result
+        if isinstance(parsed, dict):
+            return parsed
 
     except Exception:
         pass
@@ -102,12 +99,12 @@ def parse_json_object(text):
 
     if start >= 0 and end > start:
         try:
-            result = json.loads(
+            parsed = json.loads(
                 text[start:end + 1]
             )
 
-            if isinstance(result, dict):
-                return result
+            if isinstance(parsed, dict):
+                return parsed
 
         except Exception:
             pass
@@ -123,11 +120,45 @@ def call_groq(
     system_prompt,
     user_prompt,
     max_tokens=700,
-    temperature=0.2
+    temperature=0.2,
+    response_format=None,
 ):
     if not GROQ_API_KEY:
         raise RuntimeError(
             "GROQ_API_KEY is not configured"
+        )
+
+    payload = {
+        "model":
+            GROQ_MODEL,
+
+        "messages": [
+            {
+                "role":
+                    "system",
+
+                "content":
+                    system_prompt,
+            },
+            {
+                "role":
+                    "user",
+
+                "content":
+                    user_prompt,
+            },
+        ],
+
+        "temperature":
+            temperature,
+
+        "max_tokens":
+            max_tokens,
+    }
+
+    if response_format:
+        payload["response_format"] = (
+            response_format
         )
 
     response = requests.post(
@@ -141,33 +172,7 @@ def call_groq(
                 "application/json",
         },
 
-        json={
-            "model":
-                GROQ_MODEL,
-
-            "messages": [
-                {
-                    "role":
-                        "system",
-
-                    "content":
-                        system_prompt,
-                },
-                {
-                    "role":
-                        "user",
-
-                    "content":
-                        user_prompt,
-                },
-            ],
-
-            "temperature":
-                temperature,
-
-            "max_tokens":
-                max_tokens,
-        },
+        json=payload,
 
         timeout=90,
     )
@@ -188,10 +193,7 @@ def call_groq(
             {}
         )
 
-        if isinstance(
-            error,
-            dict
-        ):
+        if isinstance(error, dict):
             message = error.get(
                 "message",
                 str(error)
@@ -220,6 +222,64 @@ def call_groq(
     )
 
     return str(content).strip()
+
+
+# =========================================================
+# STRICT AGENT DECISION SCHEMA
+# =========================================================
+
+AGENT_DECISION_SCHEMA = {
+    "type":
+        "json_schema",
+
+    "json_schema": {
+        "name":
+            "tyler_next_action",
+
+        "strict":
+            True,
+
+        "schema": {
+            "type":
+                "object",
+
+            "properties": {
+                "tool": {
+                    "type":
+                        "string",
+
+                    "enum": [
+                        "read_memory",
+                        "research_web",
+                        "reason",
+                        "save_memory",
+                        "send_email",
+                        "finish",
+                    ],
+                },
+
+                "instruction": {
+                    "type":
+                        "string",
+                },
+
+                "why": {
+                    "type":
+                        "string",
+                },
+            },
+
+            "required": [
+                "tool",
+                "instruction",
+                "why",
+            ],
+
+            "additionalProperties":
+                False,
+        },
+    },
+}
 
 
 # =========================================================
@@ -354,9 +414,7 @@ def memory_exists(text):
     return False
 
 
-def compact_memory_context(
-    limit=8
-):
+def compact_memory_context(limit=8):
     try:
         memories = get_memories(
             limit
@@ -373,7 +431,7 @@ def compact_memory_context(
                 "memories",
                 ""
             )
-        )[:250]
+        )[:240]
 
         category = item.get(
             "category",
@@ -386,7 +444,7 @@ def compact_memory_context(
 
     return "\n".join(
         lines
-    )[:1500]
+    )[:1600]
 
 
 # =========================================================
@@ -422,7 +480,7 @@ def looks_sensitive(text):
 
 
 # =========================================================
-# USER PERMISSIONS
+# PERMISSIONS
 # =========================================================
 
 def user_allows_email(message):
@@ -433,9 +491,9 @@ def user_allows_email(message):
         "email the result",
         "email the results",
         "send me an email",
+        "send it to my email",
         "send the result to my email",
         "send the results to my email",
-        "send it to my email",
     ]
 
     return any(
@@ -471,12 +529,10 @@ def user_allows_memory_write(message):
 
 
 # =========================================================
-# DIRECT MEMORY SAVE
+# EXPLICIT MEMORY FAST PATH
 # =========================================================
 
-def explicit_memory_request(
-    message
-):
+def explicit_memory_request(message):
     lower = message.lower().strip()
 
     starts = [
@@ -490,16 +546,12 @@ def explicit_memory_request(
     ]
 
     return any(
-        lower.startswith(
-            item
-        )
+        lower.startswith(item)
         for item in starts
     )
 
 
-def clean_explicit_memory(
-    message
-):
+def clean_explicit_memory(message):
     text = message.strip()
 
     patterns = [
@@ -523,9 +575,7 @@ def clean_explicit_memory(
     return text.strip()
 
 
-def guess_memory_category(
-    text
-):
+def guess_memory_category(text):
     lower = text.lower()
 
     if any(
@@ -661,16 +711,14 @@ def web_search(query):
                     "answer",
                     ""
                 )
-            )[:1000],
+            )[:1100],
 
         "sources":
             sources,
     }
 
 
-def compact_research(
-    research
-):
+def compact_research(research):
     pieces = []
 
     answer = research.get(
@@ -694,13 +742,13 @@ def compact_research(
 
         pieces.append(
             f"\nSOURCE {index}\n"
-            f"{source.get('title', '')}\n"
-            f"{source.get('content', '')}"
+            f"Title: {source.get('title', '')}\n"
+            f"Info: {source.get('content', '')}"
         )
 
     return "\n".join(
         pieces
-    )[:3000]
+    )[:3300]
 
 
 # =========================================================
@@ -735,8 +783,7 @@ def send_email(
 ):
     if not TYLER_DEFAULT_EMAIL:
         raise RuntimeError(
-            "TYLER_DEFAULT_EMAIL "
-            "is not configured"
+            "TYLER_DEFAULT_EMAIL is not configured"
         )
 
     result = send_to_n8n(
@@ -773,12 +820,10 @@ def send_email(
 
 
 # =========================================================
-# FALLBACK ROUTING LOGIC
+# LOCAL INTENT HELPERS
 # =========================================================
 
-def needs_memory(
-    message
-):
+def needs_memory(message):
     lower = message.lower()
 
     terms = [
@@ -800,9 +845,7 @@ def needs_memory(
     )
 
 
-def needs_research(
-    message
-):
+def needs_research(message):
     lower = message.lower()
 
     terms = [
@@ -825,12 +868,16 @@ def needs_research(
     )
 
 
+# =========================================================
+# LOCAL FALLBACK DECIDER
+# =========================================================
+
 def fallback_next_action(
     message,
     used_tools,
     email_allowed,
     memory_allowed,
-    final_reply
+    has_final_reply,
 ):
     if (
         needs_memory(message)
@@ -842,7 +889,13 @@ def fallback_next_action(
                 "read_memory",
 
             "instruction":
-                "Read relevant saved user context."
+                "Read relevant saved user context.",
+
+            "why":
+                "User-specific context may improve the answer.",
+
+            "decision_source":
+                "local-fallback",
         }
 
     if (
@@ -855,11 +908,18 @@ def fallback_next_action(
                 "research_web",
 
             "instruction":
-                message
+                message,
+
+            "why":
+                "The request needs current information.",
+
+            "decision_source":
+                "local-fallback",
         }
 
     if (
-        "reason"
+        not has_final_reply
+        and "reason"
         not in used_tools
     ):
         return {
@@ -867,12 +927,18 @@ def fallback_next_action(
                 "reason",
 
             "instruction":
-                "Answer the request using all available information."
+                "Produce the final answer using gathered information.",
+
+            "why":
+                "Enough information is available to reason.",
+
+            "decision_source":
+                "local-fallback",
         }
 
     if (
         memory_allowed
-        and final_reply
+        and has_final_reply
         and "save_memory"
         not in used_tools
     ):
@@ -881,12 +947,18 @@ def fallback_next_action(
                 "save_memory",
 
             "instruction":
-                "Save the useful final decision or recommendation."
+                "Save the final durable recommendation.",
+
+            "why":
+                "The user explicitly requested memory storage.",
+
+            "decision_source":
+                "local-fallback",
         }
 
     if (
         email_allowed
-        and final_reply
+        and has_final_reply
         and "send_email"
         not in used_tools
     ):
@@ -895,7 +967,13 @@ def fallback_next_action(
                 "send_email",
 
             "instruction":
-                "Email the final answer."
+                "Email the completed answer.",
+
+            "why":
+                "The user explicitly requested email.",
+
+            "decision_source":
+                "local-fallback",
         }
 
     return {
@@ -903,22 +981,32 @@ def fallback_next_action(
             "finish",
 
         "instruction":
-            "Finish the task."
+            "Finish the task.",
+
+        "why":
+            "The request is complete.",
+
+        "decision_source":
+            "local-fallback",
     }
 
 
 # =========================================================
-# AUTONOMOUS NEXT-ACTION DECISION
+# STRICT AUTONOMOUS NEXT-ACTION DECIDER
 # =========================================================
 
 def decide_next_action(
     message,
     used_tools,
-    state_summary,
     email_allowed,
-    memory_allowed
+    memory_allowed,
+    has_memory,
+    has_research,
+    has_final_reply,
+    memory_done,
+    email_done,
 ):
-    available_tools = [
+    available = [
         "read_memory",
         "research_web",
         "reason",
@@ -926,94 +1014,97 @@ def decide_next_action(
     ]
 
     if memory_allowed:
-        available_tools.append(
+        available.append(
             "save_memory"
         )
 
     if email_allowed:
-        available_tools.append(
+        available.append(
             "send_email"
         )
+
+    status = {
+        "tools_already_used":
+            used_tools,
+
+        "memory_available":
+            has_memory,
+
+        "research_available":
+            has_research,
+
+        "final_answer_available":
+            has_final_reply,
+
+        "memory_write_complete":
+            memory_done,
+
+        "email_complete":
+            email_done,
+
+        "email_authorized":
+            email_allowed,
+
+        "memory_write_authorized":
+            memory_allowed,
+    }
 
     prompt = f"""
 USER REQUEST:
 {message}
 
-TOOLS ALREADY USED:
-{", ".join(used_tools) if used_tools else "none"}
+CURRENT STATUS:
+{json.dumps(status)}
 
-CURRENT STATE:
-{state_summary[:2200] if state_summary else "No tool results yet."}
+AVAILABLE TOOLS:
+{", ".join(available)}
 
-AVAILABLE NEXT ACTIONS:
-{", ".join(available_tools)}
-
-Choose ONE next action.
-
-Return ONLY JSON:
-
-{{
-  "tool": "one available action",
-  "instruction": "short specific instruction",
-  "why": "very short reason"
-}}
+Choose exactly ONE next action.
 
 Rules:
-
-- Choose only ONE action.
-- Never choose a tool already used.
-- Use read_memory if user history or preferences matter.
-- Use research_web if live/current information matters.
-- Use reason when enough information exists to answer or decide.
-- Use save_memory only if it is available.
-- Use send_email only if it is available.
-- Choose finish when the request has been completed.
-- Do not repeat tools.
+- Never repeat a tool already used.
+- If user-specific history matters and memory has not been read, choose read_memory.
+- If current information matters and research has not been done, choose research_web.
+- Choose reason after enough information has been collected.
+- Do not save memory before a final answer exists.
+- Do not send email before a final answer exists.
+- save_memory is allowed only when memory_write_authorized is true.
+- send_email is allowed only when email_authorized is true.
+- Choose finish only when all explicitly requested actions are complete.
 """
 
     try:
         raw = call_groq(
             system_prompt=(
-                "You control Tyler AI one action at a time. "
-                "Return compact JSON only."
+                "You are Tyler AI's autonomous "
+                "next-action controller."
             ),
 
             user_prompt=
                 prompt,
 
             max_tokens=
-                180,
+                120,
 
             temperature=
                 0.0,
+
+            response_format=
+                AGENT_DECISION_SCHEMA,
         )
 
-        parsed = parse_json_object(
+        decision = json.loads(
             raw
         )
 
-        if not parsed:
+        tool = decision.get(
+            "tool",
+            ""
+        )
+
+        if tool not in available:
             raise RuntimeError(
-                "No valid decision JSON"
-            )
-
-        tool = str(
-            parsed.get(
-                "tool",
-                ""
-            )
-        ).strip()
-
-        instruction = str(
-            parsed.get(
-                "instruction",
-                message
-            )
-        ).strip()
-
-        if tool not in available_tools:
-            raise RuntimeError(
-                "Invalid tool selected"
+                f"Invalid tool selected: {tool}"
             )
 
         if (
@@ -1021,7 +1112,34 @@ Rules:
             and tool in used_tools
         ):
             raise RuntimeError(
-                "Duplicate tool selected"
+                f"Repeated tool selected: {tool}"
+            )
+
+        if (
+            tool == "save_memory"
+            and not memory_allowed
+        ):
+            raise RuntimeError(
+                "Unauthorized memory write"
+            )
+
+        if (
+            tool == "send_email"
+            and not email_allowed
+        ):
+            raise RuntimeError(
+                "Unauthorized email"
+            )
+
+        if (
+            tool in [
+                "save_memory",
+                "send_email",
+            ]
+            and not has_final_reply
+        ):
+            raise RuntimeError(
+                "Action requires a final answer first"
             )
 
         return {
@@ -1029,18 +1147,19 @@ Rules:
                 tool,
 
             "instruction":
-                instruction or message,
+                decision.get(
+                    "instruction",
+                    ""
+                ),
 
             "why":
-                str(
-                    parsed.get(
-                        "why",
-                        ""
-                    )
-                )[:200],
+                decision.get(
+                    "why",
+                    ""
+                ),
 
             "decision_source":
-                "groq",
+                "groq-strict-schema",
         }
 
     except Exception as e:
@@ -1049,19 +1168,12 @@ Rules:
             used_tools,
             email_allowed,
             memory_allowed,
-            final_reply=(
-                "reason"
-                in used_tools
-            )
+            has_final_reply,
         )
 
         fallback[
-            "decision_source"
-        ] = "local-fallback"
-
-        fallback[
             "decision_error"
-        ] = str(e)[:250]
+        ] = str(e)[:300]
 
         return fallback
 
@@ -1072,46 +1184,56 @@ Rules:
 
 def reasoning_step(
     message,
-    state_summary
+    memory_text,
+    research_text,
 ):
     prompt = f"""
 USER REQUEST:
-
 {message}
 
-INFORMATION GATHERED:
+SAVED USER CONTEXT:
+{memory_text[:1600] if memory_text else "None"}
 
-{state_summary[:5000] if state_summary else "No additional information."}
+LIVE RESEARCH:
+{research_text[:3500] if research_text else "None"}
 
-Give the user the best final answer.
+Answer the user's request.
 
-Rules:
+Requirements:
+- Use user context only when relevant.
+- Use current research when available.
+- If comparing choices, clearly identify the strongest choice.
+- Explain the most important reasons.
+- Do not claim an email or memory save happened yet.
+- Keep the response useful and readable.
+- End with exactly one line in this format when you make a recommendation:
 
-- Use saved memory when relevant.
-- Use live research when available.
-- If comparing choices, pick a clear winner.
-- Explain the main reason for your choice.
-- Do not say something was emailed or saved unless it already happened.
-- Return normal prose.
-- Never return an empty answer.
+RECOMMENDATION: <one concise sentence describing the final recommendation and why>
+
+If the task does not involve a recommendation or decision, end with:
+
+RECOMMENDATION: None
 """
 
     result = call_groq(
         system_prompt=(
-            "You are Tyler AI, a practical personal autonomous assistant."
+            "You are Tyler AI, a practical "
+            "personal autonomous assistant."
         ),
 
         user_prompt=
             prompt,
 
         max_tokens=
-            750,
+            700,
 
         temperature=
             0.2,
     )
 
-    result = result.strip()
+    result = str(
+        result
+    ).strip()
 
     if not result:
         raise RuntimeError(
@@ -1127,7 +1249,7 @@ Rules:
 
 def build_fallback_answer(
     memory_text,
-    research
+    research,
 ):
     pieces = []
 
@@ -1169,38 +1291,57 @@ def build_fallback_answer(
         )
 
     if not pieces:
-        return (
-            "I received the request, but I could not "
-            "generate a complete response this time."
+        pieces.append(
+            "I received the request, but I could "
+            "not generate a complete response."
         )
 
-    return "\n\n".join(
-        pieces
-    )[:3500]
+    return (
+        "\n\n".join(pieces)[:3200]
+        + "\n\nRECOMMENDATION: None"
+    )
 
 
 # =========================================================
-# CLEAN MEMORY CREATION
+# CLEAN DECISION MEMORY
 # =========================================================
 
-def build_concise_memory(
+def extract_recommendation(
     final_reply
 ):
-    text = normalize_text(
+    if not final_reply:
+        return None
+
+    match = re.search(
+        r"(?im)^\s*RECOMMENDATION:\s*(.+?)\s*$",
         final_reply
     )
 
-    if not text:
-        return None
+    if match:
+        recommendation = normalize_text(
+            match.group(1)
+        )
 
+        if (
+            recommendation
+            and recommendation.lower()
+            not in [
+                "none",
+                "n/a",
+                "not applicable",
+            ]
+        ):
+            return recommendation[:350]
+
+    # fallback if model did not follow ending format
     sentences = re.split(
         r"(?<=[.!?])\s+",
-        text
+        normalize_text(
+            final_reply
+        )
     )
 
-    preferred = []
-
-    trigger_phrases = [
+    trigger_terms = [
         "recommend",
         "best fit",
         "best choice",
@@ -1208,7 +1349,6 @@ def build_concise_memory(
         "winner",
         "my pick",
         "i would choose",
-        "choose",
     ]
 
     for sentence in sentences:
@@ -1216,42 +1356,39 @@ def build_concise_memory(
 
         if any(
             trigger in lower
-            for trigger in trigger_phrases
+            for trigger in trigger_terms
         ):
-            preferred.append(
+            clean = normalize_text(
                 sentence
             )
 
-    if preferred:
-        memory = " ".join(
-            preferred[:2]
-        )
+            if "|" not in clean:
+                return clean[:350]
 
-    else:
-        memory = " ".join(
-            sentences[:2]
-        )
+    return None
 
-    memory = normalize_text(
-        memory
-    )[:400]
 
-    if not memory:
+def build_clean_memory(
+    final_reply
+):
+    recommendation = extract_recommendation(
+        final_reply
+    )
+
+    if not recommendation:
         return None
 
     return (
-        "Tyler AI decision: "
-        + memory
-    )
+        "Tyler AI recommendation: "
+        + recommendation
+    )[:400]
 
 
 # =========================================================
-# AUTONOMOUS LOOP
+# AUTONOMOUS AGENT LOOP
 # =========================================================
 
-def run_agent(
-    message
-):
+def run_agent(message):
     email_allowed = user_allows_email(
         message
     )
@@ -1261,25 +1398,20 @@ def run_agent(
     )
 
     used_tools = []
-
     actions = []
 
-    state_parts = []
-
-    latest_memory = ""
-
-    latest_research = None
+    memory_text = ""
+    research = None
+    research_text = ""
 
     final_reply = ""
 
     memory_result = None
-
     email_result = None
 
     sources = []
 
     decision_calls = 0
-
     reasoning_calls = 0
 
 
@@ -1288,37 +1420,54 @@ def run_agent(
         MAX_AGENT_ACTIONS + 1
     ):
 
-        state_summary = "\n\n".join(
-            state_parts
-        )[-5500:]
-
         decision = decide_next_action(
-            message,
-            used_tools,
-            state_summary,
-            email_allowed,
-            memory_allowed,
+            message=
+                message,
+
+            used_tools=
+                used_tools,
+
+            email_allowed=
+                email_allowed,
+
+            memory_allowed=
+                memory_allowed,
+
+            has_memory=
+                bool(memory_text),
+
+            has_research=
+                bool(research),
+
+            has_final_reply=
+                bool(final_reply),
+
+            memory_done=
+                memory_result is not None,
+
+            email_done=
+                email_result is not None,
         )
 
-        if decision.get(
-            "decision_source"
-        ) == "groq":
+        if (
+            decision.get(
+                "decision_source"
+            )
+            == "groq-strict-schema"
+        ):
             decision_calls += 1
 
         tool = decision[
             "tool"
         ]
 
-        instruction = decision.get(
-            "instruction",
-            message
-        )
 
-        # -------------------------------------------------
+        # =================================================
         # FINISH
-        # -------------------------------------------------
+        # =================================================
 
         if tool == "finish":
+
             actions.append(
                 {
                     "action":
@@ -1335,11 +1484,12 @@ def run_agent(
             break
 
 
-        # -------------------------------------------------
-        # DUPLICATE SAFETY
-        # -------------------------------------------------
+        # =================================================
+        # DUPLICATE PROTECTION
+        # =================================================
 
         if tool in used_tools:
+
             actions.append(
                 {
                     "action":
@@ -1353,31 +1503,35 @@ def run_agent(
 
                     "reason":
                         "Duplicate tool prevented.",
+
+                    "decision":
+                        decision,
                 }
             )
 
             break
+
 
         used_tools.append(
             tool
         )
 
 
-        # -------------------------------------------------
+        # =================================================
         # READ MEMORY
-        # -------------------------------------------------
+        # =================================================
 
         if tool == "read_memory":
 
             try:
-                latest_memory = (
+                memory_text = (
                     compact_memory_context(
                         8
                     )
                 )
 
                 result = (
-                    latest_memory
+                    memory_text
                     or
                     "No saved memory was found."
                 )
@@ -1387,11 +1541,6 @@ def run_agent(
                     f"Memory read failed: {e}"
                 )
 
-            state_parts.append(
-                "MEMORY:\n"
-                + result
-            )
-
             actions.append(
                 {
                     "action":
@@ -1409,23 +1558,27 @@ def run_agent(
             )
 
 
-        # -------------------------------------------------
-        # WEB RESEARCH
-        # -------------------------------------------------
+        # =================================================
+        # RESEARCH WEB
+        # =================================================
 
         elif tool == "research_web":
 
             try:
-                latest_research = web_search(
-                    instruction
+                research = web_search(
+                    decision.get(
+                        "instruction",
+                        ""
+                    )
+                    or message
                 )
 
                 research_text = compact_research(
-                    latest_research
+                    research
                 )
 
                 sources.extend(
-                    latest_research.get(
+                    research.get(
                         "sources",
                         []
                     )
@@ -1434,14 +1587,12 @@ def run_agent(
                 result = research_text
 
             except Exception as e:
+                research = None
+                research_text = ""
+
                 result = (
                     f"Research failed: {e}"
                 )
-
-            state_parts.append(
-                "RESEARCH:\n"
-                + result
-            )
 
             actions.append(
                 {
@@ -1460,44 +1611,36 @@ def run_agent(
             )
 
 
-        # -------------------------------------------------
+        # =================================================
         # REASON
-        # -------------------------------------------------
+        # =================================================
 
         elif tool == "reason":
-
-            state_summary = "\n\n".join(
-                state_parts
-            )[-5000:]
 
             try:
                 reasoning_calls += 1
 
                 final_reply = reasoning_step(
                     message,
-                    state_summary
+                    memory_text,
+                    research_text,
                 )
 
                 fallback_used = False
+                reason_error = None
 
             except Exception as e:
-                final_reply = build_fallback_answer(
-                    latest_memory,
-                    latest_research
+                final_reply = (
+                    build_fallback_answer(
+                        memory_text,
+                        research,
+                    )
                 )
 
                 fallback_used = True
+                reason_error = str(e)[:300]
 
-                reason_error = str(
-                    e
-                )[:300]
-
-            state_parts.append(
-                "FINAL REASONING:\n"
-                + final_reply
-            )
-
-            action_data = {
+            action_record = {
                 "action":
                     action_number,
 
@@ -1514,32 +1657,34 @@ def run_agent(
                     fallback_used,
             }
 
-            if fallback_used:
-                action_data[
+            if reason_error:
+                action_record[
                     "reason_error"
                 ] = reason_error
 
             actions.append(
-                action_data
+                action_record
             )
 
 
-        # -------------------------------------------------
+        # =================================================
         # SAVE MEMORY
-        # -------------------------------------------------
+        # =================================================
 
         elif tool == "save_memory":
 
             if not memory_allowed:
+
                 result = {
                     "saved":
                         False,
 
                     "reason":
-                        "User did not authorize memory writing."
+                        "Memory writing was not authorized."
                 }
 
             elif memory_result is not None:
+
                 result = {
                     "saved":
                         False,
@@ -1549,22 +1694,25 @@ def run_agent(
                 }
 
             else:
-                candidate = build_concise_memory(
+                candidate = build_clean_memory(
                     final_reply
                 )
 
                 if not candidate:
+
                     result = {
                         "saved":
                             False,
 
                         "reason":
-                            "No useful final result was available."
+                            "No clear recommendation "
+                            "was available to save."
                     }
 
                 elif looks_sensitive(
                     candidate
                 ):
+
                     result = {
                         "saved":
                             False,
@@ -1576,6 +1724,7 @@ def run_agent(
                 elif memory_exists(
                     candidate
                 ):
+
                     result = {
                         "saved":
                             False,
@@ -1588,6 +1737,7 @@ def run_agent(
                     }
 
                 else:
+
                     try:
                         database_result = save_memory(
                             candidate,
@@ -1613,6 +1763,7 @@ def run_agent(
                         }
 
                     except Exception as e:
+
                         result = {
                             "saved":
                                 False,
@@ -1640,22 +1791,24 @@ def run_agent(
             )
 
 
-        # -------------------------------------------------
-        # EMAIL
-        # -------------------------------------------------
+        # =================================================
+        # SEND EMAIL
+        # =================================================
 
         elif tool == "send_email":
 
             if not email_allowed:
+
                 result = {
                     "sent":
                         False,
 
                     "reason":
-                        "User did not authorize email."
+                        "Email was not authorized."
                 }
 
             elif email_result is not None:
+
                 result = {
                     "sent":
                         False,
@@ -1665,22 +1818,15 @@ def run_agent(
                 }
 
             else:
-                body = (
-                    final_reply.strip()
-                    if final_reply
-                    else build_fallback_answer(
-                        latest_memory,
-                        latest_research
-                    )
-                )
 
                 try:
                     result = send_email(
-                        body,
+                        final_reply,
                         "Tyler AI Results"
                     )
 
                 except Exception as e:
+
                     result = {
                         "sent":
                             False,
@@ -1709,57 +1855,59 @@ def run_agent(
 
 
     # =====================================================
-    # GUARANTEE FINAL ANSWER
+    # GUARANTEE A FINAL ANSWER
     # =====================================================
 
     if not final_reply:
-        state_summary = "\n\n".join(
-            state_parts
-        )[-5000:]
 
         try:
             reasoning_calls += 1
 
             final_reply = reasoning_step(
                 message,
-                state_summary
+                memory_text,
+                research_text,
             )
 
         except Exception:
             final_reply = build_fallback_answer(
-                latest_memory,
-                latest_research
+                memory_text,
+                research,
             )
 
 
     # =====================================================
-    # REQUIRED USER-AUTHORIZED ACTIONS
+    # GUARANTEE EXPLICITLY AUTHORIZED ACTIONS
     #
-    # If the loop hits its action limit before reaching
-    # email/save, complete those explicit user requests
-    # exactly once after reasoning.
+    # If the 5-action limit prevents the controller from
+    # reaching save/email, perform each explicitly requested
+    # action once after reasoning.
     # =====================================================
 
     if (
         memory_allowed
         and memory_result is None
     ):
-        candidate = build_concise_memory(
+
+        candidate = build_clean_memory(
             final_reply
         )
 
         if not candidate:
+
             memory_result = {
                 "saved":
                     False,
 
                 "reason":
-                    "No useful result was available."
+                    "No clear recommendation "
+                    "was available to save."
             }
 
         elif looks_sensitive(
             candidate
         ):
+
             memory_result = {
                 "saved":
                     False,
@@ -1771,6 +1919,7 @@ def run_agent(
         elif memory_exists(
             candidate
         ):
+
             memory_result = {
                 "saved":
                     False,
@@ -1783,6 +1932,7 @@ def run_agent(
             }
 
         else:
+
             try:
                 db_result = save_memory(
                     candidate,
@@ -1808,6 +1958,7 @@ def run_agent(
                 }
 
             except Exception as e:
+
                 memory_result = {
                     "saved":
                         False,
@@ -1821,6 +1972,7 @@ def run_agent(
         email_allowed
         and email_result is None
     ):
+
         try:
             email_result = send_email(
                 final_reply,
@@ -1828,6 +1980,7 @@ def run_agent(
             )
 
         except Exception as e:
+
             email_result = {
                 "sent":
                     False,
@@ -1896,7 +2049,13 @@ def home():
                 "online",
 
             "version":
-                "2.2-autonomous-loop",
+                "2.2.1-strict-agent",
+
+            "mode":
+                "autonomous-next-action",
+
+            "decision_format":
+                "groq-strict-json-schema",
 
             "secured":
                 bool(
@@ -1923,9 +2082,6 @@ def home():
                     SUPABASE_URL
                     and SUPABASE_KEY
                 ),
-
-            "mode":
-                "autonomous-next-action",
 
             "max_actions":
                 MAX_AGENT_ACTIONS,
@@ -1957,7 +2113,7 @@ def health():
                 "healthy",
 
             "version":
-                "2.2-autonomous-loop",
+                "2.2.1-strict-agent",
         }
     )
 
@@ -2003,6 +2159,7 @@ def memories_route():
         )
 
     except Exception as e:
+
         return jsonify(
             {
                 "success":
@@ -2044,14 +2201,12 @@ def chat():
         or {}
     )
 
-
     message = str(
         data.get(
             "message",
             ""
         )
     ).strip()
-
 
     if not message:
 
@@ -2196,7 +2351,7 @@ def chat():
                     "autonomous_agent",
 
                 "version":
-                    "2.2-autonomous-loop",
+                    "2.2.1-strict-agent",
 
                 "error":
                     str(e),
@@ -2213,7 +2368,7 @@ def chat():
                 "autonomous_agent",
 
             "version":
-                "2.2-autonomous-loop",
+                "2.2.1-strict-agent",
 
             "reply":
                 execution[
@@ -2309,7 +2464,6 @@ def webhook():
         )
         or {}
     )
-
 
     if not data.get(
         "action"
