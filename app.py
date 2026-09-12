@@ -6,6 +6,7 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
+
 # =========================================================
 # CONFIG
 # =========================================================
@@ -30,6 +31,7 @@ GROQ_MODEL = os.environ.get(
 # =========================================================
 
 def authorized():
+
     supplied = request.headers.get("X-Tyler-Key")
 
     return bool(
@@ -40,10 +42,28 @@ def authorized():
 
 
 # =========================================================
-# HELPERS
+# BASIC HELPERS
 # =========================================================
 
+def clamp(value, low, high):
+
+    try:
+        value = int(value)
+
+    except Exception:
+        value = low
+
+    return max(
+        low,
+        min(high, value)
+    )
+
+
 def parse_json_object(text):
+
+    if not text:
+        return None
+
     text = str(text).strip()
 
     text = re.sub(
@@ -59,27 +79,35 @@ def parse_json_object(text):
         text
     )
 
+    try:
+        parsed = json.loads(text)
+
+        if isinstance(parsed, dict):
+            return parsed
+
+    except Exception:
+        pass
+
+
     start = text.find("{")
     end = text.rfind("}")
 
-    if start == -1 or end == -1:
-        raise ValueError("No JSON object found")
+    if start >= 0 and end > start:
 
-    return json.loads(
-        text[start:end + 1]
-    )
+        try:
+
+            parsed = json.loads(
+                text[start:end + 1]
+            )
+
+            if isinstance(parsed, dict):
+                return parsed
+
+        except Exception:
+            pass
 
 
-def clamp(value, low, high):
-    try:
-        value = int(value)
-    except Exception:
-        value = low
-
-    return max(
-        low,
-        min(high, value)
-    )
+    return None
 
 
 # =========================================================
@@ -92,19 +120,26 @@ def call_groq(
     max_tokens=700,
     temperature=0.2
 ):
+
     if not GROQ_API_KEY:
+
         raise RuntimeError(
             "GROQ_API_KEY is not configured"
         )
 
+
     response = requests.post(
+
         "https://api.groq.com/openai/v1/chat/completions",
+
         headers={
             "Authorization":
                 f"Bearer {GROQ_API_KEY}",
+
             "Content-Type":
                 "application/json",
         },
+
         json={
             "model":
                 GROQ_MODEL,
@@ -113,12 +148,15 @@ def call_groq(
                 {
                     "role":
                         "system",
+
                     "content":
                         system_prompt,
                 },
+
                 {
                     "role":
                         "user",
+
                     "content":
                         user_prompt,
                 },
@@ -130,40 +168,47 @@ def call_groq(
             "max_tokens":
                 max_tokens,
         },
+
         timeout=90,
     )
 
+
     try:
+
         result = response.json()
 
     except Exception:
+
         raise RuntimeError(
             f"Groq returned "
             f"{response.status_code}: "
             f"{response.text[:500]}"
         )
 
+
     if not response.ok:
+
         error = result.get(
             "error",
             {}
         )
 
-        if isinstance(
-            error,
-            dict
-        ):
+        if isinstance(error, dict):
+
             message = error.get(
                 "message",
                 str(error)
             )
 
         else:
+
             message = str(error)
+
 
         raise RuntimeError(
             message
         )
+
 
     return (
         result["choices"][0]
@@ -177,10 +222,13 @@ def call_groq(
 # =========================================================
 
 def supabase_headers():
+
     if not SUPABASE_KEY:
+
         raise RuntimeError(
             "SUPABASE_KEY is not configured"
         )
+
 
     return {
         "apikey":
@@ -195,11 +243,15 @@ def supabase_headers():
 
 
 def get_memories(limit=20):
+
     if not SUPABASE_URL:
         return []
 
+
     response = requests.get(
+
         f"{SUPABASE_URL}/rest/v1/memories",
+
         headers=
             supabase_headers(),
 
@@ -209,8 +261,7 @@ def get_memories(limit=20):
                 "category,importance",
 
             "order":
-                "importance.desc,"
-                "created_at.desc",
+                "importance.desc,created_at.desc",
 
             "limit":
                 limit,
@@ -219,12 +270,15 @@ def get_memories(limit=20):
         timeout=30,
     )
 
+
     if not response.ok:
+
         raise RuntimeError(
             f"Supabase read failed: "
             f"{response.status_code} "
             f"{response.text[:500]}"
         )
+
 
     return response.json()
 
@@ -234,12 +288,16 @@ def save_memory(
     category="general",
     importance=5
 ):
+
     if not SUPABASE_URL:
+
         raise RuntimeError(
             "SUPABASE_URL is not configured"
         )
 
+
     response = requests.post(
+
         f"{SUPABASE_URL}/rest/v1/memories",
 
         headers={
@@ -267,32 +325,41 @@ def save_memory(
         timeout=30,
     )
 
+
     if not response.ok:
+
         raise RuntimeError(
             f"Supabase save failed: "
             f"{response.status_code} "
             f"{response.text[:500]}"
         )
 
+
     return response.json()
 
 
 def memory_exists(text):
+
     target = (
         str(text)
         .strip()
         .lower()
     )
 
+
     try:
+
         memories = get_memories(
             50
         )
 
     except Exception:
+
         return False
 
+
     for item in memories:
+
         existing = (
             str(
                 item.get(
@@ -307,23 +374,27 @@ def memory_exists(text):
         if existing == target:
             return True
 
+
     return False
 
 
-def compact_memory_context(
-    limit=8
-):
+def compact_memory_context(limit=8):
+
     try:
+
         memories = get_memories(
             limit
         )
 
     except Exception:
+
         return ""
+
 
     lines = []
 
     for item in memories:
+
         text = str(
             item.get(
                 "memories",
@@ -340,9 +411,8 @@ def compact_memory_context(
             f"- [{category}] {text}"
         )
 
-    return "\n".join(
-        lines
-    )
+
+    return "\n".join(lines)[:2000]
 
 
 # =========================================================
@@ -350,6 +420,7 @@ def compact_memory_context(
 # =========================================================
 
 def looks_sensitive(text):
+
     lower = text.lower()
 
     blocked_terms = [
@@ -369,6 +440,7 @@ def looks_sensitive(text):
         "private key",
     ]
 
+
     return any(
         term in lower
         for term in blocked_terms
@@ -379,30 +451,29 @@ def looks_sensitive(text):
 # EXPLICIT MEMORY
 # =========================================================
 
-def explicit_memory_request(
-    message
-):
-    lower = message.lower()
+def explicit_memory_request(message):
 
-    phrases = [
-        "remember that",
-        "remember this",
-        "save this to memory",
-        "save that to memory",
-        "store this",
-        "don't forget",
-        "do not forget",
+    lower = message.lower().strip()
+
+    starts = [
+        "remember that ",
+        "remember this ",
+        "save this to memory ",
+        "save that to memory ",
+        "store this ",
+        "don't forget ",
+        "do not forget ",
     ]
 
+
     return any(
-        phrase in lower
-        for phrase in phrases
+        lower.startswith(x)
+        for x in starts
     )
 
 
-def clean_explicit_memory(
-    message
-):
+def clean_explicit_memory(message):
+
     text = message.strip()
 
     patterns = [
@@ -415,7 +486,9 @@ def clean_explicit_memory(
         r"^do not forget(?: that)?\s+",
     ]
 
+
     for pattern in patterns:
+
         text = re.sub(
             pattern,
             "",
@@ -423,34 +496,35 @@ def clean_explicit_memory(
             flags=re.IGNORECASE
         )
 
+
     return text.strip()
 
 
-def guess_memory_category(
-    text
-):
+def guess_memory_category(text):
+
     lower = text.lower()
+
 
     if any(
         x in lower
         for x in [
             "favorite",
-            "favourite",
             "prefer",
             "i like",
         ]
     ):
         return "preference"
 
+
     if any(
         x in lower
         for x in [
             "goal",
-            "my goal",
             "want to become",
         ]
     ):
         return "goal"
+
 
     if any(
         x in lower
@@ -462,6 +536,7 @@ def guess_memory_category(
     ):
         return "project"
 
+
     if any(
         x in lower
         for x in [
@@ -472,6 +547,7 @@ def guess_memory_category(
     ):
         return "career"
 
+
     return "general"
 
 
@@ -480,12 +556,16 @@ def guess_memory_category(
 # =========================================================
 
 def web_search(query):
+
     if not TAVILY_API_KEY:
+
         raise RuntimeError(
             "TAVILY_API_KEY is not configured"
         )
 
+
     response = requests.post(
+
         "https://api.tavily.com/search",
 
         headers={
@@ -507,33 +587,39 @@ def web_search(query):
                 True,
 
             "max_results":
-                3,
+                4,
         },
 
         timeout=60,
     )
 
+
     try:
+
         result = response.json()
 
     except Exception:
+
         raise RuntimeError(
             f"Tavily returned "
             f"{response.status_code}: "
             f"{response.text[:500]}"
         )
 
+
     if not response.ok:
+
         raise RuntimeError(
             str(result)
         )
+
 
     sources = []
 
     for item in result.get(
         "results",
         []
-    )[:3]:
+    )[:4]:
 
         sources.append(
             {
@@ -555,9 +641,10 @@ def web_search(query):
                             "content",
                             ""
                         )
-                    )[:450],
+                    )[:500],
             }
         )
+
 
     return {
         "answer":
@@ -566,16 +653,15 @@ def web_search(query):
                     "answer",
                     ""
                 )
-            )[:900],
+            )[:1200],
 
         "sources":
             sources,
     }
 
 
-def compact_research(
-    research
-):
+def compact_research(research):
+
     pieces = []
 
     answer = research.get(
@@ -583,11 +669,14 @@ def compact_research(
         ""
     )
 
+
     if answer:
+
         pieces.append(
             "SEARCH SUMMARY:\n"
             + answer
         )
+
 
     for index, source in enumerate(
         research.get(
@@ -596,32 +685,37 @@ def compact_research(
         ),
         start=1
     ):
+
         pieces.append(
+
             f"\nSOURCE {index}\n"
+
             f"Title: "
             f"{source.get('title', '')}\n"
+
             f"URL: "
             f"{source.get('url', '')}\n"
+
             f"Info: "
             f"{source.get('content', '')}"
         )
 
-    return "\n".join(
-        pieces
-    )
+
+    return "\n".join(pieces)[:4500]
 
 
 # =========================================================
 # N8N
 # =========================================================
 
-def send_to_n8n(
-    payload
-):
+def send_to_n8n(payload):
+
     if not N8N_WEBHOOK_URL:
+
         raise RuntimeError(
             "N8N_WEBHOOK_URL is not configured"
         )
+
 
     response = requests.post(
         N8N_WEBHOOK_URL,
@@ -629,12 +723,15 @@ def send_to_n8n(
         timeout=60,
     )
 
+
     if not response.ok:
+
         raise RuntimeError(
             f"n8n returned "
             f"{response.status_code}: "
             f"{response.text[:500]}"
         )
+
 
     return response.text
 
@@ -643,11 +740,14 @@ def send_email(
     body,
     subject="Tyler AI Results"
 ):
+
     if not TYLER_DEFAULT_EMAIL:
+
         raise RuntimeError(
             "TYLER_DEFAULT_EMAIL "
             "is not configured"
         )
+
 
     result = send_to_n8n(
         {
@@ -667,6 +767,7 @@ def send_email(
         }
     )
 
+
     return {
         "sent":
             True,
@@ -683,23 +784,27 @@ def send_email(
 
 
 # =========================================================
-# FALLBACK ROUTER
+# LOCAL ROUTER
 # =========================================================
 
-def fallback_route(
-    message
-):
+def fallback_route(message):
+
     lower = message.lower()
 
     steps = []
 
+
     memory_terms = [
         "what you remember",
+        "what you know about me",
         "based on what you know",
-        "my favorite",
-        "my goal",
+        "my preference",
         "my preferences",
+        "my goal",
+        "my goals",
+        "my favorite",
     ]
+
 
     research_terms = [
         "research",
@@ -711,33 +816,53 @@ def fallback_route(
         "search",
         "recent",
         "right now",
+        "best current",
     ]
+
+
+    save_terms = [
+        "save that recommendation",
+        "save the recommendation",
+        "save this recommendation",
+        "remember which",
+        "remember the recommendation",
+        "remember my choice",
+        "save it to memory",
+        "save to memory",
+    ]
+
 
     email_terms = [
         "email me",
         "send me an email",
+        "email the result",
         "email the results",
+        "send the result",
         "send the results",
     ]
+
 
     if any(
         term in lower
         for term in memory_terms
     ):
+
         steps.append(
             {
                 "tool":
                     "read_memory",
 
                 "instruction":
-                    "Read relevant long-term memory."
+                    "Read relevant user preferences, goals, and project information."
             }
         )
+
 
     if any(
         term in lower
         for term in research_terms
     ):
+
         steps.append(
             {
                 "tool":
@@ -748,20 +873,39 @@ def fallback_route(
             }
         )
 
+
     steps.append(
         {
             "tool":
                 "reason",
 
             "instruction":
-                "Answer the user's request using previous results."
+                "Complete the user's request using all available results."
         }
     )
+
+
+    if any(
+        term in lower
+        for term in save_terms
+    ):
+
+        steps.append(
+            {
+                "tool":
+                    "save_memory",
+
+                "instruction":
+                    "Save the final recommendation or decision."
+            }
+        )
+
 
     if any(
         term in lower
         for term in email_terms
     ):
+
         steps.append(
             {
                 "tool":
@@ -772,9 +916,10 @@ def fallback_route(
             }
         )
 
+
     return {
         "goal":
-            message[:200],
+            message[:250],
 
         "steps":
             steps[:6],
@@ -785,88 +930,64 @@ def fallback_route(
 
 
 # =========================================================
-# TOOL ROUTER V2.1
+# GROQ ROUTER
 # =========================================================
 
-def tool_router(
-    message
-):
+def tool_router(message):
+
     prompt = f"""
-USER REQUEST:
+User request:
+
 {message}
 
-You are Tyler AI's autonomous tool router.
+Choose the smallest ordered list of tools needed.
 
 Available tools:
 
-1. read_memory
-Read useful long-term information about the user.
+read_memory
+research_web
+reason
+save_memory
+send_email
 
-2. research_web
-Search the live internet.
-
-3. reason
-Analyze information, compare choices, rank options,
-make decisions, or synthesize previous tool results.
-
-4. save_memory
-Store a durable preference, decision, project detail,
-or long-term goal.
-
-5. send_email
-Email the final useful result to the user.
-
-Create the smallest ordered plan needed to complete
-the user's request.
-
-Return ONLY valid JSON:
+Return ONLY a JSON object in this exact shape:
 
 {{
-  "goal": "short description of the goal",
+  "goal": "short goal",
   "steps": [
     {{
       "tool": "read_memory",
-      "instruction": "what memory is needed"
-    }},
-    {{
-      "tool": "research_web",
-      "instruction": "what should be researched"
-    }},
-    {{
-      "tool": "reason",
-      "instruction": "what should be analyzed or decided"
-    }},
-    {{
-      "tool": "save_memory",
-      "instruction": "what durable result should be remembered"
-    }},
-    {{
-      "tool": "send_email",
-      "instruction": "what result should be emailed"
+      "instruction": "instruction"
     }}
   ]
 }}
 
 Rules:
 
-- Use only the listed tools.
-- Put tools in execution order.
-- Maximum 6 steps.
-- Do not research unless current information is needed.
-- Do not email unless the user asks for email.
-- Do not save memory unless useful long term.
-- Never save passwords, API keys, tokens,
-  banking credentials, private keys, or secrets.
-- Use read_memory when user preferences, goals,
-  projects, or past decisions could improve the result.
-- Use reason after research when comparison,
-  ranking, selection, or synthesis is needed.
+Maximum 6 steps.
+
+Use read_memory when previous preferences,
+goals, projects, or decisions matter.
+
+Use research_web when current information matters.
+
+Use reason when analysis, comparison,
+ranking, synthesis, or a final answer is needed.
+
+Use save_memory only when the user explicitly asks
+to remember or save a durable result.
+
+Use send_email only when the user asks for email.
+
+Never store passwords, API keys,
+tokens, secrets, or banking credentials.
 """
 
+
     raw = call_groq(
+
         system_prompt=(
-            "You are Tyler AI Tool Router v2.1. "
-            "Create short ordered executable plans. "
+            "You are Tyler AI's tool router. "
             "Output JSON only."
         ),
 
@@ -874,15 +995,24 @@ Rules:
             prompt,
 
         max_tokens=
-            400,
+            350,
 
         temperature=
             0.0,
     )
 
-    route = parse_json_object(
+
+    parsed = parse_json_object(
         raw
     )
+
+
+    if not parsed:
+
+        return fallback_route(
+            message
+        )
+
 
     allowed_tools = {
         "read_memory",
@@ -892,12 +1022,21 @@ Rules:
         "send_email",
     }
 
+
     clean_steps = []
 
-    for step in route.get(
+
+    for step in parsed.get(
         "steps",
         []
     )[:6]:
+
+        if not isinstance(
+            step,
+            dict
+        ):
+            continue
+
 
         tool = str(
             step.get(
@@ -906,18 +1045,18 @@ Rules:
             )
         ).strip()
 
+
         instruction = str(
             step.get(
                 "instruction",
-                ""
+                message
             )
         ).strip()
+
 
         if tool not in allowed_tools:
             continue
 
-        if not instruction:
-            instruction = message
 
         clean_steps.append(
             {
@@ -925,25 +1064,22 @@ Rules:
                     tool,
 
                 "instruction":
-                    instruction,
+                    instruction or message,
             }
         )
 
-    if not clean_steps:
-        clean_steps = [
-            {
-                "tool":
-                    "reason",
 
-                "instruction":
-                    message,
-            }
-        ]
+    if not clean_steps:
+
+        return fallback_route(
+            message
+        )
+
 
     return {
         "goal":
             str(
-                route.get(
+                parsed.get(
                     "goal",
                     message
                 )
@@ -953,12 +1089,12 @@ Rules:
             clean_steps,
 
         "router":
-            "groq-v2.1-chain",
+            "groq-v2.1.1",
     }
 
 
 # =========================================================
-# REASONING STEP
+# REASONING
 # =========================================================
 
 def reasoning_step(
@@ -966,35 +1102,51 @@ def reasoning_step(
     instruction,
     working_context
 ):
+
     prompt = f"""
-ORIGINAL REQUEST:
+ORIGINAL USER REQUEST:
+
 {original_request}
 
-CURRENT INSTRUCTION:
+
+CURRENT TASK:
+
 {instruction}
 
-RESULTS FROM EARLIER TOOLS:
-{working_context if working_context else "None yet."}
 
-Perform the current reasoning step.
+AVAILABLE MEMORY AND TOOL RESULTS:
+
+{working_context[:6500] if working_context else "None"}
+
+
+Create the best useful final answer.
 
 Rules:
-- Use earlier tool results when relevant.
-- Do not claim an action happened unless it appears above.
-- Give concrete conclusions.
-- Keep the result compact.
+
+Use the research and memory above when relevant.
+
+If comparing products or options,
+clearly choose a winner.
+
+Do not claim something was emailed or saved
+unless that action actually happened.
+
+Be concise but useful.
 """
 
+
     return call_groq(
+
         system_prompt=(
-            "You are Tyler AI's reasoning engine."
+            "You are Tyler AI, a capable personal "
+            "autonomous assistant."
         ),
 
         user_prompt=
             prompt,
 
         max_tokens=
-            700,
+            800,
 
         temperature=
             0.2,
@@ -1002,80 +1154,81 @@ Rules:
 
 
 # =========================================================
-# MEMORY FROM WORKING CONTEXT
+# MEMORY FROM FINAL ANSWER
 # =========================================================
 
-def create_memory_from_context(
-    instruction,
-    working_context
+def build_recommendation_memory(
+    final_reply,
+    original_request
 ):
-    prompt = f"""
-MEMORY INSTRUCTION:
-{instruction}
 
-WORKING RESULTS:
-{working_context}
+    if not final_reply:
+        return None
 
-Extract ONE concise durable memory worth saving.
 
-Return ONLY JSON:
+    text = final_reply.strip()
 
-{{
-  "memory": "durable fact",
-  "category": "preference, project, goal, career, decision, or general",
-  "importance": 5
-}}
 
-Never include secrets, tokens, passwords,
-banking credentials, or authentication information.
-"""
+    lines = [
+        line.strip()
+        for line in text.splitlines()
+        if line.strip()
+    ]
 
-    raw = call_groq(
-        system_prompt=(
-            "You extract one safe long-term memory."
-        ),
 
-        user_prompt=
-            prompt,
+    useful = []
 
-        max_tokens=
-            220,
 
-        temperature=
-            0.0,
-    )
+    for line in lines:
 
-    result = parse_json_object(
-        raw
-    )
+        lower = line.lower()
 
-    return {
-        "memory":
-            str(
-                result.get(
-                    "memory",
-                    ""
-                )
-            )[:600],
+        if any(
+            word in lower
+            for word in [
+                "recommend",
+                "best",
+                "winner",
+                "choice",
+                "pick",
+            ]
+        ):
 
-        "category":
-            str(
-                result.get(
-                    "category",
-                    "general"
-                )
-            )[:50],
+            useful.append(line)
 
-        "importance":
-            clamp(
-                result.get(
-                    "importance",
-                    5
-                ),
-                1,
-                10
-            ),
-    }
+
+    if useful:
+
+        memory = " ".join(
+            useful[:3]
+        )
+
+    else:
+
+        memory = text[:550]
+
+
+    memory = re.sub(
+        r"\s+",
+        " ",
+        memory
+    ).strip()
+
+
+    if len(memory) > 600:
+
+        memory = memory[:600]
+
+
+    if memory:
+
+        return (
+            "Tyler AI recommendation: "
+            + memory
+        )
+
+
+    return None
 
 
 # =========================================================
@@ -1086,15 +1239,21 @@ def execute_chain(
     message,
     route
 ):
+
     results = []
+
     working_context = ""
 
     final_reply = ""
+
     email_result = None
+
     memory_result = None
+
     sources = []
 
-    extra_groq_calls = 0
+    groq_calls = 0
+
 
     for index, step in enumerate(
         route["steps"],
@@ -1102,7 +1261,9 @@ def execute_chain(
     ):
 
         tool = step["tool"]
+
         instruction = step["instruction"]
+
 
         # -------------------------------------------------
         # READ MEMORY
@@ -1110,31 +1271,47 @@ def execute_chain(
 
         if tool == "read_memory":
 
-            memory_text = (
-                compact_memory_context(
-                    8
+            try:
+
+                memory_text = (
+                    compact_memory_context(
+                        8
+                    )
                 )
-            )
 
-            result = {
-                "step":
-                    index,
+                result_value = (
+                    memory_text
+                    or "No relevant saved memory found."
+                )
 
-                "tool":
-                    tool,
+            except Exception as e:
 
-                "result":
-                    memory_text,
-            }
+                result_value = (
+                    f"Memory read failed: {e}"
+                )
+
 
             results.append(
-                result
+                {
+                    "step":
+                        index,
+
+                    "tool":
+                        tool,
+
+                    "result":
+                        result_value,
+                }
             )
 
+
             working_context += (
+
                 f"\n\nSTEP {index} MEMORY:\n"
-                f"{memory_text}"
+
+                f"{result_value}"
             )
+
 
         # -------------------------------------------------
         # RESEARCH WEB
@@ -1142,46 +1319,78 @@ def execute_chain(
 
         elif tool == "research_web":
 
-            research = web_search(
-                instruction
-            )
+            try:
 
-            compact = compact_research(
-                research
-            )
-
-            sources.extend(
-                research.get(
-                    "sources",
-                    []
+                research = web_search(
+                    instruction
                 )
-            )
 
-            result = {
-                "step":
-                    index,
+                compact = compact_research(
+                    research
+                )
 
-                "tool":
-                    tool,
-
-                "result":
-                    compact,
-
-                "sources":
+                sources.extend(
                     research.get(
                         "sources",
                         []
-                    ),
-            }
+                    )
+                )
 
-            results.append(
-                result
-            )
 
-            working_context += (
-                f"\n\nSTEP {index} RESEARCH:\n"
-                f"{compact}"
-            )
+                results.append(
+                    {
+                        "step":
+                            index,
+
+                        "tool":
+                            tool,
+
+                        "result":
+                            compact,
+
+                        "sources":
+                            research.get(
+                                "sources",
+                                []
+                            ),
+                    }
+                )
+
+
+                working_context += (
+
+                    f"\n\nSTEP {index} RESEARCH:\n"
+
+                    f"{compact}"
+                )
+
+
+            except Exception as e:
+
+                error_text = (
+                    f"Research failed: {e}"
+                )
+
+                results.append(
+                    {
+                        "step":
+                            index,
+
+                        "tool":
+                            tool,
+
+                        "result":
+                            error_text,
+                    }
+                )
+
+                working_context += (
+
+                    f"\n\nSTEP {index} RESEARCH ERROR:\n"
+
+                    f"{error_text}"
+                )
+
 
         # -------------------------------------------------
         # REASON
@@ -1189,35 +1398,57 @@ def execute_chain(
 
         elif tool == "reason":
 
-            reasoning = reasoning_step(
-                message,
-                instruction,
-                working_context
-            )
+            try:
 
-            extra_groq_calls += 1
+                final_reply = reasoning_step(
+                    message,
+                    instruction,
+                    working_context
+                )
 
-            final_reply = reasoning
+                groq_calls += 1
 
-            result = {
-                "step":
-                    index,
 
-                "tool":
-                    tool,
+            except Exception as e:
 
-                "result":
-                    reasoning,
-            }
+                if working_context.strip():
+
+                    final_reply = (
+                        "I completed the available tool steps, "
+                        "but the reasoning model was temporarily "
+                        "unavailable.\n\n"
+                        + working_context[-4500:]
+                    )
+
+                else:
+
+                    final_reply = (
+                        "The reasoning model was temporarily "
+                        f"unavailable: {e}"
+                    )
+
 
             results.append(
-                result
+                {
+                    "step":
+                        index,
+
+                    "tool":
+                        tool,
+
+                    "result":
+                        final_reply,
+                }
             )
 
+
             working_context += (
+
                 f"\n\nSTEP {index} REASONING:\n"
-                f"{reasoning}"
+
+                f"{final_reply}"
             )
+
 
         # -------------------------------------------------
         # SAVE MEMORY
@@ -1226,31 +1457,26 @@ def execute_chain(
         elif tool == "save_memory":
 
             candidate = (
-                create_memory_from_context(
-                    instruction,
-                    working_context
+                build_recommendation_memory(
+                    final_reply,
+                    message
                 )
             )
 
-            extra_groq_calls += 1
 
-            memory_text = (
-                candidate["memory"]
-                .strip()
-            )
-
-            if not memory_text:
+            if not candidate:
 
                 memory_result = {
                     "saved":
                         False,
 
                     "reason":
-                        "No durable memory produced."
+                        "There was no final result to save."
                 }
 
+
             elif looks_sensitive(
-                memory_text
+                candidate
             ):
 
                 memory_result = {
@@ -1261,8 +1487,9 @@ def execute_chain(
                         "Sensitive information was not stored."
                 }
 
+
             elif memory_exists(
-                memory_text
+                candidate
             ):
 
                 memory_result = {
@@ -1270,45 +1497,52 @@ def execute_chain(
                         False,
 
                     "reason":
-                        "Memory already exists."
+                        "Memory already exists.",
+
+                    "memory":
+                        candidate,
                 }
+
 
             else:
 
-                database_result = (
-                    save_memory(
-                        memory_text,
+                try:
 
-                        candidate[
-                            "category"
-                        ],
-
-                        candidate[
-                            "importance"
-                        ]
+                    database_result = save_memory(
+                        candidate,
+                        "decision",
+                        8
                     )
-                )
 
-                memory_result = {
-                    "saved":
-                        True,
 
-                    "memory":
-                        memory_text,
+                    memory_result = {
+                        "saved":
+                            True,
 
-                    "category":
-                        candidate[
-                            "category"
-                        ],
+                        "memory":
+                            candidate,
 
-                    "importance":
-                        candidate[
-                            "importance"
-                        ],
+                        "category":
+                            "decision",
 
-                    "database_result":
-                        database_result,
-                }
+                        "importance":
+                            8,
+
+                        "database_result":
+                            database_result,
+                    }
+
+
+                except Exception as e:
+
+                    memory_result = {
+                        "saved":
+                            False,
+
+                        "reason":
+                            str(e),
+                    }
+
 
             results.append(
                 {
@@ -1323,6 +1557,7 @@ def execute_chain(
                 }
             )
 
+
         # -------------------------------------------------
         # SEND EMAIL
         # -------------------------------------------------
@@ -1331,17 +1566,29 @@ def execute_chain(
 
             body = (
                 final_reply
-                if final_reply
-                else working_context
+                or working_context
+                or message
             )
 
-            if not body.strip():
-                body = message
 
-            email_result = send_email(
-                body,
-                "Tyler AI Results"
-            )
+            try:
+
+                email_result = send_email(
+                    body,
+                    "Tyler AI Results"
+                )
+
+
+            except Exception as e:
+
+                email_result = {
+                    "sent":
+                        False,
+
+                    "error":
+                        str(e),
+                }
+
 
             results.append(
                 {
@@ -1356,25 +1603,36 @@ def execute_chain(
                 }
             )
 
-            working_context += (
-                f"\n\nSTEP {index} EMAIL:\n"
-                f"Sent to "
-                f"{email_result['to']}"
-            )
 
-    # -----------------------------------------------------
-    # FINAL FALLBACK REASONING
-    # -----------------------------------------------------
+    # =====================================================
+    # FINAL ANSWER IF ROUTER DID NOT ADD REASON
+    # =====================================================
 
     if not final_reply:
 
-        final_reply = reasoning_step(
-            message,
-            "Provide the final answer.",
-            working_context
-        )
+        try:
 
-        extra_groq_calls += 1
+            final_reply = reasoning_step(
+                message,
+                "Answer the user's request.",
+                working_context
+            )
+
+            groq_calls += 1
+
+
+        except Exception as e:
+
+            if working_context:
+
+                final_reply = working_context[-4500:]
+
+            else:
+
+                final_reply = (
+                    f"Unable to complete reasoning: {e}"
+                )
+
 
     return {
         "reply":
@@ -1392,8 +1650,8 @@ def execute_chain(
         "sources":
             sources,
 
-        "extra_groq_calls":
-            extra_groq_calls,
+        "execution_groq_calls":
+            groq_calls,
     }
 
 
@@ -1416,7 +1674,7 @@ def home():
                 "online",
 
             "version":
-                "2.1-action-chain",
+                "2.1.1-resilient-chain",
 
             "secured":
                 bool(
@@ -1471,63 +1729,9 @@ def health():
                 "healthy",
 
             "version":
-                "2.1-action-chain",
+                "2.1.1-resilient-chain",
         }
     )
-
-
-# =========================================================
-# MEMORIES
-# =========================================================
-
-@app.route(
-    "/memories",
-    methods=["GET"]
-)
-def memories_route():
-
-    if not authorized():
-
-        return jsonify(
-            {
-                "success":
-                    False,
-
-                "error":
-                    "Unauthorized",
-            }
-        ), 401
-
-    try:
-
-        items = get_memories(
-            50
-        )
-
-        return jsonify(
-            {
-                "success":
-                    True,
-
-                "count":
-                    len(items),
-
-                "memories":
-                    items,
-            }
-        )
-
-    except Exception as e:
-
-        return jsonify(
-            {
-                "success":
-                    False,
-
-                "error":
-                    str(e),
-            }
-        ), 500
 
 
 # =========================================================
@@ -1552,6 +1756,7 @@ def chat():
             }
         ), 401
 
+
     data = (
         request.get_json(
             silent=True
@@ -1559,12 +1764,14 @@ def chat():
         or {}
     )
 
+
     message = str(
         data.get(
             "message",
             ""
         )
     ).strip()
+
 
     if not message:
 
@@ -1580,7 +1787,7 @@ def chat():
 
 
     # =====================================================
-    # EXPLICIT MEMORY — ZERO GROQ CALLS
+    # DIRECT MEMORY SAVE
     # =====================================================
 
     if explicit_memory_request(
@@ -1589,17 +1796,17 @@ def chat():
 
         try:
 
-            memory = (
-                clean_explicit_memory(
-                    message
-                )
+            memory = clean_explicit_memory(
+                message
             )
+
 
             if not memory:
 
                 raise RuntimeError(
                     "No memory text found."
                 )
+
 
             if looks_sensitive(
                 memory
@@ -1618,6 +1825,7 @@ def chat():
                             "will not be stored.",
                     }
                 ), 400
+
 
             if memory_exists(
                 memory
@@ -1642,17 +1850,20 @@ def chat():
                     }
                 )
 
+
             category = (
                 guess_memory_category(
                     memory
                 )
             )
 
+
             saved = save_memory(
                 memory,
                 category,
                 7
             )
+
 
             return jsonify(
                 {
@@ -1679,6 +1890,7 @@ def chat():
                 }
             )
 
+
         except Exception as e:
 
             return jsonify(
@@ -1696,10 +1908,11 @@ def chat():
 
 
     # =====================================================
-    # ROUTER
+    # ROUTE
     # =====================================================
 
     router_calls = 0
+
 
     try:
 
@@ -1709,10 +1922,11 @@ def chat():
 
         router_calls = 1
 
+
     except Exception as e:
 
         print(
-            "Router fallback:",
+            "Router error, using local fallback:",
             str(e)
         )
 
@@ -1722,7 +1936,7 @@ def chat():
 
 
     # =====================================================
-    # EXECUTE CHAIN
+    # EXECUTE
     # =====================================================
 
     try:
@@ -1731,6 +1945,7 @@ def chat():
             message,
             route
         )
+
 
     except Exception as e:
 
@@ -1743,7 +1958,7 @@ def chat():
                     "chain_execution",
 
                 "version":
-                    "2.1-action-chain",
+                    "2.1.1-resilient-chain",
 
                 "route":
                     route,
@@ -1766,10 +1981,13 @@ def chat():
                 "chain_execution",
 
             "version":
-                "2.1-action-chain",
+                "2.1.1-resilient-chain",
 
             "goal":
-                route["goal"],
+                route.get(
+                    "goal",
+                    message
+                ),
 
             "route":
                 route,
@@ -1804,13 +2022,13 @@ def chat():
 
             "execution_groq_calls":
                 execution[
-                    "extra_groq_calls"
+                    "execution_groq_calls"
                 ],
 
             "total_groq_calls":
                 router_calls
                 + execution[
-                    "extra_groq_calls"
+                    "execution_groq_calls"
                 ],
         }
     )
@@ -1838,12 +2056,14 @@ def webhook():
             }
         ), 401
 
+
     data = (
         request.get_json(
             silent=True
         )
         or {}
     )
+
 
     if not data.get(
         "action"
@@ -1859,11 +2079,13 @@ def webhook():
             }
         ), 400
 
+
     try:
 
         result = send_to_n8n(
             data
         )
+
 
         return jsonify(
             {
@@ -1874,6 +2096,7 @@ def webhook():
                     result[:500],
             }
         )
+
 
     except Exception as e:
 
@@ -1900,6 +2123,7 @@ if __name__ == "__main__":
             10000
         )
     )
+
 
     app.run(
         host="0.0.0.0",
