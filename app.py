@@ -4,9 +4,22 @@ import json
 import hmac
 import requests
 from datetime import timedelta
-from flask import Flask, request, jsonify, render_template_string, session, redirect, url_for
+
+from flask import (
+    Flask,
+    request,
+    jsonify,
+    render_template_string,
+    session,
+    redirect,
+    url_for,
+)
 
 app = Flask(__name__)
+
+# =========================================================
+# CONFIG
+# =========================================================
 
 N8N_WEBHOOK_URL = os.environ.get("N8N_WEBHOOK_URL")
 TYLER_API_KEY = os.environ.get("TYLER_API_KEY")
@@ -18,9 +31,15 @@ SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 GROQ_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-20b")
 
 MAX_AGENT_ACTIONS = 5
-VERSION = "2.5-structured-project-memory"
+VERSION = "2.6-memory-management"
+VERSION_SHORT = "v2.6"
 
-app.secret_key = os.environ.get("FLASK_SECRET_KEY") or TYLER_API_KEY or os.urandom(32)
+app.secret_key = (
+    os.environ.get("FLASK_SECRET_KEY")
+    or TYLER_API_KEY
+    or os.urandom(32)
+)
+
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
@@ -28,6 +47,9 @@ app.config.update(
     PERMANENT_SESSION_LIFETIME=timedelta(days=7),
 )
 
+# =========================================================
+# BASIC HELPERS
+# =========================================================
 
 def normalize_text(value):
     return re.sub(r"\s+", " ", str(value or "")).strip()
@@ -43,27 +65,45 @@ def clamp(value, low, high):
 
 def authorized():
     supplied = request.headers.get("X-Tyler-Key")
-    return bool(TYLER_API_KEY and supplied and hmac.compare_digest(supplied, TYLER_API_KEY))
+    return bool(
+        TYLER_API_KEY
+        and supplied
+        and hmac.compare_digest(supplied, TYLER_API_KEY)
+    )
 
 
 def parse_json_object(text):
     if not text:
         return None
-    text = re.sub(r"^```(?:json)?\s*|\s*```$", "", str(text).strip(), flags=re.I)
+
+    text = re.sub(
+        r"^```(?:json)?\s*|\s*```$",
+        "",
+        str(text).strip(),
+        flags=re.I,
+    )
+
     try:
         obj = json.loads(text)
         return obj if isinstance(obj, dict) else None
     except Exception:
         pass
-    start, end = text.find("{"), text.rfind("}")
+
+    start = text.find("{")
+    end = text.rfind("}")
+
     if start >= 0 and end > start:
         try:
             obj = json.loads(text[start:end + 1])
             return obj if isinstance(obj, dict) else None
         except Exception:
             pass
+
     return None
 
+# =========================================================
+# GROQ
+# =========================================================
 
 def groq_request(
     messages,
@@ -82,10 +122,13 @@ def groq_request(
         "temperature": temperature,
         "max_completion_tokens": max_completion_tokens,
     }
+
     if reasoning_effort is not None:
         payload["reasoning_effort"] = reasoning_effort
+
     if include_reasoning is not None:
         payload["include_reasoning"] = include_reasoning
+
     if response_format is not None:
         payload["response_format"] = response_format
 
@@ -102,17 +145,28 @@ def groq_request(
     try:
         data = response.json()
     except Exception:
-        raise RuntimeError(f"Groq returned {response.status_code}: {response.text[:500]}")
+        raise RuntimeError(
+            f"Groq returned {response.status_code}: {response.text[:500]}"
+        )
 
     if not response.ok:
         error = data.get("error", {})
-        message = error.get("message", str(error)) if isinstance(error, dict) else str(error)
+        if isinstance(error, dict):
+            message = error.get("message", str(error))
+        else:
+            message = str(error)
         raise RuntimeError(message)
 
     choices = data.get("choices", [])
     if not choices:
         raise RuntimeError("Groq returned no choices")
-    return str(choices[0].get("message", {}).get("content", "") or "").strip()
+
+    return str(
+        choices[0]
+        .get("message", {})
+        .get("content", "")
+        or ""
+    ).strip()
 
 
 def call_controller(prompt):
@@ -126,7 +180,12 @@ def call_controller(prompt):
     )
 
 
-def call_reasoner(system_prompt, user_prompt, max_tokens=800, temperature=0.2):
+def call_reasoner(
+    system_prompt,
+    user_prompt,
+    max_tokens=800,
+    temperature=0.2,
+):
     return groq_request(
         [
             {"role": "system", "content": system_prompt},
@@ -138,10 +197,14 @@ def call_reasoner(system_prompt, user_prompt, max_tokens=800, temperature=0.2):
         include_reasoning=False,
     )
 
+# =========================================================
+# SUPABASE MEMORY
+# =========================================================
 
 def supabase_headers():
     if not SUPABASE_KEY:
         raise RuntimeError("SUPABASE_KEY is not configured")
+
     return {
         "apikey": SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}",
@@ -152,6 +215,7 @@ def supabase_headers():
 def get_memories(limit=20):
     if not SUPABASE_URL:
         return []
+
     response = requests.get(
         f"{SUPABASE_URL}/rest/v1/memories",
         headers=supabase_headers(),
@@ -162,36 +226,202 @@ def get_memories(limit=20):
         },
         timeout=30,
     )
+
     if not response.ok:
-        raise RuntimeError(f"Supabase read failed: {response.status_code} {response.text[:500]}")
+        raise RuntimeError(
+            f"Supabase read failed: "
+            f"{response.status_code} "
+            f"{response.text[:500]}"
+        )
+
     return response.json()
 
 
-def save_memory(text, category="general", importance=5):
+def get_memory_by_id(memory_id):
     if not SUPABASE_URL:
         raise RuntimeError("SUPABASE_URL is not configured")
-    response = requests.post(
+
+    response = requests.get(
         f"{SUPABASE_URL}/rest/v1/memories",
-        headers={**supabase_headers(), "Prefer": "return=representation"},
-        json={
-            "memories": text,
-            "category": category,
-            "importance": clamp(importance, 1, 10),
+        headers=supabase_headers(),
+        params={
+            "select": "id,created_at,memories,category,importance",
+            "id": f"eq.{int(memory_id)}",
+            "limit": 1,
         },
         timeout=30,
     )
+
     if not response.ok:
-        raise RuntimeError(f"Supabase save failed: {response.status_code} {response.text[:500]}")
+        raise RuntimeError(
+            f"Supabase memory read failed: "
+            f"{response.status_code} "
+            f"{response.text[:500]}"
+        )
+
+    rows = response.json()
+    return rows[0] if rows else None
+
+
+def save_memory(
+    text,
+    category="general",
+    importance=5,
+):
+    if not SUPABASE_URL:
+        raise RuntimeError("SUPABASE_URL is not configured")
+
+    response = requests.post(
+        f"{SUPABASE_URL}/rest/v1/memories",
+        headers={
+            **supabase_headers(),
+            "Prefer": "return=representation",
+        },
+        json={
+            "memories": text,
+            "category": category,
+            "importance": clamp(
+                importance,
+                1,
+                10,
+            ),
+        },
+        timeout=30,
+    )
+
+    if not response.ok:
+        raise RuntimeError(
+            f"Supabase save failed: "
+            f"{response.status_code} "
+            f"{response.text[:500]}"
+        )
+
     return response.json()
+
+
+def update_memory(
+    memory_id,
+    text,
+    category=None,
+    importance=None,
+):
+    current = get_memory_by_id(memory_id)
+
+    if not current:
+        raise RuntimeError(
+            f"Memory {memory_id} was not found."
+        )
+
+    if str(
+        current.get(
+            "category",
+            "",
+        )
+    ).lower() == "project_core":
+        raise RuntimeError(
+            "The canonical project memory is protected and cannot be replaced this way."
+        )
+
+    payload = {
+        "memories": text,
+        "category": (
+            category
+            or current.get("category")
+            or "general"
+        ),
+        "importance": clamp(
+            importance
+            if importance is not None
+            else current.get("importance", 5),
+            1,
+            10,
+        ),
+    }
+
+    response = requests.patch(
+        f"{SUPABASE_URL}/rest/v1/memories",
+        headers={
+            **supabase_headers(),
+            "Prefer": "return=representation",
+        },
+        params={
+            "id": f"eq.{int(memory_id)}",
+        },
+        json=payload,
+        timeout=30,
+    )
+
+    if not response.ok:
+        raise RuntimeError(
+            f"Supabase memory update failed: "
+            f"{response.status_code} "
+            f"{response.text[:500]}"
+        )
+
+    return response.json()
+
+
+def delete_memory(memory_id):
+    current = get_memory_by_id(memory_id)
+
+    if not current:
+        raise RuntimeError(
+            f"Memory {memory_id} was not found."
+        )
+
+    if str(
+        current.get(
+            "category",
+            "",
+        )
+    ).lower() == "project_core":
+        raise RuntimeError(
+            "The canonical project memory is protected and cannot be deleted."
+        )
+
+    response = requests.delete(
+        f"{SUPABASE_URL}/rest/v1/memories",
+        headers={
+            **supabase_headers(),
+            "Prefer": "return=representation",
+        },
+        params={
+            "id": f"eq.{int(memory_id)}",
+        },
+        timeout=30,
+    )
+
+    if not response.ok:
+        raise RuntimeError(
+            f"Supabase memory delete failed: "
+            f"{response.status_code} "
+            f"{response.text[:500]}"
+        )
+
+    return {
+        "deleted": True,
+        "memory": current,
+    }
 
 
 def memory_exists(text):
     target = normalize_text(text).lower()
+
     try:
-        memories = get_memories(50)
+        memories = get_memories(100)
     except Exception:
         return False
-    return any(normalize_text(item.get("memories", "")).lower() == target for item in memories)
+
+    return any(
+        normalize_text(
+            item.get(
+                "memories",
+                "",
+            )
+        ).lower()
+        == target
+        for item in memories
+    )
 
 
 def compact_memory_context(limit=10):
@@ -199,37 +429,50 @@ def compact_memory_context(limit=10):
         memories = get_memories(limit)
     except Exception as exc:
         return f"Memory read failed: {exc}"
+
     return "\n".join(
-        f"- [{item.get('category', 'general')}] {normalize_text(item.get('memories', ''))[:300]}"
+        f"- [{item.get('category', 'general')}] "
+        f"{normalize_text(item.get('memories', ''))[:300]}"
         for item in memories
     )[:2200]
 
-
-# -------------------- Structured project memory --------------------
+# =========================================================
+# STRUCTURED PROJECT MEMORY
+# =========================================================
 
 def core_project_memory_text():
     return (
-        "TYLER_AI_CORE_PROFILE_V2 | "
+        "TYLER_AI_CORE_PROFILE_V3 | "
         "Tyler AI is the user's personal autonomous AI assistant project. "
-        "Architecture: Python Flask application deployed on Render; Groq provides AI reasoning "
-        "and controller decisions; Supabase stores long-term memory; Tavily provides live web "
-        "research; n8n handles external actions such as email. Interfaces: private server-side-"
-        "session web chat plus a secured API. Current tools: read memory, research the web, "
-        "reason, save memory, and send email. Safety: secrets are not intentionally stored as "
-        "memory; API access is protected; email and memory writes require explicit user authorization. "
-        "Current development state: memory priority, direct website memory saving, dynamic tool routing, "
-        "and autonomous next-action selection are implemented. A decision-logging feedback loop and "
-        "model fine-tuning are future ideas and are NOT currently implemented. Long-term goal: become "
-        "increasingly capable and autonomous while keeping important actions permission-controlled. "
+        "Architecture: Python Flask application deployed on Render; Groq provides "
+        "AI reasoning and controller decisions; Supabase stores long-term memory; "
+        "Tavily provides live web research; n8n handles external actions such as email. "
+        "Interfaces: private server-side-session web chat plus a secured API. "
+        "Current tools: read memory, research the web, reason, save memory, send email, "
+        "and permission-controlled memory management. "
+        "Memory management can audit saved memories, preview deletions or replacements, "
+        "and only perform destructive changes after explicit confirmation. "
+        "Safety: secrets are not intentionally stored as memory; API access is protected; "
+        "email, memory writes, replacements, and deletions require user authorization. "
+        "Current development state: memory priority, direct website memory saving, "
+        "structured project memory, dynamic tool routing, autonomous next-action selection, "
+        "and approval-based memory cleanup are implemented. "
+        "A decision-logging feedback loop and model fine-tuning are future ideas and are "
+        "NOT currently implemented. Long-term goal: become increasingly capable and "
+        "autonomous while keeping important actions permission-controlled. "
         f"Current software version: {VERSION}."
     )
 
 
 def sync_core_project_memory():
     if not SUPABASE_URL or not SUPABASE_KEY:
-        return {"synced": False, "reason": "Memory backend is not configured."}
+        return {
+            "synced": False,
+            "reason": "Memory backend is not configured.",
+        }
 
     canonical = core_project_memory_text()
+
     try:
         response = requests.get(
             f"{SUPABASE_URL}/rest/v1/memories",
@@ -242,21 +485,40 @@ def sync_core_project_memory():
             },
             timeout=30,
         )
+
         if not response.ok:
             raise RuntimeError(
-                f"Supabase core read failed: {response.status_code} {response.text[:300]}"
+                f"Supabase core read failed: "
+                f"{response.status_code} "
+                f"{response.text[:300]}"
             )
 
         rows = response.json()
+
         if rows:
             row = rows[0]
-            if normalize_text(row.get("memories", "")) == normalize_text(canonical):
-                return {"synced": True, "updated": False, "id": row.get("id")}
 
-            patch = requests.patch(
+            if normalize_text(
+                row.get(
+                    "memories",
+                    "",
+                )
+            ) == normalize_text(canonical):
+                return {
+                    "synced": True,
+                    "updated": False,
+                    "id": row.get("id"),
+                }
+
+            response = requests.patch(
                 f"{SUPABASE_URL}/rest/v1/memories",
-                headers={**supabase_headers(), "Prefer": "return=representation"},
-                params={"id": f"eq.{row.get('id')}"},
+                headers={
+                    **supabase_headers(),
+                    "Prefer": "return=representation",
+                },
+                params={
+                    "id": f"eq.{row.get('id')}",
+                },
                 json={
                     "memories": canonical,
                     "category": "project_core",
@@ -264,55 +526,125 @@ def sync_core_project_memory():
                 },
                 timeout=30,
             )
-            if not patch.ok:
-                raise RuntimeError(
-                    f"Supabase core update failed: {patch.status_code} {patch.text[:300]}"
-                )
-            return {"synced": True, "updated": True, "id": row.get("id")}
 
-        created = save_memory(canonical, "project_core", 10)
-        return {"synced": True, "created": True, "database_result": created}
+            if not response.ok:
+                raise RuntimeError(
+                    f"Supabase core update failed: "
+                    f"{response.status_code} "
+                    f"{response.text[:300]}"
+                )
+
+            return {
+                "synced": True,
+                "updated": True,
+                "id": row.get("id"),
+            }
+
+        created = save_memory(
+            canonical,
+            "project_core",
+            10,
+        )
+
+        return {
+            "synced": True,
+            "created": True,
+            "database_result": created,
+        }
 
     except Exception as exc:
-        return {"synced": False, "reason": str(exc)[:300]}
+        return {
+            "synced": False,
+            "reason": str(exc)[:300],
+        }
 
 
 def get_project_memories(limit=30):
     sync_core_project_memory()
 
     try:
-        memories = get_memories(max(limit, 30))
+        memories = get_memories(
+            max(
+                limit,
+                50,
+            )
+        )
     except Exception:
         return []
 
-    selected, seen = [], set()
+    selected = []
+    seen = set()
 
     for item in memories:
-        category = str(item.get("category", "general") or "general").lower()
-        text = normalize_text(item.get("memories", ""))
+        category = str(
+            item.get(
+                "category",
+                "general",
+            )
+            or "general"
+        ).lower()
+
+        text = normalize_text(
+            item.get(
+                "memories",
+                "",
+            )
+        )
+
         lower = text.lower()
 
         relevant = (
-            category in {"project_core", "project"}
+            category
+            in {
+                "project_core",
+                "project",
+            }
             or (
                 category == "goal"
                 and (
-                    "tyler ai" in lower
-                    or "autonomous" in lower
+                    "tyler ai"
+                    in lower
+                    or "autonomous"
+                    in lower
                 )
             )
         )
 
-        if not relevant or not text or text.lower() in seen:
+        if (
+            not relevant
+            or not text
+            or text.lower()
+            in seen
+        ):
             continue
 
-        seen.add(text.lower())
-        selected.append(item)
+        seen.add(
+            text.lower()
+        )
+
+        selected.append(
+            item
+        )
 
     selected.sort(
         key=lambda item: (
-            0 if str(item.get("category", "")).lower() == "project_core" else 1,
-            -clamp(item.get("importance", 5), 1, 10),
+            0
+            if str(
+                item.get(
+                    "category",
+                    "",
+                )
+            ).lower()
+            == "project_core"
+            else 1,
+            -clamp(
+                item.get(
+                    "importance",
+                    5,
+                ),
+                1,
+                10,
+            ),
         )
     )
 
@@ -320,7 +652,9 @@ def get_project_memories(limit=30):
 
 
 def project_memory_context(limit=12):
-    memories = get_project_memories(limit)
+    memories = get_project_memories(
+        limit
+    )
 
     lines = [
         "CANONICAL PROJECT PROFILE (authoritative):",
@@ -330,7 +664,12 @@ def project_memory_context(limit=12):
     extras = []
 
     for item in memories:
-        if str(item.get("category", "")).lower() == "project_core":
+        if str(
+            item.get(
+                "category",
+                "",
+            )
+        ).lower() == "project_core":
             continue
 
         extras.append(
@@ -339,25 +678,53 @@ def project_memory_context(limit=12):
         )
 
     if extras:
-        lines.append("SAVED PROJECT FACTS:")
-        lines.extend(extras[:6])
+        lines.append(
+            "SAVED PROJECT FACTS:"
+        )
+        lines.extend(
+            extras[:6]
+        )
 
-    return "\n".join(lines)[:3600]
+    return "\n".join(
+        lines
+    )[:3600]
 
 
 def project_recall_reply():
-    memories = get_project_memories(20)
-    core_lower = normalize_text(core_project_memory_text()).lower()
+    memories = get_project_memories(
+        20
+    )
+
+    core_lower = normalize_text(
+        core_project_memory_text()
+    ).lower()
+
     extra_facts = []
 
     for item in memories:
-        if str(item.get("category", "")).lower() == "project_core":
+        if str(
+            item.get(
+                "category",
+                "",
+            )
+        ).lower() == "project_core":
             continue
 
-        text = normalize_text(item.get("memories", ""))
+        text = normalize_text(
+            item.get(
+                "memories",
+                "",
+            )
+        )
 
-        if text and text.lower() not in core_lower:
-            extra_facts.append(text)
+        if (
+            text
+            and text.lower()
+            not in core_lower
+        ):
+            extra_facts.append(
+                text
+            )
 
     lines = [
         "Tyler AI is your personal autonomous AI assistant project.",
@@ -376,10 +743,12 @@ def project_recall_reply():
         "- Reason over memory and research",
         "- Select its next tool/action dynamically",
         "- Send email when you explicitly authorize it",
+        "- Audit, replace, and delete memories with approval",
         "",
         "Current state:",
         f"- Running build {VERSION}",
-        "- Memory priority and direct website memory saving are implemented",
+        "- Structured project memory and direct website memory saving are implemented",
+        "- Memory cleanup is approval-controlled; Tyler does not silently delete memories",
         "- Decision logging / feedback-loop fine-tuning is NOT implemented yet",
         "",
         "Long-term goal:",
@@ -387,24 +756,784 @@ def project_recall_reply():
     ]
 
     if extra_facts:
-        lines.extend(["", "Saved project facts:"])
         lines.extend(
-            f"- {fact}"
-            for fact in extra_facts[:5]
+            [
+                "",
+                "Saved project facts:",
+            ]
         )
 
-    return "\n".join(lines)
+        lines.extend(
+            f"- {fact}"
+            for fact
+            in extra_facts[:5]
+        )
+
+    return "\n".join(
+        lines
+    )
+
+# =========================================================
+# MEMORY AUDIT / MANAGEMENT
+# =========================================================
+
+def memory_audit_item(
+    item,
+    seen_texts=None,
+):
+    if seen_texts is None:
+        seen_texts = set()
+
+    memory_id = item.get("id")
+    category = str(
+        item.get(
+            "category",
+            "general",
+        )
+        or "general"
+    ).lower()
+
+    text = normalize_text(
+        item.get(
+            "memories",
+            "",
+        )
+    )
+
+    lower = text.lower()
+
+    if category == "project_core":
+        return {
+            "id": memory_id,
+            "status": "protected",
+            "reason": "Canonical Tyler AI project profile.",
+            "recommend_delete": False,
+        }
+
+    if lower in seen_texts:
+        return {
+            "id": memory_id,
+            "status": "duplicate",
+            "reason": "Exact duplicate of another saved memory.",
+            "recommend_delete": True,
+        }
+
+    seen_texts.add(lower)
+
+    test_noise_terms = [
+        "favorite test color",
+        "cobalt blue",
+        "top 3 ai-ready laptops",
+        "dell pro max 18 plus",
+        "laptop recommendation",
+    ]
+
+    if any(
+        term in lower
+        for term
+        in test_noise_terms
+    ):
+        return {
+            "id": memory_id,
+            "status": "possible_test_noise",
+            "reason": "Looks like old testing or laptop-evaluation data rather than core Tyler AI memory.",
+            "recommend_delete": True,
+        }
+
+    stale_feedback_terms = [
+        "decision-logging",
+        "decision logging",
+        "feedback loop",
+        "fine-tune",
+        "fine tune",
+        "fine-tuning",
+        "fine tuning",
+    ]
+
+    implemented_terms = [
+        "has a",
+        "has implemented",
+        "is implemented",
+        "you have implemented",
+        "will iteratively fine-tune",
+        "will iteratively fine tune",
+    ]
+
+    if (
+        any(
+            term in lower
+            for term
+            in stale_feedback_terms
+        )
+        and any(
+            term in lower
+            for term
+            in implemented_terms
+        )
+    ):
+        return {
+            "id": memory_id,
+            "status": "possible_conflict",
+            "reason": (
+                "May conflict with the canonical project profile: "
+                "decision logging / feedback-loop fine-tuning is not implemented yet."
+            ),
+            "recommend_delete": True,
+        }
+
+    if lower.startswith(
+        "tyler ai recommendation:"
+    ):
+        return {
+            "id": memory_id,
+            "status": "old_recommendation",
+            "reason": "Saved recommendation, not a permanent project fact.",
+            "recommend_delete": False,
+        }
+
+    return {
+        "id": memory_id,
+        "status": "keep",
+        "reason": "No obvious duplicate, test-noise, or project-state conflict detected.",
+        "recommend_delete": False,
+    }
 
 
-# -------------------- Intent / permissions --------------------
+def audit_memories():
+    memories = get_memories(
+        100
+    )
+
+    memories = sorted(
+        memories,
+        key=lambda item: (
+            clamp(
+                item.get(
+                    "importance",
+                    5,
+                ),
+                1,
+                10,
+            ),
+            str(
+                item.get(
+                    "created_at",
+                    "",
+                )
+            ),
+        ),
+        reverse=True,
+    )
+
+    seen_texts = set()
+    results = []
+
+    for item in memories:
+        result = memory_audit_item(
+            item,
+            seen_texts,
+        )
+
+        result.update(
+            {
+                "category": item.get(
+                    "category",
+                    "general",
+                ),
+                "importance": item.get(
+                    "importance",
+                    5,
+                ),
+                "text": normalize_text(
+                    item.get(
+                        "memories",
+                        "",
+                    )
+                ),
+            }
+        )
+
+        results.append(
+            result
+        )
+
+    return results
+
+
+def memory_audit_reply():
+    results = audit_memories()
+
+    issues = [
+        item
+        for item
+        in results
+        if item.get(
+            "status"
+        )
+        not in {
+            "keep",
+            "protected",
+        }
+    ]
+
+    recommended_ids = [
+        item["id"]
+        for item
+        in issues
+        if item.get(
+            "recommend_delete"
+        )
+        and item.get(
+            "id"
+        )
+        is not None
+    ]
+
+    lines = [
+        "Memory audit complete.",
+        "",
+        f"Checked {len(results)} saved memories.",
+    ]
+
+    if not issues:
+        lines.extend(
+            [
+                "",
+                "I did not find any obvious duplicates, test noise, or project-state conflicts.",
+                "No memories were changed or deleted.",
+            ]
+        )
+    else:
+        lines.extend(
+            [
+                "",
+                "Memories worth reviewing:",
+            ]
+        )
+
+        for item in issues[:20]:
+            lines.extend(
+                [
+                    "",
+                    f"ID {item.get('id')} · {item.get('status')}",
+                    f"Reason: {item.get('reason')}",
+                    f"Memory: {item.get('text', '')[:260]}",
+                ]
+            )
+
+        lines.extend(
+            [
+                "",
+                "Nothing has been deleted.",
+            ]
+        )
+
+        if recommended_ids:
+            id_text = ",".join(
+                str(memory_id)
+                for memory_id
+                in recommended_ids
+            )
+
+            lines.extend(
+                [
+                    "",
+                    "Suggested cleanup command:",
+                    f"Delete memories {id_text}",
+                    "",
+                    "Tyler will show a preview first. Deletion still requires a separate confirmation.",
+                ]
+            )
+
+    return "\n".join(
+        lines
+    )
+
+
+def parse_memory_id_list(text):
+    matches = re.findall(
+        r"\d+",
+        text,
+    )
+
+    ids = []
+
+    for match in matches:
+        value = int(match)
+
+        if value not in ids:
+            ids.append(value)
+
+    return ids[:25]
+
+
+def memory_audit_request(message):
+    lower = normalized_intent_text(
+        message
+    )
+
+    phrases = [
+        "review my memories",
+        "review my memory",
+        "audit my memories",
+        "audit my memory",
+        "review tyler ai memory",
+        "audit tyler ai memory",
+        "clean up memory",
+        "cleanup memory",
+        "find bad memories",
+        "find outdated memories",
+        "find incorrect memories",
+        "show memory cleanup",
+    ]
+
+    return any(
+        phrase in lower
+        for phrase
+        in phrases
+    )
+
+
+def delete_preview_request(message):
+    lower = normalize_text(
+        message
+    ).lower()
+
+    return bool(
+        re.match(
+            r"^delete memor(?:y|ies)\s+\d",
+            lower,
+        )
+    )
+
+
+def delete_confirm_request(message):
+    lower = normalize_text(
+        message
+    ).lower()
+
+    return bool(
+        re.match(
+            r"^confirm delete memor(?:y|ies)\s+\d",
+            lower,
+        )
+    )
+
+
+def replace_preview_request(message):
+    return bool(
+        re.match(
+            r"(?is)^replace memory\s+\d+\s+with\s*:",
+            normalize_text(
+                message
+            ),
+        )
+    )
+
+
+def replace_confirm_request(message):
+    return bool(
+        re.match(
+            r"(?is)^confirm replace memory\s+\d+\s+with\s*:",
+            normalize_text(
+                message
+            ),
+        )
+    )
+
+
+def parse_replace_request(message):
+    normalized = normalize_text(
+        message
+    )
+
+    match = re.match(
+        r"(?is)^(?:confirm\s+)?replace memory\s+(\d+)\s+with\s*:\s*(.+)$",
+        normalized,
+    )
+
+    if not match:
+        return None
+
+    return (
+        int(
+            match.group(1)
+        ),
+        match.group(2).strip(),
+    )
+
+
+def preview_memory_delete(memory_ids):
+    if not memory_ids:
+        return {
+            "success": False,
+            "reply": "I couldn't find any memory IDs to preview.",
+        }
+
+    rows = []
+    blocked = []
+
+    for memory_id in memory_ids:
+        memory = get_memory_by_id(
+            memory_id
+        )
+
+        if not memory:
+            rows.append(
+                {
+                    "id": memory_id,
+                    "missing": True,
+                }
+            )
+            continue
+
+        if str(
+            memory.get(
+                "category",
+                "",
+            )
+        ).lower() == "project_core":
+            blocked.append(
+                memory_id
+            )
+            continue
+
+        rows.append(
+            memory
+        )
+
+    lines = [
+        "Deletion preview:",
+        "",
+    ]
+
+    for row in rows:
+        if row.get(
+            "missing"
+        ):
+            lines.append(
+                f"- ID {row.get('id')}: not found"
+            )
+        else:
+            lines.append(
+                f"- ID {row.get('id')}: "
+                f"{normalize_text(row.get('memories', ''))[:260]}"
+            )
+
+    if blocked:
+        lines.extend(
+            [
+                "",
+                "Protected and excluded: "
+                + ", ".join(
+                    str(memory_id)
+                    for memory_id
+                    in blocked
+                ),
+            ]
+        )
+
+    deletable_ids = [
+        row.get(
+            "id"
+        )
+        for row in rows
+        if not row.get(
+            "missing"
+        )
+    ]
+
+    if deletable_ids:
+        lines.extend(
+            [
+                "",
+                "Nothing has been deleted yet.",
+                "To approve this deletion, send exactly:",
+                "Confirm delete memories "
+                + ",".join(
+                    str(memory_id)
+                    for memory_id
+                    in deletable_ids
+                ),
+            ]
+        )
+    else:
+        lines.extend(
+            [
+                "",
+                "There are no deletable memories in this request.",
+            ]
+        )
+
+    return {
+        "success": True,
+        "type": "memory_delete_preview",
+        "reply": "\n".join(lines),
+        "used_tools": [
+            "audit_memory",
+        ],
+        "controller_attempts": 0,
+        "controller_successes": 0,
+        "priority_decisions": 0,
+        "fallback_decisions": 0,
+        "reasoning_calls": 0,
+        "total_groq_calls": 0,
+        "memory_result": {
+            "preview": True,
+            "deleted": False,
+        },
+        "email_result": None,
+        "sources": [],
+    }
+
+
+def confirm_memory_delete(memory_ids):
+    if not memory_ids:
+        return {
+            "success": False,
+            "reply": "I couldn't find any memory IDs to delete.",
+        }
+
+    deleted = []
+    errors = []
+
+    for memory_id in memory_ids:
+        try:
+            result = delete_memory(
+                memory_id
+            )
+
+            deleted.append(
+                result.get(
+                    "memory",
+                    {},
+                )
+            )
+        except Exception as exc:
+            errors.append(
+                f"ID {memory_id}: {exc}"
+            )
+
+    lines = []
+
+    if deleted:
+        lines.append(
+            "Deleted memories:"
+        )
+
+        for item in deleted:
+            lines.append(
+                f"- ID {item.get('id')}: "
+                f"{normalize_text(item.get('memories', ''))[:240]}"
+            )
+
+    if errors:
+        if lines:
+            lines.append("")
+
+        lines.append(
+            "Not deleted:"
+        )
+
+        lines.extend(
+            f"- {error}"
+            for error
+            in errors
+        )
+
+    return {
+        "success": bool(
+            deleted
+        ),
+        "type": "memory_delete",
+        "reply": "\n".join(
+            lines
+        )
+        or "No memories were deleted.",
+        "used_tools": [
+            "delete_memory",
+        ],
+        "controller_attempts": 0,
+        "controller_successes": 0,
+        "priority_decisions": 0,
+        "fallback_decisions": 0,
+        "reasoning_calls": 0,
+        "total_groq_calls": 0,
+        "memory_result": {
+            "deleted": bool(
+                deleted
+            ),
+            "deleted_count": len(
+                deleted
+            ),
+        },
+        "email_result": None,
+        "sources": [],
+    }
+
+
+def preview_memory_replace(
+    memory_id,
+    new_text,
+):
+    if looks_sensitive(
+        new_text
+    ):
+        return {
+            "success": False,
+            "reply": "I won't replace a memory with text that appears to contain sensitive credentials or account data.",
+        }
+
+    current = get_memory_by_id(
+        memory_id
+    )
+
+    if not current:
+        return {
+            "success": False,
+            "reply": f"Memory {memory_id} was not found.",
+        }
+
+    if str(
+        current.get(
+            "category",
+            "",
+        )
+    ).lower() == "project_core":
+        return {
+            "success": False,
+            "reply": "The canonical project memory is protected and cannot be replaced this way.",
+        }
+
+    reply = (
+        f"Replacement preview for memory {memory_id}:\n\n"
+        f"Current:\n{normalize_text(current.get('memories', ''))}\n\n"
+        f"New:\n{new_text}\n\n"
+        "Nothing has been changed yet.\n"
+        "To approve this replacement, send exactly:\n"
+        f"Confirm replace memory {memory_id} with: {new_text}"
+    )
+
+    return {
+        "success": True,
+        "type": "memory_replace_preview",
+        "reply": reply,
+        "used_tools": [
+            "audit_memory",
+        ],
+        "controller_attempts": 0,
+        "controller_successes": 0,
+        "priority_decisions": 0,
+        "fallback_decisions": 0,
+        "reasoning_calls": 0,
+        "total_groq_calls": 0,
+        "memory_result": {
+            "preview": True,
+            "replaced": False,
+        },
+        "email_result": None,
+        "sources": [],
+    }
+
+
+def confirm_memory_replace(
+    memory_id,
+    new_text,
+):
+    if looks_sensitive(
+        new_text
+    ):
+        return {
+            "success": False,
+            "reply": "I won't store replacement text that appears to contain sensitive credentials or account data.",
+        }
+
+    current = get_memory_by_id(
+        memory_id
+    )
+
+    if not current:
+        return {
+            "success": False,
+            "reply": f"Memory {memory_id} was not found.",
+        }
+
+    if str(
+        current.get(
+            "category",
+            "",
+        )
+    ).lower() == "project_core":
+        return {
+            "success": False,
+            "reply": "The canonical project memory is protected and cannot be replaced this way.",
+        }
+
+    category = guess_memory_category(
+        new_text
+    )
+
+    updated = update_memory(
+        memory_id,
+        new_text,
+        category=category,
+        importance=current.get(
+            "importance",
+            5,
+        ),
+    )
+
+    return {
+        "success": True,
+        "type": "memory_replace",
+        "reply": (
+            f"Replaced memory {memory_id}.\n\n"
+            f"New memory: {new_text}"
+        ),
+        "used_tools": [
+            "replace_memory",
+        ],
+        "controller_attempts": 0,
+        "controller_successes": 0,
+        "priority_decisions": 0,
+        "fallback_decisions": 0,
+        "reasoning_calls": 0,
+        "total_groq_calls": 0,
+        "memory_result": {
+            "replaced": True,
+            "id": memory_id,
+            "database_result": updated,
+        },
+        "email_result": None,
+        "sources": [],
+    }
+
+# =========================================================
+# INTENT / PERMISSIONS
+# =========================================================
 
 def normalized_intent_text(message):
-    lower = normalize_text(message).lower()
-    return lower.replace("tlyer", "tyler").replace("tyelr", "tyler")
+    lower = normalize_text(
+        message
+    ).lower()
+
+    return (
+        lower
+        .replace(
+            "tlyer",
+            "tyler",
+        )
+        .replace(
+            "tyelr",
+            "tyler",
+        )
+    )
 
 
 def is_personal_tyler_project_reference(message):
-    lower = normalized_intent_text(message)
+    lower = normalized_intent_text(
+        message
+    )
 
     terms = [
         "tyler ai",
@@ -416,7 +1545,11 @@ def is_personal_tyler_project_reference(message):
         "the tyler ai project",
     ]
 
-    if any(term in lower for term in terms):
+    if any(
+        term in lower
+        for term
+        in terms
+    ):
         return True
 
     return bool(
@@ -428,9 +1561,13 @@ def is_personal_tyler_project_reference(message):
 
 
 def needs_memory(message):
-    lower = normalized_intent_text(message)
+    lower = normalized_intent_text(
+        message
+    )
 
-    if is_personal_tyler_project_reference(message):
+    if is_personal_tyler_project_reference(
+        message
+    ):
         return True
 
     terms = [
@@ -447,11 +1584,17 @@ def needs_memory(message):
         "best fit for me",
     ]
 
-    return any(term in lower for term in terms)
+    return any(
+        term in lower
+        for term
+        in terms
+    )
 
 
 def needs_research(message):
-    lower = normalized_intent_text(message)
+    lower = normalized_intent_text(
+        message
+    )
 
     terms = [
         "research",
@@ -467,17 +1610,27 @@ def needs_research(message):
         "available now",
     ]
 
-    return any(term in lower for term in terms)
+    return any(
+        term in lower
+        for term
+        in terms
+    )
 
 
 def is_simple_project_recall(message):
     if (
-        not is_personal_tyler_project_reference(message)
-        or needs_research(message)
+        not is_personal_tyler_project_reference(
+            message
+        )
+        or needs_research(
+            message
+        )
     ):
         return False
 
-    lower = normalized_intent_text(message)
+    lower = normalized_intent_text(
+        message
+    )
 
     phrases = [
         "what do you remember about",
@@ -495,12 +1648,15 @@ def is_simple_project_recall(message):
 
     return any(
         phrase in lower
-        for phrase in phrases
+        for phrase
+        in phrases
     )
 
 
 def looks_sensitive(text):
-    lower = str(text).lower()
+    lower = str(
+        text
+    ).lower()
 
     blocked = [
         "password",
@@ -521,7 +1677,8 @@ def looks_sensitive(text):
 
     return any(
         item in lower
-        for item in blocked
+        for item
+        in blocked
     )
 
 
@@ -538,7 +1695,11 @@ def user_allows_email(message):
         "dont send an email",
     ]
 
-    if any(item in lower for item in deny):
+    if any(
+        item in lower
+        for item
+        in deny
+    ):
         return False
 
     allow = [
@@ -553,7 +1714,8 @@ def user_allows_email(message):
 
     return any(
         item in lower
-        for item in allow
+        for item
+        in allow
     )
 
 
@@ -573,7 +1735,11 @@ def user_allows_memory_write(message):
         "dont store",
     ]
 
-    if any(item in lower for item in deny):
+    if any(
+        item in lower
+        for item
+        in deny
+    ):
         return False
 
     allow = [
@@ -595,7 +1761,8 @@ def user_allows_memory_write(message):
 
     return any(
         item in lower
-        for item in allow
+        for item
+        in allow
     )
 
 
@@ -617,7 +1784,8 @@ def explicit_memory_request(message):
             pattern,
             lower,
         )
-        for pattern in patterns
+        for pattern
+        in patterns
     )
 
 
@@ -691,12 +1859,18 @@ def guess_memory_category(text):
 
 
 def handle_explicit_memory(message):
-    memory = clean_explicit_memory(message)
+    memory = clean_explicit_memory(
+        message
+    )
 
     if not memory:
-        raise RuntimeError("No memory text found.")
+        raise RuntimeError(
+            "No memory text found."
+        )
 
-    if looks_sensitive(memory):
+    if looks_sensitive(
+        memory
+    ):
         return {
             "success": False,
             "type": "memory",
@@ -705,7 +1879,9 @@ def handle_explicit_memory(message):
             "reply": "I did not save that because it may contain sensitive information.",
         }, 400
 
-    if memory_exists(memory):
+    if memory_exists(
+        memory
+    ):
         return {
             "success": True,
             "type": "memory",
@@ -713,7 +1889,9 @@ def handle_explicit_memory(message):
             "reason": "Memory already exists.",
             "memory": memory,
             "reply": "I already have that saved in memory.",
-            "used_tools": ["save_memory"],
+            "used_tools": [
+                "save_memory",
+            ],
             "controller_attempts": 0,
             "controller_successes": 0,
             "priority_decisions": 0,
@@ -729,7 +1907,9 @@ def handle_explicit_memory(message):
             "email_result": None,
         }, 200
 
-    category = guess_memory_category(memory)
+    category = guess_memory_category(
+        memory
+    )
 
     saved = save_memory(
         memory,
@@ -744,7 +1924,9 @@ def handle_explicit_memory(message):
         "memory": memory,
         "category": category,
         "reply": f"Saved to memory: {memory}",
-        "used_tools": ["save_memory"],
+        "used_tools": [
+            "save_memory",
+        ],
         "controller_attempts": 0,
         "controller_successes": 0,
         "priority_decisions": 0,
@@ -780,7 +1962,9 @@ def project_recall_payload():
             }
         ],
         "post_actions": [],
-        "used_tools": ["read_memory"],
+        "used_tools": [
+            "read_memory",
+        ],
         "memory_result": None,
         "email_result": None,
         "sources": [],
@@ -796,11 +1980,52 @@ def project_recall_payload():
     }
 
 
-# -------------------- Web research / email --------------------
+def memory_audit_payload():
+    return {
+        "success": True,
+        "type": "memory_audit",
+        "version": VERSION,
+        "reply": memory_audit_reply(),
+        "actions": [
+            {
+                "action": 1,
+                "tool": "audit_memory",
+                "decision": {
+                    "decision_source": "memory-management-fast-path",
+                    "why": "The user requested a memory review.",
+                },
+            }
+        ],
+        "post_actions": [],
+        "used_tools": [
+            "audit_memory",
+        ],
+        "memory_result": {
+            "audited": True,
+            "changed": False,
+        },
+        "email_result": None,
+        "sources": [],
+        "controller_attempts": 0,
+        "controller_successes": 0,
+        "priority_decisions": 1,
+        "fallback_decisions": 0,
+        "reasoning_calls": 0,
+        "total_groq_calls": 0,
+        "max_actions": MAX_AGENT_ACTIONS,
+        "email_authorized": False,
+        "memory_write_authorized": False,
+    }
+
+# =========================================================
+# TAVILY / N8N
+# =========================================================
 
 def web_search(query):
     if not TAVILY_API_KEY:
-        raise RuntimeError("TAVILY_API_KEY is not configured")
+        raise RuntimeError(
+            "TAVILY_API_KEY is not configured"
+        )
 
     response = requests.post(
         "https://api.tavily.com/search",
@@ -821,28 +2046,42 @@ def web_search(query):
         data = response.json()
     except Exception:
         raise RuntimeError(
-            f"Tavily returned {response.status_code}: {response.text[:500]}"
+            f"Tavily returned "
+            f"{response.status_code}: "
+            f"{response.text[:500]}"
         )
 
     if not response.ok:
-        raise RuntimeError(str(data))
+        raise RuntimeError(
+            str(
+                data
+            )
+        )
 
-    sources = [
-        {
-            "title": item.get("title", ""),
-            "url": item.get("url", ""),
-            "content": normalize_text(
-                item.get(
-                    "content",
+    sources = []
+
+    for item in data.get(
+        "results",
+        [],
+    )[:4]:
+        sources.append(
+            {
+                "title": item.get(
+                    "title",
                     "",
-                )
-            )[:400],
-        }
-        for item in data.get(
-            "results",
-            [],
-        )[:4]
-    ]
+                ),
+                "url": item.get(
+                    "url",
+                    "",
+                ),
+                "content": normalize_text(
+                    item.get(
+                        "content",
+                        "",
+                    )
+                )[:400],
+            }
+        )
 
     return {
         "answer": normalize_text(
@@ -861,10 +2100,14 @@ def compact_research(research):
 
     pieces = []
 
-    if research.get("answer"):
+    if research.get(
+        "answer"
+    ):
         pieces.append(
             "SEARCH SUMMARY:\n"
-            + research["answer"]
+            + research[
+                "answer"
+            ]
         )
 
     for index, source in enumerate(
@@ -880,7 +2123,9 @@ def compact_research(research):
             f"Info: {source.get('content', '')}"
         )
 
-    return "\n".join(pieces)[:3300]
+    return "\n".join(
+        pieces
+    )[:3300]
 
 
 def send_to_n8n(payload):
@@ -932,8 +2177,9 @@ def send_email(
         "n8n_response": result[:250],
     }
 
-
-# -------------------- Controller --------------------
+# =========================================================
+# CONTROLLER
+# =========================================================
 
 ALL_TOOLS = [
     "read_memory",
@@ -992,10 +2238,14 @@ def available_tools(
         ):
             continue
 
-        tools.append(tool)
+        tools.append(
+            tool
+        )
 
     if "finish" not in tools:
-        tools.append("finish")
+        tools.append(
+            "finish"
+        )
 
     return tools
 
@@ -1049,8 +2299,11 @@ def fallback_next_action(
     has_final_reply,
 ):
     if (
-        needs_memory(message)
-        and "read_memory" not in used_tools
+        needs_memory(
+            message
+        )
+        and "read_memory"
+        not in used_tools
     ):
         return {
             "tool": "read_memory",
@@ -1060,8 +2313,11 @@ def fallback_next_action(
         }
 
     if (
-        needs_research(message)
-        and "research_web" not in used_tools
+        needs_research(
+            message
+        )
+        and "research_web"
+        not in used_tools
     ):
         return {
             "tool": "research_web",
@@ -1072,7 +2328,8 @@ def fallback_next_action(
 
     if (
         not has_final_reply
-        and "reason" not in used_tools
+        and "reason"
+        not in used_tools
     ):
         return {
             "tool": "reason",
@@ -1084,7 +2341,8 @@ def fallback_next_action(
     if (
         memory_allowed
         and has_final_reply
-        and "save_memory" not in used_tools
+        and "save_memory"
+        not in used_tools
     ):
         return {
             "tool": "save_memory",
@@ -1096,7 +2354,8 @@ def fallback_next_action(
     if (
         email_allowed
         and has_final_reply
-        and "send_email" not in used_tools
+        and "send_email"
+        not in used_tools
     ):
         return {
             "tool": "send_email",
@@ -1124,12 +2383,20 @@ def decide_next_action(
     memory_done,
     email_done,
 ):
-    memory_needed = needs_memory(message)
-    research_needed = needs_research(message)
+    memory_needed = needs_memory(
+        message
+    )
+
+    research_needed = needs_research(
+        message
+    )
 
     if (
-        is_personal_tyler_project_reference(message)
-        and "read_memory" not in used_tools
+        is_personal_tyler_project_reference(
+            message
+        )
+        and "read_memory"
+        not in used_tools
     ):
         return {
             "tool": "read_memory",
@@ -1138,11 +2405,12 @@ def decide_next_action(
                 "and saved project facts first."
             ),
             "why": (
-                "Tyler AI refers to the user's personal "
-                "assistant project."
+                "Tyler AI refers to the user's personal assistant project."
             ),
             "decision_source": "project-memory-priority",
-            "available_tools": ["read_memory"],
+            "available_tools": [
+                "read_memory",
+            ],
             "controller_raw": "",
         }
 
@@ -1164,10 +2432,11 @@ def decide_next_action(
         "email_sent": email_done,
         "memory_allowed": memory_allowed,
         "email_allowed": email_allowed,
-        "personal_tyler_project":
+        "personal_tyler_project": (
             is_personal_tyler_project_reference(
                 message
-            ),
+            )
+        ),
         "available_tools": tools,
     }
 
@@ -1203,10 +2472,14 @@ Return ONLY valid JSON:
     raw = ""
 
     try:
-        raw = call_controller(prompt)
+        raw = call_controller(
+            prompt
+        )
 
         choice = validate_controller_choice(
-            parse_json_object(raw),
+            parse_json_object(
+                raw
+            ),
             tools,
         )
 
@@ -1226,14 +2499,23 @@ Return ONLY valid JSON:
             has_final_reply,
         )
 
-        fallback["decision_error"] = str(exc)[:300]
-        fallback["available_tools"] = tools
-        fallback["controller_raw"] = raw[:300]
+        fallback[
+            "decision_error"
+        ] = str(exc)[:300]
+
+        fallback[
+            "available_tools"
+        ] = tools
+
+        fallback[
+            "controller_raw"
+        ] = raw[:300]
 
         return fallback
 
-
-# -------------------- Reasoning / agent --------------------
+# =========================================================
+# REASONING / AGENT
+# =========================================================
 
 def reasoning_step(
     message,
@@ -1262,10 +2544,10 @@ IDENTITY / GROUNDING:
 {identity_note}
 
 SAVED USER CONTEXT:
-{memory_text[:3600] if memory_text else 'None'}
+{memory_text[:3600] if memory_text else "None"}
 
 LIVE RESEARCH:
-{research_text[:3500] if research_text else 'None'}
+{research_text[:3500] if research_text else "None"}
 
 Instructions:
 - Answer clearly and practically.
@@ -1326,7 +2608,9 @@ def build_fallback_answer(
         )
 
         if answer:
-            pieces.append(answer)
+            pieces.append(
+                answer
+            )
 
     if not pieces:
         pieces.append(
@@ -1335,12 +2619,16 @@ def build_fallback_answer(
         )
 
     return (
-        "\n\n".join(pieces)[:3500]
+        "\n\n".join(
+            pieces
+        )[:3500]
         + "\n\nRECOMMENDATION: None"
     )
 
 
-def extract_recommendation(final_reply):
+def extract_recommendation(
+    final_reply
+):
     if not final_reply:
         return None
 
@@ -1366,20 +2654,30 @@ def extract_recommendation(final_reply):
     return recommendation[:350]
 
 
-def build_clean_memory(final_reply):
+def build_clean_memory(
+    final_reply
+):
     recommendation = extract_recommendation(
         final_reply
     )
 
+    if not recommendation:
+        return None
+
     return (
         "Tyler AI recommendation: "
         + recommendation
-    )[:400] if recommendation else None
+    )[:400]
 
 
 def run_agent(message):
-    email_allowed = user_allows_email(message)
-    memory_allowed = user_allows_memory_write(message)
+    email_allowed = user_allows_email(
+        message
+    )
+
+    memory_allowed = user_allows_memory_write(
+        message
+    )
 
     used_tools = []
     actions = []
@@ -1409,11 +2707,23 @@ def run_agent(message):
             used_tools=used_tools,
             email_allowed=email_allowed,
             memory_allowed=memory_allowed,
-            has_memory=bool(memory_text),
-            has_research=bool(research),
-            has_final_reply=bool(final_reply),
-            memory_done=memory_result is not None,
-            email_done=email_result is not None,
+            has_memory=bool(
+                memory_text
+            ),
+            has_research=bool(
+                research
+            ),
+            has_final_reply=bool(
+                final_reply
+            ),
+            memory_done=(
+                memory_result
+                is not None
+            ),
+            email_done=(
+                email_result
+                is not None
+            ),
         )
 
         source = decision.get(
@@ -1431,7 +2741,9 @@ def run_agent(message):
             controller_attempts += 1
             fallback_decisions += 1
 
-        tool = decision["tool"]
+        tool = decision[
+            "tool"
+        ]
 
         if tool == "finish":
             actions.append(
@@ -1455,16 +2767,22 @@ def run_agent(message):
             )
             break
 
-        used_tools.append(tool)
+        used_tools.append(
+            tool
+        )
 
         if tool == "read_memory":
             try:
                 memory_text = (
-                    project_memory_context(12)
+                    project_memory_context(
+                        12
+                    )
                     if is_personal_tyler_project_reference(
                         message
                     )
-                    else compact_memory_context(10)
+                    else compact_memory_context(
+                        10
+                    )
                 )
 
                 result = (
@@ -1511,6 +2829,7 @@ def run_agent(message):
             except Exception as exc:
                 research = None
                 research_text = ""
+
                 result = (
                     f"Research failed: {exc}"
                 )
@@ -1544,7 +2863,9 @@ def run_agent(message):
                 )
 
                 fallback_used = True
-                reason_error = str(exc)[:300]
+                reason_error = str(
+                    exc
+                )[:300]
 
             record = {
                 "action": action_number,
@@ -1555,9 +2876,13 @@ def run_agent(message):
             }
 
             if reason_error:
-                record["reason_error"] = reason_error
+                record[
+                    "reason_error"
+                ] = reason_error
 
-            actions.append(record)
+            actions.append(
+                record
+            )
 
         elif tool == "save_memory":
             candidate = build_clean_memory(
@@ -1582,13 +2907,17 @@ def run_agent(message):
                     "reason": "No clear recommendation was available to save.",
                 }
 
-            elif looks_sensitive(candidate):
+            elif looks_sensitive(
+                candidate
+            ):
                 result = {
                     "saved": False,
                     "reason": "Sensitive information was not stored.",
                 }
 
-            elif memory_exists(candidate):
+            elif memory_exists(
+                candidate
+            ):
                 result = {
                     "saved": False,
                     "reason": "Memory already exists.",
@@ -1683,7 +3012,8 @@ def run_agent(message):
 
     if (
         memory_allowed
-        and memory_result is None
+        and memory_result
+        is None
     ):
         candidate = build_clean_memory(
             final_reply
@@ -1695,13 +3025,17 @@ def run_agent(message):
                 "reason": "No clear recommendation was available to save.",
             }
 
-        elif looks_sensitive(candidate):
+        elif looks_sensitive(
+            candidate
+        ):
             memory_result = {
                 "saved": False,
                 "reason": "Sensitive information was not stored.",
             }
 
-        elif memory_exists(candidate):
+        elif memory_exists(
+            candidate
+        ):
             memory_result = {
                 "saved": False,
                 "reason": "Memory already exists.",
@@ -1739,7 +3073,8 @@ def run_agent(message):
 
     if (
         email_allowed
-        and email_result is None
+        and email_result
+        is None
     ):
         try:
             email_result = send_email(
@@ -1773,16 +3108,18 @@ def run_agent(message):
         "priority_decisions": priority_decisions,
         "fallback_decisions": fallback_decisions,
         "reasoning_calls": reasoning_calls,
-        "total_groq_calls":
+        "total_groq_calls": (
             controller_attempts
-            + reasoning_calls,
+            + reasoning_calls
+        ),
         "max_actions": MAX_AGENT_ACTIONS,
         "email_authorized": email_allowed,
         "memory_write_authorized": memory_allowed,
     }
 
-
-# -------------------- Web UI --------------------
+# =========================================================
+# WEB UI
+# =========================================================
 
 LOGIN_HTML = r"""
 <!doctype html>
@@ -1888,7 +3225,6 @@ header{padding:0 12px}
 <div class="shell">
 
 <header>
-
 <div class="orb"></div>
 
 <div>
@@ -1912,7 +3248,6 @@ online · {{ version_short }}
 Log out
 </button>
 </form>
-
 </header>
 
 <main
@@ -1928,7 +3263,6 @@ Tyler AI is online. What do you want to work on?
 
 <div class="composer">
 <div class="box">
-
 <textarea
     id="message"
     rows="1"
@@ -1942,94 +3276,83 @@ Tyler AI is online. What do you want to work on?
 >
 ↑
 </button>
-
 </div>
 
 <div class="hint">
 Enter to send · Shift+Enter for a new line
 </div>
-
 </div>
 
 </div>
 
 <script>
 
-const chat =
-    document.getElementById("chat");
-
-const input =
-    document.getElementById("message");
-
-const sendButton =
-    document.getElementById("send");
-
+const chat = document.getElementById("chat");
+const input = document.getElementById("message");
+const sendButton = document.getElementById("send");
 
 function scrollDown() {
-    chat.scrollTop =
-        chat.scrollHeight;
+    chat.scrollTop = chat.scrollHeight;
 }
 
+function memoryStatus(meta) {
+    if (!meta || !meta.memory_result) {
+        return null;
+    }
 
-function addMessage(
-    text,
-    who,
-    meta
-) {
+    const result = meta.memory_result;
 
-    const row =
-        document.createElement("div");
+    if (result.deleted) {
+        return "deleted";
+    }
 
-    row.className =
-        "row " + who;
+    if (result.replaced) {
+        return "replaced";
+    }
 
-    const bubble =
-        document.createElement("div");
+    if (result.audited) {
+        return "audited";
+    }
 
-    bubble.className =
-        "bubble";
+    if (result.preview) {
+        return "preview only";
+    }
 
-    const body =
-        document.createElement("div");
+    if (result.saved) {
+        return "saved";
+    }
 
-    body.textContent =
-        text;
+    if (result.saved === false) {
+        return "not saved";
+    }
 
+    return null;
+}
+
+function addMessage(text, who, meta) {
+    const row = document.createElement("div");
+    row.className = "row " + who;
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+
+    const body = document.createElement("div");
+    body.textContent = text;
     bubble.appendChild(body);
 
-
-    if (
-        meta
-        && who === "assistant"
-    ) {
-
-        const details =
-            document.createElement("details");
-
-        const summary =
-            document.createElement("summary");
-
-        summary.textContent =
-            "Details";
-
+    if (meta && who === "assistant") {
+        const details = document.createElement("details");
+        const summary = document.createElement("summary");
+        summary.textContent = "Details";
         details.appendChild(summary);
 
-        const d =
-            document.createElement("div");
+        const d = document.createElement("div");
+        d.className = "diag";
 
-        d.className =
-            "diag";
-
-        const tools =
-            (
-                meta.used_tools
-                || []
-            ).join(" → ")
-            || "none";
+        const tools = (meta.used_tools || []).join(" → ") || "none";
 
         d.textContent =
-            "Tools: "
-            + tools
+            "Tools: " + tools
             + "\nController: "
             + (meta.controller_successes || 0)
             + "/"
@@ -2041,14 +3364,10 @@ function addMessage(
             + "\nGroq calls: "
             + (meta.total_groq_calls || 0);
 
-        if (meta.memory_result) {
-            d.textContent +=
-                "\nMemory: "
-                + (
-                    meta.memory_result.saved
-                    ? "saved"
-                    : "not saved"
-                );
+        const memStatus = memoryStatus(meta);
+
+        if (memStatus) {
+            d.textContent += "\nMemory: " + memStatus;
         }
 
         if (meta.email_result) {
@@ -2067,13 +3386,8 @@ function addMessage(
             meta.sources
             && meta.sources.length
         ) {
-
-            const box =
-                document.createElement("div");
-
-            box.className =
-                "sources";
-
+            const box = document.createElement("div");
+            box.className = "sources";
             box.appendChild(
                 document.createTextNode(
                     "Sources: "
@@ -2087,7 +3401,6 @@ function addMessage(
                     source,
                     index
                 ) => {
-
                     if (index) {
                         box.appendChild(
                             document.createTextNode(
@@ -2096,18 +3409,10 @@ function addMessage(
                         );
                     }
 
-                    const link =
-                        document.createElement("a");
-
-                    link.href =
-                        source.url || "#";
-
-                    link.target =
-                        "_blank";
-
-                    link.rel =
-                        "noopener noreferrer";
-
+                    const link = document.createElement("a");
+                    link.href = source.url || "#";
+                    link.target = "_blank";
+                    link.rel = "noopener noreferrer";
                     link.textContent =
                         source.title
                         || (
@@ -2127,17 +3432,13 @@ function addMessage(
 
     row.appendChild(bubble);
     chat.appendChild(row);
-
     scrollDown();
 
     return row;
 }
 
-
 function resizeInput() {
-    input.style.height =
-        "auto";
-
+    input.style.height = "auto";
     input.style.height =
         Math.min(
             input.scrollHeight,
@@ -2146,43 +3447,34 @@ function resizeInput() {
         + "px";
 }
 
-
 input.addEventListener(
     "input",
     resizeInput
 );
 
-
 input.addEventListener(
     "keydown",
     event => {
-
         if (
             event.key === "Enter"
             && !event.shiftKey
         ) {
-
             event.preventDefault();
             sendMessage();
         }
     }
 );
 
-
 sendButton.addEventListener(
     "click",
     event => {
-
         event.preventDefault();
         sendMessage();
     }
 );
 
-
 async function sendMessage() {
-
-    const text =
-        input.value.trim();
+    const text = input.value.trim();
 
     if (
         !text
@@ -2196,19 +3488,14 @@ async function sendMessage() {
         "user"
     );
 
-    input.value =
-        "";
-
+    input.value = "";
     resizeInput();
+    sendButton.disabled = true;
 
-    sendButton.disabled =
-        true;
-
-    const waiting =
-        addMessage(
-            "Thinking…",
-            "assistant"
-        );
+    const waiting = addMessage(
+        "Thinking…",
+        "assistant"
+    );
 
     waiting
     .querySelector(
@@ -2219,40 +3506,28 @@ async function sendMessage() {
     );
 
     try {
-
-        const response =
-            await fetch(
-                "/ui/chat",
-                {
-                    method:
-                        "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    credentials:
-                        "same-origin",
-
-                    body:
-                        JSON.stringify(
-                            {
-                                message:
-                                    text
-                            }
-                        )
-                }
-            );
+        const response = await fetch(
+            "/ui/chat",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+                credentials: "same-origin",
+                body: JSON.stringify(
+                    {
+                        message: text
+                    }
+                )
+            }
+        );
 
         let data = {};
 
         try {
-            data =
-                await response.json();
-        }
-
-        catch (_) {
+            data = await response.json();
+        } catch (_) {
             data = {
                 error:
                     "The server returned "
@@ -2266,8 +3541,7 @@ async function sendMessage() {
             response.status
             === 401
         ) {
-            window.location =
-                "/";
+            window.location = "/";
             return;
         }
 
@@ -2275,14 +3549,12 @@ async function sendMessage() {
             !response.ok
             || !data.success
         ) {
-
             addMessage(
                 data.error
-                || "Tyler could not "
-                + "complete that request.",
+                || data.reply
+                || "Tyler could not complete that request.",
                 "assistant"
             );
-
             return;
         }
 
@@ -2293,10 +3565,7 @@ async function sendMessage() {
             data
         );
 
-    }
-
-    catch (error) {
-
+    } catch (error) {
         waiting.remove();
 
         addMessage(
@@ -2305,17 +3574,11 @@ async function sendMessage() {
             "assistant"
         );
 
-    }
-
-    finally {
-
-        sendButton.disabled =
-            false;
-
+    } finally {
+        sendButton.disabled = false;
         input.focus();
     }
 }
-
 
 input.focus();
 
@@ -2324,28 +3587,156 @@ input.focus();
 </html>
 """
 
-
-def ui_logged_in():
-    return bool(
-        session.get(
-            "tyler_ui_authenticated"
-        )
-    )
-
+# =========================================================
+# CHAT ROUTING
+# =========================================================
 
 def handle_chat_message(message):
-    if explicit_memory_request(message):
+    if delete_confirm_request(
+        message
+    ):
+        ids = parse_memory_id_list(
+            message
+        )
+
+        payload = confirm_memory_delete(
+            ids
+        )
+
+        payload[
+            "version"
+        ] = VERSION
+
+        return (
+            payload,
+            200
+            if payload.get(
+                "success"
+            )
+            else 400,
+        )
+
+    if delete_preview_request(
+        message
+    ):
+        ids = parse_memory_id_list(
+            message
+        )
+
+        payload = preview_memory_delete(
+            ids
+        )
+
+        payload[
+            "version"
+        ] = VERSION
+
+        return (
+            payload,
+            200
+            if payload.get(
+                "success"
+            )
+            else 400,
+        )
+
+    if replace_confirm_request(
+        message
+    ):
+        parsed = parse_replace_request(
+            message
+        )
+
+        if not parsed:
+            return {
+                "success": False,
+                "version": VERSION,
+                "reply": "I couldn't parse that replacement request.",
+            }, 400
+
+        memory_id, new_text = parsed
+
+        payload = confirm_memory_replace(
+            memory_id,
+            new_text,
+        )
+
+        payload[
+            "version"
+        ] = VERSION
+
+        return (
+            payload,
+            200
+            if payload.get(
+                "success"
+            )
+            else 400,
+        )
+
+    if replace_preview_request(
+        message
+    ):
+        parsed = parse_replace_request(
+            message
+        )
+
+        if not parsed:
+            return {
+                "success": False,
+                "version": VERSION,
+                "reply": "I couldn't parse that replacement request.",
+            }, 400
+
+        memory_id, new_text = parsed
+
+        payload = preview_memory_replace(
+            memory_id,
+            new_text,
+        )
+
+        payload[
+            "version"
+        ] = VERSION
+
+        return (
+            payload,
+            200
+            if payload.get(
+                "success"
+            )
+            else 400,
+        )
+
+    if memory_audit_request(
+        message
+    ):
+        return (
+            memory_audit_payload(),
+            200,
+        )
+
+    if explicit_memory_request(
+        message
+    ):
         payload, status_code = (
             handle_explicit_memory(
                 message
             )
         )
 
-        payload["version"] = VERSION
+        payload[
+            "version"
+        ] = VERSION
 
-        return payload, status_code
+        return (
+            payload,
+            status_code,
+        )
 
-    if is_simple_project_recall(message):
+    if is_simple_project_recall(
+        message
+    ):
         return (
             project_recall_payload(),
             200,
@@ -2355,8 +3746,45 @@ def handle_chat_message(message):
         "success": True,
         "type": "autonomous_agent",
         "version": VERSION,
-        **run_agent(message),
+        **run_agent(
+            message
+        ),
     }, 200
+
+# =========================================================
+# WEBSITE ROUTES
+# =========================================================
+
+def ui_logged_in():
+    return bool(
+        session.get(
+            "tyler_ui_authenticated"
+        )
+    )
+
+
+@app.after_request
+def disable_ui_cache(response):
+    if request.path in {
+        "/",
+        "/ui",
+    }:
+        response.headers[
+            "Cache-Control"
+        ] = (
+            "no-store, no-cache, "
+            "must-revalidate, max-age=0"
+        )
+
+        response.headers[
+            "Pragma"
+        ] = "no-cache"
+
+        response.headers[
+            "Expires"
+        ] = "0"
+
+    return response
 
 
 @app.route(
@@ -2376,7 +3804,7 @@ def ui_home():
 
     return render_template_string(
         CHAT_HTML,
-        version_short="v2.5",
+        version_short=VERSION_SHORT,
     )
 
 
@@ -2401,8 +3829,10 @@ def ui_login():
     ):
         return render_template_string(
             LOGIN_HTML,
-            error=
-                "That access key was not accepted.",
+            error=(
+                "That access key "
+                "was not accepted."
+            ),
         ), 401
 
     session.clear()
@@ -2442,10 +3872,8 @@ def ui_chat():
     if not ui_logged_in():
         return jsonify(
             {
-                "success":
-                    False,
-                "error":
-                    "Unauthorized",
+                "success": False,
+                "error": "Unauthorized",
             }
         ), 401
 
@@ -2466,10 +3894,8 @@ def ui_chat():
     if not message:
         return jsonify(
             {
-                "success":
-                    False,
-                "error":
-                    "Missing message",
+                "success": False,
+                "error": "Missing message",
             }
         ), 400
 
@@ -2487,15 +3913,15 @@ def ui_chat():
     except Exception as exc:
         return jsonify(
             {
-                "success":
-                    False,
-                "version":
-                    VERSION,
-                "error":
-                    str(exc),
+                "success": False,
+                "version": VERSION,
+                "error": str(exc),
             }
         ), 500
 
+# =========================================================
+# STATUS / HEALTH
+# =========================================================
 
 @app.route(
     "/status",
@@ -2504,45 +3930,41 @@ def ui_chat():
 def status():
     return jsonify(
         {
-            "name":
-                "Tyler AI",
-            "status":
-                "online",
-            "version":
-                VERSION,
-            "mode":
+            "name": "Tyler AI",
+            "status": "online",
+            "version": VERSION,
+            "mode": (
                 "autonomous-next-action"
                 "+web-chat"
-                "+structured-project-memory",
-            "secured":
-                bool(
-                    TYLER_API_KEY
-                ),
-            "groq_connected":
-                bool(
-                    GROQ_API_KEY
-                ),
-            "tavily_connected":
-                bool(
-                    TAVILY_API_KEY
-                ),
-            "n8n_connected":
-                bool(
-                    N8N_WEBHOOK_URL
-                ),
-            "memory_connected":
-                bool(
-                    SUPABASE_URL
-                    and SUPABASE_KEY
-                ),
-            "max_actions":
-                MAX_AGENT_ACTIONS,
+                "+structured-project-memory"
+                "+approval-memory-management"
+            ),
+            "secured": bool(
+                TYLER_API_KEY
+            ),
+            "groq_connected": bool(
+                GROQ_API_KEY
+            ),
+            "tavily_connected": bool(
+                TAVILY_API_KEY
+            ),
+            "n8n_connected": bool(
+                N8N_WEBHOOK_URL
+            ),
+            "memory_connected": bool(
+                SUPABASE_URL
+                and SUPABASE_KEY
+            ),
+            "max_actions": MAX_AGENT_ACTIONS,
             "tools": [
                 "read_memory",
                 "research_web",
                 "reason",
                 "save_memory",
                 "send_email",
+                "audit_memory",
+                "replace_memory",
+                "delete_memory",
             ],
         }
     )
@@ -2555,13 +3977,14 @@ def status():
 def health():
     return jsonify(
         {
-            "status":
-                "healthy",
-            "version":
-                VERSION,
+            "status": "healthy",
+            "version": VERSION,
         }
     )
 
+# =========================================================
+# MEMORY API
+# =========================================================
 
 @app.route(
     "/memories",
@@ -2571,39 +3994,73 @@ def memories_route():
     if not authorized():
         return jsonify(
             {
-                "success":
-                    False,
-                "error":
-                    "Unauthorized",
+                "success": False,
+                "error": "Unauthorized",
             }
         ), 401
 
     try:
         items = get_memories(
-            50
+            100
         )
 
         return jsonify(
             {
-                "success":
-                    True,
-                "count":
-                    len(items),
-                "memories":
-                    items,
+                "success": True,
+                "count": len(
+                    items
+                ),
+                "memories": items,
             }
         )
 
     except Exception as exc:
         return jsonify(
             {
-                "success":
-                    False,
-                "error":
-                    str(exc),
+                "success": False,
+                "error": str(
+                    exc
+                ),
             }
         ), 500
 
+
+@app.route(
+    "/memory/audit",
+    methods=["GET"],
+)
+def memory_audit_route():
+    if not authorized():
+        return jsonify(
+            {
+                "success": False,
+                "error": "Unauthorized",
+            }
+        ), 401
+
+    try:
+        return jsonify(
+            {
+                "success": True,
+                "version": VERSION,
+                "audit": audit_memories(),
+            }
+        )
+
+    except Exception as exc:
+        return jsonify(
+            {
+                "success": False,
+                "version": VERSION,
+                "error": str(
+                    exc
+                ),
+            }
+        ), 500
+
+# =========================================================
+# MAIN API CHAT
+# =========================================================
 
 @app.route(
     "/chat",
@@ -2613,10 +4070,8 @@ def chat():
     if not authorized():
         return jsonify(
             {
-                "success":
-                    False,
-                "error":
-                    "Unauthorized",
+                "success": False,
+                "error": "Unauthorized",
             }
         ), 401
 
@@ -2637,10 +4092,8 @@ def chat():
     if not message:
         return jsonify(
             {
-                "success":
-                    False,
-                "error":
-                    "Missing message",
+                "success": False,
+                "error": "Missing message",
             }
         ), 400
 
@@ -2658,15 +4111,17 @@ def chat():
     except Exception as exc:
         return jsonify(
             {
-                "success":
-                    False,
-                "version":
-                    VERSION,
-                "error":
-                    str(exc),
+                "success": False,
+                "version": VERSION,
+                "error": str(
+                    exc
+                ),
             }
         ), 500
 
+# =========================================================
+# N8N WEBHOOK
+# =========================================================
 
 @app.route(
     "/webhook",
@@ -2676,10 +4131,8 @@ def webhook():
     if not authorized():
         return jsonify(
             {
-                "success":
-                    False,
-                "error":
-                    "Unauthorized",
+                "success": False,
+                "error": "Unauthorized",
             }
         ), 401
 
@@ -2695,10 +4148,8 @@ def webhook():
     ):
         return jsonify(
             {
-                "success":
-                    False,
-                "error":
-                    "Missing action",
+                "success": False,
+                "error": "Missing action",
             }
         ), 400
 
@@ -2709,23 +4160,24 @@ def webhook():
 
         return jsonify(
             {
-                "success":
-                    True,
-                "n8n_response":
-                    result[:500],
+                "success": True,
+                "n8n_response": result[:500],
             }
         )
 
     except Exception as exc:
         return jsonify(
             {
-                "success":
-                    False,
-                "error":
-                    str(exc),
+                "success": False,
+                "error": str(
+                    exc
+                ),
             }
         ), 500
 
+# =========================================================
+# START
+# =========================================================
 
 if __name__ == "__main__":
     port = int(
@@ -2738,4 +4190,4 @@ if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
         port=port,
-    )
+            )
