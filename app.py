@@ -3499,8 +3499,7 @@ def ui_login():
         "tyler_ui_authenticated"
     ] = True
 
-    session.permanent =
-        True
+    session.permanent = True
 
     return redirect(
         url_for(
