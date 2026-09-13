@@ -6,17 +6,11 @@ import requests
 from datetime import timedelta
 
 from flask import (
-    Flask,
-    request,
-    jsonify,
-    render_template_string,
-    session,
-    redirect,
-    url_for,
+    Flask, request, jsonify, render_template_string,
+    session, redirect, url_for,
 )
 
 app = Flask(__name__)
-
 
 # =========================================================
 # CONFIG
@@ -27,26 +21,14 @@ TYLER_API_KEY = os.environ.get("TYLER_API_KEY")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY")
 TYLER_DEFAULT_EMAIL = os.environ.get("TYLER_DEFAULT_EMAIL")
-
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-
-GROQ_MODEL = os.environ.get(
-    "GROQ_MODEL",
-    "openai/gpt-oss-20b",
-)
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-20b")
 
 MAX_AGENT_ACTIONS = 5
+VERSION = "2.4.2-web-memory-fix"
 
-VERSION = "2.4.1-memory-priority"
-
-
-app.secret_key = (
-    os.environ.get("FLASK_SECRET_KEY")
-    or TYLER_API_KEY
-    or os.urandom(32)
-)
-
+app.secret_key = os.environ.get("FLASK_SECRET_KEY") or TYLER_API_KEY or os.urandom(32)
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
@@ -54,115 +36,53 @@ app.config.update(
     PERMANENT_SESSION_LIFETIME=timedelta(days=7),
 )
 
-
 # =========================================================
 # BASIC HELPERS
 # =========================================================
 
 def normalize_text(value):
-    return re.sub(
-        r"\s+",
-        " ",
-        str(value or ""),
-    ).strip()
+    return re.sub(r"\s+", " ", str(value or "")).strip()
+
+
+def clamp(value, low, high):
+    try:
+        value = int(value)
+    except Exception:
+        value = low
+    return max(low, min(high, value))
 
 
 def authorized():
-
-    supplied = request.headers.get(
-        "X-Tyler-Key"
-    )
-
+    supplied = request.headers.get("X-Tyler-Key")
     return bool(
         TYLER_API_KEY
         and supplied
-        and hmac.compare_digest(
-            supplied,
-            TYLER_API_KEY,
-        )
-    )
-
-
-def clamp(
-    value,
-    low,
-    high,
-):
-
-    try:
-        value = int(value)
-
-    except Exception:
-        value = low
-
-    return max(
-        low,
-        min(
-            high,
-            value,
-        ),
+        and hmac.compare_digest(supplied, TYLER_API_KEY)
     )
 
 
 def parse_json_object(text):
-
     if not text:
         return None
 
-    text = str(
-        text
-    ).strip()
-
-    text = re.sub(
-        r"^```(?:json)?\s*|\s*```$",
-        "",
-        text,
-        flags=re.I,
-    )
+    text = str(text).strip()
+    text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.I)
 
     try:
-
-        obj = json.loads(
-            text
-        )
-
-        if isinstance(
-            obj,
-            dict,
-        ):
+        obj = json.loads(text)
+        if isinstance(obj, dict):
             return obj
-
     except Exception:
         pass
 
-    start = text.find(
-        "{"
-    )
+    start = text.find("{")
+    end = text.rfind("}")
 
-    end = text.rfind(
-        "}"
-    )
-
-    if (
-        start >= 0
-        and end > start
-    ):
-
+    if start >= 0 and end > start:
         try:
-
-            obj = json.loads(
-                text[
-                    start:
-                    end + 1
-                ]
-            )
-
-            if isinstance(
-                obj,
-                dict,
-            ):
+            obj = json.loads(text[start:end + 1])
+            if isinstance(obj, dict):
                 return obj
-
         except Exception:
             pass
 
@@ -181,155 +101,79 @@ def groq_request(
     include_reasoning=None,
     response_format=None,
 ):
-
     if not GROQ_API_KEY:
-
-        raise RuntimeError(
-            "GROQ_API_KEY is not configured"
-        )
+        raise RuntimeError("GROQ_API_KEY is not configured")
 
     payload = {
-        "model":
-            GROQ_MODEL,
-
-        "messages":
-            messages,
-
-        "temperature":
-            temperature,
-
-        "max_completion_tokens":
-            max_completion_tokens,
+        "model": GROQ_MODEL,
+        "messages": messages,
+        "temperature": temperature,
+        "max_completion_tokens": max_completion_tokens,
     }
 
     if reasoning_effort is not None:
-
-        payload[
-            "reasoning_effort"
-        ] = reasoning_effort
+        payload["reasoning_effort"] = reasoning_effort
 
     if include_reasoning is not None:
-
-        payload[
-            "include_reasoning"
-        ] = include_reasoning
+        payload["include_reasoning"] = include_reasoning
 
     if response_format is not None:
-
-        payload[
-            "response_format"
-        ] = response_format
+        payload["response_format"] = response_format
 
     response = requests.post(
         "https://api.groq.com/openai/v1/chat/completions",
-
         headers={
-            "Authorization":
-                f"Bearer {GROQ_API_KEY}",
-
-            "Content-Type":
-                "application/json",
+            "Authorization": f"Bearer {GROQ_API_KEY}",
+            "Content-Type": "application/json",
         },
-
-        json=
-            payload,
-
-        timeout=
-            90,
+        json=payload,
+        timeout=90,
     )
 
     try:
-
         data = response.json()
-
     except Exception:
-
         raise RuntimeError(
-            f"Groq returned "
-            f"{response.status_code}: "
-            f"{response.text[:500]}"
+            f"Groq returned {response.status_code}: {response.text[:500]}"
         )
 
     if not response.ok:
+        error = data.get("error", {})
 
-        error = data.get(
-            "error",
-            {},
-        )
-
-        if isinstance(
-            error,
-            dict,
-        ):
-
-            message = error.get(
-                "message",
-                str(error),
-            )
-
+        if isinstance(error, dict):
+            message = error.get("message", str(error))
         else:
+            message = str(error)
 
-            message = str(
-                error
-            )
+        raise RuntimeError(message)
 
-        raise RuntimeError(
-            message
-        )
-
-    choices = data.get(
-        "choices",
-        [],
-    )
+    choices = data.get("choices", [])
 
     if not choices:
-
-        raise RuntimeError(
-            "Groq returned no choices"
-        )
+        raise RuntimeError("Groq returned no choices")
 
     return str(
         choices[0]
-        .get(
-            "message",
-            {},
-        )
-        .get(
-            "content",
-            "",
-        )
+        .get("message", {})
+        .get("content", "")
         or ""
     ).strip()
 
 
 def call_controller(prompt):
-
     return groq_request(
         [
             {
-                "role":
-                    "user",
-
-                "content":
-                    prompt,
+                "role": "user",
+                "content": prompt,
             }
         ],
-
-        max_completion_tokens=
-            220,
-
-        temperature=
-            0.0,
-
-        reasoning_effort=
-            "low",
-
-        include_reasoning=
-            False,
-
+        max_completion_tokens=220,
+        temperature=0.0,
+        reasoning_effort="low",
+        include_reasoning=False,
         response_format={
-            "type":
-                "json_object",
+            "type": "json_object"
         },
     )
 
@@ -340,37 +184,21 @@ def call_reasoner(
     max_tokens=700,
     temperature=0.2,
 ):
-
     return groq_request(
         [
             {
-                "role":
-                    "system",
-
-                "content":
-                    system_prompt,
+                "role": "system",
+                "content": system_prompt,
             },
-
             {
-                "role":
-                    "user",
-
-                "content":
-                    user_prompt,
+                "role": "user",
+                "content": user_prompt,
             },
         ],
-
-        max_completion_tokens=
-            max_tokens,
-
-        temperature=
-            temperature,
-
-        reasoning_effort=
-            "low",
-
-        include_reasoning=
-            False,
+        max_completion_tokens=max_tokens,
+        temperature=temperature,
+        reasoning_effort="low",
+        include_reasoning=False,
     )
 
 
@@ -379,58 +207,32 @@ def call_reasoner(
 # =========================================================
 
 def supabase_headers():
-
     if not SUPABASE_KEY:
-
-        raise RuntimeError(
-            "SUPABASE_KEY is not configured"
-        )
+        raise RuntimeError("SUPABASE_KEY is not configured")
 
     return {
-        "apikey":
-            SUPABASE_KEY,
-
-        "Authorization":
-            f"Bearer {SUPABASE_KEY}",
-
-        "Content-Type":
-            "application/json",
+        "apikey": SUPABASE_KEY,
+        "Authorization": f"Bearer {SUPABASE_KEY}",
+        "Content-Type": "application/json",
     }
 
 
-def get_memories(
-    limit=20,
-):
-
+def get_memories(limit=20):
     if not SUPABASE_URL:
         return []
 
     response = requests.get(
         f"{SUPABASE_URL}/rest/v1/memories",
-
-        headers=
-            supabase_headers(),
-
+        headers=supabase_headers(),
         params={
-            "select":
-                "id,created_at,"
-                "memories,category,"
-                "importance",
-
-            "order":
-                "importance.desc,"
-                "created_at.desc",
-
-            "limit":
-                limit,
+            "select": "id,created_at,memories,category,importance",
+            "order": "importance.desc,created_at.desc",
+            "limit": limit,
         },
-
-        timeout=
-            30,
+        timeout=30,
     )
 
     if not response.ok:
-
         raise RuntimeError(
             f"Supabase read failed: "
             f"{response.status_code} "
@@ -445,44 +247,28 @@ def save_memory(
     category="general",
     importance=5,
 ):
-
     if not SUPABASE_URL:
-
-        raise RuntimeError(
-            "SUPABASE_URL is not configured"
-        )
+        raise RuntimeError("SUPABASE_URL is not configured")
 
     response = requests.post(
         f"{SUPABASE_URL}/rest/v1/memories",
-
         headers={
             **supabase_headers(),
-
-            "Prefer":
-                "return=representation",
+            "Prefer": "return=representation",
         },
-
         json={
-            "memories":
-                text,
-
-            "category":
-                category,
-
-            "importance":
-                clamp(
-                    importance,
-                    1,
-                    10,
-                ),
+            "memories": text,
+            "category": category,
+            "importance": clamp(
+                importance,
+                1,
+                10,
+            ),
         },
-
-        timeout=
-            30,
+        timeout=30,
     )
 
     if not response.ok:
-
         raise RuntimeError(
             f"Supabase save failed: "
             f"{response.status_code} "
@@ -493,19 +279,15 @@ def save_memory(
 
 
 def memory_exists(text):
-
     target = normalize_text(
         text
     ).lower()
 
     try:
-
         memories = get_memories(
             50
         )
-
     except Exception:
-
         return False
 
     return any(
@@ -516,34 +298,24 @@ def memory_exists(text):
             )
         ).lower()
         == target
-
-        for item
-        in memories
+        for item in memories
     )
 
 
 def compact_memory_context(
     limit=10,
 ):
-
     try:
-
         memories = get_memories(
             limit
         )
-
-    except Exception as e:
-
-        return (
-            f"Memory read failed: {e}"
-        )
+    except Exception as exc:
+        return f"Memory read failed: {exc}"
 
     return "\n".join(
         f"- [{item.get('category', 'general')}] "
         f"{normalize_text(item.get('memories', ''))[:300]}"
-
-        for item
-        in memories
+        for item in memories
     )[:2200]
 
 
@@ -554,12 +326,10 @@ def compact_memory_context(
 def normalized_intent_text(
     message
 ):
-
     lower = normalize_text(
         message
     ).lower()
 
-    # Common typing mistakes.
     lower = lower.replace(
         "tlyer",
         "tyler",
@@ -576,7 +346,6 @@ def normalized_intent_text(
 def is_personal_tyler_project_reference(
     message
 ):
-
     lower = normalized_intent_text(
         message
     )
@@ -593,19 +362,13 @@ def is_personal_tyler_project_reference(
 
     if any(
         term in lower
-        for term
-        in project_terms
+        for term in project_terms
     ):
-
         return True
 
-    # Tolerates small spelling mistakes
-    # around Tyler.
     return bool(
         re.search(
-            r"\btyl\w{1,3}\s+"
-            r"(?:ai|project)\b",
-
+            r"\btyl\w{1,3}\s+(?:ai|project)\b",
             lower,
         )
     )
@@ -614,7 +377,6 @@ def is_personal_tyler_project_reference(
 def needs_memory(
     message
 ):
-
     lower = normalized_intent_text(
         message
     )
@@ -622,7 +384,6 @@ def needs_memory(
     if is_personal_tyler_project_reference(
         message
     ):
-
         return True
 
     terms = [
@@ -641,15 +402,13 @@ def needs_memory(
 
     return any(
         term in lower
-        for term
-        in terms
+        for term in terms
     )
 
 
 def needs_research(
     message
 ):
-
     lower = normalized_intent_text(
         message
     )
@@ -670,17 +429,15 @@ def needs_research(
 
     return any(
         term in lower
-        for term
-        in terms
+        for term in terms
     )
 
 
 # =========================================================
-# PERMISSIONS
+# PERMISSIONS / MEMORY COMMANDS
 # =========================================================
 
 def looks_sensitive(text):
-
     lower = str(
         text
     ).lower()
@@ -704,15 +461,13 @@ def looks_sensitive(text):
 
     return any(
         item in lower
-        for item
-        in blocked
+        for item in blocked
     )
 
 
 def user_allows_email(
     message
 ):
-
     lower = message.lower()
 
     deny = [
@@ -727,10 +482,8 @@ def user_allows_email(
 
     if any(
         item in lower
-        for item
-        in deny
+        for item in deny
     ):
-
         return False
 
     allow = [
@@ -745,15 +498,13 @@ def user_allows_email(
 
     return any(
         item in lower
-        for item
-        in allow
+        for item in allow
     )
 
 
 def user_allows_memory_write(
     message
 ):
-
     lower = message.lower()
 
     deny = [
@@ -771,10 +522,8 @@ def user_allows_memory_write(
 
     if any(
         item in lower
-        for item
-        in deny
+        for item in deny
     ):
-
         return False
 
     allow = [
@@ -796,44 +545,37 @@ def user_allows_memory_write(
 
     return any(
         item in lower
-        for item
-        in allow
+        for item in allow
     )
 
-
-# =========================================================
-# EXPLICIT MEMORY
-# =========================================================
 
 def explicit_memory_request(
     message
 ):
-
     lower = message.lower().strip()
 
-    starts = [
-        "remember that ",
-        "remember this ",
-        "save this to memory ",
-        "save that to memory ",
-        "store this ",
-        "don't forget ",
-        "do not forget ",
+    patterns = [
+        r"^remember that(?:\s+|:\s*)",
+        r"^remember this(?:\s+|:\s*)",
+        r"^save this to memory(?:\s+|:\s*)",
+        r"^save that to memory(?:\s+|:\s*)",
+        r"^store this(?:\s+|:\s*)",
+        r"^don't forget(?: that)?(?:\s+|:\s*)",
+        r"^do not forget(?: that)?(?:\s+|:\s*)",
     ]
 
     return any(
-        lower.startswith(
-            item
+        re.match(
+            pattern,
+            lower,
         )
-        for item
-        in starts
+        for pattern in patterns
     )
 
 
 def clean_explicit_memory(
     message
 ):
-
     text = message.strip()
 
     patterns = [
@@ -847,7 +589,6 @@ def clean_explicit_memory(
     ]
 
     for pattern in patterns:
-
         text = re.sub(
             pattern,
             "",
@@ -861,7 +602,6 @@ def clean_explicit_memory(
 def guess_memory_category(
     text
 ):
-
     lower = text.lower()
 
     if any(
@@ -872,7 +612,6 @@ def guess_memory_category(
             "i like",
         ]
     ):
-
         return "preference"
 
     if any(
@@ -882,7 +621,6 @@ def guess_memory_category(
             "want to become",
         ]
     ):
-
         return "goal"
 
     if any(
@@ -893,7 +631,6 @@ def guess_memory_category(
             "tyler ai",
         ]
     ):
-
         return "project"
 
     if any(
@@ -904,10 +641,109 @@ def guess_memory_category(
             "work",
         ]
     ):
-
         return "career"
 
     return "general"
+
+
+def handle_explicit_memory(
+    message
+):
+    memory = clean_explicit_memory(
+        message
+    )
+
+    if not memory:
+        raise RuntimeError(
+            "No memory text found."
+        )
+
+    if looks_sensitive(
+        memory
+    ):
+        return {
+            "success": False,
+            "type": "memory",
+            "saved": False,
+            "error":
+                "Sensitive information will not be stored.",
+            "reply":
+                "I did not save that because it may contain sensitive information.",
+        }, 400
+
+    if memory_exists(
+        memory
+    ):
+        return {
+            "success": True,
+            "type": "memory",
+            "saved": False,
+            "reason":
+                "Memory already exists.",
+            "memory":
+                memory,
+            "reply":
+                "I already have that saved in memory.",
+            "used_tools": [
+                "save_memory"
+            ],
+            "controller_attempts": 0,
+            "controller_successes": 0,
+            "priority_decisions": 0,
+            "fallback_decisions": 0,
+            "reasoning_calls": 0,
+            "total_groq_calls": 0,
+            "sources": [],
+            "memory_result": {
+                "saved": False,
+                "reason":
+                    "Memory already exists.",
+                "memory":
+                    memory,
+            },
+            "email_result":
+                None,
+        }, 200
+
+    category = guess_memory_category(
+        memory
+    )
+
+    saved = save_memory(
+        memory,
+        category,
+        7,
+    )
+
+    return {
+        "success": True,
+        "type": "memory",
+        "saved": True,
+        "memory": memory,
+        "category": category,
+        "reply":
+            f"Saved to memory: {memory}",
+        "used_tools": [
+            "save_memory"
+        ],
+        "controller_attempts": 0,
+        "controller_successes": 0,
+        "priority_decisions": 0,
+        "fallback_decisions": 0,
+        "reasoning_calls": 0,
+        "total_groq_calls": 0,
+        "sources": [],
+        "memory_result": {
+            "saved": True,
+            "memory": memory,
+            "category": category,
+            "importance": 7,
+        },
+        "email_result":
+            None,
+        "database_result":
+            saved,
+    }, 200
 
 
 # =========================================================
@@ -915,48 +751,36 @@ def guess_memory_category(
 # =========================================================
 
 def web_search(query):
-
     if not TAVILY_API_KEY:
-
         raise RuntimeError(
             "TAVILY_API_KEY is not configured"
         )
 
     response = requests.post(
         "https://api.tavily.com/search",
-
         headers={
             "Authorization":
                 f"Bearer {TAVILY_API_KEY}",
-
             "Content-Type":
                 "application/json",
         },
-
         json={
             "query":
                 query,
-
             "search_depth":
                 "basic",
-
             "include_answer":
                 True,
-
             "max_results":
                 4,
         },
-
         timeout=
             60,
     )
 
     try:
-
         data = response.json()
-
     except Exception:
-
         raise RuntimeError(
             f"Tavily returned "
             f"{response.status_code}: "
@@ -964,7 +788,6 @@ def web_search(query):
         )
 
     if not response.ok:
-
         raise RuntimeError(
             str(data)
         )
@@ -975,7 +798,6 @@ def web_search(query):
         "results",
         [],
     )[:4]:
-
         sources.append(
             {
                 "title":
@@ -983,13 +805,11 @@ def web_search(query):
                         "title",
                         "",
                     ),
-
                 "url":
                     item.get(
                         "url",
                         "",
                     ),
-
                 "content":
                     normalize_text(
                         item.get(
@@ -1008,7 +828,6 @@ def web_search(query):
                     "",
                 )
             )[:1100],
-
         "sources":
             sources,
     }
@@ -1017,7 +836,6 @@ def web_search(query):
 def compact_research(
     research
 ):
-
     if not research:
         return ""
 
@@ -1026,7 +844,6 @@ def compact_research(
     if research.get(
         "answer"
     ):
-
         pieces.append(
             "SEARCH SUMMARY:\n"
             + research[
@@ -1041,7 +858,6 @@ def compact_research(
         )[:4],
         1,
     ):
-
         pieces.append(
             f"\nSOURCE {index}\n"
             f"Title: "
@@ -1059,26 +875,23 @@ def compact_research(
 # N8N / EMAIL
 # =========================================================
 
-def send_to_n8n(payload):
-
+def send_to_n8n(
+    payload
+):
     if not N8N_WEBHOOK_URL:
-
         raise RuntimeError(
             "N8N_WEBHOOK_URL is not configured"
         )
 
     response = requests.post(
         N8N_WEBHOOK_URL,
-
         json=
             payload,
-
         timeout=
             60,
     )
 
     if not response.ok:
-
         raise RuntimeError(
             f"n8n returned "
             f"{response.status_code}: "
@@ -1092,26 +905,20 @@ def send_email(
     body,
     subject="Tyler AI Results",
 ):
-
     if not TYLER_DEFAULT_EMAIL:
-
         raise RuntimeError(
-            "TYLER_DEFAULT_EMAIL "
-            "is not configured"
+            "TYLER_DEFAULT_EMAIL is not configured"
         )
 
     result = send_to_n8n(
         {
             "action":
                 "email",
-
             "data": {
                 "to":
                     TYLER_DEFAULT_EMAIL,
-
                 "subject":
                     subject,
-
                 "message":
                     body,
             },
@@ -1121,13 +928,10 @@ def send_email(
     return {
         "sent":
             True,
-
         "to":
             TYLER_DEFAULT_EMAIL,
-
         "subject":
             subject,
-
         "n8n_response":
             result[:250],
     }
@@ -1155,30 +959,25 @@ def available_tools(
     research_needed,
     memory_needed,
 ):
-
     tools = []
 
     for tool in ALL_TOOLS:
-
         if (
             tool != "finish"
             and tool in used_tools
         ):
-
             continue
 
         if (
             tool == "read_memory"
             and not memory_needed
         ):
-
             continue
 
         if (
             tool == "research_web"
             and not research_needed
         ):
-
             continue
 
         if (
@@ -1188,7 +987,6 @@ def available_tools(
                 or not has_final_reply
             )
         ):
-
             continue
 
         if (
@@ -1198,7 +996,6 @@ def available_tools(
                 or not has_final_reply
             )
         ):
-
             continue
 
         tools.append(
@@ -1206,7 +1003,6 @@ def available_tools(
         )
 
     if "finish" not in tools:
-
         tools.append(
             "finish"
         )
@@ -1218,15 +1014,12 @@ def validate_controller_choice(
     choice,
     allowed_tools,
 ):
-
     if not isinstance(
         choice,
         dict,
     ):
-
         raise RuntimeError(
-            "Controller did not return "
-            "a JSON object"
+            "Controller did not return a JSON object"
         )
 
     tool = normalize_text(
@@ -1237,16 +1030,13 @@ def validate_controller_choice(
     ).lower()
 
     if tool not in allowed_tools:
-
         raise RuntimeError(
-            f"Controller chose "
-            f"unavailable tool: {tool}"
+            f"Controller chose unavailable tool: {tool}"
         )
 
     return {
         "tool":
             tool,
-
         "instruction":
             normalize_text(
                 choice.get(
@@ -1254,7 +1044,6 @@ def validate_controller_choice(
                     "",
                 )
             ),
-
         "why":
             normalize_text(
                 choice.get(
@@ -1272,7 +1061,6 @@ def fallback_next_action(
     memory_allowed,
     has_final_reply,
 ):
-
     if (
         needs_memory(
             message
@@ -1280,19 +1068,13 @@ def fallback_next_action(
         and "read_memory"
         not in used_tools
     ):
-
         return {
             "tool":
                 "read_memory",
-
             "instruction":
-                "Read relevant saved "
-                "user context.",
-
+                "Read relevant saved user context.",
             "why":
-                "Saved context is relevant "
-                "to this request.",
-
+                "Saved context is relevant to this request.",
             "decision_source":
                 "local-fallback",
         }
@@ -1304,18 +1086,13 @@ def fallback_next_action(
         and "research_web"
         not in used_tools
     ):
-
         return {
             "tool":
                 "research_web",
-
             "instruction":
                 message,
-
             "why":
-                "Current information "
-                "is needed.",
-
+                "Current information is needed.",
             "decision_source":
                 "local-fallback",
         }
@@ -1325,19 +1102,13 @@ def fallback_next_action(
         and "reason"
         not in used_tools
     ):
-
         return {
             "tool":
                 "reason",
-
             "instruction":
-                "Produce the final answer "
-                "using gathered information.",
-
+                "Produce the final answer using gathered information.",
             "why":
-                "Enough information is "
-                "available to reason.",
-
+                "Enough information is available to reason.",
             "decision_source":
                 "local-fallback",
         }
@@ -1348,19 +1119,13 @@ def fallback_next_action(
         and "save_memory"
         not in used_tools
     ):
-
         return {
             "tool":
                 "save_memory",
-
             "instruction":
-                "Save the final "
-                "recommendation.",
-
+                "Save the final recommendation.",
             "why":
-                "The user requested "
-                "memory storage.",
-
+                "The user requested memory storage.",
             "decision_source":
                 "local-fallback",
         }
@@ -1371,17 +1136,13 @@ def fallback_next_action(
         and "send_email"
         not in used_tools
     ):
-
         return {
             "tool":
                 "send_email",
-
             "instruction":
                 "Email the completed answer.",
-
             "why":
                 "The user requested email.",
-
             "decision_source":
                 "local-fallback",
         }
@@ -1389,13 +1150,10 @@ def fallback_next_action(
     return {
         "tool":
             "finish",
-
         "instruction":
             "Finish the task.",
-
         "why":
             "The request is complete.",
-
         "decision_source":
             "local-fallback",
     }
@@ -1412,7 +1170,6 @@ def decide_next_action(
     memory_done,
     email_done,
 ):
-
     memory_needed = needs_memory(
         message
     )
@@ -1421,10 +1178,6 @@ def decide_next_action(
         message
     )
 
-    # =====================================================
-    # NEW v2.4.1 PROJECT MEMORY PRIORITY
-    # =====================================================
-
     if (
         is_personal_tyler_project_reference(
             message
@@ -1432,28 +1185,22 @@ def decide_next_action(
         and "read_memory"
         not in used_tools
     ):
-
         return {
             "tool":
                 "read_memory",
-
             "instruction":
                 "Read saved context about "
                 "the user's Tyler AI project "
                 "before doing anything else.",
-
             "why":
                 "Tyler AI refers to the user's "
                 "personal assistant project; "
                 "saved project context has priority.",
-
             "decision_source":
                 "project-memory-priority",
-
             "available_tools": [
                 "read_memory"
             ],
-
             "controller_raw":
                 "",
         }
@@ -1463,10 +1210,8 @@ def decide_next_action(
         email_allowed,
         memory_allowed,
         has_final_reply,
-
         research_needed=
             research_needed,
-
         memory_needed=
             memory_needed,
     )
@@ -1474,41 +1219,31 @@ def decide_next_action(
     state = {
         "used_tools":
             used_tools,
-
         "memory_read":
             has_memory,
-
         "research_done":
             has_research,
-
         "final_answer_ready":
             has_final_reply,
-
         "memory_saved":
             memory_done,
-
         "email_sent":
             email_done,
-
         "memory_allowed":
             memory_allowed,
-
         "email_allowed":
             email_allowed,
-
         "personal_tyler_project":
             is_personal_tyler_project_reference(
                 message
             ),
-
         "available_tools":
             tools,
     }
 
     tool_lines = "\n".join(
         f"- {tool}"
-        for tool
-        in tools
+        for tool in tools
     )
 
     prompt = f"""
@@ -1573,7 +1308,6 @@ Return ONLY valid JSON:
     raw = ""
 
     try:
-
         raw = call_controller(
             prompt
         )
@@ -1589,19 +1323,15 @@ Return ONLY valid JSON:
 
         return {
             **choice,
-
             "decision_source":
                 "groq-controller",
-
             "available_tools":
                 tools,
-
             "controller_raw":
                 raw[:300],
         }
 
-    except Exception as e:
-
+    except Exception as exc:
         fallback = fallback_next_action(
             message,
             used_tools,
@@ -1612,7 +1342,7 @@ Return ONLY valid JSON:
 
         fallback[
             "decision_error"
-        ] = str(e)[:300]
+        ] = str(exc)[:300]
 
         fallback[
             "available_tools"
@@ -1634,7 +1364,6 @@ def reasoning_step(
     memory_text,
     research_text,
 ):
-
     personal_project = (
         is_personal_tyler_project_reference(
             message
@@ -1642,7 +1371,6 @@ def reasoning_step(
     )
 
     if personal_project:
-
         identity_note = (
             "The request refers to the user's "
             "personal Tyler AI autonomous-assistant "
@@ -1653,9 +1381,7 @@ def reasoning_step(
             "for the identity and state of the "
             "user's project."
         )
-
     else:
-
         identity_note = (
             "Use saved user context "
             "when it is relevant."
@@ -1719,18 +1445,14 @@ RECOMMENDATION: None
             "Maintain the user's project "
             "identity consistently."
         ),
-
         prompt,
-
         max_tokens=
             800,
-
         temperature=
             0.2,
     ).strip()
 
     if not result:
-
         raise RuntimeError(
             "Empty reasoning response"
         )
@@ -1742,18 +1464,15 @@ def build_fallback_answer(
     memory_text,
     research,
 ):
-
     pieces = []
 
     if memory_text:
-
         pieces.append(
             "Relevant saved context:\n"
             + memory_text
         )
 
     if research:
-
         answer = normalize_text(
             research.get(
                 "answer",
@@ -1762,13 +1481,11 @@ def build_fallback_answer(
         )
 
         if answer:
-
             pieces.append(
                 answer
             )
 
     if not pieces:
-
         pieces.append(
             "I received the request, "
             "but I could not generate "
@@ -1779,7 +1496,6 @@ def build_fallback_answer(
         "\n\n".join(
             pieces
         )[:3500]
-
         + "\n\n"
         + "RECOMMENDATION: None"
     )
@@ -1788,7 +1504,6 @@ def build_fallback_answer(
 def extract_recommendation(
     final_reply
 ):
-
     if not final_reply:
         return None
 
@@ -1796,7 +1511,6 @@ def extract_recommendation(
         r"(?im)^\s*"
         r"RECOMMENDATION:\s*"
         r"(.+?)\s*$",
-
         final_reply,
     )
 
@@ -1812,7 +1526,6 @@ def extract_recommendation(
         "n/a",
         "not applicable",
     }:
-
         return None
 
     return recommendation[
@@ -1823,13 +1536,11 @@ def extract_recommendation(
 def build_clean_memory(
     final_reply
 ):
-
     recommendation = extract_recommendation(
         final_reply
     )
 
     if not recommendation:
-
         return None
 
     return (
@@ -1843,87 +1554,54 @@ def build_clean_memory(
 # =========================================================
 
 def run_agent(message):
-
-    email_allowed = (
-        user_allows_email(
-            message
-        )
+    email_allowed = user_allows_email(
+        message
     )
 
-    memory_allowed = (
-        user_allows_memory_write(
-            message
-        )
+    memory_allowed = user_allows_memory_write(
+        message
     )
 
     used_tools = []
-
     actions = []
-
     post_actions = []
 
     memory_text = ""
-
     research = None
-
     research_text = ""
-
     final_reply = ""
-
     memory_result = None
-
     email_result = None
-
     sources = []
 
     controller_attempts = 0
-
     controller_successes = 0
-
     priority_decisions = 0
-
     fallback_decisions = 0
-
     reasoning_calls = 0
-
 
     for action_number in range(
         1,
         MAX_AGENT_ACTIONS + 1,
     ):
-
         decision = decide_next_action(
             message=
                 message,
-
             used_tools=
                 used_tools,
-
             email_allowed=
                 email_allowed,
-
             memory_allowed=
                 memory_allowed,
-
             has_memory=
-                bool(
-                    memory_text
-                ),
-
+                bool(memory_text),
             has_research=
-                bool(
-                    research
-                ),
-
+                bool(research),
             has_final_reply=
-                bool(
-                    final_reply
-                ),
-
+                bool(final_reply),
             memory_done=
                 memory_result
                 is not None,
-
             email_done=
                 email_result
                 is not None,
@@ -1933,89 +1611,57 @@ def run_agent(message):
             "decision_source"
         )
 
-        if (
-            decision_source
-            == "groq-controller"
-        ):
-
+        if decision_source == "groq-controller":
             controller_attempts += 1
-
             controller_successes += 1
 
-        elif (
-            decision_source
-            == "project-memory-priority"
-        ):
-
+        elif decision_source == "project-memory-priority":
             priority_decisions += 1
 
         else:
-
             controller_attempts += 1
-
             fallback_decisions += 1
-
 
         tool = decision[
             "tool"
         ]
 
-
         if tool == "finish":
-
             actions.append(
                 {
                     "action":
                         action_number,
-
                     "tool":
                         "finish",
-
                     "decision":
                         decision,
                 }
             )
-
             break
 
-
         if tool in used_tools:
-
             actions.append(
                 {
                     "action":
                         action_number,
-
                     "tool":
                         tool,
-
                     "skipped":
                         True,
-
                     "reason":
                         "Duplicate tool prevented.",
-
                     "decision":
                         decision,
                 }
             )
-
             break
-
 
         used_tools.append(
             tool
         )
 
-
-        # =================================================
-        # READ MEMORY
-        # =================================================
-
         if tool == "read_memory":
-
             try:
-
                 memory_text = (
                     compact_memory_context(
                         10
@@ -2028,37 +1674,26 @@ def run_agent(message):
                     "No saved memory was found."
                 )
 
-            except Exception as e:
-
+            except Exception as exc:
                 result = (
-                    f"Memory read failed: {e}"
+                    f"Memory read failed: {exc}"
                 )
 
             actions.append(
                 {
                     "action":
                         action_number,
-
                     "tool":
                         tool,
-
                     "decision":
                         decision,
-
                     "result":
                         result,
                 }
             )
 
-
-        # =================================================
-        # RESEARCH WEB
-        # =================================================
-
         elif tool == "research_web":
-
             try:
-
                 research = web_search(
                     decision.get(
                         "instruction"
@@ -2083,57 +1718,41 @@ def run_agent(message):
                     research_text
                 )
 
-            except Exception as e:
-
+            except Exception as exc:
                 research = None
-
                 research_text = ""
 
                 result = (
-                    f"Research failed: {e}"
+                    f"Research failed: {exc}"
                 )
 
             actions.append(
                 {
                     "action":
                         action_number,
-
                     "tool":
                         tool,
-
                     "decision":
                         decision,
-
                     "result":
                         result,
                 }
             )
 
-
-        # =================================================
-        # REASON
-        # =================================================
-
         elif tool == "reason":
-
             try:
-
                 reasoning_calls += 1
 
-                final_reply = (
-                    reasoning_step(
-                        message,
-                        memory_text,
-                        research_text,
-                    )
+                final_reply = reasoning_step(
+                    message,
+                    memory_text,
+                    research_text,
                 )
 
                 fallback_used = False
-
                 reason_error = None
 
-            except Exception as e:
-
+            except Exception as exc:
                 final_reply = (
                     build_fallback_answer(
                         memory_text,
@@ -2142,30 +1761,24 @@ def run_agent(message):
                 )
 
                 fallback_used = True
-
                 reason_error = str(
-                    e
+                    exc
                 )[:300]
 
             record = {
                 "action":
                     action_number,
-
                 "tool":
                     tool,
-
                 "decision":
                     decision,
-
                 "result":
                     final_reply,
-
                 "fallback_used":
                     fallback_used,
             }
 
             if reason_error:
-
                 record[
                     "reason_error"
                 ] = reason_error
@@ -2174,117 +1787,84 @@ def run_agent(message):
                 record
             )
 
-
-        # =================================================
-        # SAVE MEMORY
-        # =================================================
-
         elif tool == "save_memory":
-
-            candidate = (
-                build_clean_memory(
-                    final_reply
-                )
+            candidate = build_clean_memory(
+                final_reply
             )
 
             if not memory_allowed:
-
                 result = {
                     "saved":
                         False,
-
                     "reason":
-                        "Memory writing "
-                        "was not authorized.",
+                        "Memory writing was not authorized.",
                 }
 
             elif memory_result is not None:
-
                 result = {
                     "saved":
                         False,
-
                     "reason":
-                        "Memory write "
-                        "already attempted.",
+                        "Memory write already attempted.",
                 }
 
             elif not candidate:
-
                 result = {
                     "saved":
                         False,
-
                     "reason":
-                        "No clear recommendation "
-                        "was available to save.",
+                        "No clear recommendation was available to save.",
                 }
 
             elif looks_sensitive(
                 candidate
             ):
-
                 result = {
                     "saved":
                         False,
-
                     "reason":
-                        "Sensitive information "
-                        "was not stored.",
+                        "Sensitive information was not stored.",
                 }
 
             elif memory_exists(
                 candidate
             ):
-
                 result = {
                     "saved":
                         False,
-
                     "reason":
                         "Memory already exists.",
-
                     "memory":
                         candidate,
                 }
 
             else:
-
                 try:
-
-                    database_result = (
-                        save_memory(
-                            candidate,
-                            "decision",
-                            8,
-                        )
+                    database_result = save_memory(
+                        candidate,
+                        "decision",
+                        8,
                     )
 
                     result = {
                         "saved":
                             True,
-
                         "memory":
                             candidate,
-
                         "category":
                             "decision",
-
                         "importance":
                             8,
-
                         "database_result":
                             database_result,
                     }
 
-                except Exception as e:
-
+                except Exception as exc:
                     result = {
                         "saved":
                             False,
-
                         "reason":
-                            str(e),
+                            str(exc),
                     }
 
             memory_result = result
@@ -2293,62 +1873,45 @@ def run_agent(message):
                 {
                     "action":
                         action_number,
-
                     "tool":
                         tool,
-
                     "decision":
                         decision,
-
                     "result":
                         result,
                 }
             )
 
-
-        # =================================================
-        # SEND EMAIL
-        # =================================================
-
         elif tool == "send_email":
-
             if not email_allowed:
-
                 result = {
                     "sent":
                         False,
-
                     "reason":
                         "Email was not authorized.",
                 }
 
             elif email_result is not None:
-
                 result = {
                     "sent":
                         False,
-
                     "reason":
                         "Email already attempted.",
                 }
 
             else:
-
                 try:
-
                     result = send_email(
                         final_reply,
                         "Tyler AI Results",
                     )
 
-                except Exception as e:
-
+                except Exception as exc:
                     result = {
                         "sent":
                             False,
-
                         "error":
-                            str(e),
+                            str(exc),
                     }
 
             email_result = result
@@ -2357,27 +1920,17 @@ def run_agent(message):
                 {
                     "action":
                         action_number,
-
                     "tool":
                         tool,
-
                     "decision":
                         decision,
-
                     "result":
                         result,
                 }
             )
 
-
-    # =====================================================
-    # GUARANTEE FINAL ANSWER
-    # =====================================================
-
     if not final_reply:
-
         try:
-
             reasoning_calls += 1
 
             final_reply = reasoning_step(
@@ -2387,7 +1940,6 @@ def run_agent(message):
             )
 
         except Exception:
-
             final_reply = (
                 build_fallback_answer(
                     memory_text,
@@ -2395,63 +1947,46 @@ def run_agent(message):
                 )
             )
 
-
-    # =====================================================
-    # EXPLICIT MEMORY POST ACTION
-    # =====================================================
-
     if (
         memory_allowed
         and memory_result is None
     ):
-
         candidate = build_clean_memory(
             final_reply
         )
 
         if not candidate:
-
             memory_result = {
                 "saved":
                     False,
-
                 "reason":
-                    "No clear recommendation "
-                    "was available to save.",
+                    "No clear recommendation was available to save.",
             }
 
         elif looks_sensitive(
             candidate
         ):
-
             memory_result = {
                 "saved":
                     False,
-
                 "reason":
-                    "Sensitive information "
-                    "was not stored.",
+                    "Sensitive information was not stored.",
             }
 
         elif memory_exists(
             candidate
         ):
-
             memory_result = {
                 "saved":
                     False,
-
                 "reason":
                     "Memory already exists.",
-
                 "memory":
                     candidate,
             }
 
         else:
-
             try:
-
                 database_result = save_memory(
                     candidate,
                     "decision",
@@ -2461,919 +1996,195 @@ def run_agent(message):
                 memory_result = {
                     "saved":
                         True,
-
                     "memory":
                         candidate,
-
                     "category":
                         "decision",
-
                     "importance":
                         8,
-
                     "database_result":
                         database_result,
                 }
 
-            except Exception as e:
-
+            except Exception as exc:
                 memory_result = {
                     "saved":
                         False,
-
                     "reason":
-                        str(e),
+                        str(exc),
                 }
 
         post_actions.append(
             {
                 "tool":
                     "save_memory",
-
                 "result":
                     memory_result,
             }
         )
 
-
-    # =====================================================
-    # EXPLICIT EMAIL POST ACTION
-    # =====================================================
-
     if (
         email_allowed
         and email_result is None
     ):
-
         try:
-
             email_result = send_email(
                 final_reply,
                 "Tyler AI Results",
             )
 
-        except Exception as e:
-
+        except Exception as exc:
             email_result = {
                 "sent":
                     False,
-
                 "error":
-                    str(e),
+                    str(exc),
             }
 
         post_actions.append(
             {
                 "tool":
                     "send_email",
-
                 "result":
                     email_result,
             }
         )
 
-
     return {
         "reply":
             final_reply,
-
         "actions":
             actions,
-
         "post_actions":
             post_actions,
-
         "used_tools":
             used_tools,
-
         "memory_result":
             memory_result,
-
         "email_result":
             email_result,
-
         "sources":
             sources,
-
         "controller_attempts":
             controller_attempts,
-
         "controller_successes":
             controller_successes,
-
         "priority_decisions":
             priority_decisions,
-
         "fallback_decisions":
             fallback_decisions,
-
         "reasoning_calls":
             reasoning_calls,
-
         "total_groq_calls":
             controller_attempts
             + reasoning_calls,
-
         "max_actions":
             MAX_AGENT_ACTIONS,
-
         "email_authorized":
             email_allowed,
-
         "memory_write_authorized":
             memory_allowed,
     }
 
 
 # =========================================================
-# LOGIN PAGE
+# WEB UI
 # =========================================================
 
 LOGIN_HTML = r"""
 <!doctype html>
-
 <html lang="en">
-
 <head>
-
 <meta charset="utf-8">
-
-<meta
-    name="viewport"
-    content="width=device-width,initial-scale=1"
->
-
-<title>
-Tyler AI
-</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tyler AI</title>
 <style>
-
-:root {
-    color-scheme: dark;
-}
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-
-    background:
-        #07111f;
-
-    color:
-        #eef6ff;
-
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
-    min-height:
-        100vh;
-
-    display:
-        grid;
-
-    place-items:
-        center;
-}
-
-.card {
-    width:
-        min(
-            92vw,
-            420px
-        );
-
-    background:
-        #0d1a2c;
-
-    border:
-        1px solid
-        #20324d;
-
-    border-radius:
-        24px;
-
-    padding:
-        28px;
-
-    box-shadow:
-        0 24px 70px
-        rgba(
-            0,
-            0,
-            0,
-            .35
-        );
-}
-
-h1 {
-    margin:
-        0 0 6px;
-
-    font-size:
-        30px;
-}
-
-.sub {
-    color:
-        #91a4bf;
-
-    margin:
-        0 0 24px;
-}
-
-.input {
-    width:
-        100%;
-
-    padding:
-        14px 15px;
-
-    border-radius:
-        14px;
-
-    border:
-        1px solid
-        #2b4161;
-
-    background:
-        #081322;
-
-    color:
-        #ffffff;
-
-    font-size:
-        16px;
-
-    outline:
-        none;
-}
-
-.input:focus {
-    border-color:
-        #4b8cff;
-}
-
-.btn {
-    width:
-        100%;
-
-    margin-top:
-        12px;
-
-    padding:
-        14px;
-
-    border:
-        0;
-
-    border-radius:
-        14px;
-
-    background:
-        #2563eb;
-
-    color:
-        #ffffff;
-
-    font-weight:
-        700;
-
-    font-size:
-        16px;
-
-    cursor:
-        pointer;
-}
-
-.error {
-    background:
-        #3a1520;
-
-    color:
-        #fecdd3;
-
-    padding:
-        10px 12px;
-
-    border-radius:
-        12px;
-
-    margin-bottom:
-        14px;
-}
-
-.tiny {
-    font-size:
-        12px;
-
-    color:
-        #70839f;
-
-    margin-top:
-        14px;
-
-    line-height:
-        1.45;
-}
-
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:#07111f;color:#eef6ff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;display:grid;place-items:center}
+.card{width:min(92vw,420px);background:#0d1a2c;border:1px solid #20324d;border-radius:24px;padding:28px;box-shadow:0 24px 70px rgba(0,0,0,.35)}
+h1{margin:0 0 6px;font-size:30px}.sub{color:#91a4bf;margin:0 0 24px}
+.input{width:100%;padding:14px 15px;border-radius:14px;border:1px solid #2b4161;background:#081322;color:#fff;font-size:16px;outline:none}
+.input:focus{border-color:#4b8cff}
+.btn{width:100%;margin-top:12px;padding:14px;border:0;border-radius:14px;background:#2563eb;color:#fff;font-weight:700;font-size:16px;cursor:pointer}
+.error{background:#3a1520;color:#fecdd3;padding:10px 12px;border-radius:12px;margin-bottom:14px}
+.tiny{font-size:12px;color:#70839f;margin-top:14px;line-height:1.45}
 </style>
-
 </head>
-
 <body>
-
-<form
-    class="card"
-    method="post"
-    action="/ui/login"
->
-
-<h1>
-Tyler AI
-</h1>
-
-<p class="sub">
-Private assistant access
-</p>
-
-{% if error %}
-
-<div class="error">
-{{ error }}
-</div>
-
-{% endif %}
-
-<input
-    class="input"
-    name="key"
-    type="password"
-    autocomplete="current-password"
-    placeholder="Tyler access key"
-    required
-    autofocus
->
-
-<button
-    class="btn"
-    type="submit"
->
-Open Tyler AI
-</button>
-
-<div class="tiny">
-Your access key is checked by the server
-and is not embedded in this webpage.
-</div>
-
+<form class="card" method="post" action="/ui/login">
+<h1>Tyler AI</h1>
+<p class="sub">Private assistant access</p>
+{% if error %}<div class="error">{{ error }}</div>{% endif %}
+<input class="input" name="key" type="password" autocomplete="current-password" placeholder="Tyler access key" required autofocus>
+<button class="btn" type="submit">Open Tyler AI</button>
+<div class="tiny">Your access key is checked by the server and is not embedded in this webpage.</div>
 </form>
-
 </body>
-
 </html>
 """
 
-
-# =========================================================
-# CHAT PAGE
-# =========================================================
-
 CHAT_HTML = r"""
 <!doctype html>
-
 <html lang="en">
-
 <head>
-
 <meta charset="utf-8">
-
-<meta
-    name="viewport"
-    content="
-        width=device-width,
-        initial-scale=1,
-        maximum-scale=1
-    "
->
-
-<title>
-Tyler AI
-</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Tyler AI</title>
 <style>
-
-:root {
-    color-scheme: dark;
-
-    --bg:
-        #07111f;
-
-    --panel:
-        #0b1728;
-
-    --panel2:
-        #0f1f34;
-
-    --line:
-        #213551;
-
-    --muted:
-        #8ea1bc;
-
-    --text:
-        #edf5ff;
-
-    --blue:
-        #2563eb;
-
-    --green:
-        #22c55e;
-}
-
-* {
-    box-sizing:
-        border-box;
-}
-
-html,
-body {
-    margin:
-        0;
-
-    height:
-        100%;
-
-    background:
-        var(--bg);
-
-    color:
-        var(--text);
-
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-}
-
-.shell {
-    height:
-        100dvh;
-
-    max-width:
-        980px;
-
-    margin:
-        0 auto;
-
-    display:
-        flex;
-
-    flex-direction:
-        column;
-
-    background:
-        var(--panel);
-}
-
-header {
-    height:
-        68px;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    gap:
-        12px;
-
-    padding:
-        0 18px;
-
-    border-bottom:
-        1px solid
-        var(--line);
-
-    flex:
-        none;
-}
-
-.orb {
-    width:
-        34px;
-
-    height:
-        34px;
-
-    border-radius:
-        50%;
-
-    background:
-        radial-gradient(
-            circle at 35% 30%,
-            #93c5fd,
-            #2563eb 48%,
-            #1e3a8a
-        );
-
-    box-shadow:
-        0 0 22px
-        rgba(
-            37,
-            99,
-            235,
-            .5
-        );
-}
-
-.title {
-    font-weight:
-        800;
-
-    font-size:
-        18px;
-}
-
-.status {
-    font-size:
-        12px;
-
-    color:
-        var(--muted);
-}
-
-.dot {
-    display:
-        inline-block;
-
-    width:
-        7px;
-
-    height:
-        7px;
-
-    border-radius:
-        50%;
-
-    background:
-        var(--green);
-
-    margin-right:
-        5px;
-}
-
-.spacer {
-    flex:
-        1;
-}
-
-.logout {
-    border:
-        1px solid
-        var(--line);
-
-    background:
-        transparent;
-
-    color:
-        var(--muted);
-
-    border-radius:
-        10px;
-
-    padding:
-        7px 10px;
-
-    cursor:
-        pointer;
-}
-
-.chat {
-    flex:
-        1;
-
-    overflow-y:
-        auto;
-
-    padding:
-        22px 16px 30px;
-
-    scroll-behavior:
-        smooth;
-}
-
-.row {
-    display:
-        flex;
-
-    margin:
-        11px 0;
-}
-
-.row.user {
-    justify-content:
-        flex-end;
-}
-
-.bubble {
-    max-width:
-        min(
-            78%,
-            740px
-        );
-
-    white-space:
-        pre-wrap;
-
-    line-height:
-        1.48;
-
-    padding:
-        13px 15px;
-
-    border-radius:
-        18px;
-
-    overflow-wrap:
-        anywhere;
-}
-
-.assistant .bubble {
-    background:
-        var(--panel2);
-
-    border:
-        1px solid
-        var(--line);
-
-    border-bottom-left-radius:
-        6px;
-}
-
-.user .bubble {
-    background:
-        var(--blue);
-
-    border-bottom-right-radius:
-        6px;
-}
-
-.typing {
-    color:
-        var(--muted);
-}
-
-details {
-    margin-top:
-        10px;
-
-    border-top:
-        1px solid
-        #223955;
-
-    padding-top:
-        8px;
-
-    color:
-        var(--muted);
-
-    font-size:
-        12px;
-}
-
-summary {
-    cursor:
-        pointer;
-
-    user-select:
-        none;
-}
-
-.diag {
-    padding-top:
-        7px;
-
-    line-height:
-        1.55;
-}
-
-.sources a {
-    color:
-        #93c5fd;
-
-    text-decoration:
-        none;
-}
-
-.composer {
-    flex:
-        none;
-
-    border-top:
-        1px solid
-        var(--line);
-
-    padding:
-        12px 14px 16px;
-
-    background:
-        rgba(
-            7,
-            17,
-            31,
-            .96
-        );
-}
-
-.box {
-    display:
-        flex;
-
-    gap:
-        10px;
-
-    align-items:
-        flex-end;
-
-    background:
-        #081423;
-
-    border:
-        1px solid
-        #29415f;
-
-    border-radius:
-        18px;
-
-    padding:
-        8px;
-}
-
-.box textarea {
-    flex:
-        1;
-
-    resize:
-        none;
-
-    min-height:
-        44px;
-
-    max-height:
-        160px;
-
-    border:
-        0;
-
-    outline:
-        0;
-
-    background:
-        transparent;
-
-    color:
-        #ffffff;
-
-    font:
-        inherit;
-
-    padding:
-        10px;
-
-    line-height:
-        1.35;
-}
-
-.send {
-    width:
-        44px;
-
-    height:
-        44px;
-
-    border-radius:
-        13px;
-
-    border:
-        0;
-
-    background:
-        var(--blue);
-
-    color:
-        #ffffff;
-
-    font-weight:
-        900;
-
-    font-size:
-        18px;
-
-    cursor:
-        pointer;
-}
-
-.send:disabled {
-    opacity:
-        .45;
-
-    cursor:
-        default;
-}
-
-.hint {
-    text-align:
-        center;
-
-    color:
-        #60738f;
-
-    font-size:
-        11px;
-
-    margin-top:
-        7px;
-}
-
-@media(
-    max-width: 600px
-) {
-
-    .bubble {
-        max-width:
-            90%;
-    }
-
-    .chat {
-        padding:
-            16px 10px 24px;
-    }
-
-    header {
-        padding:
-            0 12px;
-    }
-
-    .composer {
-        padding:
-            10px;
-    }
-}
-
+:root{color-scheme:dark;--bg:#07111f;--panel:#0b1728;--panel2:#0f1f34;--line:#213551;--muted:#8ea1bc;--text:#edf5ff;--blue:#2563eb;--green:#22c55e}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.shell{height:100dvh;max-width:980px;margin:0 auto;display:flex;flex-direction:column;background:var(--panel)}
+header{height:68px;display:flex;align-items:center;gap:12px;padding:0 18px;border-bottom:1px solid var(--line);flex:none}
+.orb{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#93c5fd,#2563eb 48%,#1e3a8a);box-shadow:0 0 22px rgba(37,99,235,.5)}
+.title{font-weight:800;font-size:18px}.status{font-size:12px;color:var(--muted)}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:5px}
+.spacer{flex:1}.logout{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:10px;padding:7px 10px;cursor:pointer}
+.chat{flex:1;overflow-y:auto;padding:22px 16px 30px;scroll-behavior:smooth}
+.row{display:flex;margin:11px 0}.row.user{justify-content:flex-end}
+.bubble{max-width:min(78%,740px);white-space:pre-wrap;line-height:1.48;padding:13px 15px;border-radius:18px;overflow-wrap:anywhere}
+.assistant .bubble{background:var(--panel2);border:1px solid var(--line);border-bottom-left-radius:6px}
+.user .bubble{background:var(--blue);border-bottom-right-radius:6px}
+.typing{color:var(--muted)}
+details{margin-top:10px;border-top:1px solid #223955;padding-top:8px;color:var(--muted);font-size:12px}
+summary{cursor:pointer;user-select:none}.diag{padding-top:7px;line-height:1.55}.sources a{color:#93c5fd;text-decoration:none}
+.composer{flex:none;border-top:1px solid var(--line);padding:12px 14px 16px;background:rgba(7,17,31,.96)}
+.box{display:flex;gap:10px;align-items:flex-end;background:#081423;border:1px solid #29415f;border-radius:18px;padding:8px}
+.box textarea{flex:1;resize:none;min-height:44px;max-height:160px;border:0;outline:0;background:transparent;color:#fff;font:inherit;padding:10px;line-height:1.35}
+.send{width:44px;height:44px;border-radius:13px;border:0;background:var(--blue);color:#fff;font-weight:900;font-size:18px;cursor:pointer}
+.send:disabled{opacity:.45;cursor:default}.hint{text-align:center;color:#60738f;font-size:11px;margin-top:7px}
+@media(max-width:600px){.bubble{max-width:90%}.chat{padding:16px 10px 24px}header{padding:0 12px}.composer{padding:10px}}
 </style>
-
 </head>
-
 <body>
 
 <div class="shell">
 
 <header>
 
-<div class="orb">
-</div>
+<div class="orb"></div>
 
 <div>
-
-<div class="title">
-Tyler AI
-</div>
-
+<div class="title">Tyler AI</div>
 <div class="status">
-
-<span class="dot">
-</span>
-
-online · v2.4.1
-
+<span class="dot"></span>
+online · v2.4.2
+</div>
 </div>
 
-</div>
-
-<div class="spacer">
-</div>
+<div class="spacer"></div>
 
 <form
     method="post"
     action="/ui/logout"
 >
-
 <button
     class="logout"
     type="submit"
 >
 Log out
 </button>
-
 </form>
 
 </header>
@@ -3384,11 +2195,9 @@ Log out
 >
 
 <div class="row assistant">
-
 <div class="bubble">
 Tyler AI is online. What do you want to work on?
 </div>
-
 </div>
 
 </main>
@@ -3421,7 +2230,6 @@ Enter to send · Shift+Enter for a new line
 
 </div>
 
-
 <script>
 
 const chat =
@@ -3441,7 +2249,6 @@ const sendButton =
 
 
 function scrollDown() {
-
     chat.scrollTop =
         chat.scrollHeight;
 }
@@ -3452,7 +2259,6 @@ function addMessage(
     who,
     meta
 ) {
-
     const row =
         document.createElement(
             "div"
@@ -3559,7 +2365,6 @@ function addMessage(
         if (
             meta.memory_result
         ) {
-
             diagnostics.textContent +=
                 "\nMemory: "
                 + (
@@ -3573,7 +2378,6 @@ function addMessage(
         if (
             meta.email_result
         ) {
-
             diagnostics.textContent +=
                 "\nEmail: "
                 + (
@@ -3621,7 +2425,6 @@ function addMessage(
                 ) => {
 
                     if (index) {
-
                         sourceBox.appendChild(
                             document.createTextNode(
                                 " · "
@@ -3686,7 +2489,6 @@ function addMessage(
 
 
 function resizeInput() {
-
     input.style.height =
         "auto";
 
@@ -3742,7 +2544,6 @@ async function sendMessage() {
         !text
         || sendButton.disabled
     ) {
-
         return;
     }
 
@@ -3906,7 +2707,6 @@ input.focus();
 # =========================================================
 
 def ui_logged_in():
-
     return bool(
         session.get(
             "tyler_ui_authenticated"
@@ -3925,9 +2725,7 @@ def ui_logged_in():
 )
 
 def ui_home():
-
     if not ui_logged_in():
-
         return render_template_string(
             LOGIN_HTML,
             error=None,
@@ -3944,7 +2742,6 @@ def ui_home():
 )
 
 def ui_login():
-
     supplied = str(
         request.form.get(
             "key",
@@ -3959,15 +2756,12 @@ def ui_login():
             TYLER_API_KEY,
         )
     ):
-
         return render_template_string(
             LOGIN_HTML,
-
             error=
                 "That access key "
                 "was not accepted.",
         ), 401
-
 
     session.clear()
 
@@ -3976,7 +2770,6 @@ def ui_login():
     ] = True
 
     session.permanent = True
-
 
     return redirect(
         url_for(
@@ -3991,7 +2784,6 @@ def ui_login():
 )
 
 def ui_logout():
-
     session.clear()
 
     return redirect(
@@ -4007,19 +2799,15 @@ def ui_logout():
 )
 
 def ui_chat():
-
     if not ui_logged_in():
-
         return jsonify(
             {
                 "success":
                     False,
-
                 "error":
                     "Unauthorized",
             }
         ), 401
-
 
     data = (
         request.get_json(
@@ -4028,7 +2816,6 @@ def ui_chat():
         or {}
     )
 
-
     message = str(
         data.get(
             "message",
@@ -4036,22 +2823,49 @@ def ui_chat():
         )
     ).strip()
 
-
     if not message:
-
         return jsonify(
             {
                 "success":
                     False,
-
                 "error":
                     "Missing message",
             }
         ), 400
 
+    if explicit_memory_request(
+        message
+    ):
+        try:
+            payload, status_code = (
+                handle_explicit_memory(
+                    message
+                )
+            )
+
+            payload[
+                "version"
+            ] = VERSION
+
+            return jsonify(
+                payload
+            ), status_code
+
+        except Exception as exc:
+            return jsonify(
+                {
+                    "success":
+                        False,
+                    "type":
+                        "memory",
+                    "version":
+                        VERSION,
+                    "error":
+                        str(exc),
+                }
+            ), 500
 
     try:
-
         execution = run_agent(
             message
         )
@@ -4060,38 +2874,31 @@ def ui_chat():
             {
                 "success":
                     True,
-
                 "type":
                     "autonomous_agent",
-
                 "version":
                     VERSION,
-
                 **execution,
             }
         )
 
-    except Exception as e:
-
+    except Exception as exc:
         return jsonify(
             {
                 "success":
                     False,
-
                 "type":
                     "autonomous_agent",
-
                 "version":
                     VERSION,
-
                 "error":
-                    str(e),
+                    str(exc),
             }
         ), 500
 
 
 # =========================================================
-# STATUS
+# STATUS / HEALTH
 # =========================================================
 
 @app.route(
@@ -4100,52 +2907,42 @@ def ui_chat():
 )
 
 def status():
-
     return jsonify(
         {
             "name":
                 "Tyler AI",
-
             "status":
                 "online",
-
             "version":
                 VERSION,
-
             "mode":
                 "autonomous-next-action"
                 "+web-chat"
-                "+memory-priority",
-
+                "+memory-priority"
+                "+web-memory-fix",
             "secured":
                 bool(
                     TYLER_API_KEY
                 ),
-
             "groq_connected":
                 bool(
                     GROQ_API_KEY
                 ),
-
             "tavily_connected":
                 bool(
                     TAVILY_API_KEY
                 ),
-
             "n8n_connected":
                 bool(
                     N8N_WEBHOOK_URL
                 ),
-
             "memory_connected":
                 bool(
                     SUPABASE_URL
                     and SUPABASE_KEY
                 ),
-
             "max_actions":
                 MAX_AGENT_ACTIONS,
-
             "tools": [
                 "read_memory",
                 "research_web",
@@ -4163,12 +2960,10 @@ def status():
 )
 
 def health():
-
     return jsonify(
         {
             "status":
                 "healthy",
-
             "version":
                 VERSION,
         }
@@ -4185,22 +2980,17 @@ def health():
 )
 
 def memories_route():
-
     if not authorized():
-
         return jsonify(
             {
                 "success":
                     False,
-
                 "error":
                     "Unauthorized",
             }
         ), 401
 
-
     try:
-
         items = get_memories(
             50
         )
@@ -4209,26 +2999,22 @@ def memories_route():
             {
                 "success":
                     True,
-
                 "count":
                     len(
                         items
                     ),
-
                 "memories":
                     items,
             }
         )
 
-    except Exception as e:
-
+    except Exception as exc:
         return jsonify(
             {
                 "success":
                     False,
-
                 "error":
-                    str(e),
+                    str(exc),
             }
         ), 500
 
@@ -4243,19 +3029,15 @@ def memories_route():
 )
 
 def chat():
-
     if not authorized():
-
         return jsonify(
             {
                 "success":
                     False,
-
                 "error":
                     "Unauthorized",
             }
         ), 401
-
 
     data = (
         request.get_json(
@@ -4264,7 +3046,6 @@ def chat():
         or {}
     )
 
-
     message = str(
         data.get(
             "message",
@@ -4272,147 +3053,49 @@ def chat():
         )
     ).strip()
 
-
     if not message:
-
         return jsonify(
             {
                 "success":
                     False,
-
                 "error":
                     "Missing message",
             }
         ), 400
 
-
-    # =====================================================
-    # DIRECT EXPLICIT MEMORY SAVE
-    # =====================================================
-
     if explicit_memory_request(
         message
     ):
-
         try:
-
-            memory = clean_explicit_memory(
-                message
-            )
-
-
-            if not memory:
-
-                raise RuntimeError(
-                    "No memory text found."
-                )
-
-
-            if looks_sensitive(
-                memory
-            ):
-
-                return jsonify(
-                    {
-                        "success":
-                            False,
-
-                        "type":
-                            "memory",
-
-                        "error":
-                            "Sensitive information "
-                            "will not be stored.",
-                    }
-                ), 400
-
-
-            if memory_exists(
-                memory
-            ):
-
-                return jsonify(
-                    {
-                        "success":
-                            True,
-
-                        "type":
-                            "memory",
-
-                        "saved":
-                            False,
-
-                        "reason":
-                            "Memory already exists.",
-
-                        "groq_calls":
-                            0,
-                    }
-                )
-
-
-            category = (
-                guess_memory_category(
-                    memory
+            payload, status_code = (
+                handle_explicit_memory(
+                    message
                 )
             )
 
-
-            saved = save_memory(
-                memory,
-                category,
-                7,
-            )
-
+            payload[
+                "version"
+            ] = VERSION
 
             return jsonify(
-                {
-                    "success":
-                        True,
+                payload
+            ), status_code
 
-                    "type":
-                        "memory",
-
-                    "saved":
-                        True,
-
-                    "memory":
-                        memory,
-
-                    "category":
-                        category,
-
-                    "groq_calls":
-                        0,
-
-                    "database_result":
-                        saved,
-                }
-            )
-
-
-        except Exception as e:
-
+        except Exception as exc:
             return jsonify(
                 {
                     "success":
                         False,
-
                     "type":
                         "memory",
-
+                    "version":
+                        VERSION,
                     "error":
-                        str(e),
+                        str(exc),
                 }
             ), 500
 
-
-    # =====================================================
-    # AUTONOMOUS AGENT
-    # =====================================================
-
     try:
-
         execution = run_agent(
             message
         )
@@ -4421,32 +3104,25 @@ def chat():
             {
                 "success":
                     True,
-
                 "type":
                     "autonomous_agent",
-
                 "version":
                     VERSION,
-
                 **execution,
             }
         )
 
-    except Exception as e:
-
+    except Exception as exc:
         return jsonify(
             {
                 "success":
                     False,
-
                 "type":
                     "autonomous_agent",
-
                 "version":
                     VERSION,
-
                 "error":
-                    str(e),
+                    str(exc),
             }
         ), 500
 
@@ -4461,19 +3137,15 @@ def chat():
 )
 
 def webhook():
-
     if not authorized():
-
         return jsonify(
             {
                 "success":
                     False,
-
                 "error":
                     "Unauthorized",
             }
         ), 401
-
 
     data = (
         request.get_json(
@@ -4482,24 +3154,19 @@ def webhook():
         or {}
     )
 
-
     if not data.get(
         "action"
     ):
-
         return jsonify(
             {
                 "success":
                     False,
-
                 "error":
                     "Missing action",
             }
         ), 400
 
-
     try:
-
         result = send_to_n8n(
             data
         )
@@ -4508,21 +3175,18 @@ def webhook():
             {
                 "success":
                     True,
-
                 "n8n_response":
                     result[:500],
             }
         )
 
-    except Exception as e:
-
+    except Exception as exc:
         return jsonify(
             {
                 "success":
                     False,
-
                 "error":
-                    str(e),
+                    str(exc),
             }
         ), 500
 
@@ -4532,7 +3196,6 @@ def webhook():
 # =========================================================
 
 if __name__ == "__main__":
-
     port = int(
         os.environ.get(
             "PORT",
