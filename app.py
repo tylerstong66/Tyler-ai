@@ -2341,8 +2341,7 @@ def handle_chat_message(message):
             )
         )
 
-        payload["version"] =
-            VERSION
+        payload["version"] = VERSION
 
         return payload, status_code
 
