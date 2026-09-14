@@ -1202,7 +1202,7 @@ def plan_task(message):
         steps = fallback_plan(message)
         planner_fallback = True
 
-      return {
+    return {
         'goal': goal,
         'steps': steps,
         'planner_fallback': planner_fallback,
