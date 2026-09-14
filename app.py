@@ -397,7 +397,7 @@ def explicit_memory_request(message):
 
 def clean_memory_command(message):
     return re.sub("(?i)^(remember that|remember this|save this to memory|save that to memory|store this|don't forget(?: that)?|do not forget(?: that)?)(?:\\s+|:\\s*)", '', message.strip()).strip()
-    def memory_write_denied(message):
+def memory_write_denied(message):
     text = normalized(message)
     return any(
         (
