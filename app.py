@@ -343,7 +343,12 @@ def is_tyler_project(message):
 
 def needs_memory(message):
     text = normalized(message)
-    return is_tyler_project(message) or any((term in text for term in ['what do you remember', 'what you know about me', 'based on what you know', 'my goals', 'my preferences', 'for me', 'using what you remember']))
+    personal_question = bool(re.search(
+        r'\b(?:my\s+(?:preferred|favorite|usual|saved)|'
+        r'(?:do|did|would)\s+i\s+(?:prefer|like|choose|want)|'
+        r'what\s+(?:is|are)\s+my)\b', text
+    ))
+    return personal_question or is_tyler_project(message) or any((term in text for term in ['what do you remember', 'what you know about me', 'based on what you know', 'my goals', 'my preferences', 'for me', 'using what you remember']))
 
 def needs_research(message):
     text = normalized(message)
