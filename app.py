@@ -2613,8 +2613,8 @@ def show_tasks(limit=12):
         ],
                     )
     
-    }
-    def feedback_request(message):
+    
+def feedback_request(message):
     return bool(
         re.match(
             r'(?i)^(?:feedback|rate this|rating)\b',
