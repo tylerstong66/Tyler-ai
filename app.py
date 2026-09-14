@@ -1202,15 +1202,18 @@ def plan_task(message):
         steps = fallback_plan(message)
         planner_fallback = True
 
-    return {
+      return {
         'goal': goal,
         'steps': steps,
         'planner_fallback': planner_fallback,
-        def task_storage_payload(task):
+    }
+
+
+def task_storage_payload(task):
     data = dict(task)
     data.pop('task_id', None)
     data['updated_at'] = now_iso()
-    return data
+    return data   
 
 def persist_task(task):
     task_id = task.get('task_id')
