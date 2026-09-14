@@ -7,6 +7,8 @@ from datetime import datetime, timedelta, timezone
 from flask import Flask, request, jsonify, render_template_string, session, redirect, url_for
 app = Flask(__name__)
 N8N_WEBHOOK_URL = os.environ.get('N8N_WEBHOOK_URL')
+N8N_WEBHOOK_KEY = os.environ.get('N8N_WEBHOOK_KEY')
+N8N_AUTH_HEADER = os.environ.get('N8N_AUTH_HEADER', 'X-Tyler-Key')
 TYLER_API_KEY = os.environ.get('TYLER_API_KEY')
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
 TAVILY_API_KEY = os.environ.get('TAVILY_API_KEY')
@@ -14,8 +16,8 @@ TYLER_DEFAULT_EMAIL = os.environ.get('TYLER_DEFAULT_EMAIL')
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
 SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
 GROQ_MODEL = os.environ.get('GROQ_MODEL', 'openai/gpt-oss-20b')
-VERSION = '2.8.2-ui-completion-reporting'
-VERSION_SHORT = 'v2.8.2'
+VERSION = '2.8.3-reliable-actions'
+VERSION_SHORT = 'v2.8.3'
 MAX_AGENT_ACTIONS = 5
 MAX_TASK_STEPS = 8
 MAX_TASK_EXECUTIONS_PER_RUN = 10
@@ -107,8 +109,17 @@ def get_memories(limit=100, category=None):
     return response.json()
 
 def get_memory(memory_id):
-    rows = get_memories(250)
-    return next((item for item in rows if int(item.get('id', -1)) == int(memory_id)), None)
+    if not SUPABASE_URL:
+        return None
+    response = requests.get(
+        f'{SUPABASE_URL}/rest/v1/memories', headers=supabase_headers(),
+        params={'select': 'id,created_at,memories,category,importance',
+                'id': f'eq.{int(memory_id)}', 'limit': 1}, timeout=30,
+    )
+    if not response.ok:
+        raise RuntimeError(f'Supabase lookup failed: {response.status_code}')
+    rows = response.json()
+    return rows[0] if rows else None
 
 def save_memory(text, category='general', importance=5):
     if not SUPABASE_URL:
@@ -641,43 +652,43 @@ def tavily_search(query):
     }
 
 def send_email_via_n8n(subject, body, to=None):
-    if not N8N_WEBHOOK_URL:
-        raise RuntimeError('N8N_WEBHOOK_URL is not configured')
-
+    if not N8N_WEBHOOK_URL or not N8N_WEBHOOK_URL.startswith('https://'):
+        raise RuntimeError('An HTTPS N8N_WEBHOOK_URL is required')
+    if not N8N_WEBHOOK_KEY:
+        raise RuntimeError('N8N_WEBHOOK_KEY is not configured')
     recipient = to or TYLER_DEFAULT_EMAIL
-
     if not recipient:
         raise RuntimeError('TYLER_DEFAULT_EMAIL is not configured')
-
-    payload = {
-        'action': 'email',
-        'data': {
-            'to': recipient,
-            'subject': subject,
-            'message': body,
-        },
-    }
-
-    response = requests.post(
-        N8N_WEBHOOK_URL,
-        json=payload,
-        timeout=60,
-    )
-
-    if not response.ok:
-        raise RuntimeError(
-            f'n8n email failed: '
-            f'{response.status_code} {response.text[:300]}'
+    payload = {'action': 'email', 'data': {
+        'to': recipient, 'subject': subject, 'message': body,
+    }}
+    try:
+        response = requests.post(
+            N8N_WEBHOOK_URL, json=payload,
+            headers={N8N_AUTH_HEADER: N8N_WEBHOOK_KEY},
+            timeout=60, allow_redirects=False,
         )
-
+    except requests.RequestException:
+        raise RuntimeError(
+            'Email outcome is unknown. Check n8n execution history before sending again.'
+        ) from None
+    if not 200 <= response.status_code < 300:
+        raise RuntimeError(
+            f'n8n returned HTTP {response.status_code}. '
+            'Check n8n execution history before sending again.'
+        )
     try:
         result = response.json()
-    except Exception:
-        result = {
-            'success': True,
-            'raw': response.text[:500],
-        }
-
+    except ValueError:
+        result = None
+    if (not isinstance(result, dict) or result.get('success') is not True
+            or result.get('sent') is not True
+            or not isinstance(result.get('message_id'), str)
+            or not result['message_id'].strip()):
+        raise RuntimeError(
+            'Email outcome is unconfirmed: no valid Gmail receipt. '
+            'Check n8n execution history before sending again.'
+        )
     return result
 
 def base_payload(
@@ -1212,27 +1223,31 @@ def plan_task(message):
 def task_storage_payload(task):
     data = dict(task)
     data.pop('task_id', None)
+    data.pop('_storage_revision', None)
     data['updated_at'] = now_iso()
-    return data   
+    return data
 
 def persist_task(task):
-    task_id = task.get('task_id')
-
-    if not task_id:
-        raise RuntimeError('Task has no task_id.')
-
+    if not task.get('task_id') or '_storage_revision' not in task:
+        raise RuntimeError('Task must be loaded before updating it.')
     payload = task_storage_payload(task)
-
-    patch_memory_raw(
-        task_id,
-        json.dumps(
-            payload,
-            ensure_ascii=False,
-            separators=(',', ':'),
-        ),
-        category='task_state',
-        importance=1,
+    serialized = json.dumps(payload, ensure_ascii=False, separators=(',', ':'))
+    # Compare-and-swap: a stale request cannot overwrite another runner's claim.
+    response = requests.patch(
+        f'{SUPABASE_URL}/rest/v1/memories',
+        headers={**supabase_headers(), 'Prefer': 'return=representation'},
+        params={'id': f'eq.{int(task["task_id"])}', 'category': 'eq.task_state',
+                'memories': 'eq.' + json.dumps(task['_storage_revision'], ensure_ascii=False)},
+        json={'memories': serialized, 'category': 'task_state', 'importance': 1},
+        timeout=30,
     )
+    if not response.ok:
+        raise RuntimeError(f'Task state save failed: {response.status_code}')
+    rows = response.json()
+    if not rows:
+        raise RuntimeError('Task changed in another request. Refresh task status before continuing.')
+    task['_storage_revision'] = rows[0]['memories']
+    task['updated_at'] = payload['updated_at']
 
 def create_task(message):
     plan = plan_task(message)
@@ -1271,6 +1286,7 @@ def create_task(message):
         raise RuntimeError('Could not create task state.')
 
     task['task_id'] = int(rows[0].get('id'))
+    task['_storage_revision'] = rows[0]['memories']
 
     persist_task(task)
 
@@ -1365,6 +1381,7 @@ def load_task(task_id):
         [],
     )
 
+    task['_storage_revision'] = row['memories']
     return task
 
 def task_progress(task):
@@ -2292,6 +2309,16 @@ def run_task(
 
                 break
 
+        if current.get('tool') in SIDE_EFFECT_TOOLS and current.get('status') == 'running':
+            # A process may have stopped after dispatch but before saving its receipt.
+            task['status'] = 'failed'
+            task['last_error'] = (
+                'An earlier action may already have completed. Check its result before '
+                'starting a new task; this action will not be repeated automatically.'
+            )
+            persist_task(task)
+            break
+
         current['status'] = 'running'
 
         current['attempts'] = int(
@@ -2336,6 +2363,14 @@ def run_task(
             persist_task(task)
 
         except Exception as exc:
+            if current.get('tool') in SIDE_EFFECT_TOOLS:
+                # Never retry or replan a write: a timeout is not proof of failure.
+                current['status'] = 'failed'
+                current['error'] = str(exc)
+                task['status'] = 'failed'
+                task['last_error'] = str(exc) + ' This action was not retried; check its result before sending again.'
+                persist_task(task)
+                break
             current['error'] = str(
                 exc
             )
@@ -5647,3 +5682,4 @@ if __name__ == '__main__':
             )
         )
 )
+
