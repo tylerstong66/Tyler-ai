@@ -160,6 +160,14 @@ class ReliabilityTests(unittest.TestCase):
             self.assertEqual(bot.get_memory(1), row)
         self.assertEqual(get.call_args.kwargs['params']['id'], 'eq.1')
 
+    def test_personal_question_routes_through_memory(self):
+        rows = [{'id': 5, 'memories': 'I prefer a 7 iron golf club', 'category': 'preference'}]
+        with patch.object(bot, 'normal_memories', return_value=rows), \
+             patch.object(bot, 'reason_with_context', return_value='7 iron') as reason:
+            result = bot.run_agent('What golf club do I prefer?')
+        self.assertIn('read_memory', result['used_tools'])
+        self.assertIn('7 iron', reason.call_args.kwargs['memory_context'])
+
     def test_memory_save_requires_database_record(self):
         with patch.object(bot.requests, 'post', return_value=self.response([])):
             with self.assertRaisesRegex(RuntimeError, 'confirm'):
