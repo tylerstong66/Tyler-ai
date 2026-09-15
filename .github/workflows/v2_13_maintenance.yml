@@ -1,0 +1,48 @@
+name: Tyler AI v2.13 maintenance planner
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  maintenance-planner-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run v2.13 maintenance planner tests
+        run: python -m unittest -v test_maintenance_planner.py
+
+      - name: Smoke-test v2.13 integration
+        run: |
+          python - <<'PY'
+          import app_v2_13
+          assert app_v2_13.VERSION_SHORT == 'v2.13.0'
+          assert app_v2_13.app is not None
+          assert app_v2_13.base.handle_message is app_v2_13.handle_message_v213
+          assert 'maintenance_plan' in app_v2_13.base.SPECIAL_MEMORY_CATEGORIES
+          assert 'maintenance_planner.py' in app_v2_13.v210.v297._safe_source_files()
+          status = app_v2_13.PLANNER.status()
+          assert status['automatic_code_changes_enabled'] is False
+          assert status['automatic_deployment_enabled'] is False
+          assert status['approval_required_before_execution'] is True
+          with app_v2_13.app.test_client() as client:
+              health = client.get('/health')
+              assert health.status_code == 200
+              assert health.get_json()['version_short'] == 'v2.13.0'
+              maintenance = client.get('/diagnostics/maintenance')
+              assert maintenance.status_code == 401
+          print('v2.13 maintenance planner integration import passed')
+          PY
