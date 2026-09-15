@@ -1,3 +1,4 @@
+import os
 import re
 
 import app_v2_12 as v212
@@ -290,5 +291,5 @@ base.app.view_functions['health'] = health_v2121
 if __name__ == '__main__':
     app.run(
         host='0.0.0.0',
-        port=int(base.os.environ.get('PORT', 10000)),
+        port=int(os.environ.get('PORT', 10000)),
     )
