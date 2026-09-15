@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run reliability, skill, observability, and grounded-chat tests
+      - name: Run reliability, skill, observability, and health-history tests
         run: >-
           python -m unittest -v
           test_reliability.py
@@ -36,6 +36,7 @@ jobs:
           test_code_grounded_developer.py
           test_dependency_observability.py
           test_resilient_grounded_chat.py
+          test_persistent_health_history.py
 
       - name: Smoke-test v2.9 integration
         run: |
@@ -148,4 +149,21 @@ jobs:
               assert health.status_code == 200
               assert health.get_json()['version_short'] == 'v2.10.1'
           print('v2.10.1 integration import passed')
+          PY
+
+      - name: Smoke-test v2.10.2 integration
+        run: |
+          python - <<'PY'
+          import app_v2_10_2
+          assert app_v2_10_2.VERSION_SHORT == 'v2.10.2'
+          assert app_v2_10_2.app is not None
+          assert 'dependency_health' in app_v2_10_2.base.SPECIAL_MEMORY_CATEGORIES
+          assert 'persistent_health_history.py' in app_v2_10_2.v210.v297._safe_source_files()
+          with app_v2_10_2.app.test_client() as client:
+              health = client.get('/health')
+              assert health.status_code == 200
+              assert health.get_json()['version_short'] == 'v2.10.2'
+              history = client.get('/diagnostics/dependencies/history')
+              assert history.status_code == 401
+          print('v2.10.2 integration import passed')
           PY
