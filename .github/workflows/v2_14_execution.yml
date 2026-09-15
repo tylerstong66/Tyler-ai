@@ -1,0 +1,52 @@
+name: Tyler AI v2.14 maintenance execution
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  maintenance-execution-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run v2.14 approval-gated maintenance execution tests
+        run: python -m unittest -v test_maintenance_execution.py
+
+      - name: Re-run v2.13 planner safety tests
+        run: python -m unittest -v test_maintenance_planner.py test_maintenance_planner_drill.py
+
+      - name: Smoke-test v2.14 integration
+        run: |
+          python - <<'PY'
+          import app_v2_14
+          assert app_v2_14.VERSION_SHORT == 'v2.14.0'
+          assert app_v2_14.app is not None
+          assert app_v2_14.base.handle_message is app_v2_14.handle_message_v214
+          assert 'maintenance_execution' in app_v2_14.base.SPECIAL_MEMORY_CATEGORIES
+          assert 'maintenance_execution.py' in app_v2_14.v210.v297._safe_source_files()
+          status = app_v2_14.EXECUTOR.status()
+          assert status['automatic_github_writes_enabled'] is False
+          assert status['automatic_production_deployment_enabled'] is False
+          assert status['approval_required_before_github_write'] is True
+          assert status['writes_to_main_branch_directly'] is False
+          with app_v2_14.app.test_client() as client:
+              health = client.get('/health')
+              assert health.status_code == 200
+              assert health.get_json()['version_short'] == 'v2.14.0'
+              diagnostics = client.get('/diagnostics/maintenance/execution')
+              assert diagnostics.status_code == 401
+          print('v2.14 maintenance execution integration import passed')
+          PY
