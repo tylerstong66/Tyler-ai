@@ -29,6 +29,7 @@ jobs:
           test_skill_engine.py
           test_skill_tool_fallback.py
           test_grounded_evaluator.py
+          test_evaluator_score_normalization.py
 
       - name: Smoke-test v2.9 integration
         run: |
@@ -58,4 +59,14 @@ jobs:
           assert app_v2_9_2.app is not None
           assert app_v2_9_2.ENGINE.evaluate_skill is app_v2_9_2._grounded_evaluate_skill
           print('v2.9.2 integration import passed')
+          PY
+
+      - name: Smoke-test v2.9.3 integration
+        run: |
+          python - <<'PY'
+          import app_v2_9_3
+          assert app_v2_9_3.VERSION_SHORT == 'v2.9.3'
+          assert app_v2_9_3.app is not None
+          assert app_v2_9_3.ENGINE.evaluate_skill is app_v2_9_3._evaluate_skill_v293
+          print('v2.9.3 integration import passed')
           PY
