@@ -236,7 +236,11 @@ class SkillEngine:
         if tools:
             lines.append('ALLOWED TOOLS: ' + ', '.join(tools))
 
-        examples = self.examples_for_skill(skill['skill_id'], example_limit)
+        examples = (
+            self.examples_for_skill(skill['skill_id'], example_limit)
+            if int(example_limit) > 0
+            else []
+        )
         if examples:
             lines.append('TRAINING EXAMPLES:')
             for index, item in enumerate(examples, start=1):
