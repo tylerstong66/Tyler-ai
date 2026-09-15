@@ -22,8 +22,12 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run reliability and skill-engine tests
-        run: python -m unittest -v test_reliability.py test_skill_engine.py
+      - name: Run reliability and skill tests
+        run: >-
+          python -m unittest -v
+          test_reliability.py
+          test_skill_engine.py
+          test_skill_tool_fallback.py
 
       - name: Smoke-test v2.9 integration
         run: |
@@ -33,4 +37,14 @@ jobs:
           assert app_v2_9.app is not None
           assert 'skill_profile' in app_v2_9.base.SPECIAL_MEMORY_CATEGORIES
           print('v2.9 integration import passed')
+          PY
+
+      - name: Smoke-test v2.9.1 integration
+        run: |
+          python - <<'PY'
+          import app_v2_9_1
+          assert app_v2_9_1.VERSION_SHORT == 'v2.9.1'
+          assert app_v2_9_1.app is not None
+          assert app_v2_9_1.ENGINE.complete is app_v2_9_1._skill_complete
+          print('v2.9.1 integration import passed')
           PY
