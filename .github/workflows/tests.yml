@@ -43,6 +43,9 @@ jobs:
       - name: Run v2.11 health intelligence tests
         run: python -m unittest -v test_health_intelligence.py
 
+      - name: Run v2.12 proactive operations tests
+        run: python -m unittest -v test_proactive_operations.py
+
       - name: Smoke-test v2.9 integration
         run: |
           python - <<'PY'
@@ -189,4 +192,26 @@ jobs:
               alerts = client.get('/diagnostics/dependencies/alerts')
               assert alerts.status_code == 401
           print('v2.11 integration import passed')
+          PY
+
+      - name: Smoke-test v2.12 integration
+        run: |
+          python - <<'PY'
+          import app_v2_12
+          assert app_v2_12.VERSION_SHORT == 'v2.12.0'
+          assert app_v2_12.app is not None
+          assert app_v2_12.base.handle_message is app_v2_12.handle_message_v212
+          assert 'operational_incident' in app_v2_12.base.SPECIAL_MEMORY_CATEGORIES
+          assert 'operational_preference' in app_v2_12.base.SPECIAL_MEMORY_CATEGORIES
+          assert 'proactive_operations.py' in app_v2_12.v210.v297._safe_source_files()
+          status = app_v2_12.OPS.status()
+          assert status['automatic_remediation_enabled'] is False
+          assert status['active_probes'] is False
+          with app_v2_12.app.test_client() as client:
+              health = client.get('/health')
+              assert health.status_code == 200
+              assert health.get_json()['version_short'] == 'v2.12.0'
+              incidents = client.get('/diagnostics/incidents')
+              assert incidents.status_code == 401
+          print('v2.12 integration import passed')
           PY
