@@ -198,7 +198,7 @@ class SkillEngine:
             for item in self._records(SKILL_EXAMPLE_CATEGORY, max(100, limit * 8))
             if _slug(item.get('skill_id')) == skill_id
         ]
-        return output[:max(1, min(int(limit), 30))]
+        return output[:max(0, min(int(limit), 500))]
 
     def evaluations_for_skill(self, skill_name, limit=30):
         skill = self.get_skill(skill_name)
