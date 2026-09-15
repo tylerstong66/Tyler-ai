@@ -1,0 +1,42 @@
+name: Tyler AI v2.13.1 maintenance drill
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  maintenance-drill-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run v2.13.1 safe maintenance planner drill tests
+        run: python -m unittest -v test_maintenance_planner_drill.py
+
+      - name: Smoke-test v2.13.1 integration
+        run: |
+          python - <<'PY'
+          import app_v2_13_1
+          assert app_v2_13_1.VERSION_SHORT == 'v2.13.1'
+          assert app_v2_13_1.app is not None
+          payload = app_v2_13_1.run_maintenance_planner_drill()
+          assert payload['success'] is True
+          drill = payload['maintenance_planner_drill']
+          assert drill['simulation'] is True
+          assert drill['persisted'] is False
+          assert drill['production_mutation_performed'] is False
+          assert drill['external_side_effect_performed'] is False
+          print('v2.13.1 maintenance planner drill import passed')
+          PY
