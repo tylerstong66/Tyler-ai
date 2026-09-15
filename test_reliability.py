@@ -110,7 +110,9 @@ class ReliabilityTests(unittest.TestCase):
             params = update.call_args.kwargs['params']
             self.assertEqual(params['id'], 'eq.1')
             self.assertEqual(params['category'], 'eq.task_state')
-            self.assertEqual(json.loads(params['memories'][3:]), task['_storage_revision'])
+            # PostgREST top-level eq consumes the literal remainder after eq.;
+            # JSON-quoting here would compare against added quote characters.
+            self.assertEqual(params['memories'][3:], task['_storage_revision'])
 
     def test_revision_not_persisted_inside_state(self):
         task = self.task()
