@@ -150,10 +150,12 @@ class DependencyObservabilityIntegrationTests(unittest.TestCase):
         self.assertEqual(total, 0)
 
     def test_groq_wrapper_records_real_success(self):
-        with patch.object(app210, '_ORIGINAL_GROQ', return_value='answer'):
+        with patch.object(app210.base, 'GROQ_API_KEY', 'configured'), patch.object(
+            app210, '_ORIGINAL_GROQ', return_value='answer'
+        ):
             result = app210.groq_observed([{'role': 'user', 'content': 'hello'}])
+            snapshot = app210.dependency_snapshot(include_errors=False)
         self.assertEqual(result, 'answer')
-        snapshot = app210.dependency_snapshot(include_errors=False)
         groq = snapshot['services']['groq']
         self.assertEqual(groq['total_operations'], 1)
         self.assertEqual(groq['state'], 'healthy')
