@@ -1,0 +1,36 @@
+name: Tyler AI tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run reliability and skill-engine tests
+        run: python -m unittest -v test_reliability.py test_skill_engine.py
+
+      - name: Smoke-test v2.9 integration
+        run: |
+          python - <<'PY'
+          import app_v2_9
+          assert app_v2_9.VERSION_SHORT == 'v2.9.0'
+          assert app_v2_9.app is not None
+          assert 'skill_profile' in app_v2_9.base.SPECIAL_MEMORY_CATEGORIES
+          print('v2.9 integration import passed')
+          PY
