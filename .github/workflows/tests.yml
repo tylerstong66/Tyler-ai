@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run reliability, skill, and observability tests
+      - name: Run reliability, skill, observability, and grounded-chat tests
         run: >-
           python -m unittest -v
           test_reliability.py
@@ -35,6 +35,7 @@ jobs:
           test_adaptive_groq_fallback.py
           test_code_grounded_developer.py
           test_dependency_observability.py
+          test_resilient_grounded_chat.py
 
       - name: Smoke-test v2.9 integration
         run: |
@@ -132,4 +133,19 @@ jobs:
               assert health.status_code == 200
               assert health.get_json()['active_probes'] is False
           print('v2.10 integration import passed')
+          PY
+
+      - name: Smoke-test v2.10.1 integration
+        run: |
+          python - <<'PY'
+          import app_v2_10_1
+          assert app_v2_10_1.VERSION_SHORT == 'v2.10.1'
+          assert app_v2_10_1.app is not None
+          assert app_v2_10_1.base.groq is app_v2_10_1.groq_resilient
+          assert app_v2_10_1.base.reason_with_context is app_v2_10_1.reason_with_context_grounded
+          with app_v2_10_1.app.test_client() as client:
+              health = client.get('/health')
+              assert health.status_code == 200
+              assert health.get_json()['version_short'] == 'v2.10.1'
+          print('v2.10.1 integration import passed')
           PY
