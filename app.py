@@ -16,8 +16,8 @@ TYLER_DEFAULT_EMAIL = os.environ.get('TYLER_DEFAULT_EMAIL')
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
 SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
 GROQ_MODEL = os.environ.get('GROQ_MODEL', 'openai/gpt-oss-20b')
-VERSION = '2.8.3-reliable-actions'
-VERSION_SHORT = 'v2.8.3'
+VERSION = '2.8.3.1-task-filter-fix'
+VERSION_SHORT = 'v2.8.3.1'
 MAX_AGENT_ACTIONS = 5
 MAX_TASK_STEPS = 8
 MAX_TASK_EXECUTIONS_PER_RUN = 10
@@ -1237,7 +1237,7 @@ def persist_task(task):
         f'{SUPABASE_URL}/rest/v1/memories',
         headers={**supabase_headers(), 'Prefer': 'return=representation'},
         params={'id': f'eq.{int(task["task_id"])}', 'category': 'eq.task_state',
-                'memories': 'eq.' + json.dumps(task['_storage_revision'], ensure_ascii=False)},
+                'memories': 'eq.' + task['_storage_revision']},
         json={'memories': serialized, 'category': 'task_state', 'importance': 1},
         timeout=30,
     )
