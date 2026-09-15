@@ -117,7 +117,7 @@ class ProactiveOperationsUnitTests(unittest.TestCase):
         )
         text = str(bundle)
         self.assertNotIn('SUPERSECRET', text)
-        self.assertIn('<redacted>', text)
+        self.assertIn('redacted_sensitive_error', text)
 
     def make_ops(self, email_fn=None, n8n_state='healthy'):
         return ProactiveOperations(
