@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run reliability and skill tests
+      - name: Run reliability, skill, and observability tests
         run: >-
           python -m unittest -v
           test_reliability.py
@@ -34,6 +34,7 @@ jobs:
           test_contextual_architecture_checks.py
           test_adaptive_groq_fallback.py
           test_code_grounded_developer.py
+          test_dependency_observability.py
 
       - name: Smoke-test v2.9 integration
         run: |
@@ -115,4 +116,20 @@ jobs:
           snapshot = app_v2_9_7._developer_grounding('review architecture', max_chars=5000)
           assert 'VERIFIED LOCAL SOURCE SNAPSHOT' in snapshot
           print('v2.9.7 integration import passed')
+          PY
+
+      - name: Smoke-test v2.10 integration
+        run: |
+          python - <<'PY'
+          import app_v2_10
+          assert app_v2_10.VERSION_SHORT == 'v2.10.0'
+          assert app_v2_10.app is not None
+          assert app_v2_10.base.groq is app_v2_10.groq_observed
+          assert app_v2_10.base.send_email_via_n8n is app_v2_10.send_email_via_n8n_observed
+          assert 'dependency_observability.py' in app_v2_10.v297._safe_source_files()
+          with app_v2_10.app.test_client() as client:
+              health = client.get('/health')
+              assert health.status_code == 200
+              assert health.get_json()['active_probes'] is False
+          print('v2.10 integration import passed')
           PY
