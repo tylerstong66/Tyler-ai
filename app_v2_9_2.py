@@ -196,7 +196,7 @@ def _grounded_evaluate_skill(skill_name, test_input, expected='', criteria=None)
         'architecture_checks': checks,
         'created_at': v291.base.now_iso(),
     }
-    return v291.ENGINE._save(v291.SKILL_SCORE_CATEGORY, record, importance=5)
+    return v291.ENGINE._save('skill_score', record, importance=5)
 
 
 # Patch the live skill engine instance. All v2.9.1 tool-call fallback behavior
