@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run reliability, skill, observability, and health-history tests
+      - name: Run legacy reliability, skill, observability, and grounded-chat tests
         run: >-
           python -m unittest -v
           test_reliability.py
@@ -36,7 +36,9 @@ jobs:
           test_code_grounded_developer.py
           test_dependency_observability.py
           test_resilient_grounded_chat.py
-          test_persistent_health_history.py
+
+      - name: Run v2.10.2 persistent health history tests
+        run: python -m unittest -v test_persistent_health_history.py
 
       - name: Smoke-test v2.9 integration
         run: |
