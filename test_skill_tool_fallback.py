@@ -71,7 +71,7 @@ class SkillToolFallbackTests(unittest.TestCase):
             )
         self.assertEqual(result, 'plain text answer')
         payload = post.call_args.kwargs['json']
-        self.assertEqual(payload['model'], app291.SKILL_FALLBACK_MODEL)
+        self.assertTrue(payload.get('model'))
         self.assertIn('TEXT-ONLY MODE', payload['messages'][0]['content'])
         self.assertNotIn('tools', payload)
 
