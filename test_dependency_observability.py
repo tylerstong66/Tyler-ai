@@ -121,7 +121,7 @@ class DependencyObservabilityIntegrationTests(unittest.TestCase):
         response = self.client.get('/status')
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
-        self.assertEqual(data['version_short'], 'v2.10.0')
+        self.assertEqual(data['version_short'], app210.base.VERSION_SHORT)
         service = data['dependency_observability']['services']['groq']
         self.assertNotIn('last_error_summary', service)
         self.assertIn('dependency_observability', data['capabilities'])
