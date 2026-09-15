@@ -30,13 +30,24 @@ def _iso(value):
 
 def _safe_text(value, limit=700):
     text = re.sub(r'\s+', ' ', str(value or '')).strip()
-    # Defensive redaction for anything that accidentally resembles a credential.
+    # Broad defensive redaction for accidental credential-like material.
     text = re.sub(
-        r'(?i)\b(api[_-]?key|token|password|secret|authorization)\s*[:=]\s*\S+',
+        r'(?i)\b(api[_-]?key|token|password|secret|authorization)\s*[:=]\s*[^,;|]+',
         r'\1=<redacted>',
         text,
     )
+    text = re.sub(r'(?i)\bBearer\s+[A-Za-z0-9._~+/=-]+', 'Bearer <redacted>', text)
     return text[:limit]
+
+
+def _safe_error_category(value):
+    text = re.sub(r'\s+', ' ', str(value or '')).strip()
+    if not text:
+        return None
+    # Error categories should be categorical, never credential-bearing text.
+    if re.search(r'(?i)\b(api[_-]?key|token|password|secret|authorization|bearer)\b', text):
+        return 'redacted_sensitive_error'
+    return _safe_text(text, 80) or None
 
 
 def incident_id_for(fingerprint):
@@ -65,7 +76,7 @@ def safe_diagnostic_bundle(alert, live_snapshot, history_summary, recorded_at=No
             'p95_latency_ms': live.get('p95_latency_ms'),
             'window_success_rate': live.get('window_success_rate'),
             'consecutive_failures': int(live.get('consecutive_failures') or 0),
-            'last_error_category': _safe_text(live.get('last_error_category'), 80) or None,
+            'last_error_category': _safe_error_category(live.get('last_error_category')),
             'last_outcome_unknown': bool(live.get('last_outcome_unknown')),
             'total_operations': int(live.get('total_operations') or 0),
         },
