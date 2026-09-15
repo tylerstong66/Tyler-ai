@@ -33,6 +33,7 @@ jobs:
           test_auditable_evaluator.py
           test_contextual_architecture_checks.py
           test_adaptive_groq_fallback.py
+          test_code_grounded_developer.py
 
       - name: Smoke-test v2.9 integration
         run: |
@@ -102,4 +103,16 @@ jobs:
           assert app_v2_9_6.app is not None
           assert app_v2_9_6.v291._fallback_groq is app_v2_9_6._adaptive_fallback_groq
           print('v2.9.6 integration import passed')
+          PY
+
+      - name: Smoke-test v2.9.7 integration
+        run: |
+          python - <<'PY'
+          import app_v2_9_7
+          assert app_v2_9_7.VERSION_SHORT == 'v2.9.7'
+          assert app_v2_9_7.app is not None
+          assert app_v2_9_7.ENGINE.run_skill is app_v2_9_7._run_code_grounded_skill
+          snapshot = app_v2_9_7._developer_grounding('review architecture', max_chars=5000)
+          assert 'VERIFIED LOCAL SOURCE SNAPSHOT' in snapshot
+          print('v2.9.7 integration import passed')
           PY
