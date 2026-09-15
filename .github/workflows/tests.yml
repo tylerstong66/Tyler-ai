@@ -40,6 +40,9 @@ jobs:
       - name: Run v2.10.2 persistent health history tests
         run: python -m unittest -v test_persistent_health_history.py
 
+      - name: Run v2.11 health intelligence tests
+        run: python -m unittest -v test_health_intelligence.py
+
       - name: Smoke-test v2.9 integration
         run: |
           python - <<'PY'
@@ -168,4 +171,22 @@ jobs:
               history = client.get('/diagnostics/dependencies/history')
               assert history.status_code == 401
           print('v2.10.2 integration import passed')
+          PY
+
+      - name: Smoke-test v2.11 integration
+        run: |
+          python - <<'PY'
+          import app_v2_11
+          assert app_v2_11.VERSION_SHORT == 'v2.11.0'
+          assert app_v2_11.app is not None
+          assert app_v2_11.base.handle_message is app_v2_11.handle_message_v211
+          assert 'dependency_health_alert' in app_v2_11.base.SPECIAL_MEMORY_CATEGORIES
+          assert 'health_intelligence.py' in app_v2_11.v210.v297._safe_source_files()
+          with app_v2_11.app.test_client() as client:
+              health = client.get('/health')
+              assert health.status_code == 200
+              assert health.get_json()['version_short'] == 'v2.11.0'
+              alerts = client.get('/diagnostics/dependencies/alerts')
+              assert alerts.status_code == 401
+          print('v2.11 integration import passed')
           PY
