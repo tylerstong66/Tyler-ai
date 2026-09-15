@@ -32,6 +32,7 @@ jobs:
           test_evaluator_score_normalization.py
           test_auditable_evaluator.py
           test_contextual_architecture_checks.py
+          test_adaptive_groq_fallback.py
 
       - name: Smoke-test v2.9 integration
         run: |
@@ -91,4 +92,14 @@ jobs:
           assert app_v2_9_5.app is not None
           assert app_v2_9_5.v294.v293.v292._architecture_checks is app_v2_9_5._contextual_architecture_checks
           print('v2.9.5 integration import passed')
+          PY
+
+      - name: Smoke-test v2.9.6 integration
+        run: |
+          python - <<'PY'
+          import app_v2_9_6
+          assert app_v2_9_6.VERSION_SHORT == 'v2.9.6'
+          assert app_v2_9_6.app is not None
+          assert app_v2_9_6.v291._fallback_groq is app_v2_9_6._adaptive_fallback_groq
+          print('v2.9.6 integration import passed')
           PY
