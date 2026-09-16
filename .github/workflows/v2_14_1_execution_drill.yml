@@ -1,0 +1,44 @@
+name: Tyler AI v2.14.1 execution drill
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  execution-drill-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run v2.14.1 safe execution drill tests
+        run: python -m unittest -v test_maintenance_execution_drill.py
+
+      - name: Re-run v2.14 approval-gate tests
+        run: python -m unittest -v test_maintenance_execution.py
+
+      - name: Smoke-test v2.14.1 integration
+        run: |
+          python - <<'PY'
+          import app_v2_14_1
+          assert app_v2_14_1.VERSION_SHORT == 'v2.14.1'
+          assert app_v2_14_1.app is not None
+          assert app_v2_14_1.DRILL_EXECUTOR.status()['automatic_github_writes_enabled'] is False
+          assert app_v2_14_1.DRILL_EXECUTOR.status()['automatic_production_deployment_enabled'] is False
+          with app_v2_14_1.app.test_client() as client:
+              health = client.get('/health')
+              assert health.status_code == 200
+              assert health.get_json()['version_short'] == 'v2.14.1'
+          print('v2.14.1 execution drill integration import passed')
+          PY
