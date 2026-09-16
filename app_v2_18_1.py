@@ -45,23 +45,34 @@ _ORIGINAL_EVALUATE = SKILL_LAB.evaluate
 def _allocate_benchmark_budget(case_count):
     """Return conservative per-case run/judge token caps.
 
-    The allocation is deterministic and keeps the configured maximum requested
-    output for a complete suite at or below BENCHMARK_OUTPUT_BUDGET whenever the
-    suite has enough budget to satisfy the minimum caps. Developer bootstrap has
-    five cases, which receives 100 run tokens + 70 judge tokens per case = 850.
+    The allocation is deterministic and keeps the maximum requested output for
+    the complete suite at or below BENCHMARK_OUTPUT_BUDGET. The five-case
+    Developer bootstrap receives 102 run tokens + 68 judge tokens per case,
+    totaling exactly 850 requested output tokens across the benchmark.
     """
     count = max(1, int(case_count or 1))
     per_case = max(1, BENCHMARK_OUTPUT_BUDGET // count)
 
-    judge = min(BENCHMARK_MAX_JUDGE_TOKENS, max(BENCHMARK_MIN_JUDGE_TOKENS, per_case * 2 // 5))
-    run = min(BENCHMARK_MAX_RUN_TOKENS, max(BENCHMARK_MIN_RUN_TOKENS, per_case - judge))
+    judge = min(
+        BENCHMARK_MAX_JUDGE_TOKENS,
+        max(BENCHMARK_MIN_JUDGE_TOKENS, per_case * 2 // 5),
+    )
+    run = min(
+        BENCHMARK_MAX_RUN_TOKENS,
+        max(BENCHMARK_MIN_RUN_TOKENS, per_case - judge),
+    )
 
-    # If a very large custom suite cannot fit both minimums under the budget,
-    # favor the judge just enough to preserve valid JSON and use the remainder
-    # for a concise candidate answer.
+    # Larger custom suites may not fit the normal quality minimums. In that
+    # case, compact both answer and judge output while still preserving enough
+    # judge space for score/passed/weaknesses JSON.
     if (run + judge) * count > BENCHMARK_OUTPUT_BUDGET:
-        judge = max(30, min(BENCHMARK_MAX_JUDGE_TOKENS, BENCHMARK_OUTPUT_BUDGET // count // 3))
-        run = max(30, BENCHMARK_OUTPUT_BUDGET // count - judge)
+        judge = max(12, min(BENCHMARK_MAX_JUDGE_TOKENS, per_case // 3))
+        run = max(8, per_case - judge)
+
+    # Integer rounding guard. benchmark_cases() caps suites at 20 cases, so a
+    # positive run budget is always available with the configured 850 ceiling.
+    if (run + judge) * count > BENCHMARK_OUTPUT_BUDGET:
+        run = max(1, per_case - judge)
 
     return int(run), int(judge)
 
