@@ -116,8 +116,11 @@ def _parse_candidate_text(text):
     raw = str(text or "").replace("\r\n", "\n")
 
     def line_value(tag):
-        match = re.search(rf"(?im)^\s*{tag}\s*[:=]\s*(.+?)\s*$", raw)
-        return match.group(1).strip() if match else ""
+        # ``tag`` may contain alternatives, so group them before adding the
+        # delimiter/capture portion. Without this grouping, a bare CRITERIA
+        # alternative can match without populating the value capture.
+        match = re.search(rf"(?im)^\s*(?:{tag})\s*[:=]\s*(.+?)\s*$", raw)
+        return match.group(1).strip() if match and match.group(1) is not None else ""
 
     instructions_raw = line_value("INSTRUCTIONS")
     criteria_raw = line_value("CRITERIA|SUCCESS_CRITERIA|SUCCESS CRITERIA")
