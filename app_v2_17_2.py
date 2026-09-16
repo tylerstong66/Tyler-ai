@@ -3,8 +3,9 @@
 Fixes a false-negative in v2.17.1 where final production verification made an
 HTTP request back into the same single-sync-worker Gunicorn service. The
 external GitHub deployment workflow already verifies /status and /health. This
-layer uses Render's local RENDER_GIT_COMMIT for the final runtime identity and
-allows a prior verification_failed record to be safely re-verified.
+layer uses Render's local RENDER_GIT_COMMIT for final runtime identity and can
+re-check a verification_failed record when the running commit still matches
+that record's exact approved target.
 """
 
 import app_v2_17_1 as v2171
@@ -36,7 +37,7 @@ def _runtime_status_local():
 
 
 def verify_production_v2172(deployment_id):
-    """Re-verify a dispatched production promotion without calling ourselves.
+    """Verify a dispatched production promotion without calling ourselves.
 
     The GitHub deployment workflow is the external health authority. A
     successful workflow means it already observed both /status and /health on
@@ -58,7 +59,8 @@ def verify_production_v2172(deployment_id):
 
     # v2.17.1 could persist verification_failed solely because its self-HTTP
     # check timed out on a one-worker Gunicorn process. Permit a deterministic
-    # re-check of that terminal-looking state; never redispatch the deployment.
+    # re-check only when current runtime identity still proves the same target;
+    # never redispatch the deployment from this path.
     if state not in {
         "deployment_dispatched",
         "dispatch_outcome_unknown",
@@ -148,6 +150,18 @@ def verify_production_v2172(deployment_id):
 # without duplicating or re-registering Flask endpoints.
 v2171.verify_production = verify_production_v2172
 verify_production = verify_production_v2172
+
+
+# Keep Tyler's maintenance source inventory aware of this version layer.
+_ORIGINAL_SAFE_SOURCE_FILES = v2171._safe_source_files_v2171
+
+
+def _safe_source_files_v2172():
+    return sorted(set(list(_ORIGINAL_SAFE_SOURCE_FILES()) + ["app_v2_17_2.py"]))
+
+
+v2171.v210.v297._safe_source_files = _safe_source_files_v2172
+EXECUTOR.safe_source_files_fn = _safe_source_files_v2172
 
 
 __all__ = [
