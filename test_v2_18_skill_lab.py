@@ -191,6 +191,20 @@ class SkillLabTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'sensitive'):
             self.lab.add_benchmark_case('Test Skill', 'SECRET_TOKEN=abc', 'Do not expose it')
 
+    def test_credential_discussion_is_not_treated_as_a_secret_value(self):
+        store = MemoryStore()
+        engine = FakeEngine()
+        lab = SkillPromotionLab(
+            engine,
+            store.get_rows,
+            store.save_row,
+            sensitive_fn=lambda value: 'token' in str(value or '').lower(),
+            now_fn=lambda: '2026-09-16T20:30:00+00:00',
+        )
+        result = lab.bootstrap_developer_skill()
+        self.assertEqual(result['benchmark_cases'], 5)
+        self.assertEqual(engine.get_skill('Tyler AI Developer')['version'], 1)
+
     def test_developer_bootstrap_is_idempotent(self):
         first = self.lab.bootstrap_developer_skill()
         second = self.lab.bootstrap_developer_skill()
