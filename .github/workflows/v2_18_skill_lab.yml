@@ -1,0 +1,54 @@
+name: Tyler AI v2.18 skill lab
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'skill_lab.py'
+      - 'app_v2_18.py'
+      - 'test_v2_18_skill_lab.py'
+      - '.github/workflows/v2_18_skill_lab.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'skill_lab.py'
+      - 'app_v2_18.py'
+      - 'test_v2_18_skill_lab.py'
+      - '.github/workflows/v2_18_skill_lab.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  skill-lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run v2.18 Skill Lab tests
+        run: python -m unittest -v test_v2_18_skill_lab.py
+      - name: Import and safety smoke test
+        run: |
+          python - <<'PY'
+          import app_v2_18 as app
+          assert app.VERSION_SHORT == 'v2.18.0'
+          assert app.app is not None
+          assert app.base.handle_message is app.handle_message_v218
+          assert app.SKILL_LAB.status()['automatic_skill_promotion_enabled'] is False
+          safe = app.EXECUTOR.safe_source_files_fn()
+          assert 'skill_lab.py' in safe
+          assert 'app_v2_18.py' in safe
+          with app.app.test_client() as client:
+              health = client.get('/health')
+              assert health.status_code == 200
+              assert health.get_json()['version_short'] == 'v2.18.0'
+              lab = client.get('/skills/lab')
+              assert lab.status_code == 401
+          print(app.VERSION_SHORT)
+          PY
