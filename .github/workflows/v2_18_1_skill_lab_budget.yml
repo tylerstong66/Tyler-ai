@@ -1,0 +1,50 @@
+name: Tyler AI v2.18.1 Skill Lab budget
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app_v2_18_1.py'
+      - 'test_v2_18_1_budget.py'
+      - '.github/workflows/v2_18_1_skill_lab_budget.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app_v2_18_1.py'
+      - 'test_v2_18_1_budget.py'
+      - '.github/workflows/v2_18_1_skill_lab_budget.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  skill-lab-budget:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run v2.18 and v2.18.1 tests
+        run: |
+          python -m unittest -v test_v2_18_skill_lab.py
+          python -m unittest -v test_v2_18_1_budget.py
+      - name: Import and runtime smoke test
+        run: |
+          python - <<'PY'
+          import app_v2_18_1 as app
+          assert app.VERSION_SHORT == 'v2.18.1'
+          run_tokens, judge_tokens = app._allocate_benchmark_budget(5)
+          assert (run_tokens + judge_tokens) * 5 <= app.BENCHMARK_OUTPUT_BUDGET < 1000
+          assert app.SKILL_LAB.status()['automatic_skill_promotion_enabled'] is False
+          assert 'app_v2_18_1.py' in app.EXECUTOR.safe_source_files_fn()
+          with app.app.test_client() as client:
+              health = client.get('/health')
+              assert health.status_code == 200
+              assert health.get_json()['version_short'] == 'v2.18.1'
+          print(app.VERSION_SHORT, run_tokens, judge_tokens)
+          PY
