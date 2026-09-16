@@ -1,0 +1,48 @@
+name: Tyler AI stable launcher
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'wsgi.py'
+      - 'test_wsgi_launcher.py'
+      - 'app_v*.py'
+      - '.github/workflows/wsgi_launcher.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'wsgi.py'
+      - 'test_wsgi_launcher.py'
+      - 'app_v*.py'
+      - '.github/workflows/wsgi_launcher.yml'
+  workflow_dispatch:
+
+jobs:
+  stable-launcher:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Test stable WSGI launcher
+        run: python -m unittest -v test_wsgi_launcher.py
+
+      - name: Smoke-test selected production module
+        env:
+          TYLER_APP_MODULE: app_v2_15
+        run: |
+          python - <<'PY'
+          import wsgi
+          assert wsgi.ACTIVE_MODULE == 'app_v2_15'
+          assert wsgi.VERSION_SHORT == 'v2.15.0'
+          assert wsgi.app is not None
+          print('stable launcher smoke test passed')
+          PY
