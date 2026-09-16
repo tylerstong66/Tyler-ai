@@ -1,0 +1,85 @@
+name: Tyler AI v2.15 review gate
+
+on:
+  push:
+    branches:
+      - main
+      - 'tyler-maintenance/**'
+  create:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  review-gate:
+    if: >-
+      github.event_name != 'create' ||
+      (github.event.ref_type == 'branch' && startsWith(github.event.ref, 'tyler-maintenance/'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run legacy reliability and grounding tests
+        run: >-
+          python -m unittest -v
+          test_reliability.py
+          test_skill_engine.py
+          test_skill_tool_fallback.py
+          test_grounded_evaluator.py
+          test_evaluator_score_normalization.py
+          test_auditable_evaluator.py
+          test_contextual_architecture_checks.py
+          test_adaptive_groq_fallback.py
+          test_code_grounded_developer.py
+          test_dependency_observability.py
+          test_resilient_grounded_chat.py
+
+      - name: Run health and proactive-operations tests
+        run: >-
+          python -m unittest -v
+          test_persistent_health_history.py
+          test_health_intelligence.py
+          test_proactive_operations.py
+
+      - name: Run maintenance planner and execution tests
+        run: >-
+          python -m unittest -v
+          test_maintenance_planner.py
+          test_maintenance_planner_drill.py
+          test_maintenance_execution.py
+          test_maintenance_execution_drill.py
+
+      - name: Run v2.15 review-gate tests
+        run: python -m unittest -v test_maintenance_review_gate.py
+
+      - name: Smoke-test v2.15 integration
+        run: |
+          python - <<'PY'
+          import app_v2_15
+          assert app_v2_15.VERSION_SHORT == 'v2.15.0'
+          assert app_v2_15.app is not None
+          assert app_v2_15.base.handle_message is app_v2_15.handle_message_v215
+          assert 'maintenance_review_gate' in app_v2_15.base.SPECIAL_MEMORY_CATEGORIES
+          assert 'maintenance_review_gate.py' in app_v2_15.v210.v297._safe_source_files()
+          status = app_v2_15.REVIEW_GATE.status()
+          assert status['automatic_merge_enabled'] is False
+          assert status['automatic_pull_request_creation_enabled'] is False
+          assert status['automatic_production_deployment_enabled'] is False
+          assert status['automatic_branch_mutation_enabled'] is False
+          with app_v2_15.app.test_client() as client:
+              health = client.get('/health')
+              assert health.status_code == 200
+              assert health.get_json()['version_short'] == 'v2.15.0'
+              diagnostics = client.get('/diagnostics/maintenance/review-gate')
+              assert diagnostics.status_code == 401
+          print('v2.15 automated review gate integration import passed')
+          PY
