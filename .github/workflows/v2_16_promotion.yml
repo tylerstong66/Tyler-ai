@@ -1,0 +1,66 @@
+name: Tyler AI v2.16 human-gated promotion
+
+on:
+  push:
+    branches:
+      - main
+      - 'tyler-maintenance/**'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  promotion-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run v2.14 approval-gated execution tests
+        run: python -m unittest -v test_maintenance_execution.py
+
+      - name: Run v2.14.1 safe execution drill tests
+        run: python -m unittest -v test_maintenance_execution_drill.py
+
+      - name: Run v2.15 automated review-gate tests
+        run: python -m unittest -v test_maintenance_review_gate.py
+
+      - name: Run v2.16 human-gated promotion tests
+        run: python -m unittest -v test_maintenance_promotion.py
+
+      - name: Re-run stable launcher tests
+        run: python -m unittest -v test_wsgi_launcher.py
+
+      - name: Smoke-test v2.16 integration
+        run: |
+          python - <<'PY'
+          import app_v2_16
+          assert app_v2_16.VERSION_SHORT == 'v2.16.0'
+          assert app_v2_16.app is not None
+          assert app_v2_16.base.handle_message is app_v2_16.handle_message_v216
+          assert 'maintenance_promotion' in app_v2_16.base.SPECIAL_MEMORY_CATEGORIES
+          assert 'maintenance_promotion.py' in app_v2_16.v210.v297._safe_source_files()
+          status = app_v2_16.PROMOTION.status()
+          assert status['fresh_ready_review_required'] is True
+          assert status['fresh_human_approval_required'] is True
+          assert status['automatic_pull_request_creation_enabled'] is False
+          assert status['automatic_merge_enabled'] is False
+          assert status['direct_main_write_enabled'] is False
+          assert status['automatic_production_deployment_enabled'] is False
+          assert status['blind_retry_after_unknown_pr_outcome_enabled'] is False
+          with app_v2_16.app.test_client() as client:
+              health = client.get('/health')
+              assert health.status_code == 200
+              assert health.get_json()['version_short'] == 'v2.16.0'
+              diagnostics = client.get('/diagnostics/maintenance/promotion')
+              assert diagnostics.status_code == 401
+          print('v2.16 human-gated maintenance promotion integration import passed')
+          PY
