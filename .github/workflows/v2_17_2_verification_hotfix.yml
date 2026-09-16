@@ -1,0 +1,35 @@
+name: Tyler AI v2.17.2 verification hotfix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app_v2_17_2.py'
+      - 'v2_17_2_verification_hotfix_test.py'
+      - '.github/workflows/v2_17_2_verification_hotfix.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verification-hotfix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run v2.17.2 regression tests
+        run: python v2_17_2_verification_hotfix_test.py
+      - name: Import smoke test
+        run: |
+          python - <<'PY'
+          import app_v2_17_2 as app
+          assert app.VERSION_SHORT == 'v2.17.2'
+          assert app.app is not None
+          print(app.VERSION_SHORT)
+          PY
