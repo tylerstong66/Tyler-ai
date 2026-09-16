@@ -1,0 +1,102 @@
+name: Tyler AI production deploy
+run-name: Tyler production ${{ github.event.client_payload.deployment_id }}
+
+on:
+  repository_dispatch:
+    types: [tyler-production-deploy]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-exact-commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Validate deployment payload
+        env:
+          DEPLOYMENT_ID: ${{ github.event.client_payload.deployment_id }}
+          TARGET_SHA: ${{ github.event.client_payload.target_sha }}
+          ROLLBACK_SHA: ${{ github.event.client_payload.rollback_sha }}
+          SERVICE_URL: ${{ github.event.client_payload.service_url }}
+          DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          python - <<'PY'
+          import os, re, sys
+          ok = (
+              re.fullmatch(r'DPL-[A-F0-9]{10}', os.environ.get('DEPLOYMENT_ID',''))
+              and re.fullmatch(r'[0-9a-f]{40}', os.environ.get('TARGET_SHA',''))
+              and re.fullmatch(r'[0-9a-f]{40}', os.environ.get('ROLLBACK_SHA',''))
+              and os.environ.get('SERVICE_URL','').startswith('https://')
+              and os.environ.get('DEPLOY_HOOK','').startswith('https://')
+          )
+          if not ok:
+              print('Invalid deployment payload or missing RENDER_DEPLOY_HOOK_URL secret.', file=sys.stderr)
+              sys.exit(2)
+          PY
+
+      - name: Deploy exact target, verify, and rollback on failed health
+        env:
+          TARGET_SHA: ${{ github.event.client_payload.target_sha }}
+          ROLLBACK_SHA: ${{ github.event.client_payload.rollback_sha }}
+          SERVICE_URL: ${{ github.event.client_payload.service_url }}
+          DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          set -u
+
+          trigger_ref() {
+            REF="$1" python - <<'PY'
+          import os, urllib.parse, urllib.request
+          hook = os.environ['DEPLOY_HOOK']
+          ref = os.environ['REF']
+          parts = urllib.parse.urlsplit(hook)
+          query = [(k,v) for k,v in urllib.parse.parse_qsl(parts.query, keep_blank_values=True) if k != 'ref']
+          query.append(('ref', ref))
+          url = urllib.parse.urlunsplit((parts.scheme, parts.netloc, parts.path, urllib.parse.urlencode(query), parts.fragment))
+          request = urllib.request.Request(url, method='POST')
+          with urllib.request.urlopen(request, timeout=20) as response:
+              if response.status not in (200, 202):
+                  raise RuntimeError(f'unexpected deploy hook status {response.status}')
+          PY
+          }
+
+          check_ref() {
+            EXPECTED="$1" python - <<'PY'
+          import json, os, sys, urllib.request
+          base = os.environ['SERVICE_URL'].rstrip('/')
+          expected = os.environ['EXPECTED']
+          try:
+              with urllib.request.urlopen(base + '/status', timeout=10) as response:
+                  status = json.load(response)
+              with urllib.request.urlopen(base + '/health', timeout=10) as response:
+                  health = json.load(response)
+              commit = str(status.get('render_git_commit') or '').lower()
+              healthy = bool(str(health.get('version_short') or ''))
+              sys.exit(0 if commit == expected and healthy else 1)
+          except Exception:
+              sys.exit(1)
+          PY
+          }
+
+          echo "Triggering exact target commit ${TARGET_SHA}."
+          trigger_ref "$TARGET_SHA"
+          for i in $(seq 1 72); do
+            if check_ref "$TARGET_SHA"; then
+              echo "Target commit is live and healthy."
+              exit 0
+            fi
+            sleep 5
+          done
+
+          echo "Target failed health verification; triggering pinned rollback ${ROLLBACK_SHA}." >&2
+          trigger_ref "$ROLLBACK_SHA" || true
+          for i in $(seq 1 72); do
+            if check_ref "$ROLLBACK_SHA"; then
+              echo "Rollback commit is live and healthy." >&2
+              exit 1
+            fi
+            sleep 5
+          done
+
+          echo "Rollback could not be verified." >&2
+          exit 2
