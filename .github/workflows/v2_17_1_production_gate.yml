@@ -1,0 +1,40 @@
+name: Tyler AI v2.17.1 production gate
+
+on:
+  push:
+    branches:
+      - main
+      - 'tyler-maintenance/**'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  production-gate-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - name: v2.17.1 production promotion tests
+        run: python -m unittest -v test_v2_17_1_production.py
+      - name: Stable launcher smoke test
+        env:
+          TYLER_APP_MODULE: app_v2_17_1
+        run: |
+          python - <<'PY'
+          import wsgi
+          assert wsgi.ACTIVE_MODULE == 'app_v2_17_1'
+          assert wsgi.VERSION_SHORT == 'v2.17.1'
+          client = wsgi.app.test_client()
+          response = client.get('/health')
+          assert response.status_code == 200
+          data = response.get_json()
+          assert data['version_short'] == 'v2.17.1'
+          assert 'render_git_commit' in data
+          PY
