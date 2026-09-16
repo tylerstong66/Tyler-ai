@@ -1,0 +1,35 @@
+name: Tyler AI v2.17 merge gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  v2-17-merge-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Compile v2.17 merge files
+        run: python -m py_compile maintenance_merge.py app_v2_17.py test_maintenance_merge.py
+      - name: Run v2.17 merge tests
+        run: python -m unittest -v test_maintenance_merge.py
+      - name: Smoke import v2.17
+        env:
+          TYLER_APP_MODULE: app_v2_17
+        run: |
+          python - <<'PY'
+          import app_v2_17 as v
+          assert v.VERSION_SHORT == 'v2.17.0'
+          client = v.app.test_client()
+          r = client.get('/health')
+          assert r.status_code == 200, r.status_code
+          data = r.get_json()
+          assert data.get('version_short') == 'v2.17.0', data
+          print('v2.17 smoke OK')
+          PY
