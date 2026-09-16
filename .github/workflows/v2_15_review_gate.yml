@@ -43,20 +43,26 @@ jobs:
           test_dependency_observability.py
           test_resilient_grounded_chat.py
 
-      - name: Run health and proactive-operations tests
-        run: >-
-          python -m unittest -v
-          test_persistent_health_history.py
-          test_health_intelligence.py
-          test_proactive_operations.py
+      - name: Run v2.10.2 persistent-health tests
+        run: python -m unittest -v test_persistent_health_history.py
 
-      - name: Run maintenance planner and execution tests
-        run: >-
-          python -m unittest -v
-          test_maintenance_planner.py
-          test_maintenance_planner_drill.py
-          test_maintenance_execution.py
-          test_maintenance_execution_drill.py
+      - name: Run v2.11 health-intelligence tests
+        run: python -m unittest -v test_health_intelligence.py
+
+      - name: Run v2.12 proactive-operations tests
+        run: python -m unittest -v test_proactive_operations.py
+
+      - name: Run v2.13 maintenance-planner tests
+        run: python -m unittest -v test_maintenance_planner.py
+
+      - name: Run v2.13.1 maintenance-planner drill tests
+        run: python -m unittest -v test_maintenance_planner_drill.py
+
+      - name: Run v2.14 maintenance-execution tests
+        run: python -m unittest -v test_maintenance_execution.py
+
+      - name: Run v2.14.1 maintenance-execution drill tests
+        run: python -m unittest -v test_maintenance_execution_drill.py
 
       - name: Run v2.15 review-gate tests
         run: python -m unittest -v test_maintenance_review_gate.py
