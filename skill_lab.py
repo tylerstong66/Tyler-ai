@@ -76,6 +76,27 @@ def _score(value):
     return max(0, min(100, value))
 
 
+def _contains_secret_literal(value):
+    """Return True for credential-like *values*, not harmless credential discussion.
+
+    Skill benchmarks need to be able to test behavior such as "never ask the user
+    to paste a personal access token". The application's broader sensitive-data
+    classifier may intentionally flag that phrase, but a benchmark should only be
+    rejected when it appears to contain an actual credential/private-key value.
+    """
+    text = str(value or '')
+    patterns = [
+        r'-----BEGIN\s+(?:RSA\s+|EC\s+|OPENSSH\s+)?PRIVATE KEY-----',
+        r'\bgh[pousr]_[A-Za-z0-9]{20,}\b',
+        r'\bsk-[A-Za-z0-9_-]{16,}\b',
+        r'\bAKIA[0-9A-Z]{16}\b',
+        r'\bBearer\s+[A-Za-z0-9._~+\-/=]{16,}\b',
+        r'\bSECRET_TOKEN\s*[:=]\s*[^\s]{3,}',
+        r'(?i)\b(?:api[_ -]?key|access[_ -]?token|secret[_ -]?token|client[_ -]?secret|password)\s*[:=]\s*["\']?[^\s"\']{8,}',
+    ]
+    return any(re.search(pattern, text) for pattern in patterns)
+
+
 class SkillPromotionLab:
     """Candidate, benchmark, and human-promotion layer over SkillEngine.
 
@@ -158,7 +179,7 @@ class SkillPromotionLab:
         skill = self.engine.get_skill(skill_name)
         if not skill:
             raise ValueError(f'Skill {skill_name!r} was not found.')
-        if any(self.sensitive_fn(v) for v in [test_input, expected_behavior] if v):
+        if any(_contains_secret_literal(v) for v in [test_input, expected_behavior] if v):
             raise ValueError('Benchmark cases cannot contain credentials or sensitive secrets.')
         test_input, expected_behavior = _norm(test_input), _norm(expected_behavior)
         if not test_input or not expected_behavior:
