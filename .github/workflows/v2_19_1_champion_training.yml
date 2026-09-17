@@ -1,0 +1,59 @@
+name: Tyler AI v2.19.1 champion training
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'champion_training.py'
+      - 'app_v2_19_1.py'
+      - 'test_v2_19_1_champion_training.py'
+      - '.github/workflows/v2_19_1_champion_training.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'champion_training.py'
+      - 'app_v2_19_1.py'
+      - 'test_v2_19_1_champion_training.py'
+      - '.github/workflows/v2_19_1_champion_training.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  champion-training:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run v2.19.1 champion training tests
+        run: python -m unittest -v test_v2_19_1_champion_training.py
+      - name: Re-run v2.19 iterative training suite in a fresh process
+        run: python -m unittest -v test_v2_19_iterative_training.py
+      - name: Re-run v2.18.2 provider-safe transport suite in a fresh process
+        run: python -m unittest -v test_v2_18_2_transport.py
+      - name: Re-run v2.18 Skill Lab suite in a fresh process
+        run: python -m unittest -v test_v2_18_skill_lab.py
+      - name: Import and safety smoke test
+        run: |
+          python - <<'PY'
+          import app_v2_19_1 as app
+          assert app.VERSION_SHORT == 'v2.19.1'
+          assert app.app is not None
+          assert app.ITERATIVE_BENCHMARK_OUTPUT_BUDGET == 800
+          assert app.ITERATIVE_CANDIDATE_OUTPUT_TOKENS == 150
+          assert app.ITERATIVE_BENCHMARK_OUTPUT_BUDGET + app.ITERATIVE_CANDIDATE_OUTPUT_TOKENS <= 1000
+          status = app.TRAINER.status()
+          assert status['champion_based_training'] is True
+          assert status['champion_requires_confirmation'] is True
+          assert status['automatic_activation'] is False
+          assert status['human_promotion_required'] is True
+          assert 'champion_training.py' in app.EXECUTOR.safe_source_files_fn()
+          assert 'app_v2_19_1.py' in app.EXECUTOR.safe_source_files_fn()
+          print(app.VERSION_SHORT)
+          PY
