@@ -1,0 +1,57 @@
+name: Tyler AI v2.19 iterative skill training
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'skill_iteration.py'
+      - 'app_v2_19.py'
+      - 'test_v2_19_iterative_training.py'
+      - '.github/workflows/v2_19_iterative_skill_training.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'skill_iteration.py'
+      - 'app_v2_19.py'
+      - 'test_v2_19_iterative_training.py'
+      - '.github/workflows/v2_19_iterative_skill_training.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  iterative-skill-training:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run v2.19 iterative training tests
+        run: python -m unittest -v test_v2_19_iterative_training.py
+      - name: Re-run v2.18.2 provider-safe transport suite
+        run: python -m unittest -v test_v2_18_2_transport.py
+      - name: Re-run v2.18.1 benchmark budget suite
+        run: python -m unittest -v test_v2_18_1_budget.py
+      - name: Re-run v2.18 Skill Lab suite
+        run: python -m unittest -v test_v2_18_skill_lab.py
+      - name: Import and safety smoke test
+        run: |
+          python - <<'PY'
+          import app_v2_19 as app
+          assert app.VERSION_SHORT == 'v2.19.0'
+          assert app.app is not None
+          assert app.ITERATIVE_BENCHMARK_OUTPUT_BUDGET == 800
+          assert app.ITERATIVE_CANDIDATE_OUTPUT_TOKENS == 150
+          assert app.ITERATIVE_BENCHMARK_OUTPUT_BUDGET + app.ITERATIVE_CANDIDATE_OUTPUT_TOKENS <= 1000
+          status = app.TRAINER.status()
+          assert status['automatic_activation'] is False
+          assert status['human_promotion_required'] is True
+          assert 'skill_iteration.py' in app.EXECUTOR.safe_source_files_fn()
+          assert 'app_v2_19.py' in app.EXECUTOR.safe_source_files_fn()
+          print(app.VERSION_SHORT)
+          PY
