@@ -21,12 +21,17 @@ class MutationIndexRepairTests(unittest.TestCase):
         self.assertTrue(fixed['index_repaired'])
 
         instructions, criteria, diff = v21921._single_mutation_with_index_repair(
-            self.parent, fixed
+            self.parent,
+            {
+                'target_kind': 'instruction', 'target_index': 99,
+                'replacement': 'I2 improved', 'rationale': 'target weak case',
+            },
         )
         self.assertEqual(instructions, ['I1', 'I2 improved'])
         self.assertEqual(criteria, ['C1', 'C2', 'C3'])
-        self.assertEqual(diff['requested_index'], 2)
+        self.assertEqual(diff['requested_index'], 99)
         self.assertEqual(diff['resolved_index'], 2)
+        self.assertTrue(diff['index_repaired'])
 
     def test_zero_criterion_index_clamps_to_first_existing_line(self):
         instructions, criteria, diff = v21921._single_mutation_with_index_repair(
