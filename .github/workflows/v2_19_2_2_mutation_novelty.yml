@@ -1,0 +1,55 @@
+name: Tyler AI v2.19.2.2 mutation novelty
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app_v2_19_2_2.py'
+      - 'test_v2_19_2_2_mutation_novelty.py'
+      - '.github/workflows/v2_19_2_2_mutation_novelty.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app_v2_19_2_2.py'
+      - 'test_v2_19_2_2_mutation_novelty.py'
+      - '.github/workflows/v2_19_2_2_mutation_novelty.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mutation-novelty:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run v2.19.2.2 mutation novelty tests
+        run: python -m unittest -v test_v2_19_2_2_mutation_novelty.py
+      - name: Re-run v2.19.2.1 index repair suite in a fresh process
+        run: python -m unittest -v test_v2_19_2_1_index_repair.py
+      - name: Re-run v2.19.2 constrained mutation suite in a fresh process
+        run: python -m unittest -v test_v2_19_2_constrained_mutation.py
+      - name: Re-run v2.19.1 champion training suite in a fresh process
+        run: python -m unittest -v test_v2_19_1_champion_training.py
+      - name: Re-run v2.19 iterative training suite in a fresh process
+        run: python -m unittest -v test_v2_19_iterative_training.py
+      - name: Import, provider-budget, and safety smoke test
+        run: |
+          python - <<'PY'
+          import app_v2_19_2_2 as app
+          assert app.VERSION_SHORT == 'v2.19.2.2'
+          assert app.app is not None
+          assert app.MAX_MUTATED_FIELDS == 1
+          assert app.MAX_NOVELTY_OPTIONS == 3
+          assert app.ITERATIVE_BENCHMARK_OUTPUT_BUDGET + app.ITERATIVE_CANDIDATE_OUTPUT_TOKENS <= 1000
+          assert app.MUTATION_ATTEMPT_CATEGORY in app.base.SPECIAL_MEMORY_CATEGORIES
+          assert app.TRAINER.status()['automatic_activation'] is False
+          assert 'app_v2_19_2_2.py' in app.EXECUTOR.safe_source_files_fn()
+          print(app.VERSION_SHORT)
+          PY
