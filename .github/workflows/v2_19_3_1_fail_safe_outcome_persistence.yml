@@ -33,8 +33,17 @@ jobs:
         run: python -m unittest -v test_v2_19_3_1_fail_safe_outcome_persistence.py
       - name: Re-run v2.19.3 outcome-learning suite in a fresh process
         run: python -m unittest -v test_v2_19_3_mutation_outcome_learning.py
-      - name: Re-run v2.19.2.3 transport suite in a fresh process
-        run: python -m unittest -v test_v2_19_2_3_mutation_transport.py
+      - name: Re-run v2.19.2.3.1 parser repair suite in a fresh process
+        run: |
+          python - <<'PY'
+          import unittest
+          import app_v2_19_2_3_1
+          import test_v2_19_2_3_mutation_transport
+          suite = unittest.defaultTestLoader.loadTestsFromModule(test_v2_19_2_3_mutation_transport)
+          result = unittest.TextTestRunner(verbosity=2).run(suite)
+          if not result.wasSuccessful():
+              raise SystemExit(1)
+          PY
       - name: Re-run v2.19.2.2 novelty suite in a fresh process
         run: python -m unittest -v test_v2_19_2_2_mutation_novelty.py
       - name: Re-run v2.19.2 constrained mutation suite in a fresh process
