@@ -156,6 +156,7 @@ class GeminiTrainingTests(unittest.TestCase):
 
     def test_status_and_source_inventory_expose_safe_configuration_only(self):
         self.assertEqual(v21933.VERSION_SHORT, "v2.19.3.3")
+        self.assertEqual(v21933.GEMINI_MODEL, "gemini-3.5-flash-lite")
         self.assertIn("app_v2_19_3_3.py", v21933.EXECUTOR.safe_source_files_fn())
         with v21933.app.app_context():
             status = v21933.status_v21933().get_json()

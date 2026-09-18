@@ -47,8 +47,8 @@ OUTCOME_LEARNING_MODE = v21932.OUTCOME_LEARNING_MODE
 
 TRAINING_PROVIDER = "gemini"
 GEMINI_MODEL = re.sub(
-    r"[^a-zA-Z0-9._-]", "", os.environ.get("GEMINI_MODEL", "gemini-2.5-flash-lite")
-) or "gemini-2.5-flash-lite"
+    r"[^a-zA-Z0-9._-]", "", os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
+) or "gemini-3.5-flash-lite"
 GEMINI_TIMEOUT_SECONDS = 90
 _TRAINING_PROVIDER_CONTEXT = ContextVar("tyler_training_provider", default=None)
 
