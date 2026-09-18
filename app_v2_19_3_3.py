@@ -203,6 +203,7 @@ SKILL_LAB._valid_eval = types.MethodType(_provider_valid_eval, SKILL_LAB)
 
 _ORIGINAL_VALID_CANDIDATE_RUNS = TRAINER._valid_candidate_runs
 _ORIGINAL_SAVE_SESSION = TRAINER._save_session
+_ORIGINAL_SEED_CHAMPION_STATE = TRAINER._seed_champion_state
 
 
 def _provider_valid_candidate_runs(self, active, candidate):
@@ -227,10 +228,22 @@ def _provider_save_session(self, session, importance=8):
     return _ORIGINAL_SAVE_SESSION(clean, importance)
 
 
+def _provider_seed_champion_state(self, session):
+    if _TRAINING_PROVIDER_CONTEXT.get() == TRAINING_PROVIDER:
+        # Historical scans can be slow and pre-Gemini candidates are not valid
+        # comparison data. New Gemini candidates will still become champions
+        # through the normal two-run confirmation path.
+        return dict(session or {})
+    return _ORIGINAL_SEED_CHAMPION_STATE(session)
+
+
 TRAINER._valid_candidate_runs = types.MethodType(
     _provider_valid_candidate_runs, TRAINER
 )
 TRAINER._save_session = types.MethodType(_provider_save_session, TRAINER)
+TRAINER._seed_champion_state = types.MethodType(
+    _provider_seed_champion_state, TRAINER
+)
 
 
 _ORIGINAL_TRAINER_START = TRAINER.start
@@ -269,7 +282,14 @@ def _gemini_training_start(self, skill_name, restart=False):
     try:
         # A provider-specific active baseline is mandatory before a new session;
         # prior Groq scores must not be used as Gemini's comparison reference.
-        self.lab.evaluate(active["skill_id"], "active")
+        existing_baseline = self.lab._valid_eval(active, "active")
+        restarting_gemini = bool(
+            restart and current
+            and current.get("training_provider") == TRAINING_PROVIDER
+            and current.get("training_model") == GEMINI_MODEL
+        )
+        if existing_baseline is None or restarting_gemini:
+            self.lab.evaluate(active["skill_id"], "active")
         return _ORIGINAL_TRAINER_START(skill_name, restart=True)
     finally:
         _TRAINING_PROVIDER_CONTEXT.reset(token)
@@ -344,6 +364,7 @@ __all__ = [
     "MUTATION_OUTCOME_CATEGORY", "OUTCOME_LEARNING_MODE", "TRAINING_PROVIDER",
     "GEMINI_MODEL", "GEMINI_TIMEOUT_SECONDS", "_gemini_complete",
     "_provider_routed_complete", "_provider_valid_eval",
-    "_provider_valid_candidate_runs", "_gemini_training_start",
+    "_provider_valid_candidate_runs", "_provider_seed_champion_state",
+    "_gemini_training_start",
     "_gemini_training_advance",
 ]

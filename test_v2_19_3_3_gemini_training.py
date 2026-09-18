@@ -154,6 +154,61 @@ class GeminiTrainingTests(unittest.TestCase):
                     FakeTrainer(), "tyler-ai-developer", restart=False
                 )
 
+    def test_gemini_session_skips_cross_provider_historical_seed(self):
+        original = v21933._ORIGINAL_SEED_CHAMPION_STATE
+        try:
+            v21933._ORIGINAL_SEED_CHAMPION_STATE = lambda session: self.fail(
+                "historical seed should not run"
+            )
+            token = v21933._TRAINING_PROVIDER_CONTEXT.set("gemini")
+            try:
+                session = v21933._provider_seed_champion_state(
+                    object(), {"session_id": "TRN-1"}
+                )
+            finally:
+                v21933._TRAINING_PROVIDER_CONTEXT.reset(token)
+        finally:
+            v21933._ORIGINAL_SEED_CHAMPION_STATE = original
+        self.assertEqual(session, {"session_id": "TRN-1"})
+
+    def test_failed_restart_reuses_saved_gemini_baseline(self):
+        class FakeEngine:
+            def get_skill(self, name):
+                return {"skill_id": "tyler-ai-developer"}
+
+        class FakeLab:
+            engine = FakeEngine()
+
+            def __init__(self):
+                self.evaluations = 0
+
+            def _valid_eval(self, active, target_kind):
+                return {"run_id": "EVL-GEMINI"}
+
+            def evaluate(self, skill_id, target_kind):
+                self.evaluations += 1
+
+        class FakeTrainer:
+            lab = FakeLab()
+            TERMINAL = {"exhausted"}
+
+            def latest_session(self, skill_id):
+                return {"status": "needs_next_round"}
+
+        original = v21933._ORIGINAL_TRAINER_START
+        try:
+            v21933._ORIGINAL_TRAINER_START = lambda skill_name, restart: {
+                "session_id": "TRN-NEW"
+            }
+            with patch.dict(os.environ, {"GEMINI_API_KEY": "configured"}):
+                result = v21933._gemini_training_start(
+                    FakeTrainer(), "tyler-ai-developer", restart=True
+                )
+        finally:
+            v21933._ORIGINAL_TRAINER_START = original
+        self.assertEqual(result["session_id"], "TRN-NEW")
+        self.assertEqual(FakeTrainer.lab.evaluations, 0)
+
     def test_status_and_source_inventory_expose_safe_configuration_only(self):
         self.assertEqual(v21933.VERSION_SHORT, "v2.19.3.3")
         self.assertEqual(v21933.GEMINI_MODEL, "gemini-3.5-flash-lite")
