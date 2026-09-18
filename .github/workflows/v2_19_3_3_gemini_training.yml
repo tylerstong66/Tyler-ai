@@ -1,0 +1,39 @@
+name: v2.19.3.3 Gemini training
+
+on:
+  push:
+    paths:
+      - 'app_v2_19_3_3.py'
+      - 'test_v2_19_3_3_gemini_training.py'
+      - '.github/workflows/v2_19_3_3_gemini_training.yml'
+  pull_request:
+    paths:
+      - 'app_v2_19_3_3.py'
+      - 'test_v2_19_3_3_gemini_training.py'
+      - '.github/workflows/v2_19_3_3_gemini_training.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m unittest test_v2_19_3_3_gemini_training.py
+      - name: Verify production entrypoint
+        run: |
+          python - <<'PY'
+          import app_v2_19_3_3 as app
+
+          assert app.VERSION_SHORT == 'v2.19.3.3'
+          assert app.TRAINING_PROVIDER == 'gemini'
+          assert app.TRAINER.status()['automatic_activation'] is False
+          assert app.TRAINER.status()['human_promotion_required'] is True
+          assert 'app_v2_19_3_3.py' in app.EXECUTOR.safe_source_files_fn()
+          PY
