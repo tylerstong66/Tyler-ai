@@ -1,0 +1,54 @@
+name: Tyler AI v2.19.3.2 quota-aware training
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app_v2_19_3_2.py'
+      - 'test_v2_19_3_2_quota_aware_training.py'
+      - '.github/workflows/v2_19_3_2_quota_aware_training.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app_v2_19_3_2.py'
+      - 'test_v2_19_3_2_quota_aware_training.py'
+      - '.github/workflows/v2_19_3_2_quota_aware_training.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quota-aware-training:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run v2.19.3.2 quota-aware training suite
+        run: python -m unittest -v test_v2_19_3_2_quota_aware_training.py
+      - name: Re-run v2.19.3.1 fail-safe suite in a fresh process
+        run: python -m unittest -v test_v2_19_3_1_fail_safe_outcome_persistence.py
+      - name: Re-run v2.19.3 outcome-learning suite in a fresh process
+        run: python -m unittest -v test_v2_19_3_mutation_outcome_learning.py
+      - name: Re-run v2.19.1 champion suite in a fresh process
+        run: python -m unittest -v test_v2_19_1_champion_training.py
+      - name: Import and release-safety smoke test
+        run: |
+          python - <<'PY'
+          import app_v2_19_3_2 as app
+          assert app.VERSION_SHORT == 'v2.19.3.2'
+          assert app.app is not None
+          assert app.MAX_MUTATED_FIELDS == 1
+          assert app.MAX_NOVELTY_OPTIONS == 3
+          assert app.ITERATIVE_BENCHMARK_OUTPUT_BUDGET + app.ITERATIVE_CANDIDATE_OUTPUT_TOKENS <= 770
+          status = app.TRAINER.status()
+          assert status['automatic_activation'] is False
+          assert status['human_promotion_required'] is True
+          assert 'app_v2_19_3_2.py' in app.EXECUTOR.safe_source_files_fn()
+          print(app.VERSION_SHORT)
+          PY
