@@ -1,4 +1,5 @@
 import os
+import runpy
 import unittest
 from unittest.mock import patch
 
@@ -213,6 +214,7 @@ class GeminiTrainingTests(unittest.TestCase):
         self.assertEqual(v21933.VERSION_SHORT, "v2.19.3.3")
         self.assertEqual(v21933.GEMINI_MODEL, "gemini-3.5-flash-lite")
         self.assertIn("app_v2_19_3_3.py", v21933.EXECUTOR.safe_source_files_fn())
+        self.assertIn("gunicorn.conf.py", v21933.EXECUTOR.safe_source_files_fn())
         with v21933.app.app_context():
             status = v21933.status_v21933().get_json()
         self.assertEqual(status["training_provider"], "gemini")
@@ -221,6 +223,11 @@ class GeminiTrainingTests(unittest.TestCase):
         trainer_status = v21933.TRAINER.status()
         self.assertFalse(trainer_status["automatic_activation"])
         self.assertTrue(trainer_status["human_promotion_required"])
+
+    def test_gunicorn_allows_atomic_training_request_to_finish(self):
+        config = runpy.run_path("gunicorn.conf.py")
+        self.assertEqual(config["timeout"], 120)
+        self.assertEqual(config["graceful_timeout"], 30)
 
 
 if __name__ == "__main__":

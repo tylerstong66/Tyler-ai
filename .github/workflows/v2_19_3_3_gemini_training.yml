@@ -5,11 +5,13 @@ on:
     paths:
       - 'app_v2_19_3_3.py'
       - 'test_v2_19_3_3_gemini_training.py'
+      - 'gunicorn.conf.py'
       - '.github/workflows/v2_19_3_3_gemini_training.yml'
   pull_request:
     paths:
       - 'app_v2_19_3_3.py'
       - 'test_v2_19_3_3_gemini_training.py'
+      - 'gunicorn.conf.py'
       - '.github/workflows/v2_19_3_3_gemini_training.yml'
 
 permissions:

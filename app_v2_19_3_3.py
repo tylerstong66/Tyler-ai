@@ -346,7 +346,10 @@ _ORIGINAL_SAFE_SOURCE_FILES = v21932._safe_source_files_v21932
 
 
 def _safe_source_files_v21933():
-    return sorted(set(list(_ORIGINAL_SAFE_SOURCE_FILES()) + ["app_v2_19_3_3.py"]))
+    return sorted(set(
+        list(_ORIGINAL_SAFE_SOURCE_FILES())
+        + ["app_v2_19_3_3.py", "gunicorn.conf.py"]
+    ))
 
 
 v21932.v21931.v2193.v219231.v21923.v21922.v21921.v2192.v2191.v219.v2182.v2181.v218.v2172.v2171.v217.v216.v210.v297._safe_source_files = _safe_source_files_v21933
