@@ -41,7 +41,11 @@ MAX_MUTATED_FIELDS = v219231.MAX_MUTATED_FIELDS
 MUTATION_ATTEMPT_CATEGORY = v219231.MUTATION_ATTEMPT_CATEGORY
 MAX_NOVELTY_OPTIONS = v219231.MAX_NOVELTY_OPTIONS
 MUTATION_TRANSPORT = v219231.MUTATION_TRANSPORT
-MAX_LOCAL_FALLBACK_OPTIONS = v219231.MAX_LOCAL_FALLBACK_OPTIONS
+# Outcome learning can reject an entire mutation direction after a harmful run.
+# Keep a wider, still-bounded recovery slate so the remaining safe directions do
+# not collapse to the same three deterministic edits on every request.
+MAX_LOCAL_FALLBACK_OPTIONS = max(48, v219231.MAX_LOCAL_FALLBACK_OPTIONS)
+v219231.v21923.MAX_LOCAL_FALLBACK_OPTIONS = MAX_LOCAL_FALLBACK_OPTIONS
 
 MUTATION_OUTCOME_CATEGORY = "skill_mutation_outcome"
 OUTCOME_HISTORY_LIMIT = 500
@@ -310,9 +314,93 @@ _v21922._parse_mutation_slate = _outcome_sorted_parse
 # provider failures do not bypass the outcome-learning layer.
 _ORIGINAL_LOCAL_FALLBACK_MUTATIONS = v219231.v21923._local_fallback_mutations
 
+_ADAPTIVE_FALLBACK_SUFFIXES = (
+    "Also explicitly satisfy this requirement: {requirement}",
+    "Before reporting completion, explicitly satisfy: {requirement}",
+    "Verification must explicitly cover this requirement: {requirement}",
+    "Use current evidence to demonstrate: {requirement}",
+    "Treat this as a required acceptance check: {requirement}",
+    "Include a concrete verification step for: {requirement}",
+    "Do not claim success until evidence confirms: {requirement}",
+    "Make the final result auditable against: {requirement}",
+    "Record the evidence used to establish: {requirement}",
+    "If evidence is incomplete, say so instead of assuming: {requirement}",
+    "Cross-check the completed work against: {requirement}",
+    "The completion summary must state how it satisfied: {requirement}",
+)
+
+
+def _fit_adaptive_fallback_replacement(old_value, weakness, variant):
+    """Return a bounded useful edit from a wider deterministic template bank."""
+    old = _norm(old_value)
+    requirement = v219231.v21923._trim_requirement(weakness, 120)
+    if not old or not requirement:
+        return None
+    template = _ADAPTIVE_FALLBACK_SUFFIXES[
+        int(variant) % len(_ADAPTIVE_FALLBACK_SUFFIXES)
+    ]
+    suffix = template.format(requirement=requirement)
+    limits = v219231.v21923.v21922.v21921.v2192
+    max_chars = min(
+        int(limits.MAX_REPLACEMENT_CHARS),
+        max(180, int(max(1, len(old)) * float(limits.MAX_REPLACEMENT_RATIO))),
+    )
+    available = max_chars - len(old) - 1
+    if available < 36:
+        return None
+    if len(suffix) > available:
+        suffix = suffix[:available].rsplit(" ", 1)[0].rstrip(" ,;:")
+    if len(suffix) < 24:
+        return None
+    return f"{old} {suffix}".strip()
+
+
+def _adaptive_local_fallback_mutations(parent, focus, limit=MAX_LOCAL_FALLBACK_OPTIONS):
+    """Generate diverse bounded edits before outcome-history safety ranking.
+
+    The old fallback exposed three phrasings per field. Once those keys had been
+    attempted, retrying could never escape duplicate recovery. This generator
+    keeps deterministic behavior but searches twelve phrasings across every
+    mutable field. Downstream novelty, profile, structural, outcome-learning,
+    benchmark, champion-confirmation, and human-promotion gates remain intact.
+    """
+    weakness = _norm((focus or {}).get("weakness")) or (
+        "Improve the weakest benchmark behavior."
+    )
+    out = []
+    seen = set()
+    requested_limit = max(1, min(int(limit), MAX_LOCAL_FALLBACK_OPTIONS))
+    for kind, index, old_value in v219231.v21923._rank_parent_targets(
+        parent, weakness
+    ):
+        for variant in range(len(_ADAPTIVE_FALLBACK_SUFFIXES)):
+            replacement = _fit_adaptive_fallback_replacement(
+                old_value, weakness, variant
+            )
+            if not replacement:
+                continue
+            key = v219231.v21923.v21922._mutation_key(
+                kind, index, replacement
+            )
+            if key in seen:
+                continue
+            seen.add(key)
+            out.append({
+                "target_kind": kind,
+                "target_index": index,
+                "replacement": replacement,
+                "rationale": (
+                    "Adaptive deterministic fallback targeting the weakest "
+                    "verified benchmark evidence."
+                ),
+            })
+            if len(out) >= requested_limit:
+                return out
+    return out
+
 
 def _outcome_ranked_local_fallback(parent, focus, limit=MAX_LOCAL_FALLBACK_OPTIONS):
-    options = list(_ORIGINAL_LOCAL_FALLBACK_MUTATIONS(
+    options = list(_adaptive_local_fallback_mutations(
         parent, focus, max(int(limit), MAX_LOCAL_FALLBACK_OPTIONS)
     ))
     context = _LEARNING_CONTEXT.get()

@@ -120,6 +120,30 @@ class MutationOutcomeLearningTests(unittest.TestCase):
         self.assertEqual(options[0]['target_kind'], 'criterion')
         self.assertEqual(options[0]['target_index'], 2)
 
+    def test_local_recovery_has_novel_options_after_first_three_duplicates(self):
+        parent = {
+            'instructions': ['Inspect current code.', 'Report only verified state.'],
+            'success_criteria': ['Changes are grounded.', 'Claims are verified.'],
+        }
+        focus = {'weakness': 'Verify repository state before claiming success.'}
+        options = v2193._outcome_ranked_local_fallback(parent, focus)
+
+        self.assertGreater(len(options), 3)
+        first_three = {
+            v2193.v219231.v21923.v21922._mutation_key(
+                item['target_kind'], item['target_index'], item['replacement']
+            )
+            for item in options[:3]
+        }
+        remaining = [
+            item for item in options
+            if v2193.v219231.v21923.v21922._mutation_key(
+                item['target_kind'], item['target_index'], item['replacement']
+            ) not in first_three
+        ]
+        self.assertTrue(remaining)
+        self.assertLessEqual(len(options), v2193.MAX_LOCAL_FALLBACK_OPTIONS)
+
     def test_historical_candidates_become_cross_session_learning_evidence(self):
         store, engine, lab, active = self.make_lab()
         candidate = {
