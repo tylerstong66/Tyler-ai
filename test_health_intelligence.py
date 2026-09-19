@@ -36,6 +36,13 @@ def record(service, state='healthy', latency=100, error=None, unknown=False):
     }
 
 
+def operation_record(service, total, state='healthy', latency=100, error=None):
+    item = record(service, state=state, latency=latency, error=error)
+    item['process_started_at'] = '2026-09-15T19:00:00+00:00'
+    item['services'][service]['total_operations'] = total
+    return item
+
+
 def snapshot(service='groq', state='healthy', latency=100, consecutive=0, error=None, unknown=False):
     services = {
         name: {
@@ -148,6 +155,19 @@ class HealthIntelligenceUnitTests(unittest.TestCase):
         self.assertEqual(signals['older_latency_ms'], 110)
         self.assertEqual(signals['newer_latency_ms'], 220)
         self.assertEqual(signals['latency_change_pct'], 100.0)
+
+    def test_historical_signals_ignore_repeated_last_known_state(self):
+        records = [
+            operation_record('groq', 1, state='unhealthy', error='quota'),
+            operation_record('groq', 1, state='unhealthy', error='quota'),
+            operation_record('groq', 1, state='unhealthy', error='quota'),
+            operation_record('groq', 2, state='healthy'),
+            operation_record('groq', 2, state='healthy'),
+        ]
+        signals = historical_signals(records, 'groq')
+        self.assertEqual(signals['samples'], 2)
+        self.assertEqual(signals['failure_samples'], 1)
+        self.assertEqual(signals['healthy_rate'], 0.5)
 
     def test_raised_alert_is_deduplicated_and_resolution_is_emitted_once(self):
         now = [datetime(2026, 9, 15, 22, 0, tzinfo=timezone.utc)]

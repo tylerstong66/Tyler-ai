@@ -149,7 +149,7 @@ def health_history_payload(message=''):
     lines = [
         f"Persistent dependency history: last {hours} hours",
         'Historical snapshots from Supabase — no Groq, Tavily, or n8n probe requests were sent.',
-        f"Stored snapshots in window: {summary.get('samples', 0)}",
+        f"Stored dependency snapshots in window: {summary.get('samples', 0)}",
         '',
     ]
     labels = {'groq': 'Groq', 'tavily': 'Tavily', 'supabase': 'Supabase', 'n8n': 'n8n'}
@@ -169,10 +169,20 @@ def health_history_payload(message=''):
             if p95 is not None:
                 latency_text += f' · p95 {p95} ms'
         lines.append(
-            f"{labels[name]}: {item.get('latest_state') or 'unknown'} · {healthy_text} · "
+            f"{labels[name]}: {item.get('latest_state') or 'unknown'} · {healthy_text} across "
+            f"{samples} operation checkpoint{'s' if samples != 1 else ''} · "
             f"{latency_text} · {_trend_label(item.get('latency_trend'))} · "
             f"failure samples {item.get('failure_samples', 0)}"
         )
+        ignored = int(item.get('ignored_repeated_snapshots') or 0)
+        if ignored:
+            lines.append(f"  Repeated unchanged snapshots excluded: {ignored}")
+        categories = item.get('error_categories') or {}
+        if categories:
+            category_text = ', '.join(
+                f"{name} {count}" for name, count in sorted(categories.items())
+            )
+            lines.append(f"  Failure categories: {category_text}")
         if item.get('unknown_outcome_samples'):
             lines.append(f"  Unknown external-outcome samples: {item.get('unknown_outcome_samples')}")
 

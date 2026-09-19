@@ -1,0 +1,38 @@
+name: Tyler AI v2.19.3.4 health and Markdown
+
+on:
+  push:
+    paths:
+      - 'app_v2_19_3_4.py'
+      - 'app_v2_10_2.py'
+      - 'persistent_health_history.py'
+      - 'health_intelligence.py'
+      - 'test_v2_19_3_4_health_markdown.py'
+      - 'test_persistent_health_history.py'
+      - 'test_health_intelligence.py'
+      - '.github/workflows/v2_19_3_4_health_markdown.yml'
+  pull_request:
+    paths:
+      - 'app_v2_19_3_4.py'
+      - 'app_v2_10_2.py'
+      - 'persistent_health_history.py'
+      - 'health_intelligence.py'
+      - 'test_v2_19_3_4_health_markdown.py'
+      - 'test_persistent_health_history.py'
+      - 'test_health_intelligence.py'
+      - '.github/workflows/v2_19_3_4_health_markdown.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: python -m unittest -v test_persistent_health_history.py
+      - run: python -m unittest -v test_health_intelligence.py
+      - run: python -m unittest -v test_proactive_operations.py
+      - run: python -m unittest -v test_v2_19_3_3_gemini_training.py
+      - run: python -m unittest -v test_v2_19_3_4_health_markdown.py

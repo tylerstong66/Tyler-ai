@@ -68,7 +68,49 @@ def _compact_service(item):
         'last_error_category': item.get('last_error_category'),
         'last_outcome_unknown': bool(item.get('last_outcome_unknown')),
         'total_operations': int(item.get('total_operations') or 0),
+        'last_observed_at': item.get('last_observed_at'),
     }
+
+
+def operation_checkpoints(records, service):
+    """Return service samples only when its operation counter advances.
+
+    Health-history rows are global snapshots. A forced history request or an
+    unrelated dependency call can therefore persist Groq's unchanged
+    last-known state again. Treating every row as a new Groq sample inflates
+    both failures and successes. The process start timestamp plus the
+    monotonic per-process operation counter lets us discard those duplicates.
+
+    Legacy/test records without both fields remain distinct for backward
+    compatibility; real v1 history rows contain them.
+    """
+    output = []
+    last_total_by_process = {}
+    for record in records or []:
+        item = (record.get('services') or {}).get(service)
+        if not isinstance(item, dict) or not item.get('observed'):
+            continue
+
+        process_started_at = record.get('process_started_at')
+        total_operations = item.get('total_operations')
+        has_counter = (
+            process_started_at not in {None, ''}
+            and isinstance(total_operations, (int, float))
+            and int(total_operations) > 0
+        )
+        if has_counter:
+            process_key = str(process_started_at)
+            total = int(total_operations)
+            previous = last_total_by_process.get(process_key)
+            if previous is not None and total <= previous:
+                continue
+            last_total_by_process[process_key] = total
+
+        sample = dict(item)
+        sample['recorded_at'] = record.get('recorded_at') or record.get('stored_at')
+        sample['process_started_at'] = process_started_at
+        output.append(sample)
+    return output
 
 
 def compact_snapshot(snapshot, version, recorded_at=None):
@@ -304,14 +346,17 @@ class PersistentHealthHistory:
             return summary
 
         for name in ['groq', 'tavily', 'supabase', 'n8n']:
-            samples = []
+            raw_samples = []
             for record in records:
                 item = (record.get('services') or {}).get(name)
                 if isinstance(item, dict) and item.get('observed'):
-                    samples.append(item)
+                    raw_samples.append(item)
+            samples = operation_checkpoints(records, name)
             if not samples:
                 summary['services'][name] = {
                     'samples': 0,
+                    'raw_snapshots': len(raw_samples),
+                    'ignored_repeated_snapshots': len(raw_samples),
                     'latest_state': None,
                     'healthy_sample_rate': None,
                     'average_latency_ms': None,
@@ -329,8 +374,15 @@ class PersistentHealthHistory:
                 if item.get('state') in {'degraded', 'unhealthy'} or item.get('last_error_category')
             )
             unknown_outcomes = sum(1 for item in samples if item.get('last_outcome_unknown'))
+            error_categories = {}
+            for item in samples:
+                category = str(item.get('last_error_category') or '').strip()
+                if category:
+                    error_categories[category] = error_categories.get(category, 0) + 1
             summary['services'][name] = {
                 'samples': len(samples),
+                'raw_snapshots': len(raw_samples),
+                'ignored_repeated_snapshots': max(0, len(raw_samples) - len(samples)),
                 'latest_state': samples[-1].get('state'),
                 'healthy_sample_rate': round(healthy_count / len(samples), 3),
                 'average_latency_ms': int(round(sum(latencies) / len(latencies))) if latencies else None,
@@ -338,6 +390,8 @@ class PersistentHealthHistory:
                 'latency_trend': _trend(latencies),
                 'failure_samples': failure_samples,
                 'unknown_outcome_samples': unknown_outcomes,
+                'error_categories': error_categories,
+                'last_observed_at': samples[-1].get('last_observed_at'),
             }
         summary['first_recorded_at'] = records[0].get('recorded_at')
         summary['last_recorded_at'] = records[-1].get('recorded_at')

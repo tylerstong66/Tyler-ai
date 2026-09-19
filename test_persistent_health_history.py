@@ -7,6 +7,7 @@ from persistent_health_history import (
     HEALTH_HISTORY_CATEGORY,
     PersistentHealthHistory,
     compact_snapshot,
+    operation_checkpoints,
     state_signature,
 )
 import app_v2_10_2 as app2102
@@ -79,6 +80,23 @@ class PersistentHistoryUnitTests(unittest.TestCase):
         self.assertEqual(record['services']['groq']['last_latency_ms'], 600)
         self.assertNotIn('last_error_summary', record['services']['groq'])
 
+    def test_operation_checkpoints_exclude_repeated_unchanged_snapshots(self):
+        records = []
+        for index, total in enumerate([1, 1, 1, 2, 2]):
+            record = compact_snapshot(
+                self.snapshot,
+                'v2.19.3.4',
+                self.clock.now() + timedelta(minutes=index),
+            )
+            record['process_started_at'] = '2026-09-15T21:55:00+00:00'
+            record['services']['groq']['total_operations'] = total
+            record['services']['groq']['state'] = 'healthy' if total == 2 else 'unhealthy'
+            records.append(record)
+        samples = operation_checkpoints(records, 'groq')
+        self.assertEqual(len(samples), 2)
+        self.assertEqual([item['total_operations'] for item in samples], [1, 2])
+        self.assertEqual(samples[-1]['state'], 'healthy')
+
     def test_state_signature_ignores_latency_changes(self):
         first = state_signature(self.snapshot)
         self.snapshot['services']['groq']['last_latency_ms'] = 9999
@@ -123,6 +141,7 @@ class PersistentHistoryUnitTests(unittest.TestCase):
             record = compact_snapshot(self.snapshot, 'v2.10.2', recorded)
             record['services']['groq']['last_latency_ms'] = latency
             record['services']['groq']['state'] = 'healthy'
+            record['services']['groq']['total_operations'] = index + 1
             rows.append({
                 'id': index + 1,
                 'created_at': recorded.isoformat(),
@@ -135,6 +154,30 @@ class PersistentHistoryUnitTests(unittest.TestCase):
         self.assertEqual(groq['healthy_sample_rate'], 1.0)
         self.assertEqual(groq['latency_trend'], 'faster')
         self.assertGreater(groq['p95_latency_ms'], 0)
+
+    @patch('persistent_health_history.requests.get')
+    def test_summary_reports_operation_checkpoints_not_forced_duplicates(self, get):
+        rows = []
+        for index, total in enumerate([1, 1, 1, 2, 2]):
+            recorded = self.clock.now() + timedelta(minutes=index)
+            record = compact_snapshot(self.snapshot, 'v2.19.3.4', recorded)
+            record['process_started_at'] = '2026-09-15T21:55:00+00:00'
+            record['services']['groq']['total_operations'] = total
+            record['services']['groq']['state'] = 'unhealthy' if total == 1 else 'healthy'
+            record['services']['groq']['last_error_category'] = 'quota' if total == 1 else None
+            rows.append({
+                'id': index + 1,
+                'created_at': recorded.isoformat(),
+                'memories': json.dumps(record),
+            })
+        get.return_value = FakeResponse(data=rows)
+        groq = self.history.summarize(hours=24)['services']['groq']
+        self.assertEqual(groq['samples'], 2)
+        self.assertEqual(groq['raw_snapshots'], 5)
+        self.assertEqual(groq['ignored_repeated_snapshots'], 3)
+        self.assertEqual(groq['healthy_sample_rate'], 0.5)
+        self.assertEqual(groq['failure_samples'], 1)
+        self.assertEqual(groq['error_categories'], {'quota': 1})
 
 
 class PersistentHistoryIntegrationTests(unittest.TestCase):

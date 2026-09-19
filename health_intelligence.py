@@ -6,6 +6,8 @@ from datetime import datetime, timedelta, timezone
 
 import requests
 
+from persistent_health_history import operation_checkpoints
+
 
 ALERT_STATE_CATEGORY = 'dependency_health_alert'
 ALERT_SCHEMA = 'dependency_health_alert_v1'
@@ -76,16 +78,13 @@ def _alert(service, kind, severity, title, message, evidence=None):
 
 def _historical_service_series(records, service):
     output = []
-    for record in records or []:
-        item = (record.get('services') or {}).get(service)
-        if not isinstance(item, dict) or not item.get('observed'):
-            continue
+    for item in operation_checkpoints(records, service):
         output.append({
             'state': item.get('state'),
             'last_latency_ms': item.get('last_latency_ms'),
             'last_error_category': item.get('last_error_category'),
             'last_outcome_unknown': bool(item.get('last_outcome_unknown')),
-            'recorded_at': record.get('recorded_at') or record.get('stored_at'),
+            'recorded_at': item.get('recorded_at'),
         })
     return output
 
@@ -190,7 +189,7 @@ def detect_service_alert(service, live_item, historical=None):
                 'historical_reliability',
                 'critical',
                 f'{label} reliability is poor',
-                f'{label} was healthy in only {round(healthy_rate * 100)}% of persisted samples in the analysis window.',
+                f'{label} was healthy in only {round(healthy_rate * 100)}% of observed operation checkpoints in the analysis window.',
                 {
                     'samples': samples,
                     'healthy_rate': healthy_rate,
@@ -203,7 +202,7 @@ def detect_service_alert(service, live_item, historical=None):
                 'historical_reliability',
                 'warning',
                 f'{label} reliability has degraded',
-                f'{label} was healthy in {round(healthy_rate * 100)}% of persisted samples in the analysis window.',
+                f'{label} was healthy in {round(healthy_rate * 100)}% of observed operation checkpoints in the analysis window.',
                 {
                     'samples': samples,
                     'healthy_rate': healthy_rate,
