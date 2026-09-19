@@ -220,7 +220,10 @@ class PersistentHistoryIntegrationTests(unittest.TestCase):
             payload, status = app2102.base.handle_message('Show health history')
         self.assertEqual(status, 200)
         self.assertEqual(payload['type'], 'dependency_health_history')
-        self.assertIn('no Groq, Tavily, or n8n probe requests were sent', payload['reply'])
+        self.assertIn(
+            'no Groq, Gemini, Tavily, or n8n probe requests were sent',
+            payload['reply'],
+        )
         self.assertIn('Groq: healthy', payload['reply'])
 
     def test_detailed_history_route_requires_authentication(self):

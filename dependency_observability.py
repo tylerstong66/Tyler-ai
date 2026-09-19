@@ -54,7 +54,14 @@ def classify_error(error):
         return 'unknown_outcome'
     if 'timeout' in text or 'timed out' in text:
         return 'timeout'
-    if 'rate limit' in text or '429' in text or 'too many requests' in text:
+    if (
+        'rate limit' in text
+        or '429' in text
+        or 'too many requests' in text
+        or 'quota' in text
+        or 'resource_exhausted' in text
+        or 'tokens per day' in text
+    ):
         return 'rate_limit'
     if (
         'unauthorized' in text

@@ -148,12 +148,15 @@ def health_history_payload(message=''):
     summary = HISTORY.summarize(hours=hours, limit=HISTORY.max_records)
     lines = [
         f"Persistent dependency history: last {hours} hours",
-        'Historical snapshots from Supabase — no Groq, Tavily, or n8n probe requests were sent.',
+        'Historical snapshots from Supabase — no Groq, Gemini, Tavily, or n8n probe requests were sent.',
         f"Stored dependency snapshots in window: {summary.get('samples', 0)}",
         '',
     ]
-    labels = {'groq': 'Groq', 'tavily': 'Tavily', 'supabase': 'Supabase', 'n8n': 'n8n'}
-    for name in ['groq', 'tavily', 'supabase', 'n8n']:
+    labels = {
+        'groq': 'Groq', 'gemini': 'Gemini', 'tavily': 'Tavily',
+        'supabase': 'Supabase', 'n8n': 'n8n',
+    }
+    for name in ['groq', 'gemini', 'tavily', 'supabase', 'n8n']:
         item = (summary.get('services') or {}).get(name) or {}
         samples = int(item.get('samples') or 0)
         if not samples:

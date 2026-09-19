@@ -10,6 +10,7 @@ HEALTH_HISTORY_CATEGORY = 'dependency_health'
 DEFAULT_INTERVAL_SECONDS = 600
 DEFAULT_MAX_RECORDS = 1500
 DEFAULT_TIMEOUT_SECONDS = 8
+SERVICE_NAMES = ('groq', 'gemini', 'tavily', 'supabase', 'n8n')
 
 
 def _utcnow():
@@ -117,7 +118,7 @@ def compact_snapshot(snapshot, version, recorded_at=None):
     snapshot = dict(snapshot or {})
     recorded_at = recorded_at or _utcnow()
     services = {}
-    for name in ['groq', 'tavily', 'supabase', 'n8n']:
+    for name in SERVICE_NAMES:
         item = (snapshot.get('services') or {}).get(name)
         if item is not None:
             services[name] = _compact_service(item)
@@ -135,7 +136,7 @@ def state_signature(snapshot):
     snapshot = dict(snapshot or {})
     parts = [str(snapshot.get('overall') or '')]
     services = snapshot.get('services') or {}
-    for name in ['groq', 'tavily', 'supabase', 'n8n']:
+    for name in SERVICE_NAMES:
         item = services.get(name) or {}
         parts.extend([
             name,
@@ -345,7 +346,7 @@ class PersistentHealthHistory:
         if not records:
             return summary
 
-        for name in ['groq', 'tavily', 'supabase', 'n8n']:
+        for name in SERVICE_NAMES:
             raw_samples = []
             for record in records:
                 item = (record.get('services') or {}).get(name)

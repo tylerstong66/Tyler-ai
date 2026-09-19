@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
-from dependency_observability import DependencyObservability
+from dependency_observability import DependencyObservability, classify_error
 import app_v2_10 as app210
 
 
@@ -27,6 +27,10 @@ class DependencyObservabilityUnitTests(unittest.TestCase):
         self.assertEqual(snapshot['overall'], 'warming_up')
         self.assertEqual(snapshot['services']['groq']['state'], 'unknown')
         self.assertFalse(snapshot['active_probes'])
+
+    def test_quota_errors_are_classified_as_rate_limits(self):
+        self.assertEqual(classify_error('daily token quota exhausted'), 'rate_limit')
+        self.assertEqual(classify_error('RESOURCE_EXHAUSTED'), 'rate_limit')
 
     def test_success_records_latency_and_health(self):
         self.telemetry.record_success('groq', 'completion', 123)

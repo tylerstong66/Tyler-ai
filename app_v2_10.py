@@ -27,6 +27,7 @@ DEPENDENCIES = DependencyObservability(history_size=TELEMETRY_HISTORY_SIZE)
 def _configured_dependencies():
     return {
         'groq': bool(base.GROQ_API_KEY),
+        'gemini': bool(os.environ.get('GEMINI_API_KEY')),
         'tavily': bool(base.TAVILY_API_KEY),
         'supabase': bool(base.SUPABASE_URL and base.SUPABASE_KEY),
         'n8n': bool(base.N8N_WEBHOOK_URL and base.N8N_WEBHOOK_KEY),
@@ -269,6 +270,7 @@ v297._safe_source_files = _safe_source_files_v210
 def _service_line(name, item):
     label = {
         'groq': 'Groq',
+        'gemini': 'Gemini',
         'tavily': 'Tavily',
         'supabase': 'Supabase',
         'n8n': 'n8n',
@@ -299,7 +301,7 @@ def dependency_health_payload():
         'Passive telemetry only — no probe requests were sent.',
         '',
     ]
-    for name in ['groq', 'tavily', 'supabase', 'n8n']:
+    for name in ['groq', 'gemini', 'tavily', 'supabase', 'n8n']:
         item = snapshot.get('services', {}).get(name)
         if item:
             lines.append(_service_line(name, item))
@@ -342,7 +344,7 @@ def core_project_text_v210():
     return (
         _ORIGINAL_CORE_PROJECT_TEXT()
         + ' Dependency observability records bounded passive telemetry from real '
-          'Groq, Tavily, Supabase, and n8n operations, including latency, recent '
+          'Groq, Gemini, Tavily, Supabase, and n8n operations, including latency, recent '
           'success rate, failure category, and unknown-outcome signals. Health '
           'reporting performs no automatic external probes and does not retry side effects.'
     )

@@ -11,9 +11,10 @@ from persistent_health_history import operation_checkpoints
 
 ALERT_STATE_CATEGORY = 'dependency_health_alert'
 ALERT_SCHEMA = 'dependency_health_alert_v1'
-SERVICE_ORDER = ['groq', 'tavily', 'supabase', 'n8n']
+SERVICE_ORDER = ['groq', 'gemini', 'tavily', 'supabase', 'n8n']
 SERVICE_LABELS = {
     'groq': 'Groq',
+    'gemini': 'Gemini',
     'tavily': 'Tavily',
     'supabase': 'Supabase',
     'n8n': 'n8n',
@@ -250,7 +251,7 @@ def detect_service_alert(service, live_item, historical=None):
 class HealthIntelligence:
     """Passive alert engine built from observed health and persisted history.
 
-    It never probes Groq, Tavily, n8n, or Supabase for service health. Supabase
+    It never probes Groq, Gemini, Tavily, n8n, or Supabase for service health. Supabase
     is used only to read existing health history and persist alert state. Alert
     state persistence is best effort and cannot break the user request.
     """
