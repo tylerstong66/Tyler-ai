@@ -1,0 +1,26 @@
+name: v2.19.3.6 fallback drill
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app_v2_19_3_6.py"
+      - "test_v2_19_3_6_fallback_drill.py"
+      - ".github/workflows/v2_19_3_6_fallback_drill.yml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python -m unittest -v test_v2_19_3_6_fallback_drill.py
+      - run: python -m unittest -v test_v2_19_3_5_runtime_fallback.py
+      - run: python -m unittest -v test_v2_19_3_4_health_markdown.py
+      - run: python -m unittest -v test_persistent_health_history.py
+      - run: python -m unittest -v test_health_intelligence.py
+
