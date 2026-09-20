@@ -1,0 +1,23 @@
+name: v2.19.3.8 grounded training diagnostics
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app_v2_19_3_8.py"
+      - "test_v2_19_3_8_training_diagnostics.py"
+      - ".github/workflows/v2_19_3_8_training_diagnostics.yml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python -m unittest -v test_v2_19_3_8_training_diagnostics.py
+      - run: python -m unittest -v test_v2_19_3_7_copy_buttons.py
+      - run: python -m unittest -v test_v2_19_3_6_fallback_drill.py
