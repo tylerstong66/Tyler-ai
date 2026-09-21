@@ -136,7 +136,7 @@ function recipeFormat() {
       properties: {
         title: { type: 'string' }, description: { type: 'string' },
         minutes: { type: 'integer', minimum: 5, maximum: 480 },
-        category: { type: 'string', enum: ['breakfast','lunch','dinner','snack'] },
+        category: { type: 'string', enum: ['breakfast','lunch','dinner','snack','dessert'] },
         servings: { type: 'integer', minimum: 1, maximum: 12 },
         ingredients: { type: 'array', items: { type: 'string' }, minItems: 2, maxItems: 30 },
         instructions: { type: 'array', items: { type: 'string' }, minItems: 2, maxItems: 20 },
@@ -163,7 +163,7 @@ function normalizeRecipeRequest(body) {
       dietaryNotes: typeof profile.dietaryNotes === 'string' ? profile.dietaryNotes.slice(0, 1000) : ''
     },
     timeBucket: ['quick','medium','long'].includes(body.timeBucket) ? body.timeBucket : 'quick',
-    mealCategory: ['breakfast','lunch','dinner','snack'].includes(body.mealCategory) ? body.mealCategory : 'dinner',
+    mealCategory: ['breakfast','lunch','dinner','snack','dessert'].includes(body.mealCategory) ? body.mealCategory : 'dinner',
     chosenRecipes: Array.isArray(body.chosenRecipes) ? body.chosenRecipes.slice(0, 10) : [],
     ratedRecipes: Array.isArray(body.ratedRecipes) ? body.ratedRecipes.slice(0, 15) : []
   };
