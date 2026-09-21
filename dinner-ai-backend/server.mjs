@@ -20,14 +20,48 @@ const server = http.createServer(async (req, res) => {
       const imageBase64 = typeof body.imageBase64 === 'string' ? body.imageBase64 : '';
       if (imageBase64.length < 100) return json(res, 400, { error: 'A fridge image is required.' });
       const mime = body.mimeType === 'image/png' ? 'image/png' : 'image/jpeg';
-      const result = await callOpenAI(VISION_MODEL, [
+      const image = { type: 'input_image', image_url: 'data:' + mime + ';base64,' + imageBase64, detail: 'high' };
+      const firstPassPrompt = [
+        'Create a thorough inventory of every visible food or beverage in this refrigerator or pantry photo.',
+        'Inspect the image systematically from top to bottom and left to right, including door shelves and partially visible containers.',
+        'Prioritize readable label or package text over container color, shape, or food color.',
+        'Do not guess a specific product just because a bottle or jar resembles a familiar condiment.',
+        'Explicitly check for milk and other beverage jugs, sauces, dressings, condiments, jars, squeeze bottles, and small containers.',
+        'Use practical ingredient names rather than brand names unless the brand helps identify the food.',
+        'If an item is visible but cannot be identified confidently, use a generic name such as "unknown condiment" or "bottled sauce" and give it low confidence instead of inventing a specific food.',
+        'Do not invent hidden contents or include non-food items.'
+      ].join(' ');
+
+      const draft = await callOpenAI(VISION_MODEL, [
         { role: 'user', content: [
-          { type: 'input_text', text: 'Identify visible food ingredients in this refrigerator or pantry photo. Use practical ingredient names, do not invent hidden contents, ignore non-food items, and lower confidence for ambiguous items.' },
-          { type: 'input_image', image_url: 'data:' + mime + ';base64,' + imageBase64, detail: 'high' }
+          { type: 'input_text', text: firstPassPrompt },
+          image
         ] }
-      ], fridgeFormat());
-      const items = Array.isArray(result.ingredients) ? result.ingredients : [];
-      return json(res, 200, { ingredients: items.slice(0, 30), model: VISION_MODEL });
+      ], fridgeFormat(), { effort: 'low' });
+
+      const draftItems = Array.isArray(draft.ingredients) ? draft.ingredients : [];
+      const auditPrompt = [
+        'Audit this refrigerator/pantry photo a second time and return a corrected FINAL inventory.',
+        'The first-pass draft is provided below. Do not blindly trust it.',
+        'Correct misidentifications, remove unsupported guesses, and add foods the draft missed.',
+        'Read visible labels carefully. Never decide between similar-looking products from color alone.',
+        'Pay special attention to beverage containers (including milk jugs), sauces, salsa, dressings, mustard-like squeeze bottles, lemon/lime juice bottles, jars, and door-shelf condiments.',
+        'A yellow bottle could be lemon juice rather than mustard; a red or tan jar could be salsa or another sauce rather than nut butter. Use label evidence whenever possible.',
+        'If the label is unreadable or evidence conflicts, prefer a generic low-confidence item with a note saying what is uncertain.',
+        'Return the complete final list, not just changes.',
+        'FIRST-PASS DRAFT:',
+        JSON.stringify(draftItems)
+      ].join(' ');
+
+      const reviewed = await callOpenAI(VISION_MODEL, [
+        { role: 'user', content: [
+          { type: 'input_text', text: auditPrompt },
+          image
+        ] }
+      ], fridgeFormat(), { effort: 'medium' });
+
+      const items = Array.isArray(reviewed.ingredients) ? reviewed.ingredients : draftItems;
+      return json(res, 200, { ingredients: items.slice(0, 50), model: VISION_MODEL, passes: 2 });
     }
 
     if (req.method === 'POST' && req.url === '/generate-recipe') {
