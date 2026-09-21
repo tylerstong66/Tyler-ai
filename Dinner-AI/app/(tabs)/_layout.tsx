@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Text } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '@/src/components/ui';
 import { useApp } from '@/src/context/AppContext';
 
@@ -10,6 +11,7 @@ function EmojiIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
 
 export default function TabsLayout() {
   const { state } = useApp();
+  const insets = useSafeAreaInsets();
   const shoppingCount = state.shoppingList.filter((item) => !item.checked).length;
 
   return (
@@ -20,7 +22,13 @@ export default function TabsLayout() {
         headerTitleStyle: { color: colors.text, fontWeight: '800' },
         tabBarActiveTintColor: colors.green,
         tabBarInactiveTintColor: colors.muted,
-        tabBarStyle: { height: 68, paddingBottom: 9, paddingTop: 6 }
+        tabBarHideOnKeyboard: true,
+        tabBarStyle: {
+          height: 60 + insets.bottom,
+          paddingBottom: Math.max(insets.bottom, 8),
+          paddingTop: 8
+        },
+        tabBarLabelStyle: { paddingBottom: insets.bottom > 0 ? 2 : 0 }
       }}
     >
       <Tabs.Screen name="index" options={{ title: 'Home', tabBarIcon: ({ focused }) => <EmojiIcon emoji="🍽️" focused={focused} /> }} />
