@@ -25,3 +25,10 @@ jobs:
         env:
           EXPO_PUBLIC_AI_BASE_URL: https://dinner-ai-backend.onrender.com
         run: npx expo export --platform android --output-dir /tmp/dinner-ai-export
+      - name: Run native-style Expo export embed
+        env:
+          EXPO_PUBLIC_AI_BASE_URL: https://dinner-ai-backend.onrender.com
+          NODE_ENV: production
+        run: |
+          mkdir -p /tmp/dinner-ai-assets
+          npx expo export:embed             --platform android             --dev false             --entry-file node_modules/expo-router/entry.js             --bundle-output /tmp/index.android.bundle             --assets-dest /tmp/dinner-ai-assets             --reset-cache
