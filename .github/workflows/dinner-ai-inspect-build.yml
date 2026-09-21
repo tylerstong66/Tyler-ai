@@ -26,7 +26,20 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: eas init --id 0cbf5170-095b-4c59-8ac7-2e15667ed41c --non-interactive --force
-      - name: Show failed EAS build details
+      - name: Fetch failed EAS build logs
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas build:view 85b8b074-250e-4c8d-82a4-99c42aa4aa16 --json
+        shell: bash
+        run: |
+          eas build:view 85b8b074-250e-4c8d-82a4-99c42aa4aa16 --json > /tmp/build.json
+          LOG_URL=$(node -e "const fs=require('fs');const t=fs.readFileSync('/tmp/build.json','utf8');const i=t.indexOf('{');const j=JSON.parse(t.slice(i));process.stdout.write(j.logFiles?.[0]||'')")
+          if [ -z "$LOG_URL" ]; then
+            echo "No EAS build log URL found"
+            cat /tmp/build.json
+            exit 1
+          fi
+          curl -L --fail "$LOG_URL" -o /tmp/eas-build.log
+          echo "===== BUNDLE / ERROR EXCERPTS ====="
+          grep -n -C 12 -E "Bundle JavaScript|Metro|Unable to resolve|SyntaxError|ReferenceError|TypeError|ERROR|Error:" /tmp/eas-build.log | tail -n 350 || true
+          echo "===== FINAL 250 LOG LINES ====="
+          tail -n 250 /tmp/eas-build.log
