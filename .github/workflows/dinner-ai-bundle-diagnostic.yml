@@ -1,0 +1,27 @@
+name: Dinner AI Android Bundle Diagnostic
+
+on:
+  push:
+    branches:
+      - dinner-ai-app
+    paths:
+      - Dinner-AI/.bundle-diagnostic-trigger
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Dinner-AI
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: Dinner-AI/package.json
+      - run: npm install
+      - name: Bundle Android JavaScript with Metro
+        env:
+          EXPO_PUBLIC_AI_BASE_URL: https://dinner-ai-backend.onrender.com
+        run: npx expo export --platform android --output-dir /tmp/dinner-ai-export
