@@ -1,4 +1,5 @@
 import { AppState, MealCategory, Recipe, TimeBucket } from '@/src/types';
+import { isCommonStapleIngredient } from '@/src/lib/shopping';
 
 export function bucketForMinutes(minutes: number): TimeBucket {
   if (minutes <= 30) return 'quick';
@@ -35,7 +36,9 @@ function meetsDietaryNotes(recipe: Recipe, notes: string) {
 
 export function scoreRecipe(recipe: Recipe, state: AppState) {
   const pantryNames = state.pantry.map((item) => normalize(item.name));
-  const recipeIngredients = recipe.ingredients.map(normalize);
+  const recipeIngredients = recipe.ingredients
+    .filter((ingredient) => !isCommonStapleIngredient(ingredient))
+    .map(normalize);
   const matched = recipeIngredients.filter((ingredient) =>
     pantryNames.some((pantry) => pantry.includes(ingredient) || ingredient.includes(pantry))
   ).length;
