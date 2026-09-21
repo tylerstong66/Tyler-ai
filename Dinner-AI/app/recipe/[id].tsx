@@ -97,21 +97,21 @@ export default function RecipeDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { padding: 18, gap: 14, backgroundColor: colors.bg, paddingBottom: 36 },
+  content: { paddingHorizontal: 20, paddingTop: 16, gap: 16, backgroundColor: colors.bg, paddingBottom: 44 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bg },
-  badges: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, marginBottom: 10 },
-  title: { color: colors.text, fontSize: 30, fontWeight: '900' },
-  description: { color: colors.muted, lineHeight: 22, fontSize: 16, marginTop: 7 },
-  match: { color: colors.muted, fontWeight: '700', fontSize: 12, marginTop: 10 },
-  reason: { color: colors.green, lineHeight: 20, fontSize: 13, fontWeight: '700', marginTop: 8 },
-  section: { color: colors.text, fontSize: 19, fontWeight: '900', marginBottom: 10 },
-  line: { color: colors.text, lineHeight: 25 },
-  step: { flexDirection: 'row', gap: 10, marginBottom: 12 },
-  number: { width: 26, height: 26, borderRadius: 13, backgroundColor: colors.greenSoft, color: colors.green, textAlign: 'center', paddingTop: 3, fontWeight: '900' },
-  stepText: { flex: 1, color: colors.text, lineHeight: 22 },
+  badges: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, marginBottom: 12 },
+  title: { color: colors.text, fontSize: 31, lineHeight: 37, fontWeight: '900', letterSpacing: -0.5 },
+  description: { color: colors.muted, lineHeight: 23, fontSize: 15.5, marginTop: 8 },
+  match: { alignSelf: 'flex-start', color: colors.greenDark, backgroundColor: colors.greenSoft, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6, fontWeight: '900', fontSize: 11.5, marginTop: 12, overflow: 'hidden' },
+  reason: { color: colors.greenDark, lineHeight: 20, fontSize: 13, fontWeight: '700', marginTop: 10 },
+  section: { color: colors.text, fontSize: 19, lineHeight: 24, fontWeight: '900', marginBottom: 11 },
+  line: { color: colors.text, lineHeight: 26, fontSize: 15 },
+  step: { flexDirection: 'row', gap: 11, marginBottom: 14 },
+  number: { width: 29, height: 29, borderRadius: 15, backgroundColor: colors.greenSoft, color: colors.greenDark, textAlign: 'center', paddingTop: 4, fontWeight: '900' },
+  stepText: { flex: 1, color: colors.text, lineHeight: 23, fontSize: 15 },
   allergen: { color: colors.danger, lineHeight: 20, fontSize: 13 },
   cardButton: { marginTop: 12 },
-  feedbackCard: { gap: 10 },
+  feedbackCard: { gap: 11, backgroundColor: colors.surfaceGreen, borderColor: colors.borderStrong },
   feedbackHelp: { color: colors.muted, lineHeight: 19, marginTop: -5, marginBottom: 2 },
   neverNote: { color: colors.orange, fontSize: 12, lineHeight: 18, fontWeight: '700' }
 });
