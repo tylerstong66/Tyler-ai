@@ -1,0 +1,48 @@
+{
+  "expo": {
+    "name": "Dinner AI",
+    "slug": "dinner-ai",
+    "version": "0.6.0",
+    "orientation": "portrait",
+    "scheme": "dinnerai",
+    "userInterfaceStyle": "automatic",
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Dinner AI to use your camera to scan your fridge and food barcodes.",
+          "barcodeScannerEnabled": true,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "enableSceneSupport": true
+          }
+        }
+      ]
+    ],
+    "android": {
+      "package": "com.dinnerai.app",
+      "versionCode": 6,
+      "permissions": ["CAMERA"]
+    },
+    "ios": {
+      "bundleIdentifier": "com.dinnerai.app",
+      "buildNumber": "6",
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Dinner AI uses the camera to scan your refrigerator and food barcodes."
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
