@@ -33,7 +33,7 @@ export default function ScanFridgeScreen() {
       const shot = await cameraRef.current.takePictureAsync({ quality: 0.55, base64: true });
       if (!shot?.base64) throw new Error('The photo did not include image data.');
       setPhoto(shot);
-      const result = await analyzeFridgePhoto(shot.base64, shot.format === 'png' ? 'image/png' : 'image/jpeg');
+      const result = await analyzeFridgePhoto(shot.base64, 'image/jpeg');
       setItems(result.ingredients);
       if (!result.ingredients.length) setError('No ingredients were confidently identified. You can retake the photo or add items manually.');
     } catch (e: any) {
