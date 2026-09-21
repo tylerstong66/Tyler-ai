@@ -22,6 +22,10 @@ jobs:
           cache-dependency-path: Dinner-AI/package.json
       - run: npm install
       - run: npm install --global eas-cli
+      - name: Link existing Expo project
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas init --id 0cbf5170-095b-4c59-8ac7-2e15667ed41c --non-interactive --force
       - name: Show failed EAS build details
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
