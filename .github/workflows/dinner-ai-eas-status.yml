@@ -1,0 +1,26 @@
+name: Dinner AI EAS Status
+
+on:
+  push:
+    branches:
+      - dinner-ai-app
+    paths:
+      - Dinner-AI/.eas-status-trigger
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Dinner-AI
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm install --global eas-cli
+      - name: Show recent Android builds
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas build:list --platform android --limit 5 --json --non-interactive
