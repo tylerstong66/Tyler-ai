@@ -92,14 +92,21 @@ export default function ScanFridgeScreen() {
       <Image source={{ uri: photo.uri }} style={styles.preview} />
       {busy ? <Card style={styles.centerCard}><ActivityIndicator size="large" color={colors.green} /><Text style={styles.muted}>Looking for ingredients…</Text></Card> : null}
       {error ? <Text style={styles.error}>{error}</Text> : null}
+      {!busy && items.some((item) => item.confidence < 0.72) ? (
+        <Card style={styles.reviewCard}>
+          <Text style={styles.reviewTitle}>Review uncertain items</Text>
+          <Text style={styles.muted}>Low-confidence detections are left unchecked so Dinner AI does not add a guess to your Kitchen without you confirming it.</Text>
+        </Card>
+      ) : null}
 
       {items.map((item) => (
         <Card key={item.id} style={[styles.itemCard, !item.selected && styles.dim]}>
           <Pressable onPress={() => patch(item.id, { selected: !item.selected })} style={styles.selectRow}>
             <View style={[styles.checkbox, item.selected && styles.checked]}><Text style={styles.check}>{item.selected ? '✓' : ''}</Text></View>
             <TextInput value={item.name} onChangeText={(name) => patch(item.id, { name })} style={styles.nameInput} />
-            <Text style={styles.confidence}>{Math.round(item.confidence * 100)}%</Text>
+            <Text style={[styles.confidence, item.confidence < 0.72 && styles.reviewConfidence]}>{Math.round(item.confidence * 100)}%{item.confidence < 0.72 ? ' · REVIEW' : ''}</Text>
           </Pressable>
+          {item.notes ? <Text style={styles.notes}>{item.notes}</Text> : null}
           <TextInput
             value={item.quantity || ''}
             onChangeText={(quantity) => patch(item.id, { quantity })}
@@ -149,6 +156,8 @@ const styles = StyleSheet.create({
   title: { color: colors.text, fontSize: 25, fontWeight: '900' },
   muted: { color: colors.muted, lineHeight: 20 },
   error: { color: colors.danger, lineHeight: 20, fontWeight: '700' },
+  reviewCard: { gap: 5, borderColor: '#D7B56D', backgroundColor: '#FFF9E8' },
+  reviewTitle: { color: colors.text, fontWeight: '900', fontSize: 16 },
   itemCard: { gap: 10 },
   dim: { opacity: 0.55 },
   selectRow: { flexDirection: 'row', alignItems: 'center', gap: 9 },
@@ -157,6 +166,8 @@ const styles = StyleSheet.create({
   check: { color: '#fff', fontWeight: '900' },
   nameInput: { flex: 1, color: colors.text, fontSize: 16, fontWeight: '800', borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 5 },
   confidence: { color: colors.muted, fontSize: 11, fontWeight: '700' },
+  reviewConfidence: { color: colors.orange },
+  notes: { color: colors.muted, fontSize: 12, lineHeight: 17 },
   qtyInput: { borderWidth: 1, borderColor: colors.border, borderRadius: 10, paddingHorizontal: 11, paddingVertical: 9, color: colors.text },
   storageRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   storage: { borderWidth: 1, borderColor: colors.border, borderRadius: 99, paddingHorizontal: 9, paddingVertical: 7 },
