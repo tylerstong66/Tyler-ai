@@ -72,7 +72,7 @@ function normalizeRecipe(value: any, requestedCategory: MealCategory): Recipe | 
   const ingredients = cleanStringArray(value.ingredients);
   const instructions = cleanStringArray(value.instructions);
   if (!ingredients.length || !instructions.length) return null;
-  const category: MealCategory = ['breakfast', 'lunch', 'dinner', 'snack'].includes(value.category)
+  const category: MealCategory = ['breakfast', 'lunch', 'dinner', 'snack', 'dessert'].includes(value.category)
     ? value.category
     : requestedCategory;
 
