@@ -12,7 +12,8 @@ const MEAL_FILTERS: { key: MealCategory | 'all'; label: string }[] = [
   { key: 'breakfast', label: 'Breakfast' },
   { key: 'lunch', label: 'Lunch' },
   { key: 'dinner', label: 'Dinner' },
-  { key: 'snack', label: 'Snack' }
+  { key: 'snack', label: 'Snack' },
+  { key: 'dessert', label: 'Dessert' }
 ];
 
 const LIBRARY_FILTERS: { key: TimeBucket | 'all' | 'favorites' | 'ai' | 'never'; label: string }[] = [
