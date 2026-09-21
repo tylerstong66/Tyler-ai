@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react';
 import { AppState, PantryItem, PantryStorage, Recipe, RecipeFeedbackRating, UserProfile } from '@/src/types';
-import { mergeRecipeMissingIngredients, mergeShoppingItems } from '@/src/lib/shopping';
+import { isCommonStapleIngredient, mergeRecipeMissingIngredients, mergeShoppingItems } from '@/src/lib/shopping';
 
 const STORAGE_KEY = 'dinner-ai-state-v1';
 const MAX_GENERATED_RECIPES = 25;
@@ -181,7 +181,10 @@ function normalizeLoadedState(value: Partial<AppState> | null | undefined): AppS
     recipeFeedback,
     generatedRecipes,
     shoppingList: Array.isArray(value?.shoppingList)
-      ? value.shoppingList.filter((item) => item && typeof item.name === 'string').map((item) => ({ ...item, checked: Boolean(item.checked), addedAt: Number(item.addedAt) || Date.now() }))
+      ? value.shoppingList
+          .filter((item) => item && typeof item.name === 'string')
+          .filter((item) => !((item as any).recipeId && isCommonStapleIngredient((item as any).name)))
+          .map((item) => ({ ...item, checked: Boolean(item.checked), addedAt: Number(item.addedAt) || Date.now() }))
       : []
   };
 }
