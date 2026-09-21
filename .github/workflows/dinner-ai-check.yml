@@ -1,0 +1,33 @@
+name: Dinner AI Cloud Check
+
+on:
+  push:
+    branches:
+      - dinner-ai-app
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Dinner-AI
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: Dinner-AI/package.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: TypeScript check
+        run: npm run typecheck
+
+      - name: Expo Doctor
+        run: npx expo-doctor
