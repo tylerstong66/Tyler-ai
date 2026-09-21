@@ -7,12 +7,7 @@ const STORAGE_KEY = 'dinner-ai-state-v1';
 const MAX_GENERATED_RECIPES = 25;
 
 const initialState: AppState = {
-  pantry: [
-    { id: 'starter-1', name: 'chicken breast', quantity: '2', storage: 'refrigerator', addedAt: Date.now() },
-    { id: 'starter-2', name: 'rice', quantity: '1 bag', storage: 'pantry', addedAt: Date.now() },
-    { id: 'starter-3', name: 'onion', quantity: '2', storage: 'pantry', addedAt: Date.now() },
-    { id: 'starter-4', name: 'garlic', quantity: '1 bulb', storage: 'pantry', addedAt: Date.now() }
-  ],
+  pantry: [],
   favorites: [],
   profile: { likes: [], dislikes: [], allergies: [], dietaryNotes: '' },
   recipeSelections: {},
@@ -157,10 +152,13 @@ function normalizeLoadedState(value: Partial<AppState> | null | undefined): AppS
   );
 
   const pantry = Array.isArray(value?.pantry)
-    ? value.pantry.filter((item) => item && typeof (item as any).name === 'string').map((item) => ({
-        ...item,
-        storage: isPantryStorage((item as any).storage) ? (item as any).storage : 'pantry'
-      })) as PantryItem[]
+    ? value.pantry
+        .filter((item) => item && typeof (item as any).name === 'string')
+        .filter((item) => !String((item as any).id || '').startsWith('starter-'))
+        .map((item) => ({
+          ...item,
+          storage: isPantryStorage((item as any).storage) ? (item as any).storage : 'pantry'
+        })) as PantryItem[]
     : initialState.pantry;
 
   const generatedRecipes = Array.isArray(value?.generatedRecipes)
