@@ -15,7 +15,15 @@ export function FeedbackButtons({ value, onChange }: { value?: RecipeFeedbackRat
       {OPTIONS.map((option) => {
         const active = value === option.rating;
         return (
-          <Pressable key={option.rating} onPress={() => onChange(option.rating)} style={[styles.button, active && styles.buttonActive]}>
+          <Pressable
+            key={option.rating}
+            onPress={() => onChange(option.rating)}
+            style={({ pressed }) => [
+              styles.button,
+              active && styles.buttonActive,
+              pressed && styles.buttonPressed
+            ]}
+          >
             <Text style={styles.emoji}>{option.emoji}</Text>
             <Text style={[styles.label, active && styles.labelActive]}>{option.label}</Text>
           </Pressable>
@@ -26,10 +34,22 @@ export function FeedbackButtons({ value, onChange }: { value?: RecipeFeedbackRat
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', gap: 8 },
-  button: { flex: 1, minHeight: 66, borderWidth: 1, borderColor: colors.border, borderRadius: 14, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6, paddingVertical: 9 },
-  buttonActive: { borderColor: colors.green, backgroundColor: colors.greenSoft },
-  emoji: { fontSize: 20, marginBottom: 4 },
-  label: { color: colors.muted, fontWeight: '800', fontSize: 11, textAlign: 'center' },
-  labelActive: { color: colors.green }
+  row: { flexDirection: 'row', gap: 9 },
+  button: {
+    flex: 1,
+    minHeight: 74,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 18,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 7,
+    paddingVertical: 11
+  },
+  buttonActive: { borderColor: colors.borderStrong, backgroundColor: colors.greenSoft },
+  buttonPressed: { transform: [{ scale: 0.985 }], opacity: 0.92 },
+  emoji: { fontSize: 22, marginBottom: 5 },
+  label: { color: colors.muted, fontWeight: '800', fontSize: 11.5, textAlign: 'center' },
+  labelActive: { color: colors.greenDark }
 });
