@@ -26,7 +26,7 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: eas init --id 0cbf5170-095b-4c59-8ac7-2e15667ed41c --non-interactive --force
-      - name: Fetch and decode failed EAS build logs
+      - name: Inspect EAS binary log container
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         shell: bash
@@ -34,18 +34,11 @@ jobs:
           eas build:view 85b8b074-250e-4c8d-82a4-99c42aa4aa16 --json > /tmp/build.json
           LOG_URL=$(node -e "const fs=require('fs');const t=fs.readFileSync('/tmp/build.json','utf8');const i=t.indexOf('{');const j=JSON.parse(t.slice(i));process.stdout.write(j.logFiles?.[0]||'')")
           curl -L --fail "$LOG_URL" -o /tmp/eas-build.bin
-          python - <<'PY'
-          import gzip, pathlib
-          p = pathlib.Path('/tmp/eas-build.bin')
-          b = p.read_bytes()
-          try:
-              t = gzip.decompress(b).decode('utf-8', errors='replace')
-          except Exception:
-              t = b.decode('utf-8', errors='replace')
-          pathlib.Path('/tmp/eas-build.log').write_text(t, encoding='utf-8')
-          print('decoded bytes:', len(b), 'decoded chars:', len(t))
-          PY
-          echo "===== ERROR LINES ====="
-          grep -n -C 15 -E "Bundle JavaScript|Metro|Unable to resolve|SyntaxError|ReferenceError|TypeError|TransformError|error:|ERROR|Error:" /tmp/eas-build.log | tail -n 500 || true
-          echo "===== FINAL 300 LINES ====="
-          tail -n 300 /tmp/eas-build.log
+          echo "===== FILE TYPE ====="
+          file /tmp/eas-build.bin || true
+          echo "===== FIRST 64 BYTES ====="
+          xxd -l 64 /tmp/eas-build.bin || true
+          echo "===== PRINTABLE ERROR STRINGS ====="
+          strings -n 4 /tmp/eas-build.bin | grep -i -E "bundle|metro|resolve|syntax|reference|typeerror|transform|error|module|router|src/|app/" | tail -n 500 || true
+          echo "===== LAST PRINTABLE STRINGS ====="
+          strings -n 4 /tmp/eas-build.bin | tail -n 500 || true
