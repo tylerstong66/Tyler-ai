@@ -130,7 +130,7 @@ function isPantryStorage(value: unknown): value is PantryStorage {
 }
 
 function isMealCategory(value: unknown) {
-  return ['breakfast', 'lunch', 'dinner', 'snack'].includes(String(value));
+  return ['breakfast', 'lunch', 'dinner', 'snack', 'dessert'].includes(String(value));
 }
 
 function normalizeLoadedState(value: Partial<AppState> | null | undefined): AppState {
