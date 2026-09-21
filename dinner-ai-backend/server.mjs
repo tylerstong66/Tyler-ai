@@ -144,6 +144,12 @@ function validateRecipe(recipe, request) {
   const text = strings(recipe.ingredients, 30).concat(strings(recipe.allergens, 12)).join(' ').toLowerCase();
   const conflict = request.profile.allergies.find(x => x && text.includes(x.toLowerCase()));
   if (conflict) throw new Error('Generated recipe conflicted with an avoid-item (' + conflict + ').');
+  const notes = String(request.profile.dietaryNotes || '').toLowerCase();
+  const meat = ['chicken','beef','pork','turkey','lamb','sausage','bacon','ham','fish','salmon','tuna','shrimp','shellfish'];
+  const animal = meat.concat(['egg','milk','cheese','butter','cream','yogurt','honey']);
+  if (notes.includes('vegan') && animal.some(x => text.includes(x))) throw new Error('Generated recipe conflicted with the saved vegan preference.');
+  if (notes.includes('vegetarian') && meat.some(x => text.includes(x))) throw new Error('Generated recipe conflicted with the saved vegetarian preference.');
+  if ((notes.includes('no pork') || notes.includes('pork-free') || notes.includes('pork free')) && /pork|bacon|ham/.test(text)) throw new Error('Generated recipe conflicted with the saved pork-free preference.');
 }
 
 function timeText(bucket) {
