@@ -1,0 +1,59 @@
+name: Build Dinner AI APK on GitHub
+
+on:
+  push:
+    branches:
+      - dinner-ai-app
+    paths:
+      - Dinner-AI/.github-apk-trigger
+
+permissions:
+  contents: read
+
+jobs:
+  android-apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Dinner-AI
+    steps:
+      - name: Check out Dinner AI
+        uses: actions/checkout@v5
+
+      - name: Use Node 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: Dinner-AI/package.json
+
+      - name: Use Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate Android project
+        env:
+          EXPO_PUBLIC_AI_BASE_URL: https://dinner-ai-backend.onrender.com
+        run: npx expo prebuild --platform android --clean --non-interactive
+
+      - name: Build standalone release APK
+        env:
+          EXPO_PUBLIC_AI_BASE_URL: https://dinner-ai-backend.onrender.com
+          NODE_ENV: production
+        run: |
+          chmod +x android/gradlew
+          cd android
+          ./gradlew assembleRelease --no-daemon --stacktrace
+
+      - name: Upload Dinner AI APK
+        uses: actions/upload-artifact@v6
+        with:
+          name: Dinner-AI-v0.6-Android-APK
+          path: Dinner-AI/android/app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
+          retention-days: 7
