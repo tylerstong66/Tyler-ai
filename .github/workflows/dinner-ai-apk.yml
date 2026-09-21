@@ -41,12 +41,12 @@ jobs:
       - name: Setup EAS CLI
         run: npm install --global eas-cli
 
-      - name: Initialize or link EAS project
+      - name: Verify linked EAS project
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas init --force --non-interactive
+        run: eas project:info
 
       - name: Build installable Android APK on EAS
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas build --platform android --profile preview --non-interactive --wait
+        run: eas build --platform android --profile preview --non-interactive --wait --clear-cache --verbose-logs --build-logger-level debug
