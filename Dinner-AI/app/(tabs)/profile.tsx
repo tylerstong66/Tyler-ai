@@ -59,11 +59,11 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { padding: 18, gap: 12, backgroundColor: colors.bg, paddingBottom: 36 },
-  card: { gap: 8 },
-  title: { color: colors.text, fontSize: 18, fontWeight: '800' },
-  help: { color: colors.muted, lineHeight: 19, fontSize: 13 },
+  content: { paddingHorizontal: 20, paddingTop: 16, gap: 14, backgroundColor: colors.bg, paddingBottom: 42 },
+  card: { gap: 9 },
+  title: { color: colors.text, fontSize: 18, lineHeight: 23, fontWeight: '900' },
+  help: { color: colors.muted, lineHeight: 20, fontSize: 13 },
   warning: { color: colors.danger, lineHeight: 19, fontSize: 13 },
-  input: { minHeight: 48, borderWidth: 1, borderColor: colors.border, borderRadius: 12, padding: 12, color: colors.text, backgroundColor: '#fff', textAlignVertical: 'top' },
+  input: { minHeight: 50, borderWidth: 1, borderColor: colors.border, borderRadius: 16, padding: 14, color: colors.text, backgroundColor: colors.surface, textAlignVertical: 'top', fontSize: 15 },
   notes: { minHeight: 90 }
 });
