@@ -12,7 +12,8 @@ const MEALS: { key: MealCategory; label: string }[] = [
   { key: 'breakfast', label: 'Breakfast' },
   { key: 'lunch', label: 'Lunch' },
   { key: 'dinner', label: 'Dinner' },
-  { key: 'snack', label: 'Snack' }
+  { key: 'snack', label: 'Snack' },
+  { key: 'dessert', label: 'Dessert' }
 ];
 
 export default function HomeScreen() {
@@ -27,7 +28,7 @@ export default function HomeScreen() {
       <View>
         <Text style={styles.eyebrow}>DINNER AI</Text>
         <Text style={styles.hero}>What should we make?</Text>
-        <Text style={styles.sub}>Use what you already have, match your tastes, and get ideas for breakfast, lunch, dinner, or a snack.</Text>
+        <Text style={styles.sub}>Use what you already have, match your tastes, and get ideas for breakfast, lunch, dinner, snacks, or dessert.</Text>
       </View>
 
       <Card style={styles.scanCard}>
