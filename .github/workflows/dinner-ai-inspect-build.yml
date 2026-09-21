@@ -1,0 +1,25 @@
+name: Inspect Dinner AI EAS Build
+
+on:
+  push:
+    branches:
+      - dinner-ai-app
+    paths:
+      - Dinner-AI/.inspect-build-trigger
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Dinner-AI
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - run: npm install --global eas-cli
+      - name: Show failed EAS build details
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas build:view 85b8b074-250e-4c8d-82a4-99c42aa4aa16 --json
