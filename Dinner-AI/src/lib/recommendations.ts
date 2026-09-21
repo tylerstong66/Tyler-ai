@@ -92,7 +92,8 @@ export function createPantrySurprise(state: AppState, bucket: TimeBucket = 'quic
     breakfast: ['oats', 'eggs', 'banana', 'toast', 'fruit'],
     lunch: ['rice', 'vegetables', 'beans', 'greens', 'tortilla'],
     dinner: ['rice', 'vegetables', 'onion', 'potato', 'beans'],
-    snack: ['fruit', 'yogurt', 'cucumber', 'hummus', 'crackers']
+    snack: ['fruit', 'yogurt', 'cucumber', 'hummus', 'crackers'],
+    dessert: ['fruit', 'chocolate', 'yogurt', 'oats', 'cinnamon']
   };
   const defaults = defaultsByCategory[category].filter(allowed);
   const base = available[0] ?? defaults[0] ?? 'a verified allergy-safe staple';
