@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import { AppState, MealCategory, Recipe, TimeBucket } from '@/src/types';
 import { RECIPES } from '@/src/data/recipes';
+import { isCommonStapleIngredient } from '@/src/lib/shopping';
 
 const configuredBaseUrl = process.env.EXPO_PUBLIC_AI_BASE_URL?.replace(/\/$/, '');
 const DEV_WEB_BASE_URL = Platform.OS === 'web' ? 'http://localhost:8787' : '';
@@ -89,7 +90,7 @@ function normalizeRecipe(value: any, requestedCategory: MealCategory): Recipe | 
     generated: true,
     generatedAt: Date.now(),
     pantryIngredientsUsed: cleanStringArray(value.pantryIngredientsUsed),
-    missingIngredients: cleanStringArray(value.missingIngredients),
+    missingIngredients: cleanStringArray(value.missingIngredients).filter((item) => !isCommonStapleIngredient(item)),
     safetyNotes: typeof value.safetyNotes === 'string' ? value.safetyNotes.trim() : undefined,
     generationReason: typeof value.generationReason === 'string' ? value.generationReason.trim() : undefined
   };
