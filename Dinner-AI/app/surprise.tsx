@@ -12,7 +12,7 @@ const TIMES: { key: TimeBucket; label: string }[] = [
   { key: 'medium', label: '30 min–2 hr' },
   { key: 'long', label: '2+ hr' }
 ];
-const MEALS: MealCategory[] = ['breakfast', 'lunch', 'dinner', 'snack'];
+const MEALS: MealCategory[] = ['breakfast', 'lunch', 'dinner', 'snack', 'dessert'];
 
 export default function SurpriseScreen() {
   const { state, markRecipeChosen, saveGeneratedRecipe, setRecipeFeedback, addRecipeMissingToShoppingList } = useApp();
