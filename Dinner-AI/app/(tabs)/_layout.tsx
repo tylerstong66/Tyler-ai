@@ -1,12 +1,16 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '@/src/components/ui';
 import { useApp } from '@/src/context/AppContext';
 
 function EmojiIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
-  return <Text style={{ fontSize: focused ? 22 : 20, opacity: focused ? 1 : 0.65 }}>{emoji}</Text>;
+  return (
+    <View style={[styles.iconWrap, focused && styles.iconWrapFocused]}>
+      <Text style={[styles.icon, !focused && styles.iconMuted]}>{emoji}</Text>
+    </View>
+  );
 }
 
 export default function TabsLayout() {
@@ -24,11 +28,24 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: colors.muted,
         tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          height: 60 + insets.bottom,
+          height: 64 + insets.bottom,
           paddingBottom: Math.max(insets.bottom, 8),
-          paddingTop: 8
+          paddingTop: 7,
+          backgroundColor: colors.card,
+          borderTopWidth: 1,
+          borderTopColor: colors.border,
+          shadowColor: colors.shadow,
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.05,
+          shadowRadius: 12,
+          elevation: 10
         },
-        tabBarLabelStyle: { paddingBottom: insets.bottom > 0 ? 2 : 0 }
+        tabBarItemStyle: { paddingTop: 1 },
+        tabBarLabelStyle: {
+          paddingBottom: insets.bottom > 0 ? 2 : 0,
+          fontSize: 11,
+          fontWeight: '700'
+        }
       }}
     >
       <Tabs.Screen name="index" options={{ title: 'Home', tabBarIcon: ({ focused }) => <EmojiIcon emoji="🍽️" focused={focused} /> }} />
@@ -39,3 +56,18 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
+
+
+const styles = StyleSheet.create({
+  iconWrap: {
+    minWidth: 34,
+    height: 30,
+    paddingHorizontal: 7,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  iconWrapFocused: { backgroundColor: colors.greenSoft },
+  icon: { fontSize: 19 },
+  iconMuted: { opacity: 0.58 }
+});
