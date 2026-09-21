@@ -89,14 +89,14 @@ export default function RecipesScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { padding: 18, backgroundColor: colors.bg, paddingBottom: 36 },
-  intro: { color: colors.muted, lineHeight: 21, marginBottom: 14 },
-  filterLabel: { color: colors.text, fontWeight: '900', marginBottom: 8 },
-  filters: { gap: 8, paddingBottom: 14 },
-  filter: { borderWidth: 1, borderColor: colors.border, paddingHorizontal: 13, paddingVertical: 9, borderRadius: 99, backgroundColor: '#fff' },
-  filterActive: { backgroundColor: colors.green, borderColor: colors.green },
-  filterText: { color: colors.text, fontWeight: '700' },
+  content: { paddingHorizontal: 20, paddingTop: 16, backgroundColor: colors.bg, paddingBottom: 42 },
+  intro: { color: colors.muted, lineHeight: 22, fontSize: 14.5, marginBottom: 18 },
+  filterLabel: { color: colors.text, fontWeight: '900', fontSize: 14, marginBottom: 9 },
+  filters: { gap: 8, paddingBottom: 16, paddingRight: 10 },
+  filter: { borderWidth: 1, borderColor: colors.border, paddingHorizontal: 15, paddingVertical: 10, borderRadius: 999, backgroundColor: colors.card },
+  filterActive: { backgroundColor: colors.greenDark, borderColor: colors.greenDark },
+  filterText: { color: colors.text, fontWeight: '800', fontSize: 13 },
   filterTextActive: { color: '#fff' },
-  list: { gap: 12 },
+  list: { gap: 14 },
   empty: { color: colors.muted, textAlign: 'center', paddingVertical: 32 }
 });
