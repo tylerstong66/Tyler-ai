@@ -1,7 +1,7 @@
 export type TimeBucket = 'quick' | 'medium' | 'long';
 export type RecipeFeedbackRating = 'love' | 'okay' | 'never';
 export type PantryStorage = 'refrigerator' | 'freezer' | 'pantry' | 'seasoning';
-export type MealCategory = 'breakfast' | 'lunch' | 'dinner' | 'snack';
+export type MealCategory = 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'dessert';
 
 export type PantryItem = {
   id: string;
