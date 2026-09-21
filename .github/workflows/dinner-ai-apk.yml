@@ -1,0 +1,47 @@
+name: Build Dinner AI APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Dinner-AI
+    steps:
+      - name: Check out Dinner AI
+        uses: actions/checkout@v5
+
+      - name: Use Node 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: Dinner-AI/package.json
+
+      - name: Verify Expo token exists
+        shell: bash
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "EXPO_TOKEN repository secret is missing."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Setup EAS CLI
+        run: npm install --global eas-cli
+
+      - name: Initialize or link EAS project
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas init --force --non-interactive
+
+      - name: Build installable Android APK on EAS
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas build --platform android --profile preview --non-interactive --wait
