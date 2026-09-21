@@ -16,7 +16,7 @@ export async function analyzeFridgePhoto(imageBase64: string, mimeType = 'image/
   }
 
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 60_000);
+  const timer = setTimeout(() => controller.abort(), 90_000);
 
   try {
     const response = await fetch(`${API_BASE_URL}/analyze-fridge`, {
@@ -59,7 +59,7 @@ function normalizeDetectedIngredient(value: any): DetectedIngredient | null {
     quantity: typeof value.quantity === 'string' && value.quantity.trim() ? value.quantity.trim() : undefined,
     confidence,
     notes: typeof value.notes === 'string' && value.notes.trim() ? value.notes.trim() : undefined,
-    selected: true,
+    selected: confidence >= 0.72,
     storage: 'refrigerator'
   };
 }
