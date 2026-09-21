@@ -1,0 +1,139 @@
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Card, PrimaryButton, SecondaryButton, colors } from '@/src/components/ui';
+import { useApp } from '@/src/context/AppContext';
+import { BarcodeProduct, lookupBarcode } from '@/src/lib/openFoodFacts';
+import { PantryStorage } from '@/src/types';
+
+const STORAGE_OPTIONS: { key: PantryStorage; label: string }[] = [
+  { key: 'refrigerator', label: 'Refrigerator' },
+  { key: 'freezer', label: 'Freezer' },
+  { key: 'pantry', label: 'Pantry' },
+  { key: 'seasoning', label: 'Seasoning' }
+];
+
+export default function ScanUpcScreen() {
+  const router = useRouter();
+  const { addPantryItem } = useApp();
+  const [permission, requestPermission] = useCameraPermissions();
+  const [locked, setLocked] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [product, setProduct] = useState<BarcodeProduct | null>(null);
+  const [lastBarcode, setLastBarcode] = useState<string | null>(null);
+  const [storage, setStorage] = useState<PantryStorage>('pantry');
+
+  async function handleScan(data: string) {
+    if (locked) return;
+    setLocked(true);
+    setLastBarcode(data);
+    setLoading(true);
+    try {
+      const found = await lookupBarcode(data);
+      setProduct(found);
+      if (!found) Alert.alert('Product not found', 'The barcode scanned correctly, but this product was not found in the food database.');
+    } catch (error) {
+      Alert.alert('Lookup failed', error instanceof Error ? error.message : 'Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function addProduct() {
+    if (!product) return;
+    addPantryItem({ name: product.name, brand: product.brand, barcode: product.barcode, imageUrl: product.imageUrl, storage });
+    const label = STORAGE_OPTIONS.find((item) => item.key === storage)?.label ?? 'Pantry';
+    Alert.alert(`Added to ${label}`, product.name, [{ text: 'Done', onPress: () => router.back() }]);
+  }
+
+  function scanAgain() {
+    setProduct(null);
+    setLastBarcode(null);
+    setStorage('pantry');
+    setLocked(false);
+  }
+
+  if (!permission) return <View style={styles.center}><ActivityIndicator /></View>;
+  if (!permission.granted) {
+    return (
+      <View style={styles.permission}>
+        <Text style={styles.title}>Camera permission needed</Text>
+        <Text style={styles.help}>Dinner AI uses the camera only when you choose to scan food or your fridge.</Text>
+        <PrimaryButton label="Allow camera" onPress={requestPermission} />
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      {!locked ? (
+        <CameraView
+          style={styles.camera}
+          facing="back"
+          barcodeScannerSettings={{ barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e'] }}
+          onBarcodeScanned={({ data }) => handleScan(data)}
+        >
+          <View style={styles.overlay}>
+            <View style={styles.frame} />
+            <Text style={styles.scanText}>Center the UPC barcode in the box</Text>
+          </View>
+        </CameraView>
+      ) : (
+        <View style={styles.resultWrap}>
+          {loading ? (
+            <View style={styles.center}><ActivityIndicator size="large" /><Text style={styles.help}>Looking up {lastBarcode}…</Text></View>
+          ) : product ? (
+            <Card style={styles.card}>
+              <Text style={styles.kicker}>FOUND</Text>
+              <Text style={styles.title}>{product.name}</Text>
+              {product.brand ? <Text style={styles.help}>{product.brand}</Text> : null}
+              <Text style={styles.barcode}>UPC: {product.barcode}</Text>
+              <Text style={styles.storageLabel}>Where do you keep it?</Text>
+              <View style={styles.storageWrap}>
+                {STORAGE_OPTIONS.map((option) => {
+                  const active = storage === option.key;
+                  return (
+                    <Pressable key={option.key} onPress={() => setStorage(option.key)} style={[styles.storageButton, active && styles.storageButtonActive]}>
+                      <Text style={[styles.storageText, active && styles.storageTextActive]}>{option.label}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+              <PrimaryButton label={`Add to ${STORAGE_OPTIONS.find((item) => item.key === storage)?.label}`} onPress={addProduct} />
+              <SecondaryButton label="Scan another" onPress={scanAgain} />
+            </Card>
+          ) : (
+            <Card style={styles.card}>
+              <Text style={styles.title}>Not in the database</Text>
+              <Text style={styles.help}>Scan another item, or add the ingredient manually from Kitchen.</Text>
+              <PrimaryButton label="Scan another" onPress={scanAgain} />
+            </Card>
+          )}
+        </View>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#111' },
+  camera: { flex: 1 },
+  overlay: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.18)' },
+  frame: { width: '82%', height: 190, borderWidth: 3, borderColor: '#fff', borderRadius: 20 },
+  scanText: { color: '#fff', fontWeight: '800', marginTop: 18, backgroundColor: 'rgba(0,0,0,0.55)', paddingHorizontal: 14, paddingVertical: 9, borderRadius: 99 },
+  resultWrap: { flex: 1, backgroundColor: colors.bg, justifyContent: 'center', padding: 18 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, backgroundColor: colors.bg },
+  permission: { flex: 1, justifyContent: 'center', gap: 14, padding: 24, backgroundColor: colors.bg },
+  card: { gap: 12 },
+  kicker: { color: colors.green, fontSize: 11, fontWeight: '900', letterSpacing: 1.4 },
+  title: { color: colors.text, fontSize: 25, fontWeight: '900' },
+  help: { color: colors.muted, lineHeight: 21 },
+  barcode: { color: colors.muted, fontSize: 12, fontWeight: '700' },
+  storageLabel: { color: colors.text, fontWeight: '800', marginTop: 4 },
+  storageWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 },
+  storageButton: { borderWidth: 1, borderColor: colors.border, backgroundColor: '#fff', paddingHorizontal: 10, paddingVertical: 8, borderRadius: 99 },
+  storageButtonActive: { borderColor: colors.green, backgroundColor: colors.green },
+  storageText: { color: colors.text, fontSize: 12, fontWeight: '700' },
+  storageTextActive: { color: '#fff' }
+});
