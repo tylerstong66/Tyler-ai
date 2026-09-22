@@ -32,5 +32,11 @@ jobs:
       - name: Source audit
         run: npm run audit
 
+      - name: Android bundle smoke test
+        env:
+          EXPO_PUBLIC_AI_BASE_URL: https://dinner-ai-backend.onrender.com
+          NODE_ENV: production
+        run: npx expo export --platform android --output-dir dist-smoke
+
       - name: Expo Doctor
         run: npx expo-doctor
