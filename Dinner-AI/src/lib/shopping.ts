@@ -87,7 +87,7 @@ export function isCommonStapleIngredient(value: string) {
     /\bsalt\b/,
     /\bblack pepper\b/,
     /\bground pepper\b/,
-    /\bpepper\b/,
+    /^pepper$/,
     /\bcooking oil\b/,
     /\bolive oil\b/,
     /\bvegetable oil\b/,
@@ -102,12 +102,17 @@ export function ingredientsMatch(a: string, b: string) {
   const left = canonicalIngredient(a);
   const right = canonicalIngredient(b);
   if (!left || !right) return false;
-  if (left === right || left.includes(right) || right.includes(left)) return true;
+  if (left === right) return true;
 
   const leftTokens = new Set(left.split(' ').filter(Boolean));
   const rightTokens = new Set(right.split(' ').filter(Boolean));
   const smaller = leftTokens.size <= rightTokens.size ? leftTokens : rightTokens;
   const larger = leftTokens.size <= rightTokens.size ? rightTokens : leftTokens;
+  if (smaller.size === 1) {
+    const [onlyToken] = [...smaller];
+    return onlyToken.length >= 2 && larger.has(onlyToken);
+  }
+
   let overlap = 0;
   smaller.forEach((token) => { if (larger.has(token)) overlap += 1; });
 
@@ -145,6 +150,10 @@ function singularize(word: string) {
   if (word.length > 4 && word.endsWith('ies')) return word.slice(0, -3) + 'y';
   if (word.length > 4 && word.endsWith('oes')) return word.slice(0, -2);
   if (word.endsWith('sses')) return word.slice(0, -2);
-  if (word.length > 3 && word.endsWith('s') && !word.endsWith('ss')) return word.slice(0, -1);
+  if (
+    word.length > 3
+    && word.endsWith('s')
+    && !/(us|ss|is|ous)$/.test(word)
+  ) return word.slice(0, -1);
   return word;
 }
