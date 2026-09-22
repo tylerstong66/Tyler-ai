@@ -5,7 +5,7 @@ import { canonicalIngredient, isCommonStapleIngredient, mergeRecipeMissingIngred
 
 const STORAGE_KEY = 'dinner-ai-state-v1';
 const MAX_GENERATED_RECIPES = 25;
-const TRIAL_RECIPE_CLEANUP_CUTOFF = Date.parse('2026-09-22T19:00:00Z');
+const TRIAL_RECIPE_CLEANUP_CUTOFF = Date.parse('2026-09-22T20:30:00Z');
 
 const initialState: AppState = {
   pantry: [],
@@ -226,10 +226,14 @@ function isCreamyOreganoTrialRecipe(recipe: Recipe) {
     recipe.title,
     recipe.description,
     ...(Array.isArray(recipe.ingredients) ? recipe.ingredients : []),
-    ...(Array.isArray(recipe.tags) ? recipe.tags : [])
+    ...(Array.isArray(recipe.instructions) ? recipe.instructions : []),
+    ...(Array.isArray(recipe.tags) ? recipe.tags : []),
+    recipe.safetyNotes || '',
+    recipe.generationReason || ''
   ].join(' ').toLowerCase();
 
-  return /\bcreamy\b/.test(text) && /\boregano\b/.test(text);
+  const hasCreamyElement = /\bcreamy\b|\bcream\b|\bheavy cream\b|\bcream cheese\b/.test(text);
+  return hasCreamyElement && /\boregano\b/.test(text);
 }
 
 
