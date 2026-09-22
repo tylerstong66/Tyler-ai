@@ -166,7 +166,11 @@ const styles = StyleSheet.create({
   },
   featureImage: { width: '100%', height: 245 },
   featureOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     padding: 22,
     justifyContent: 'space-between',
     backgroundColor: 'rgba(19,49,35,0.56)'
