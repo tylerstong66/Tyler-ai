@@ -1,11 +1,12 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React from 'react';
-import { Alert, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { FeedbackButtons } from '@/src/components/FeedbackButtons';
 import { Card, Pill, PrimaryButton, SecondaryButton, colors } from '@/src/components/ui';
 import { useApp } from '@/src/context/AppContext';
 import { RECIPES } from '@/src/data/recipes';
 import { scoreRecipe } from '@/src/lib/recommendations';
+import { scaledIngredients } from '@/src/lib/servings';
 import { deriveRecipeMissingIngredients } from '@/src/lib/shopping';
 import { RecipeFeedbackRating } from '@/src/types';
 
@@ -14,29 +15,42 @@ export default function RecipeDetailScreen() {
   const router = useRouter();
   const { state, toggleFavorite, markRecipeChosen, setRecipeFeedback, addRecipeMissingToShoppingList } = useApp();
   const recipe = [...state.generatedRecipes, ...RECIPES].find((item) => item.id === id);
+  const baseServings = recipe?.servings || 4;
+  const [servings, setServings] = useState(baseServings);
+
+  const ingredients = useMemo(
+    () => recipe ? scaledIngredients(recipe.ingredients, baseServings, servings) : [],
+    [recipe, baseServings, servings]
+  );
 
   if (!recipe) {
     return <View style={styles.center}><Text style={styles.title}>Recipe not found.</Text></View>;
   }
 
+  const scaledRecipe = { ...recipe, servings, ingredients };
   const match = scoreRecipe(recipe, state);
   const favorite = state.favorites.includes(recipe.id);
   const feedback = state.recipeFeedback[recipe.id]?.rating;
-  const missingIngredients = deriveRecipeMissingIngredients(recipe, state.pantry);
+  const missingIngredients = deriveRecipeMissingIngredients(scaledRecipe, state.pantry);
 
   function chooseRecipe() {
-    markRecipeChosen(recipe!);
+    markRecipeChosen(scaledRecipe);
     const missing = missingIngredients.length;
     Alert.alert(
       `${recipe!.category.charAt(0).toUpperCase() + recipe!.category.slice(1)} selected`,
       missing
-        ? 'Dinner AI added any missing ingredients that were not already on your shopping list.'
+        ? 'Dinner AI added the missing ingredients to your shopping list.'
         : 'This meal was added to your learning history.'
     );
   }
 
+  function startCookMode() {
+    markRecipeChosen(scaledRecipe);
+    router.push({ pathname: '/cook/[id]', params: { id: recipe!.id, servings: String(servings) } });
+  }
+
   function addMissing() {
-    addRecipeMissingToShoppingList(recipe!);
+    addRecipeMissingToShoppingList(scaledRecipe);
     Alert.alert('Shopping list updated', 'Missing ingredients were added without creating duplicates.');
   }
 
@@ -45,19 +59,43 @@ export default function RecipeDetailScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.content}>
-      {recipe.imageUrl ? <Image source={{ uri: recipe.imageUrl }} style={styles.heroImage} resizeMode="cover" /> : <View style={styles.heroFallback}><Text style={styles.heroFallbackEmoji}>{recipe.category === 'dessert' ? '🍰' : recipe.category === 'breakfast' ? '☀️' : recipe.category === 'lunch' ? '🥪' : recipe.category === 'snack' ? '🍎' : '🍽️'}</Text></View>}
+    <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      {recipe.imageUrl ? (
+        <Image source={{ uri: recipe.imageUrl }} style={styles.heroImage} resizeMode="cover" />
+      ) : (
+        <View style={styles.heroFallback}>
+          <Text style={styles.heroFallbackEmoji}>
+            {recipe.category === 'dessert' ? '🍰' : recipe.category === 'breakfast' ? '☀️' : recipe.category === 'lunch' ? '🥪' : recipe.category === 'snack' ? '🍎' : '🍽️'}
+          </Text>
+        </View>
+      )}
+
       <View>
         <View style={styles.badges}>
           {recipe.generated ? <Pill>AI creation</Pill> : null}
           <Pill>{recipe.category.charAt(0).toUpperCase() + recipe.category.slice(1)}</Pill>
           <Pill>{recipe.minutes} min</Pill>
-          {recipe.servings ? <Pill>{recipe.servings} servings</Pill> : null}
         </View>
         <Text style={styles.title}>{recipe.title}</Text>
         <Text style={styles.description}>{recipe.description}</Text>
         <Text style={styles.match}>{match.matched}/{match.total} pantry ingredients matched</Text>
         {recipe.generationReason ? <Text style={styles.reason}>{recipe.generationReason}</Text> : null}
+      </View>
+
+      <View style={styles.servingPanel}>
+        <View>
+          <Text style={styles.servingLabel}>SERVINGS</Text>
+          <Text style={styles.servingHelp}>Ingredient amounts update automatically.</Text>
+        </View>
+        <View style={styles.servingControls}>
+          <Pressable onPress={() => setServings((value) => Math.max(1, value - 1))} style={styles.servingButton}>
+            <Text style={styles.servingButtonText}>−</Text>
+          </Pressable>
+          <Text style={styles.servingNumber}>{servings}</Text>
+          <Pressable onPress={() => setServings((value) => Math.min(12, value + 1))} style={styles.servingButton}>
+            <Text style={styles.servingButtonText}>+</Text>
+          </Pressable>
+        </View>
       </View>
 
       {missingIngredients.length ? (
@@ -69,14 +107,17 @@ export default function RecipeDetailScreen() {
       ) : null}
 
       <Card>
-        <Text style={styles.section}>Ingredients</Text>
-        {recipe.ingredients.map((ingredient) => <Text key={ingredient} style={styles.line}>• {ingredient}</Text>)}
+        <Text style={styles.section}>Ingredients · {servings} servings</Text>
+        {ingredients.map((ingredient) => <Text key={ingredient} style={styles.line}>• {ingredient}</Text>)}
       </Card>
 
       <Card>
         <Text style={styles.section}>Directions</Text>
         {recipe.instructions.map((instruction, index) => (
-          <View key={`${index}-${instruction}`} style={styles.step}><Text style={styles.number}>{index + 1}</Text><Text style={styles.stepText}>{instruction}</Text></View>
+          <View key={`${index}-${instruction}`} style={styles.step}>
+            <Text style={styles.number}>{index + 1}</Text>
+            <Text style={styles.stepText}>{instruction}</Text>
+          </View>
         ))}
       </Card>
 
@@ -84,7 +125,8 @@ export default function RecipeDetailScreen() {
       {recipe.safetyNotes ? <Text style={styles.allergen}>{recipe.safetyNotes}</Text> : null}
       {recipe.generated && state.profile.allergies.length ? <Text style={styles.allergen}>AI-generated recipes are not a medical allergy guarantee. Independently verify every ingredient.</Text> : null}
 
-      <PrimaryButton label="I’m making this" onPress={chooseRecipe} />
+      <PrimaryButton label="👨‍🍳 Start Cook Mode" onPress={startCookMode} />
+      <SecondaryButton label="I’m making this" onPress={chooseRecipe} />
       <SecondaryButton label={favorite ? 'Remove from favorites' : 'Save to favorites'} onPress={() => toggleFavorite(recipe.id)} />
 
       <Card style={styles.feedbackCard}>
@@ -110,6 +152,13 @@ const styles = StyleSheet.create({
   description: { color: colors.muted, lineHeight: 23, fontSize: 15.5, marginTop: 8 },
   match: { alignSelf: 'flex-start', color: colors.greenDark, backgroundColor: colors.greenSoft, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6, fontWeight: '900', fontSize: 11.5, marginTop: 12, overflow: 'hidden' },
   reason: { color: colors.greenDark, lineHeight: 20, fontSize: 13, fontWeight: '700', marginTop: 10 },
+  servingPanel: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 16, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 20, padding: 16 },
+  servingLabel: { color: colors.green, fontSize: 10, fontWeight: '900', letterSpacing: 1.3 },
+  servingHelp: { color: colors.muted, fontSize: 12, marginTop: 4 },
+  servingControls: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  servingButton: { width: 38, height: 38, borderRadius: 13, backgroundColor: colors.greenSoft, alignItems: 'center', justifyContent: 'center' },
+  servingButtonText: { color: colors.greenDark, fontSize: 23, lineHeight: 25, fontWeight: '700' },
+  servingNumber: { minWidth: 24, textAlign: 'center', color: colors.text, fontSize: 20, fontWeight: '900' },
   section: { color: colors.text, fontSize: 19, lineHeight: 24, fontWeight: '900', marginBottom: 11 },
   line: { color: colors.text, lineHeight: 26, fontSize: 15 },
   step: { flexDirection: 'row', gap: 11, marginBottom: 14 },
