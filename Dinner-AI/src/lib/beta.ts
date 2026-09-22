@@ -25,7 +25,7 @@ export async function markOnboardingComplete() {
 export async function redeemBetaCode(code: string) {
   if (!API_BASE_URL) throw new Error('Dinner AI beta service is not configured.');
 
-  const response = await fetch(`${API_BASE_URL}/beta/access`, {
+  const response = await fetchWithTimeout(`${API_BASE_URL}/beta/access`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -33,7 +33,7 @@ export async function redeemBetaCode(code: string) {
       appVersion: appVersion(),
       platform: Platform.OS
     })
-  });
+  }, 15_000);
   const body = await response.json().catch(() => null) as any;
   if (!response.ok || typeof body?.token !== 'string') {
     throw new Error(typeof body?.error === 'string' ? body.error : 'That beta access code did not work.');
@@ -46,7 +46,7 @@ export async function clearBetaToken() {
   await AsyncStorage.removeItem(BETA_TOKEN_KEY);
 }
 
-export async function betaFetch(path: string, init: RequestInit = {}) {
+export async function betaFetch(path: string, init: RequestInit = {}, timeoutMs = 15_000) {
   if (!API_BASE_URL) throw new Error('Dinner AI beta service is not configured.');
   const token = await getBetaToken();
   if (!token) throw new Error('BETA_ACCESS_REQUIRED');
@@ -55,7 +55,7 @@ export async function betaFetch(path: string, init: RequestInit = {}) {
   headers.set('Authorization', `Bearer ${token}`);
   if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
 
-  const response = await fetch(`${API_BASE_URL}${path}`, { ...init, headers });
+  const response = await fetchWithTimeout(`${API_BASE_URL}${path}`, { ...init, headers }, timeoutMs);
   if (response.status === 401) {
     await clearBetaToken();
     throw new Error('BETA_ACCESS_REQUIRED');
@@ -76,7 +76,7 @@ export async function sendBetaEvent(event: string, screen?: string, details?: Re
         platform: Platform.OS,
         sessionId
       })
-    });
+    }, 7_000);
   } catch {
     // Analytics should never interrupt the app.
   }
@@ -94,7 +94,7 @@ export async function sendBetaFeedback(input: { category: string; message: strin
       platform: Platform.OS,
       sessionId
     })
-  });
+  }, 15_000);
   const body = await response.json().catch(() => null) as any;
   if (!response.ok) throw new Error(typeof body?.error === 'string' ? body.error : 'Feedback could not be sent.');
   return body;
@@ -115,7 +115,7 @@ export async function reportClientError(error: unknown, screen?: string, fatal =
         platform: Platform.OS,
         sessionId
       })
-    });
+    }, 7_000);
   } catch {
     // Error reporting must not create another user-facing error.
   }
@@ -140,4 +140,20 @@ async function getSessionId() {
   value = `session-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
   await AsyncStorage.setItem(SESSION_KEY, value);
   return value;
+}
+
+
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number) {
+  if (init.signal) return fetch(url, init);
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } catch (error: any) {
+    if (error?.name === 'AbortError') throw new Error('Dinner AI request timed out. Please try again.');
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
 }
