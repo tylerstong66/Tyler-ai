@@ -1,21 +1,139 @@
 import http from 'node:http';
+import crypto from 'node:crypto';
 
 const PORT = Number(process.env.PORT || 8787);
 const KEY = process.env.OPENAI_API_KEY || '';
 const VISION_MODEL = process.env.OPENAI_VISION_MODEL || 'gpt-5.6-luna';
 const RECIPE_MODEL = process.env.OPENAI_RECIPE_MODEL || 'gpt-5.6-luna';
+const BETA_CODE = process.env.DINNER_AI_BETA_CODE || '';
+const BETA_SECRET = process.env.DINNER_AI_BETA_SECRET || '';
+const BETA_AUTH_ENABLED = Boolean(BETA_CODE && BETA_SECRET);
 const MAX_BODY = 15 * 1024 * 1024;
+const DAY = 24 * 60 * 60 * 1000;
+const HOUR = 60 * 60 * 1000;
+const rateBuckets = new Map();
+
+const LIMITS = {
+  '/analyze-fridge': { limit: 12, windowMs: DAY, label: 'fridge scans' },
+  '/generate-recipe': { limit: 25, windowMs: DAY, label: 'AI recipes' },
+  '/feedback': { limit: 50, windowMs: DAY, label: 'feedback reports' },
+  '/event': { limit: 600, windowMs: DAY, label: 'beta events' },
+  '/client-error': { limit: 120, windowMs: DAY, label: 'error reports' }
+};
+
+const PROTECTED_POSTS = new Set(Object.keys(LIMITS));
 
 const server = http.createServer(async (req, res) => {
   cors(res);
   if (req.method === 'OPTIONS') return json(res, 204, {});
+
   if (req.method === 'GET' && req.url === '/health') {
-    return json(res, 200, { ok: true, hasApiKey: Boolean(KEY), visionModel: VISION_MODEL, recipeModel: RECIPE_MODEL });
+    return json(res, 200, {
+      ok: true,
+      hasApiKey: Boolean(KEY),
+      visionModel: VISION_MODEL,
+      recipeModel: RECIPE_MODEL,
+      betaProtected: BETA_AUTH_ENABLED
+    });
   }
-  if (!KEY && req.method === 'POST') return json(res, 503, { error: 'OPENAI_API_KEY is not configured on the server.' });
 
   try {
+    if (req.method === 'POST' && req.url === '/beta/access') {
+      const ip = clientIp(req);
+      const accessLimit = takeRate('access:' + ip, 40, HOUR);
+      if (!accessLimit.allowed) {
+        return json(res, 429, { error: 'Too many beta access attempts. Please try again later.', retryAfterSeconds: accessLimit.retryAfterSeconds });
+      }
+
+      const body = await readBody(req);
+      const code = typeof body.code === 'string' ? body.code.trim() : '';
+
+      if (!BETA_AUTH_ENABLED) {
+        return json(res, 200, { token: 'development-beta-token', expiresInDays: 30 });
+      }
+
+      if (!code || !safeEqualText(code.toUpperCase(), BETA_CODE.toUpperCase())) {
+        return json(res, 403, { error: 'That beta access code is not valid.' });
+      }
+
+      const token = issueBetaToken();
+      console.log('BETA_ACCESS ' + JSON.stringify({
+        at: new Date().toISOString(),
+        appVersion: cleanText(body.appVersion, 30),
+        platform: cleanText(body.platform, 30)
+      }));
+      return json(res, 200, { token, expiresInDays: 30 });
+    }
+
+    let betaSession = null;
+    if (req.method === 'POST' && PROTECTED_POSTS.has(req.url || '')) {
+      const verified = verifyBetaRequest(req);
+      if (!verified.ok) return json(res, 401, { error: 'Beta access expired. Re-enter the beta access code.' });
+      betaSession = verified.session;
+
+      const config = LIMITS[req.url];
+      const rate = takeRate(betaSession.id + ':' + req.url, config.limit, config.windowMs);
+      if (!rate.allowed) {
+        const daily = config.windowMs >= DAY;
+        return json(res, 429, {
+          error: (daily ? 'Daily beta limit reached for ' : 'Beta limit reached for ') + config.label + '. Please try again later.',
+          retryAfterSeconds: rate.retryAfterSeconds
+        });
+      }
+    }
+
+    if (req.method === 'POST' && req.url === '/event') {
+      const body = await readBody(req);
+      console.log('BETA_EVENT ' + JSON.stringify({
+        at: new Date().toISOString(),
+        betaSession: betaSession?.id || '',
+        sessionId: cleanText(body.sessionId, 80),
+        event: cleanText(body.event, 80),
+        screen: cleanText(body.screen, 120),
+        appVersion: cleanText(body.appVersion, 30),
+        platform: cleanText(body.platform, 30),
+        details: cleanDetails(body.details)
+      }));
+      return json(res, 200, { ok: true });
+    }
+
+    if (req.method === 'POST' && req.url === '/feedback') {
+      const body = await readBody(req);
+      const message = cleanText(body.message, 4000);
+      if (!message) return json(res, 400, { error: 'Feedback message is required.' });
+
+      console.log('BETA_FEEDBACK ' + JSON.stringify({
+        at: new Date().toISOString(),
+        betaSession: betaSession?.id || '',
+        sessionId: cleanText(body.sessionId, 80),
+        category: cleanText(body.category, 80),
+        message,
+        screen: cleanText(body.screen, 120),
+        appVersion: cleanText(body.appVersion, 30),
+        platform: cleanText(body.platform, 30)
+      }));
+      return json(res, 200, { ok: true });
+    }
+
+    if (req.method === 'POST' && req.url === '/client-error') {
+      const body = await readBody(req);
+      console.error('BETA_CLIENT_ERROR ' + JSON.stringify({
+        at: new Date().toISOString(),
+        betaSession: betaSession?.id || '',
+        sessionId: cleanText(body.sessionId, 80),
+        message: cleanText(body.message, 700),
+        stack: cleanText(body.stack, 2500),
+        screen: cleanText(body.screen, 120),
+        fatal: Boolean(body.fatal),
+        appVersion: cleanText(body.appVersion, 30),
+        platform: cleanText(body.platform, 30)
+      }));
+      return json(res, 200, { ok: true });
+    }
+
     if (req.method === 'POST' && req.url === '/analyze-fridge') {
+      if (!KEY) return json(res, 503, { error: 'The AI service is temporarily unavailable.' });
+
       const body = await readBody(req);
       const imageBase64 = typeof body.imageBase64 === 'string' ? body.imageBase64 : '';
       if (imageBase64.length < 100) return json(res, 400, { error: 'A fridge image is required.' });
@@ -65,6 +183,8 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === 'POST' && req.url === '/generate-recipe') {
+      if (!KEY) return json(res, 503, { error: 'The AI service is temporarily unavailable.' });
+
       const body = normalizeRecipeRequest(await readBody(req));
       if (!body.pantry.length) return json(res, 400, { error: 'Add at least one kitchen item first.' });
       const instruction = [
@@ -83,6 +203,7 @@ const server = http.createServer(async (req, res) => {
         'Use professional technique: browning before braising, controlled simmering rather than violent boiling, proper pan preheating, finishing pasta in sauce where appropriate, resting proteins, and adding delicate herbs/acids at the right time.',
         'Keep the directions concise enough to cook from on a phone, but never omit temperatures, timing, or doneness information that affects success.'
       ].join(' ');
+
       const result = await callOpenAI(RECIPE_MODEL, [
         { role: 'system', content: [{ type: 'input_text', text: instruction }] },
         { role: 'user', content: [{ type: 'input_text', text: JSON.stringify(body) }] }
@@ -96,6 +217,7 @@ const server = http.createServer(async (req, res) => {
 
     return json(res, 404, { error: 'Not found' });
   } catch (error) {
+    console.error('DINNER_AI_SERVER_ERROR', error);
     return json(res, error && error.code === 'BODY_TOO_LARGE' ? 413 : 500, { error: error && error.message ? error.message : 'Request failed.' });
   }
 });
@@ -111,7 +233,7 @@ async function callOpenAI(model, input, format, reasoning) {
     body: JSON.stringify(payload)
   });
   const data = await response.json();
-  if (!response.ok) throw new Error((data.error && data.error.message) || 'OpenAI request failed (' + response.status + ').');
+  if (!response.ok) throw new Error((data.error && data.error.message) || 'The AI provider returned an error (' + response.status + ').');
   const text = outputText(data);
   if (!text) throw new Error('The AI service returned no structured data.');
   try { return JSON.parse(text); } catch { throw new Error('The AI service returned malformed structured data.'); }
@@ -222,6 +344,72 @@ function readBody(req) {
   });
 }
 
+function issueBetaToken() {
+  const id = crypto.randomUUID();
+  const expires = Date.now() + 30 * DAY;
+  const payload = id + '.' + expires;
+  const signature = crypto.createHmac('sha256', BETA_SECRET).update(payload).digest('base64url');
+  return payload + '.' + signature;
+}
+
+function verifyBetaRequest(req) {
+  if (!BETA_AUTH_ENABLED) return { ok: true, session: { id: 'development' } };
+  const auth = typeof req.headers.authorization === 'string' ? req.headers.authorization : '';
+  if (!auth.startsWith('Bearer ')) return { ok: false };
+  const token = auth.slice(7).trim();
+  const parts = token.split('.');
+  if (parts.length !== 3) return { ok: false };
+  const [id, expiresText, signature] = parts;
+  const expires = Number(expiresText);
+  if (!id || !Number.isFinite(expires) || expires <= Date.now()) return { ok: false };
+  const expected = crypto.createHmac('sha256', BETA_SECRET).update(id + '.' + expiresText).digest('base64url');
+  if (!safeEqualText(signature, expected)) return { ok: false };
+  return { ok: true, session: { id, expires } };
+}
+
+function takeRate(key, limit, windowMs) {
+  const now = Date.now();
+  const existing = rateBuckets.get(key);
+  if (!existing || now >= existing.resetAt) {
+    rateBuckets.set(key, { count: 1, resetAt: now + windowMs });
+    return { allowed: true, retryAfterSeconds: 0 };
+  }
+  if (existing.count >= limit) {
+    return { allowed: false, retryAfterSeconds: Math.max(1, Math.ceil((existing.resetAt - now) / 1000)) };
+  }
+  existing.count += 1;
+  return { allowed: true, retryAfterSeconds: 0 };
+}
+
+function safeEqualText(a, b) {
+  const left = Buffer.from(String(a));
+  const right = Buffer.from(String(b));
+  return left.length === right.length && crypto.timingSafeEqual(left, right);
+}
+
+function clientIp(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (typeof forwarded === 'string' && forwarded.trim()) return forwarded.split(',')[0].trim();
+  return req.socket?.remoteAddress || 'unknown';
+}
+
+function cleanText(value, max) {
+  return typeof value === 'string' ? value.trim().slice(0, max) : '';
+}
+
+function cleanDetails(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  const result = {};
+  for (const [key, item] of Object.entries(value).slice(0, 15)) {
+    const cleanKey = cleanText(key, 50);
+    if (!cleanKey) continue;
+    if (typeof item === 'string') result[cleanKey] = item.slice(0, 120);
+    else if (typeof item === 'number' && Number.isFinite(item)) result[cleanKey] = item;
+    else if (typeof item === 'boolean' || item === null) result[cleanKey] = item;
+  }
+  return result;
+}
+
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -229,6 +417,9 @@ function cors(res) {
 }
 
 function json(res, status, value) {
-  res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
+  res.writeHead(status, {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Cache-Control': 'no-store'
+  });
   res.end(status === 204 ? '' : JSON.stringify(value));
 }
