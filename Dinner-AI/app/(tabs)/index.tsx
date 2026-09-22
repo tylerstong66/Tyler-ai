@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { RecipeCard } from '@/src/components/RecipeCard';
+import { hasRecipePhoto, RecipePhoto } from '@/src/components/RecipePhoto';
 import { colors } from '@/src/components/ui';
 import { useApp } from '@/src/context/AppContext';
 import { RECIPES } from '@/src/data/recipes';
@@ -65,8 +66,10 @@ export default function HomeScreen() {
         >
           {featured.recipe.imageUrl ? (
             <Image source={{ uri: featured.recipe.imageUrl }} style={styles.featureImage} resizeMode="cover" />
+          ) : hasRecipePhoto(featured.recipe.id) ? (
+            <RecipePhoto recipeId={featured.recipe.id} height={245} />
           ) : null}
-          <View style={featured.recipe.imageUrl ? styles.featureOverlay : styles.featureInner}>
+          <View style={(featured.recipe.imageUrl || hasRecipePhoto(featured.recipe.id)) ? styles.featureOverlay : styles.featureInner}>
           <View style={styles.featureTop}>
             <View style={styles.featureLabelWrap}>
               <Text style={styles.featureEyebrow}>TOP MATCH</Text>
