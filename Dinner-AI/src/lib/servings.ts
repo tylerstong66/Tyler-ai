@@ -10,7 +10,7 @@ export function scaleIngredient(ingredient: string, fromServings: number, toServ
   const ratio = toServings / fromServings;
 
   return ingredient.replace(
-    /^\s*((?:\d+\s+)?[¼½¾⅓⅔⅛⅜⅝⅞]|\d+(?:\.\d+)?(?:\/\d+)?)\b?/,
+    /^\s*((?:\d+\s+)?[¼½¾⅓⅔⅛⅜⅝⅞]|\d+(?:\.\d+)?(?:\/\d+)?)/,
     (match) => {
       const parsed = parseAmount(match.trim());
       if (parsed == null) return match;
