@@ -222,6 +222,10 @@ function isCreamyOreganoTrialRecipe(recipe: Recipe) {
   if (!recipe?.generated) return false;
   const generatedAt = Number(recipe.generatedAt) || 0;
   if (generatedAt > TRIAL_RECIPE_CLEANUP_CUTOFF) return false;
+
+  const normalizedTitle = recipe.title.trim().toLowerCase();
+  if (normalizedTitle === 'tomato-oregano chicken with garlic rice') return true;
+
   const text = [
     recipe.title,
     recipe.description,
