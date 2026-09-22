@@ -31,7 +31,7 @@ export default function ShoppingScreen() {
     <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       <View>
         <Text style={styles.heading}>Shopping list</Text>
-        <Text style={styles.sub}>Missing recipe ingredients are added automatically when you choose a dinner.</Text>
+        <Text style={styles.sub}>Missing recipe ingredients are added automatically when you choose a recipe.</Text>
       </View>
 
       <Card style={styles.addCard}>
