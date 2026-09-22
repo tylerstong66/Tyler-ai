@@ -10,7 +10,7 @@ export function scaleIngredient(ingredient: string, fromServings: number, toServ
   const ratio = toServings / fromServings;
 
   return ingredient.replace(
-    /^\s*((?:\d+\s+)?[¼½¾⅓⅔⅛⅜⅝⅞]|\d+(?:\.\d+)?(?:\/\d+)?)/,
+    /^\s*((?:\d+\s+)?[¼½¾⅓⅔⅛⅜⅝⅞]|\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?)/,
     (match) => {
       const parsed = parseAmount(match.trim());
       if (parsed == null) return match;
@@ -24,12 +24,12 @@ export function scaledIngredients(ingredients: string[], fromServings: number, t
 }
 
 export function ingredientsForStep(ingredients: string[], step: string) {
-  const normalizedStep = canonicalIngredient(step);
+  const stepTokens = new Set(canonicalIngredient(step).split(' ').filter((token) => token.length > 2));
   const matches = ingredients.filter((ingredient) => {
     const key = canonicalIngredient(ingredient);
     if (!key) return false;
     const tokens = key.split(' ').filter((token) => token.length > 2);
-    return tokens.some((token) => normalizedStep.includes(token));
+    return tokens.some((token) => stepTokens.has(token));
   });
   return matches.slice(0, 8);
 }
@@ -46,26 +46,39 @@ export function suggestedTimerSeconds(step: string) {
 }
 
 function parseAmount(value: string) {
-  const mixed = value.match(/^(\d+)\s+([¼½¾⅓⅔⅛⅜⅝⅞])$/);
-  if (mixed) return Number(mixed[1]) + (FRACTIONS[mixed[2]] || 0);
+  const mixedGlyph = value.match(/^(\d+)\s+([¼½¾⅓⅔⅛⅜⅝⅞])$/);
+  if (mixedGlyph) return Number(mixedGlyph[1]) + (FRACTIONS[mixedGlyph[2]] || 0);
+
+  const mixedAscii = value.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+  if (mixedAscii) {
+    const denominator = Number(mixedAscii[3]);
+    if (!denominator) return null;
+    return Number(mixedAscii[1]) + Number(mixedAscii[2]) / denominator;
+  }
+
   if (FRACTIONS[value] != null) return FRACTIONS[value];
 
   const fraction = value.match(/^(\d+)\/(\d+)$/);
-  if (fraction) return Number(fraction[1]) / Number(fraction[2]);
+  if (fraction) {
+    const denominator = Number(fraction[2]);
+    return denominator ? Number(fraction[1]) / denominator : null;
+  }
 
   const number = Number(value);
   return Number.isFinite(number) ? number : null;
 }
 
 function formatAmount(value: number) {
-  const rounded = Math.round(value * 8) / 8;
-  const whole = Math.floor(rounded);
-  const fraction = rounded - whole;
+  if (!Number.isFinite(value)) return '';
+  const whole = Math.floor(value);
+  const fraction = value - whole;
   const glyphs: [number, string][] = [
-    [0.125, '⅛'], [0.25, '¼'], [0.333, '⅓'], [0.375, '⅜'],
-    [0.5, '½'], [0.625, '⅝'], [0.667, '⅔'], [0.75, '¾'], [0.875, '⅞']
+    [0.125, '⅛'], [0.25, '¼'], [1 / 3, '⅓'], [0.375, '⅜'],
+    [0.5, '½'], [0.625, '⅝'], [2 / 3, '⅔'], [0.75, '¾'], [0.875, '⅞']
   ];
-  const glyph = glyphs.find(([amount]) => Math.abs(fraction - amount) < 0.045)?.[1];
+  const glyph = glyphs.find(([amount]) => Math.abs(fraction - amount) < 0.025)?.[1];
   if (glyph) return whole ? `${whole} ${glyph}` : glyph;
-  return Number.isInteger(rounded) ? String(rounded) : String(Number(rounded.toFixed(2)));
+
+  const rounded = Number(value.toFixed(2));
+  return Number.isInteger(rounded) ? String(rounded) : String(rounded);
 }
