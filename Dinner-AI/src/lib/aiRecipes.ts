@@ -2,6 +2,7 @@ import { Platform } from 'react-native';
 import { AppState, MealCategory, Recipe, TimeBucket } from '@/src/types';
 import { RECIPES } from '@/src/data/recipes';
 import { deriveRecipeMissingIngredients, isCommonStapleIngredient } from '@/src/lib/shopping';
+import { betaFetch, friendlyBetaError, reportClientError, sendBetaEvent } from '@/src/lib/beta';
 
 const configuredBaseUrl = process.env.EXPO_PUBLIC_AI_BASE_URL?.replace(/\/$/, '');
 const DEV_WEB_BASE_URL = Platform.OS === 'web' ? 'http://localhost:8787' : '';
@@ -35,7 +36,7 @@ export async function generateAIRecipe(state: AppState, timeBucket: TimeBucket, 
     .map(({ rating, title, tags, category }) => ({ rating, title, tags, category }));
 
   try {
-    const response = await fetch(`${API_BASE_URL}/generate-recipe`, {
+    const response = await betaFetch('/generate-recipe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -61,8 +62,10 @@ export async function generateAIRecipe(state: AppState, timeBucket: TimeBucket, 
 
     return { recipe, model: typeof body?.model === 'string' ? body.model : undefined };
   } catch (error: any) {
+    void reportClientError(error, '/surprise');
+    void sendBetaEvent('ai_recipe_failed', '/surprise', { category: mealCategory, timeBucket });
     if (error?.name === 'AbortError') throw new Error('Recipe generation timed out. Please try again.');
-    throw error;
+    throw new Error(friendlyBetaError(error, 'Dinner AI could not create a recipe right now. Please try again.'));
   } finally {
     clearTimeout(timer);
   }
