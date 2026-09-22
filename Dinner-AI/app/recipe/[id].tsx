@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { FeedbackButtons } from '@/src/components/FeedbackButtons';
+import { hasRecipePhoto, RecipePhoto } from '@/src/components/RecipePhoto';
 import { Card, Pill, PrimaryButton, SecondaryButton, colors } from '@/src/components/ui';
 import { useApp } from '@/src/context/AppContext';
 import { RECIPES } from '@/src/data/recipes';
@@ -62,6 +63,8 @@ export default function RecipeDetailScreen() {
     <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
       {recipe.imageUrl ? (
         <Image source={{ uri: recipe.imageUrl }} style={styles.heroImage} resizeMode="cover" />
+      ) : hasRecipePhoto(recipe.id) ? (
+        <RecipePhoto recipeId={recipe.id} height={240} style={styles.heroImage} />
       ) : (
         <View style={styles.heroFallback}>
           <Text style={styles.heroFallbackEmoji}>
