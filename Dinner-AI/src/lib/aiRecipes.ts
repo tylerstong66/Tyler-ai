@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import { AppState, MealCategory, Recipe, TimeBucket } from '@/src/types';
 import { RECIPES } from '@/src/data/recipes';
-import { isCommonStapleIngredient } from '@/src/lib/shopping';
+import { deriveRecipeMissingIngredients, isCommonStapleIngredient } from '@/src/lib/shopping';
 
 const configuredBaseUrl = process.env.EXPO_PUBLIC_AI_BASE_URL?.replace(/\/$/, '');
 const DEV_WEB_BASE_URL = Platform.OS === 'web' ? 'http://localhost:8787' : '';
@@ -57,6 +57,7 @@ export async function generateAIRecipe(state: AppState, timeBucket: TimeBucket, 
 
     const recipe = normalizeRecipe(body?.recipe, mealCategory);
     if (!recipe) throw new Error('The recipe service returned invalid recipe data.');
+    recipe.missingIngredients = deriveRecipeMissingIngredients(recipe, state.pantry);
 
     return { recipe, model: typeof body?.model === 'string' ? body.model : undefined };
   } catch (error: any) {
