@@ -13,7 +13,8 @@
     "build:android:preview": "npx eas-cli build --platform android --profile preview",
     "build:android:production": "npx eas-cli build --platform android --profile production",
     "build:ios:preview": "npx eas-cli build --platform ios --profile preview",
-    "build:ios:production": "npx eas-cli build --platform ios --profile production"
+    "build:ios:production": "npx eas-cli build --platform ios --profile production",
+    "audit": "node scripts/audit.mjs"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
