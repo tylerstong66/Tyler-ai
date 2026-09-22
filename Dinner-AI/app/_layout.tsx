@@ -23,6 +23,7 @@ export default function RootLayout() {
         <Stack.Screen name="scan-upc" options={{ title: 'Scan a UPC' }} />
         <Stack.Screen name="scan-fridge" options={{ title: 'Scan Your Fridge' }} />
         <Stack.Screen name="recipe/[id]" options={{ title: 'Recipe' }} />
+        <Stack.Screen name="cook/[id]" options={{ title: 'Cook Mode', headerBackTitle: 'Recipe' }} />
         <Stack.Screen name="surprise" options={{ title: 'Surprise Me' }} />
         </Stack>
       </AppProvider>
