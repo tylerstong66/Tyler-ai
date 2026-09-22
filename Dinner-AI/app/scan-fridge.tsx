@@ -1,7 +1,7 @@
 import { CameraCapturedPicture, CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Card, PrimaryButton, SecondaryButton, colors } from '@/src/components/ui';
 import { useApp } from '@/src/context/AppContext';
 import { analyzeFridgePhoto } from '@/src/lib/fridgeVision';
@@ -72,7 +72,10 @@ export default function ScanFridgeScreen() {
     <View style={styles.permission}>
       <Text style={styles.title}>Camera permission needed</Text>
       <Text style={styles.muted}>Dinner AI needs camera access only when you choose to scan your fridge.</Text>
-      <PrimaryButton label="Allow camera" onPress={requestPermission} />
+      <PrimaryButton
+        label={permission.canAskAgain ? "Allow camera" : "Open phone settings"}
+        onPress={() => permission.canAskAgain ? void requestPermission() : void Linking.openSettings()}
+      />
     </View>
   );
 
