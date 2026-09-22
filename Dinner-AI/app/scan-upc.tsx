@@ -1,11 +1,12 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Card, PrimaryButton, SecondaryButton, colors } from '@/src/components/ui';
 import { useApp } from '@/src/context/AppContext';
 import { BarcodeProduct, lookupBarcode } from '@/src/lib/openFoodFacts';
 import { PantryStorage } from '@/src/types';
+import { reportClientError, sendBetaEvent } from '@/src/lib/beta';
 
 const STORAGE_OPTIONS: { key: PantryStorage; label: string }[] = [
   { key: 'refrigerator', label: 'Refrigerator' },
@@ -32,8 +33,11 @@ export default function ScanUpcScreen() {
     try {
       const found = await lookupBarcode(data);
       setProduct(found);
+      void sendBetaEvent('upc_scan_completed', '/scan-upc', { found: Boolean(found) });
       if (!found) Alert.alert('Product not found', 'The barcode scanned correctly, but this product was not found in the food database.');
     } catch (error) {
+      void reportClientError(error, '/scan-upc');
+      void sendBetaEvent('upc_scan_failed', '/scan-upc');
       Alert.alert('Lookup failed', error instanceof Error ? error.message : 'Please try again.');
     } finally {
       setLoading(false);
@@ -60,7 +64,10 @@ export default function ScanUpcScreen() {
       <View style={styles.permission}>
         <Text style={styles.title}>Camera permission needed</Text>
         <Text style={styles.help}>Dinner AI uses the camera only when you choose to scan food or your fridge.</Text>
-        <PrimaryButton label="Allow camera" onPress={requestPermission} />
+        <PrimaryButton
+          label={permission.canAskAgain ? "Allow camera" : "Open phone settings"}
+          onPress={() => permission.canAskAgain ? void requestPermission() : void Linking.openSettings()}
+        />
       </View>
     );
   }
