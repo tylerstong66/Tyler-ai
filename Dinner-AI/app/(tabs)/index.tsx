@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { RecipeCard } from '@/src/components/RecipeCard';
 import { colors } from '@/src/components/ui';
 import { useApp } from '@/src/context/AppContext';
@@ -63,6 +63,10 @@ export default function HomeScreen() {
           onPress={() => router.push(`/recipe/${featured.recipe.id}`)}
           style={({ pressed }) => [styles.feature, pressed && styles.featurePressed]}
         >
+          {featured.recipe.imageUrl ? (
+            <Image source={{ uri: featured.recipe.imageUrl }} style={styles.featureImage} resizeMode="cover" />
+          ) : null}
+          <View style={featured.recipe.imageUrl ? styles.featureOverlay : styles.featureInner}>
           <View style={styles.featureTop}>
             <View style={styles.featureLabelWrap}>
               <Text style={styles.featureEyebrow}>TOP MATCH</Text>
@@ -75,6 +79,7 @@ export default function HomeScreen() {
           <View style={styles.featureMeta}>
             <Text style={styles.featurePill}>{featured.recipe.minutes} min</Text>
             <Text style={styles.featurePill}>{featured.matched}/{featured.total} on hand</Text>
+          </View>
           </View>
         </Pressable>
       ) : (
@@ -150,9 +155,8 @@ const styles = StyleSheet.create({
   feature: {
     backgroundColor: colors.greenDark,
     borderRadius: 26,
-    padding: 22,
     minHeight: 214,
-    justifyContent: 'space-between',
+    overflow: 'hidden',
     marginBottom: 27,
     shadowColor: colors.greenDark,
     shadowOffset: { width: 0, height: 8 },
@@ -160,6 +164,14 @@ const styles = StyleSheet.create({
     shadowRadius: 18,
     elevation: 5
   },
+  featureImage: { width: '100%', height: 245 },
+  featureOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    padding: 22,
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(19,49,35,0.56)'
+  },
+  featureInner: { padding: 22, minHeight: 214, justifyContent: 'space-between' },
   featurePressed: { opacity: 0.94, transform: [{ scale: 0.995 }] },
   featureTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   featureLabelWrap: { flexDirection: 'row', gap: 8, alignItems: 'center' },
