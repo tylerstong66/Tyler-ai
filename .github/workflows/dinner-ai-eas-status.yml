@@ -43,3 +43,5 @@ jobs:
           curl -fsSL "$LOG_URL" -o /tmp/eas-build.log
           echo "===== EAS bundle failure lines ====="
           grep -nEi "error|failed|unable to resolve|module not found|syntax|referenceerror|typeerror|bundle javascript" /tmp/eas-build.log | tail -120 || true
+          echo "===== Raw EAS log tail ====="
+          tail -250 /tmp/eas-build.log
