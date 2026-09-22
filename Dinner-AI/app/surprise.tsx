@@ -5,6 +5,7 @@ import { Card, Pill, PrimaryButton, SecondaryButton, colors } from '@/src/compon
 import { useApp } from '@/src/context/AppContext';
 import { generateAIRecipe } from '@/src/lib/aiRecipes';
 import { createPantrySurprise } from '@/src/lib/recommendations';
+import { deriveRecipeMissingIngredients } from '@/src/lib/shopping';
 import { MealCategory, Recipe, RecipeFeedbackRating, TimeBucket } from '@/src/types';
 
 const TIMES: { key: TimeBucket; label: string }[] = [
@@ -24,6 +25,7 @@ export default function SurpriseScreen() {
   const [source, setSource] = useState<'local' | 'ai'>('local');
   const [message, setMessage] = useState('');
   const [chosen, setChosen] = useState(false);
+  const missingIngredients = deriveRecipeMissingIngredients(recipe, state.pantry);
 
   useEffect(() => { void generate('quick', 'dinner', false); }, []);
 
@@ -55,7 +57,7 @@ export default function SurpriseScreen() {
   function choose() {
     markRecipeChosen(recipe);
     setChosen(true);
-    Alert.alert('Meal selected', recipe.missingIngredients?.length ? 'Missing items were added to your shopping list.' : 'This choice was added to Dinner AI’s learning history.');
+    Alert.alert('Meal selected', missingIngredients.length ? 'Missing items were added to your shopping list.' : 'This choice was added to Dinner AI’s learning history.');
   }
 
   function rate(rating: RecipeFeedbackRating) {
@@ -92,10 +94,10 @@ export default function SurpriseScreen() {
       <Text style={styles.description}>{recipe.description}</Text>
       {recipe.generationReason ? <Text style={styles.reason}>{recipe.generationReason}</Text> : null}
 
-      {recipe.missingIngredients?.length ? (
+      {missingIngredients.length ? (
         <Card>
           <Text style={styles.section}>You may still need</Text>
-          {recipe.missingIngredients.map((x) => <Text key={x} style={styles.line}>• {x}</Text>)}
+          {missingIngredients.map((x) => <Text key={x} style={styles.line}>• {x}</Text>)}
           <View style={styles.topGap}><SecondaryButton label="🛒 Add these to shopping list" onPress={() => addRecipeMissingToShoppingList(recipe)} /></View>
         </Card>
       ) : null}
