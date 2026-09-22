@@ -134,9 +134,20 @@ function isMealCategory(value: unknown) {
 }
 
 function normalizeLoadedState(value: Partial<AppState> | null | undefined): AppState {
+  const rawGeneratedRecipes = Array.isArray(value?.generatedRecipes)
+    ? value.generatedRecipes.filter((recipe) => recipe && typeof (recipe as any).title === 'string')
+    : [];
+  const trialRecipeIds = new Set(
+    rawGeneratedRecipes
+      .filter((recipe) => isCreamyOreganoTrialRecipe(recipe as Recipe))
+      .map((recipe) => String((recipe as any).id || ''))
+      .filter(Boolean)
+  );
+
   const rawFeedback = value?.recipeFeedback && typeof value.recipeFeedback === 'object' ? value.recipeFeedback : {};
   const recipeFeedback = Object.fromEntries(
     Object.entries(rawFeedback).flatMap(([id, entry]) => {
+      if (trialRecipeIds.has(id)) return [];
       if (!entry || typeof entry !== 'object') return [];
       const rating = (entry as any).rating;
       if (!['love', 'okay', 'never'].includes(rating)) return [];
@@ -161,30 +172,47 @@ function normalizeLoadedState(value: Partial<AppState> | null | undefined): AppS
         })) as PantryItem[]
     : initialState.pantry;
 
-  const generatedRecipes = Array.isArray(value?.generatedRecipes)
-    ? value.generatedRecipes.filter((recipe) => recipe && typeof (recipe as any).title === 'string').map((recipe) => ({
-        ...recipe,
-        category: isMealCategory((recipe as any).category) ? (recipe as any).category : 'dinner'
-      })).slice(0, MAX_GENERATED_RECIPES) as Recipe[]
-    : [];
+  const generatedRecipes = rawGeneratedRecipes
+    .filter((recipe) => !trialRecipeIds.has(String((recipe as any).id || '')))
+    .map((recipe) => ({
+      ...recipe,
+      category: isMealCategory((recipe as any).category) ? (recipe as any).category : 'dinner'
+    }))
+    .slice(0, MAX_GENERATED_RECIPES) as Recipe[];
 
   return {
     pantry,
-    favorites: Array.isArray(value?.favorites) ? value.favorites : [],
+    favorites: Array.isArray(value?.favorites) ? value.favorites.filter((id) => !trialRecipeIds.has(id)) : [],
     profile: {
       likes: Array.isArray(value?.profile?.likes) ? value.profile.likes : [],
       dislikes: Array.isArray(value?.profile?.dislikes) ? value.profile.dislikes : [],
       allergies: Array.isArray(value?.profile?.allergies) ? value.profile.allergies : [],
       dietaryNotes: typeof value?.profile?.dietaryNotes === 'string' ? value.profile.dietaryNotes : ''
     },
-    recipeSelections: value?.recipeSelections && typeof value.recipeSelections === 'object' ? value.recipeSelections : {},
+    recipeSelections: value?.recipeSelections && typeof value.recipeSelections === 'object'
+      ? Object.fromEntries(Object.entries(value.recipeSelections).filter(([id]) => !trialRecipeIds.has(id)))
+      : {},
     recipeFeedback,
     generatedRecipes,
     shoppingList: Array.isArray(value?.shoppingList)
       ? value.shoppingList
           .filter((item) => item && typeof item.name === 'string')
+          .filter((item) => !((item as any).recipeId && trialRecipeIds.has(String((item as any).recipeId))))
           .filter((item) => !((item as any).recipeId && isCommonStapleIngredient((item as any).name)))
           .map((item) => ({ ...item, checked: Boolean(item.checked), addedAt: Number(item.addedAt) || Date.now() }))
       : []
   };
+}
+
+
+function isCreamyOreganoTrialRecipe(recipe: Recipe) {
+  if (!recipe?.generated) return false;
+  const text = [
+    recipe.title,
+    recipe.description,
+    ...(Array.isArray(recipe.ingredients) ? recipe.ingredients : []),
+    ...(Array.isArray(recipe.tags) ? recipe.tags : [])
+  ].join(' ').toLowerCase();
+
+  return /\bcreamy\b/.test(text) && /\boregano\b/.test(text);
 }
