@@ -24,3 +24,8 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: eas build:list --platform android --limit 5 --json --non-interactive
+
+      - name: Inspect failed stable-signing build
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas build:view bd0a41ac-96ab-46dd-bd1a-5cd8a18e81a1 --json
