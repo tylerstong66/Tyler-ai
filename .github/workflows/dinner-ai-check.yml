@@ -29,5 +29,8 @@ jobs:
       - name: TypeScript check
         run: npm run typecheck
 
+      - name: Source audit
+        run: npm run audit
+
       - name: Expo Doctor
         run: npx expo-doctor
