@@ -1,6 +1,11 @@
 import { Recipe } from '@/src/types';
+import { BREAKFAST_RECIPES } from '@/src/data/recipesBreakfast';
+import { LUNCH_RECIPES } from '@/src/data/recipesLunch';
+import { DINNER_RECIPES_A } from '@/src/data/recipesDinnerA';
+import { DINNER_RECIPES_B } from '@/src/data/recipesDinnerB';
+import { SNACK_DESSERT_RECIPES } from '@/src/data/recipesSnackDessert';
 
-export const RECIPES: Recipe[] = [
+const CORE_RECIPES: Recipe[] = [
   {
     id: 'veggie-omelet',
     title: 'French-Style Garden Omelet',
@@ -539,4 +544,14 @@ export const RECIPES: Recipe[] = [
     tags: ['dessert', 'quick', 'fruit', 'vegetarian', 'no-cook'],
     allergens: ['dairy', 'gluten']
   }
+];
+
+
+export const RECIPES: Recipe[] = [
+  ...CORE_RECIPES,
+  ...BREAKFAST_RECIPES,
+  ...LUNCH_RECIPES,
+  ...DINNER_RECIPES_A,
+  ...DINNER_RECIPES_B,
+  ...SNACK_DESSERT_RECIPES
 ];
