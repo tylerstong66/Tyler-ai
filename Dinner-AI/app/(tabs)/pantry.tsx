@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { Card, PrimaryButton, colors } from '@/src/components/ui';
+import { PrimaryButton, colors } from '@/src/components/ui';
 import { useApp } from '@/src/context/AppContext';
 import { PantryStorage } from '@/src/types';
 
@@ -29,59 +29,109 @@ export default function PantryScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-      <Card style={styles.form}>
-        <Text style={styles.title}>Add an ingredient</Text>
-        <TextInput value={name} onChangeText={setName} placeholder="e.g. chicken breast" style={styles.input} placeholderTextColor={colors.muted} />
-        <TextInput value={quantity} onChangeText={setQuantity} placeholder="Quantity (optional)" style={styles.input} placeholderTextColor={colors.muted} />
-        <Text style={styles.label}>Stored in</Text>
-        <View style={styles.storageWrap}>
+    <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+      <View style={styles.header}>
+        <Text style={styles.eyebrow}>YOUR KITCHEN</Text>
+        <View style={styles.headerRow}>
+          <View style={styles.headerCopy}>
+            <Text style={styles.title}>What you have</Text>
+            <Text style={styles.sub}>Keep this current and Dinner AI can make smarter recommendations.</Text>
+          </View>
+          <View style={styles.totalBubble}>
+            <Text style={styles.totalNumber}>{state.pantry.length}</Text>
+            <Text style={styles.totalLabel}>items</Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.addPanel}>
+        <Text style={styles.addTitle}>Add something</Text>
+        <View style={styles.inputRow}>
+          <TextInput
+            value={name}
+            onChangeText={setName}
+            placeholder="Ingredient"
+            style={[styles.input, styles.nameInput]}
+            placeholderTextColor={colors.muted}
+          />
+          <TextInput
+            value={quantity}
+            onChangeText={setQuantity}
+            placeholder="Qty"
+            style={[styles.input, styles.qtyInput]}
+            placeholderTextColor={colors.muted}
+          />
+        </View>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.storageWrap}>
           {STORAGE_OPTIONS.map((option) => {
             const active = option.key === storage;
             return (
-              <Pressable key={option.key} onPress={() => setStorage(option.key)} style={[styles.storageButton, active && styles.storageButtonActive]}>
-                <Text style={[styles.storageText, active && styles.storageTextActive]}>{option.icon} {option.label}</Text>
+              <Pressable
+                key={option.key}
+                onPress={() => setStorage(option.key)}
+                style={[styles.storageButton, active && styles.storageButtonActive]}
+              >
+                <Text style={styles.storageEmoji}>{option.icon}</Text>
+                <Text style={[styles.storageText, active && styles.storageTextActive]}>{option.label}</Text>
               </Pressable>
             );
           })}
-        </View>
-        <PrimaryButton label={`Add to ${STORAGE_OPTIONS.find((item) => item.key === storage)?.label}`} onPress={add} disabled={!name.trim()} />
-      </Card>
+        </ScrollView>
 
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.title}>Kitchen inventory</Text>
-          <Text style={styles.meta}>Ingredients organized by where you keep them</Text>
-        </View>
-        <Text style={styles.count}>{state.pantry.length}</Text>
+        <PrimaryButton
+          label={'Add to ' + (STORAGE_OPTIONS.find((item) => item.key === storage)?.label ?? 'Kitchen')}
+          onPress={add}
+          disabled={!name.trim()}
+        />
       </View>
 
-      {state.pantry.length === 0 ? <Text style={styles.empty}>Nothing here yet. Add ingredients or scan your kitchen.</Text> : null}
+      {state.pantry.length === 0 ? (
+        <View style={styles.empty}>
+          <Text style={styles.emptyEmoji}>🥕</Text>
+          <Text style={styles.emptyTitle}>Your kitchen is empty</Text>
+          <Text style={styles.emptyText}>Scan your fridge or add a few ingredients to get started.</Text>
+        </View>
+      ) : null}
 
       {STORAGE_OPTIONS.map((section) => {
         const items = grouped[section.key];
+        if (!items.length) return null;
+
         return (
           <View key={section.key} style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>{section.icon} {section.label}</Text>
-              <Text style={styles.sectionCount}>{items.length} item{items.length === 1 ? '' : 's'}</Text>
+              <View style={styles.sectionNameRow}>
+                <Text style={styles.sectionEmoji}>{section.icon}</Text>
+                <Text style={styles.sectionTitle}>{section.label}</Text>
+              </View>
+              <Text style={styles.sectionCount}>{items.length}</Text>
             </View>
-            {items.length === 0 ? (
-              <Card style={styles.emptySection}><Text style={styles.emptySectionText}>No ingredients stored here yet.</Text></Card>
-            ) : items.map((item) => (
-              <Card key={item.id} style={styles.item}>
-                <View style={styles.itemText}>
-                  <Text style={styles.itemName}>{item.name}</Text>
-                  <Text style={styles.itemMeta}>{[item.brand, item.quantity, item.barcode ? `UPC ${item.barcode}` : undefined].filter(Boolean).join(' · ') || section.label}</Text>
+
+            <View style={styles.itemGroup}>
+              {items.map((item, index) => (
+                <View key={item.id}>
+                  <View style={styles.itemRow}>
+                    <View style={styles.itemText}>
+                      <Text style={styles.itemName}>{item.name}</Text>
+                      <Text style={styles.itemMeta}>
+                        {[item.brand, item.quantity, item.barcode ? 'UPC ' + item.barcode : undefined].filter(Boolean).join(' · ') || 'Saved ingredient'}
+                      </Text>
+                    </View>
+                    <Pressable
+                      hitSlop={10}
+                      onPress={() => Alert.alert('Remove item?', item.name, [
+                        { text: 'Cancel', style: 'cancel' },
+                        { text: 'Remove', style: 'destructive', onPress: () => removePantryItem(item.id) }
+                      ])}
+                    >
+                      <Text style={styles.remove}>Remove</Text>
+                    </Pressable>
+                  </View>
+                  {index < items.length - 1 ? <View style={styles.divider} /> : null}
                 </View>
-                <Pressable onPress={() => Alert.alert('Remove item?', item.name, [
-                  { text: 'Cancel', style: 'cancel' },
-                  { text: 'Remove', style: 'destructive', onPress: () => removePantryItem(item.id) }
-                ])}>
-                  <Text style={styles.remove}>Remove</Text>
-                </Pressable>
-              </Card>
-            ))}
+              ))}
+            </View>
           </View>
         );
       })}
@@ -90,29 +140,46 @@ export default function PantryScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { paddingHorizontal: 20, paddingTop: 16, gap: 16, backgroundColor: colors.bg, paddingBottom: 42 },
-  form: { gap: 12, backgroundColor: colors.surfaceGreen, borderColor: colors.borderStrong },
-  input: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 16, paddingHorizontal: 15, paddingVertical: 14, color: colors.text, fontSize: 16 },
-  label: { color: colors.text, fontWeight: '900', fontSize: 13, marginTop: 3 },
-  storageWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  storageButton: { borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 9 },
-  storageButtonActive: { backgroundColor: colors.greenDark, borderColor: colors.greenDark },
-  storageText: { color: colors.text, fontWeight: '800', fontSize: 12 },
-  storageTextActive: { color: '#fff' },
-  header: { marginTop: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12 },
-  title: { color: colors.text, fontSize: 21, lineHeight: 27, fontWeight: '900', letterSpacing: -0.25 },
-  meta: { color: colors.muted, marginTop: 4, lineHeight: 20 },
-  count: { color: colors.greenDark, backgroundColor: colors.greenSoft, borderRadius: 999, paddingHorizontal: 11, paddingVertical: 6, fontWeight: '900', fontSize: 13, overflow: 'hidden' },
-  section: { gap: 8, marginTop: 3 },
-  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 },
-  sectionTitle: { color: colors.text, fontSize: 17, fontWeight: '900', letterSpacing: -0.15 },
-  sectionCount: { color: colors.muted, fontSize: 12, fontWeight: '700' },
-  item: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  content: { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 46, backgroundColor: colors.bg },
+  header: { marginBottom: 20 },
+  eyebrow: { color: colors.green, fontSize: 11, fontWeight: '900', letterSpacing: 1.7 },
+  headerRow: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: 18, marginTop: 6 },
+  headerCopy: { flex: 1 },
+  title: { color: colors.text, fontSize: 30, lineHeight: 35, fontWeight: '900', letterSpacing: -0.7 },
+  sub: { color: colors.muted, marginTop: 7, lineHeight: 21, fontSize: 14.5 },
+  totalBubble: { minWidth: 62, alignItems: 'center', backgroundColor: colors.greenSoft, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 10 },
+  totalNumber: { color: colors.greenDark, fontSize: 20, lineHeight: 22, fontWeight: '900' },
+  totalLabel: { color: colors.greenDark, fontSize: 10, fontWeight: '800', marginTop: 2 },
+
+  addPanel: { backgroundColor: colors.card, borderRadius: 22, padding: 17, marginBottom: 28, borderWidth: 1, borderColor: colors.border },
+  addTitle: { color: colors.text, fontSize: 17, fontWeight: '900', marginBottom: 11 },
+  inputRow: { flexDirection: 'row', gap: 9 },
+  input: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 14, paddingHorizontal: 13, paddingVertical: 12, color: colors.text, fontSize: 15 },
+  nameInput: { flex: 1 },
+  qtyInput: { width: 88 },
+  storageWrap: { gap: 8, paddingVertical: 12, paddingRight: 8 },
+  storageButton: { flexDirection: 'row', alignItems: 'center', gap: 5, borderRadius: 999, backgroundColor: colors.surface, paddingHorizontal: 11, paddingVertical: 8 },
+  storageButtonActive: { backgroundColor: colors.greenSoft },
+  storageEmoji: { fontSize: 13 },
+  storageText: { color: colors.muted, fontWeight: '800', fontSize: 11.5 },
+  storageTextActive: { color: colors.greenDark },
+
+  empty: { alignItems: 'center', paddingVertical: 36, paddingHorizontal: 24 },
+  emptyEmoji: { fontSize: 36 },
+  emptyTitle: { color: colors.text, fontSize: 18, fontWeight: '900', marginTop: 8 },
+  emptyText: { color: colors.muted, textAlign: 'center', lineHeight: 20, marginTop: 5 },
+
+  section: { marginBottom: 26 },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 },
+  sectionNameRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  sectionEmoji: { fontSize: 17 },
+  sectionTitle: { color: colors.text, fontSize: 19, fontWeight: '900', letterSpacing: -0.2 },
+  sectionCount: { color: colors.muted, fontSize: 12, fontWeight: '800' },
+  itemGroup: { backgroundColor: colors.card, borderRadius: 20, paddingHorizontal: 16, borderWidth: 1, borderColor: colors.border },
+  itemRow: { minHeight: 68, flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 12 },
   itemText: { flex: 1 },
-  itemName: { color: colors.text, fontSize: 16.5, fontWeight: '900', textTransform: 'capitalize' },
-  itemMeta: { color: colors.muted, marginTop: 3, fontSize: 12 },
+  itemName: { color: colors.text, fontSize: 16, fontWeight: '900', textTransform: 'capitalize' },
+  itemMeta: { color: colors.muted, fontSize: 11.5, marginTop: 4 },
   remove: { color: colors.danger, fontWeight: '800', fontSize: 12 },
-  empty: { color: colors.muted, paddingVertical: 20, textAlign: 'center' },
-  emptySection: { paddingVertical: 12 },
-  emptySectionText: { color: colors.muted, fontSize: 12 }
+  divider: { height: 1, backgroundColor: colors.border }
 });
