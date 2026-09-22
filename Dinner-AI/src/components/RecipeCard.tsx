@@ -3,6 +3,7 @@ import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Recipe } from '@/src/types';
 import { colors } from './ui';
+import { hasRecipePhoto, RecipePhoto } from './RecipePhoto';
 
 const CATEGORY_EMOJI: Record<Recipe['category'], string> = {
   breakfast: '☀️',
@@ -22,6 +23,8 @@ export function RecipeCard({ recipe, match, favorite }: { recipe: Recipe; match?
     >
       {recipe.imageUrl ? (
         <Image source={{ uri: recipe.imageUrl }} style={styles.image} resizeMode="cover" />
+      ) : hasRecipePhoto(recipe.id) ? (
+        <RecipePhoto recipeId={recipe.id} height={168} />
       ) : (
         <View style={styles.imageFallback}>
           <Text style={styles.fallbackEmoji}>{CATEGORY_EMOJI[recipe.category]}</Text>
