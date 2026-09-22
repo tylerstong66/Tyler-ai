@@ -5,6 +5,7 @@ import { PrimaryButton, SecondaryButton, colors } from '@/src/components/ui';
 import { useApp } from '@/src/context/AppContext';
 import { RECIPES } from '@/src/data/recipes';
 import { ingredientsForStep, scaledIngredients, suggestedTimerSeconds } from '@/src/lib/servings';
+import { sendBetaEvent } from '@/src/lib/beta';
 
 export default function CookModeScreen() {
   const { id, servings: servingsParam } = useLocalSearchParams<{ id: string; servings?: string }>();
@@ -66,6 +67,7 @@ export default function CookModeScreen() {
   }
 
   function finishCooking() {
+    void sendBetaEvent('cook_mode_completed', '/cook', { recipeId: recipe!.id, steps: totalSteps, servings: requestedServings });
     Alert.alert('Dinner is ready', 'How did this recipe turn out?', [
       { text: 'Love it', onPress: () => { setRecipeFeedback(recipe!, 'love'); router.back(); } },
       { text: 'It was okay', onPress: () => { setRecipeFeedback(recipe!, 'okay'); router.back(); } },
