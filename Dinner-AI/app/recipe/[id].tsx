@@ -6,6 +6,7 @@ import { Card, Pill, PrimaryButton, SecondaryButton, colors } from '@/src/compon
 import { useApp } from '@/src/context/AppContext';
 import { RECIPES } from '@/src/data/recipes';
 import { scoreRecipe } from '@/src/lib/recommendations';
+import { deriveRecipeMissingIngredients } from '@/src/lib/shopping';
 import { RecipeFeedbackRating } from '@/src/types';
 
 export default function RecipeDetailScreen() {
@@ -21,10 +22,11 @@ export default function RecipeDetailScreen() {
   const match = scoreRecipe(recipe, state);
   const favorite = state.favorites.includes(recipe.id);
   const feedback = state.recipeFeedback[recipe.id]?.rating;
+  const missingIngredients = deriveRecipeMissingIngredients(recipe, state.pantry);
 
   function chooseRecipe() {
     markRecipeChosen(recipe!);
-    const missing = recipe!.missingIngredients?.length ?? 0;
+    const missing = missingIngredients.length;
     Alert.alert(
       `${recipe!.category.charAt(0).toUpperCase() + recipe!.category.slice(1)} selected`,
       missing
@@ -57,10 +59,10 @@ export default function RecipeDetailScreen() {
         {recipe.generationReason ? <Text style={styles.reason}>{recipe.generationReason}</Text> : null}
       </View>
 
-      {recipe.missingIngredients?.length ? (
+      {missingIngredients.length ? (
         <Card>
           <Text style={styles.section}>You may still need</Text>
-          {recipe.missingIngredients.map((ingredient) => <Text key={ingredient} style={styles.line}>• {ingredient}</Text>)}
+          {missingIngredients.map((ingredient) => <Text key={ingredient} style={styles.line}>• {ingredient}</Text>)}
           <View style={styles.cardButton}><SecondaryButton label="🛒 Add missing items to shopping list" onPress={addMissing} /></View>
         </Card>
       ) : null}
