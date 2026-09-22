@@ -1,10 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react';
 import { AppState, PantryItem, PantryStorage, Recipe, RecipeFeedbackRating, UserProfile } from '@/src/types';
-import { isCommonStapleIngredient, mergeRecipeMissingIngredients, mergeShoppingItems } from '@/src/lib/shopping';
+import { canonicalIngredient, isCommonStapleIngredient, mergeRecipeMissingIngredients, mergeShoppingItems } from '@/src/lib/shopping';
 
 const STORAGE_KEY = 'dinner-ai-state-v1';
 const MAX_GENERATED_RECIPES = 25;
+const TRIAL_RECIPE_CLEANUP_CUTOFF = Date.parse('2026-09-22T19:00:00Z');
 
 const initialState: AppState = {
   pantry: [],
@@ -63,24 +64,30 @@ export function AppProvider({ children }: PropsWithChildren) {
   const value = useMemo<AppContextValue>(() => ({
     state,
     hydrated,
-    addPantryItem: (item) => setState((current) => ({
-      ...current,
-      pantry: [{ ...item, id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, addedAt: Date.now() }, ...current.pantry]
-    })),
+    addPantryItem: (item) => {
+      const clean = cleanPantryInput(item);
+      if (!clean) return;
+      setState((current) => ({ ...current, pantry: mergePantryItems(current.pantry, [clean]) }));
+    },
     addPantryItems: (items) => {
-      const clean = items.filter((item) => item && item.name?.trim()).map((item) => ({ ...item, name: item.name.trim(), quantity: item.quantity?.trim() || undefined }));
+      const clean = items.map(cleanPantryInput).filter((item): item is NewPantryItem => Boolean(item));
       if (!clean.length) return;
-      setState((current) => ({
-        ...current,
-        pantry: [...clean.map((item, index) => ({ ...item, id: `${Date.now()}-${index}-${Math.random().toString(36).slice(2, 6)}`, addedAt: Date.now() })), ...current.pantry]
-      }));
+      setState((current) => ({ ...current, pantry: mergePantryItems(current.pantry, clean) }));
     },
     removePantryItem: (id) => setState((current) => ({ ...current, pantry: current.pantry.filter((item) => item.id !== id) })),
     toggleFavorite: (recipeId) => setState((current) => ({
       ...current,
       favorites: current.favorites.includes(recipeId) ? current.favorites.filter((id) => id !== recipeId) : [...current.favorites, recipeId]
     })),
-    updateProfile: (profile) => setState((current) => ({ ...current, profile })),
+    updateProfile: (profile) => setState((current) => ({
+      ...current,
+      profile: {
+        likes: cleanTerms(profile.likes),
+        dislikes: cleanTerms(profile.dislikes),
+        allergies: cleanTerms(profile.allergies),
+        dietaryNotes: profile.dietaryNotes.trim().slice(0, 1000)
+      }
+    })),
     saveGeneratedRecipe: (recipe) => {
       if (!recipe.generated) return;
       setState((current) => ({ ...current, generatedRecipes: upsertGeneratedRecipe(current.generatedRecipes, recipe) }));
@@ -163,13 +170,19 @@ function normalizeLoadedState(value: Partial<AppState> | null | undefined): AppS
   );
 
   const pantry = Array.isArray(value?.pantry)
-    ? value.pantry
-        .filter((item) => item && typeof (item as any).name === 'string')
-        .filter((item) => !String((item as any).id || '').startsWith('starter-'))
-        .map((item) => ({
-          ...item,
-          storage: isPantryStorage((item as any).storage) ? (item as any).storage : 'pantry'
-        })) as PantryItem[]
+    ? dedupeLoadedPantry(
+        value.pantry
+          .filter((item) => item && typeof (item as any).name === 'string')
+          .filter((item) => !String((item as any).id || '').startsWith('starter-'))
+          .map((item, index) => ({
+            ...item,
+            id: typeof (item as any).id === 'string' && (item as any).id ? (item as any).id : `loaded-${index}`,
+            name: String((item as any).name).trim(),
+            quantity: typeof (item as any).quantity === 'string' && (item as any).quantity.trim() ? (item as any).quantity.trim() : undefined,
+            storage: isPantryStorage((item as any).storage) ? (item as any).storage : 'pantry',
+            addedAt: Number((item as any).addedAt) || Date.now()
+          }) as PantryItem[]
+      )
     : initialState.pantry;
 
   const generatedRecipes = rawGeneratedRecipes
@@ -184,10 +197,10 @@ function normalizeLoadedState(value: Partial<AppState> | null | undefined): AppS
     pantry,
     favorites: Array.isArray(value?.favorites) ? value.favorites.filter((id) => !trialRecipeIds.has(id)) : [],
     profile: {
-      likes: Array.isArray(value?.profile?.likes) ? value.profile.likes : [],
-      dislikes: Array.isArray(value?.profile?.dislikes) ? value.profile.dislikes : [],
-      allergies: Array.isArray(value?.profile?.allergies) ? value.profile.allergies : [],
-      dietaryNotes: typeof value?.profile?.dietaryNotes === 'string' ? value.profile.dietaryNotes : ''
+      likes: cleanTerms(Array.isArray(value?.profile?.likes) ? value.profile.likes : []),
+      dislikes: cleanTerms(Array.isArray(value?.profile?.dislikes) ? value.profile.dislikes : []),
+      allergies: cleanTerms(Array.isArray(value?.profile?.allergies) ? value.profile.allergies : []),
+      dietaryNotes: typeof value?.profile?.dietaryNotes === 'string' ? value.profile.dietaryNotes.trim().slice(0, 1000) : ''
     },
     recipeSelections: value?.recipeSelections && typeof value.recipeSelections === 'object'
       ? Object.fromEntries(Object.entries(value.recipeSelections).filter(([id]) => !trialRecipeIds.has(id)))
@@ -207,6 +220,8 @@ function normalizeLoadedState(value: Partial<AppState> | null | undefined): AppS
 
 function isCreamyOreganoTrialRecipe(recipe: Recipe) {
   if (!recipe?.generated) return false;
+  const generatedAt = Number(recipe.generatedAt) || 0;
+  if (generatedAt > TRIAL_RECIPE_CLEANUP_CUTOFF) return false;
   const text = [
     recipe.title,
     recipe.description,
@@ -215,4 +230,78 @@ function isCreamyOreganoTrialRecipe(recipe: Recipe) {
   ].join(' ').toLowerCase();
 
   return /\bcreamy\b/.test(text) && /\boregano\b/.test(text);
+}
+
+
+function cleanPantryInput(item: NewPantryItem): NewPantryItem | null {
+  const name = item?.name?.trim();
+  if (!name) return null;
+  return {
+    ...item,
+    name: name.slice(0, 120),
+    quantity: item.quantity?.trim().slice(0, 80) || undefined,
+    brand: item.brand?.trim().slice(0, 120) || undefined,
+    barcode: item.barcode?.trim().slice(0, 40) || undefined
+  };
+}
+
+function mergePantryItems(current: PantryItem[], additions: NewPantryItem[]) {
+  const next = [...current];
+
+  for (const item of additions) {
+    const key = canonicalIngredient(item.name);
+    const existingIndex = next.findIndex((existing) => {
+      if (item.barcode && existing.barcode) return item.barcode === existing.barcode;
+      return existing.storage === item.storage && Boolean(key) && canonicalIngredient(existing.name) === key;
+    });
+
+    if (existingIndex >= 0) {
+      const existing = next[existingIndex];
+      next[existingIndex] = {
+        ...existing,
+        name: item.name || existing.name,
+        quantity: item.quantity ?? existing.quantity,
+        brand: item.brand ?? existing.brand,
+        barcode: item.barcode ?? existing.barcode,
+        imageUrl: item.imageUrl ?? existing.imageUrl
+      };
+      continue;
+    }
+
+    next.unshift({
+      ...item,
+      id: `pantry-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      addedAt: Date.now()
+    });
+  }
+
+  return next;
+}
+
+function dedupeLoadedPantry(items: PantryItem[]) {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    const key = item.barcode
+      ? `barcode:${item.barcode}`
+      : `${item.storage}:${canonicalIngredient(item.name)}`;
+    if (!key || key.endsWith(':')) return true;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function cleanTerms(values: unknown[]) {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const value of values) {
+    if (typeof value !== 'string') continue;
+    const clean = value.trim().slice(0, 120);
+    const key = clean.toLowerCase();
+    if (!clean || seen.has(key)) continue;
+    seen.add(key);
+    result.push(clean);
+    if (result.length >= 40) break;
+  }
+  return result;
 }
