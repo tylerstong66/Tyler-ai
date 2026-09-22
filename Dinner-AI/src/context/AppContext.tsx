@@ -181,7 +181,7 @@ function normalizeLoadedState(value: Partial<AppState> | null | undefined): AppS
             quantity: typeof (item as any).quantity === 'string' && (item as any).quantity.trim() ? (item as any).quantity.trim() : undefined,
             storage: isPantryStorage((item as any).storage) ? (item as any).storage : 'pantry',
             addedAt: Number((item as any).addedAt) || Date.now()
-          }) as PantryItem[]
+          } as PantryItem))
       )
     : initialState.pantry;
 
