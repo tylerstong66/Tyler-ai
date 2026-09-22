@@ -36,8 +36,8 @@ export default function CookModeScreen() {
   }, [stepIndex, step]);
 
   useEffect(() => {
-    if (!running || remaining <= 0) return;
-    const id = setInterval(() => {
+    if (!running) return;
+    const timerId = setInterval(() => {
       setRemaining((current) => {
         if (current <= 1) {
           setRunning(false);
@@ -50,8 +50,8 @@ export default function CookModeScreen() {
         return current - 1;
       });
     }, 1000);
-    return () => clearInterval(id);
-  }, [running, remaining]);
+    return () => clearInterval(timerId);
+  }, [running]);
 
   if (!recipe) {
     return <View style={styles.center}><Text style={styles.title}>Recipe not found.</Text></View>;
