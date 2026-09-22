@@ -68,18 +68,25 @@ const server = http.createServer(async (req, res) => {
       const body = normalizeRecipeRequest(await readBody(req));
       if (!body.pantry.length) return json(res, 400, { error: 'Add at least one kitchen item first.' });
       const instruction = [
-        'Create one practical home-cooking recipe.',
+        'Create one original, polished home-cooking recipe at the standard of a professional test kitchen or fine restaurant, while keeping it practical for a home cook.',
+        'Do not copy or imitate the wording of any published chef or recipe.',
         'The meal category must be exactly ' + body.mealCategory + '.',
-        'The cooking time must fit ' + timeText(body.timeBucket) + '.',
+        'The total cooking time must fit ' + timeText(body.timeBucket) + '.',
         'Treat allergies and avoid-items as hard constraints.',
-        'Prefer kitchen inventory; list only genuinely missing items in missingIngredients.',
+        'Prefer the user\'s kitchen inventory and list only genuinely missing items in missingIngredients.',
         'Use feedback as taste preference only, never as an allergy signal.',
-        'Return realistic quantities and safe cooking directions.'
+        'Every ingredient must include a useful quantity or count, except salt and pepper when they are truly to taste.',
+        'Instructions must be chronological and precise. For every active cooking step, specify the burner heat level or oven temperature, an estimated time range, and a sensory doneness cue such as color, texture, reduction, or tenderness.',
+        'When meat, poultry, seafood, eggs, casseroles, or reheated leftovers are involved, include an appropriate safe internal temperature in the relevant instruction and summarize critical safety information in safetyNotes.',
+        'Use USDA-style minimum safety targets: poultry 165°F, ground beef/pork/lamb/veal 160°F, fish and whole beef/pork/lamb/veal cuts 145°F with a 3-minute rest for whole cuts, and egg dishes/casseroles 160°F or 165°F as appropriate.',
+        'Include resting time when it materially affects texture or safety.',
+        'Use professional technique: browning before braising, controlled simmering rather than violent boiling, proper pan preheating, finishing pasta in sauce where appropriate, resting proteins, and adding delicate herbs/acids at the right time.',
+        'Keep the directions concise enough to cook from on a phone, but never omit temperatures, timing, or doneness information that affects success.'
       ].join(' ');
       const result = await callOpenAI(RECIPE_MODEL, [
         { role: 'system', content: [{ type: 'input_text', text: instruction }] },
         { role: 'user', content: [{ type: 'input_text', text: JSON.stringify(body) }] }
-      ], recipeFormat(), { effort: 'low' });
+      ], recipeFormat(), { effort: 'medium' });
       validateRecipe(result, body);
       result.id = 'ai-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
       result.generated = true;
