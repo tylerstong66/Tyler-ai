@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { FeedbackButtons } from '@/src/components/FeedbackButtons';
@@ -16,6 +17,7 @@ const TIMES: { key: TimeBucket; label: string }[] = [
 const MEALS: MealCategory[] = ['breakfast', 'lunch', 'dinner', 'snack', 'dessert'];
 
 export default function SurpriseScreen() {
+  const router = useRouter();
   const { state, markRecipeChosen, saveGeneratedRecipe, setRecipeFeedback, addRecipeMissingToShoppingList } = useApp();
   const fallback = useMemo(() => createPantrySurprise(state, 'quick', 'dinner'), []);
   const [recipe, setRecipe] = useState<Recipe>(fallback);
@@ -64,6 +66,12 @@ export default function SurpriseScreen() {
     setRecipeFeedback(recipe, rating);
   }
 
+  function startCookMode() {
+    markRecipeChosen(recipe);
+    setChosen(true);
+    router.push({ pathname: '/cook/[id]', params: { id: recipe.id, servings: String(recipe.servings || 4) } });
+  }
+
   return (
     <ScrollView contentContainerStyle={styles.content}>
       <Text style={styles.kicker}>AI MEAL GENERATOR</Text>
@@ -109,7 +117,9 @@ export default function SurpriseScreen() {
       </Card>
 
       {state.profile.allergies.length ? <Text style={styles.allergy}>AI allergy filtering is not a medical guarantee. Verify labels, ingredients, and cross-contact yourself.</Text> : null}
-      <PrimaryButton label="I’ll make this" onPress={choose} disabled={loading} />
+      <PrimaryButton label="👨‍🍳 Start Cook Mode" onPress={startCookMode} disabled={loading} />
+      <SecondaryButton label="I’ll make this" onPress={choose} />
+      <SecondaryButton label="Open full recipe" onPress={() => router.push(`/recipe/${recipe.id}`)} />
       {chosen || state.recipeFeedback[recipe.id] ? (
         <Card>
           <Text style={styles.section}>How was it?</Text>
