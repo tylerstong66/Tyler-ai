@@ -5,7 +5,7 @@ const PORT = Number(process.env.PORT || 8787);
 const KEY = process.env.OPENAI_API_KEY || '';
 const VISION_MODEL = process.env.OPENAI_VISION_MODEL || 'gpt-5.6-luna';
 const RECIPE_MODEL = process.env.OPENAI_RECIPE_MODEL || 'gpt-5.6-luna';
-const BETA_CODE = process.env.DINNER_AI_BETA_CODE || 'DINNER91';
+const BETA_CODE = process.env.DINNER_AI_BETA_CODE || '';
 const BETA_SECRET = process.env.DINNER_AI_BETA_SECRET || (KEY ? crypto.createHash('sha256').update(KEY + ':dinner-ai-beta-v1').digest('hex') : '');
 const BETA_AUTH_ENABLED = Boolean(BETA_CODE && BETA_SECRET);
 const MAX_BODY = 15 * 1024 * 1024;
@@ -49,7 +49,7 @@ const server = http.createServer(async (req, res) => {
       const code = typeof body.code === 'string' ? body.code.trim() : '';
 
       if (!BETA_AUTH_ENABLED) {
-        return json(res, 200, { token: 'development-beta-token', expiresInDays: 30 });
+        return json(res, 503, { error: 'Beta access is temporarily unavailable.' });
       }
 
       if (!code || !safeEqualText(code.toUpperCase(), BETA_CODE.toUpperCase())) {
@@ -353,7 +353,7 @@ function issueBetaToken() {
 }
 
 function verifyBetaRequest(req) {
-  if (!BETA_AUTH_ENABLED) return { ok: true, session: { id: 'development' } };
+  if (!BETA_AUTH_ENABLED) return { ok: false };
   const auth = typeof req.headers.authorization === 'string' ? req.headers.authorization : '';
   if (!auth.startsWith('Bearer ')) return { ok: false };
   const token = auth.slice(7).trim();
@@ -369,6 +369,11 @@ function verifyBetaRequest(req) {
 
 function takeRate(key, limit, windowMs) {
   const now = Date.now();
+  if (rateBuckets.size > 2000) {
+    for (const [bucketKey, bucket] of rateBuckets) {
+      if (now >= bucket.resetAt) rateBuckets.delete(bucketKey);
+    }
+  }
   const existing = rateBuckets.get(key);
   if (!existing || now >= existing.resetAt) {
     rateBuckets.set(key, { count: 1, resetAt: now + windowMs });
