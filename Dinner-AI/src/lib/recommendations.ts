@@ -1,5 +1,5 @@
 import { AppState, MealCategory, Recipe, TimeBucket } from '@/src/types';
-import { isCommonStapleIngredient } from '@/src/lib/shopping';
+import { canonicalIngredient, ingredientsMatch, isCommonStapleIngredient } from '@/src/lib/shopping';
 
 export function bucketForMinutes(minutes: number): TimeBucket {
   if (minutes <= 30) return 'quick';
@@ -11,7 +11,19 @@ const normalize = (value: string) => value.trim().toLowerCase();
 
 function includesTerm(texts: string[], term: string) {
   const needle = normalize(term);
-  return needle.length > 0 && texts.some((value) => normalize(value).includes(needle));
+  if (!needle) return false;
+
+  const canonicalNeedle = canonicalIngredient(needle);
+  return texts.some((value) => {
+    const normalizedValue = normalize(value);
+    if (needle.includes(' ')) return normalizedValue.includes(needle);
+
+    const words = normalizedValue.split(/[^a-z0-9]+/).filter(Boolean);
+    if (words.includes(needle)) return true;
+
+    const canonicalValue = canonicalIngredient(value);
+    return Boolean(canonicalNeedle && canonicalValue && ingredientsMatch(canonicalValue, canonicalNeedle));
+  });
 }
 
 export function isRecipeSafe(recipe: Recipe, allergies: string[]) {
@@ -35,12 +47,11 @@ function meetsDietaryNotes(recipe: Recipe, notes: string) {
 }
 
 export function scoreRecipe(recipe: Recipe, state: AppState) {
-  const pantryNames = state.pantry.map((item) => normalize(item.name));
+  const pantryNames = state.pantry.map((item) => item.name).filter(Boolean);
   const recipeIngredients = recipe.ingredients
-    .filter((ingredient) => !isCommonStapleIngredient(ingredient))
-    .map(normalize);
+    .filter((ingredient) => !isCommonStapleIngredient(ingredient));
   const matched = recipeIngredients.filter((ingredient) =>
-    pantryNames.some((pantry) => pantry.includes(ingredient) || ingredient.includes(pantry))
+    pantryNames.some((pantry) => ingredientsMatch(ingredient, pantry))
   ).length;
 
   const coverage = recipeIngredients.length ? matched / recipeIngredients.length : 0;
@@ -130,10 +141,9 @@ export function createPantrySurprise(state: AppState, bucket: TimeBucket = 'quic
 
 function recipeSimilarity(recipe: Recipe, feedbackTags: string[], feedbackIngredients: string[], feedbackCategory?: MealCategory) {
   const recipeTags = new Set(recipe.tags.map(normalize));
-  const recipeIngredients = recipe.ingredients.map(normalize);
   const sharedTags = feedbackTags.map(normalize).filter((tag) => tag && recipeTags.has(tag)).length;
-  const sharedIngredients = feedbackIngredients.map(normalize).filter((ingredient) =>
-    ingredient && recipeIngredients.some((candidate) => candidate.includes(ingredient) || ingredient.includes(candidate))
+  const sharedIngredients = feedbackIngredients.filter((ingredient) =>
+    ingredient && recipe.ingredients.some((candidate) => ingredientsMatch(candidate, ingredient))
   ).length;
   const categoryMatch = feedbackCategory && feedbackCategory === recipe.category ? 1 : 0;
   return sharedTags * 2 + Math.min(sharedIngredients, 6) + categoryMatch;
