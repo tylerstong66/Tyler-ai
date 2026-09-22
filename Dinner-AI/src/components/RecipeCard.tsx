@@ -1,8 +1,16 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Recipe } from '@/src/types';
-import { Card, Pill, colors } from './ui';
+import { colors } from './ui';
+
+const CATEGORY_EMOJI: Record<Recipe['category'], string> = {
+  breakfast: '☀️',
+  lunch: '🥪',
+  dinner: '🍽️',
+  snack: '🍎',
+  dessert: '🍰'
+};
 
 export function RecipeCard({ recipe, match, favorite }: { recipe: Recipe; match?: string; favorite?: boolean }) {
   const router = useRouter();
@@ -10,75 +18,74 @@ export function RecipeCard({ recipe, match, favorite }: { recipe: Recipe; match?
   return (
     <Pressable
       onPress={() => router.push(`/recipe/${recipe.id}`)}
-      style={({ pressed }) => pressed ? styles.pressed : undefined}
+      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
-      <Card style={styles.card}>
-        <View style={styles.topRow}>
+      {recipe.imageUrl ? (
+        <Image source={{ uri: recipe.imageUrl }} style={styles.image} resizeMode="cover" />
+      ) : (
+        <View style={styles.imageFallback}>
+          <Text style={styles.fallbackEmoji}>{CATEGORY_EMOJI[recipe.category]}</Text>
+          <Text style={styles.fallbackText}>{recipe.category}</Text>
+        </View>
+      )}
+
+      <View style={styles.body}>
+        <View style={styles.titleRow}>
           <View style={styles.titleWrap}>
-            <View style={styles.titleLine}>
-              <Text style={styles.title}>{recipe.title}</Text>
+            <View style={styles.labelRow}>
+              <Text style={styles.category}>{recipe.category.toUpperCase()}</Text>
               {recipe.generated ? <Text style={styles.aiBadge}>AI</Text> : null}
             </View>
-            <Text style={styles.description} numberOfLines={3}>{recipe.description}</Text>
+            <Text style={styles.title} numberOfLines={2}>{recipe.title}</Text>
           </View>
-          <View style={[styles.favoriteCircle, favorite && styles.favoriteCircleActive]}>
-            <Text style={[styles.heart, favorite && styles.heartActive]}>{favorite ? '♥' : '♡'}</Text>
-          </View>
+          <Text style={[styles.heart, favorite && styles.heartActive]}>{favorite ? '♥' : '♡'}</Text>
         </View>
 
-        <View style={styles.footer}>
-          <View style={styles.pills}>
-            <Pill>{recipe.category.charAt(0).toUpperCase() + recipe.category.slice(1)}</Pill>
-            <Pill>{recipe.minutes} min</Pill>
-          </View>
+        <Text style={styles.description} numberOfLines={2}>{recipe.description}</Text>
+
+        <View style={styles.metaRow}>
+          <Text style={styles.meta}>{recipe.minutes} min</Text>
+          {match ? <Text style={styles.dot}>•</Text> : null}
           {match ? <Text style={styles.match}>{match}</Text> : null}
         </View>
-      </Card>
+      </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  pressed: { opacity: 0.92, transform: [{ scale: 0.995 }] },
-  card: { gap: 15 },
-  topRow: { flexDirection: 'row', gap: 14, alignItems: 'flex-start' },
-  titleWrap: { flex: 1 },
-  titleLine: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 7 },
-  title: { flexShrink: 1, color: colors.text, fontSize: 19, lineHeight: 24, fontWeight: '900' },
-  aiBadge: {
-    color: colors.greenDark,
-    backgroundColor: colors.greenSoft,
-    fontSize: 10,
-    fontWeight: '900',
-    paddingHorizontal: 7,
-    paddingVertical: 4,
-    borderRadius: 999,
-    overflow: 'hidden'
-  },
-  description: { color: colors.muted, lineHeight: 21, fontSize: 14.5 },
-  favoriteCircle: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: colors.surface,
+  card: {
+    backgroundColor: colors.card,
+    borderRadius: 22,
+    overflow: 'hidden',
     borderWidth: 1,
     borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center'
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.05,
+    shadowRadius: 13,
+    elevation: 2
   },
-  favoriteCircleActive: { backgroundColor: '#FFF2EA', borderColor: '#F1D7C8' },
-  heart: { fontSize: 21, color: colors.muted, lineHeight: 23 },
+  pressed: { opacity: 0.94, transform: [{ scale: 0.995 }] },
+  image: { width: '100%', height: 168, backgroundColor: colors.greenSoft },
+  imageFallback: {
+    width: '100%', height: 150, backgroundColor: colors.greenSoft,
+    alignItems: 'center', justifyContent: 'center'
+  },
+  fallbackEmoji: { fontSize: 34, marginBottom: 6 },
+  fallbackText: { color: colors.greenDark, fontWeight: '900', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1.2 },
+  body: { padding: 16, gap: 8 },
+  titleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+  titleWrap: { flex: 1 },
+  labelRow: { flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: 5 },
+  category: { color: colors.green, fontWeight: '900', fontSize: 10, letterSpacing: 1.1 },
+  aiBadge: { color: colors.greenDark, backgroundColor: colors.greenSoft, fontSize: 9, fontWeight: '900', paddingHorizontal: 6, paddingVertical: 3, borderRadius: 999, overflow: 'hidden' },
+  title: { color: colors.text, fontSize: 19, lineHeight: 24, fontWeight: '900', letterSpacing: -0.25 },
+  heart: { color: colors.muted, fontSize: 24, lineHeight: 25 },
   heartActive: { color: colors.orange },
-  footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
-  pills: { flexDirection: 'row', gap: 7, flexWrap: 'wrap', flexShrink: 1 },
-  match: {
-    color: colors.greenDark,
-    backgroundColor: colors.greenFaint,
-    borderRadius: 999,
-    paddingHorizontal: 9,
-    paddingVertical: 6,
-    fontWeight: '800',
-    fontSize: 11,
-    overflow: 'hidden'
-  }
+  description: { color: colors.muted, fontSize: 14, lineHeight: 20 },
+  metaRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
+  meta: { color: colors.text, fontWeight: '800', fontSize: 12 },
+  dot: { color: colors.borderStrong, fontWeight: '900' },
+  match: { color: colors.greenDark, fontWeight: '800', fontSize: 12 }
 });
