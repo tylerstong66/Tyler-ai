@@ -89,7 +89,7 @@ export function AppProvider({ children }: PropsWithChildren) {
       ...current,
       generatedRecipes: recipe.generated ? upsertGeneratedRecipe(current.generatedRecipes, recipe) : current.generatedRecipes,
       recipeSelections: { ...current.recipeSelections, [recipe.id]: (current.recipeSelections[recipe.id] ?? 0) + 1 },
-      shoppingList: mergeRecipeMissingIngredients(current.shoppingList, recipe)
+      shoppingList: mergeRecipeMissingIngredients(current.shoppingList, recipe, current.pantry)
     })),
     setRecipeFeedback: (recipe, rating) => setState((current) => ({
       ...current,
@@ -98,7 +98,7 @@ export function AppProvider({ children }: PropsWithChildren) {
         [recipe.id]: { rating, title: recipe.title, tags: recipe.tags, ingredients: recipe.ingredients, category: recipe.category, updatedAt: Date.now() }
       }
     })),
-    addRecipeMissingToShoppingList: (recipe) => setState((current) => ({ ...current, shoppingList: mergeRecipeMissingIngredients(current.shoppingList, recipe) })),
+    addRecipeMissingToShoppingList: (recipe) => setState((current) => ({ ...current, shoppingList: mergeRecipeMissingIngredients(current.shoppingList, recipe, current.pantry) })),
     addShoppingItem: (name) => {
       const clean = name.trim();
       if (!clean) return;
