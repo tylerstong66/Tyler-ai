@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'expo-router';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { PrimaryButton, colors } from '@/src/components/ui';
 import { useApp } from '@/src/context/AppContext';
@@ -6,6 +7,7 @@ import { useApp } from '@/src/context/AppContext';
 const splitTerms = (value: string) => value.split(',').map((v) => v.trim()).filter(Boolean);
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const { state, updateProfile, resetData } = useApp();
   const [likes, setLikes] = useState(state.profile.likes.join(', '));
   const [dislikes, setDislikes] = useState(state.profile.dislikes.join(', '));
@@ -76,6 +78,20 @@ export default function ProfileScreen() {
       />
 
       <PrimaryButton label="Save food profile" onPress={save} />
+
+      <View style={styles.betaPanel}>
+        <Text style={styles.betaEyebrow}>PRIVATE BETA</Text>
+        <Text style={styles.betaTitle}>Help make Dinner AI better</Text>
+        <Text style={styles.help}>Report anything broken, confusing, unsafe, or missing. Feedback includes the app version and current screen.</Text>
+        <Pressable onPress={() => router.push({ pathname: '/feedback', params: { from: '/(tabs)/profile' } })} style={styles.betaLink}>
+          <Text style={styles.betaLinkText}>Send beta feedback</Text>
+          <Text style={styles.betaArrow}>›</Text>
+        </Pressable>
+        <Pressable onPress={() => router.push('/privacy')} style={styles.betaLink}>
+          <Text style={styles.betaLinkText}>Privacy & safety</Text>
+          <Text style={styles.betaArrow}>›</Text>
+        </Pressable>
+      </View>
 
       <Pressable
         onPress={() => Alert.alert(
@@ -164,6 +180,12 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top'
   },
   inputTall: { minHeight: 92 },
+  betaPanel: { backgroundColor: colors.greenFaint, borderWidth: 1, borderColor: colors.borderStrong, borderRadius: 20, padding: 16, marginTop: 22, marginBottom: 8 },
+  betaEyebrow: { color: colors.green, fontSize: 10, fontWeight: '900', letterSpacing: 1.4 },
+  betaTitle: { color: colors.text, fontSize: 18, fontWeight: '900', marginTop: 4, marginBottom: 4 },
+  betaLink: { minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: colors.border, marginTop: 10, paddingTop: 10 },
+  betaLinkText: { color: colors.greenDark, fontWeight: '900', fontSize: 14 },
+  betaArrow: { color: colors.greenDark, fontSize: 26, lineHeight: 27 },
   reset: { alignItems: 'center', paddingVertical: 22, marginTop: 3 },
   resetText: { color: colors.danger, fontWeight: '800', fontSize: 13 }
 });
