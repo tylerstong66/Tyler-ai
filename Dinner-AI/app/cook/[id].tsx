@@ -76,7 +76,7 @@ export default function CookModeScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.progressTrack}>
-        <View style={[styles.progressFill, { width: ((stepIndex + 1) / totalSteps * 100) + '%' }]} />
+        <View style={[styles.progressFill, { width: (((stepIndex + 1) / totalSteps * 100) + '%') as any }]} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -106,7 +106,7 @@ export default function CookModeScreen() {
             <Text style={styles.timerLabel}>STEP TIMER</Text>
             <Text style={styles.timer}>{formatClock(remaining)}</Text>
             <View style={styles.timerButtons}>
-              <Pressable onPress={() => setRunning((value) => !value)} style={styles.timerPrimary}>
+              <Pressable onPress={() => { if (remaining === 0) { completedRef.current = false; setRemaining(initialTimer); setRunning(true); } else { setRunning((value) => !value); } }} style={styles.timerPrimary}>
                 <Text style={styles.timerPrimaryText}>{running ? 'Pause' : remaining === 0 ? 'Restart' : 'Start'}</Text>
               </Pressable>
               <Pressable onPress={() => resetTimer()} style={styles.timerSecondary}>
