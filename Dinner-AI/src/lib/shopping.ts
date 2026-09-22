@@ -9,7 +9,8 @@ export function deriveRecipeMissingIngredients(recipe: Recipe, pantry: PantryIte
   const explicit = (recipe.missingIngredients ?? [])
     .map((item) => item.trim())
     .filter(Boolean)
-    .filter((item) => !isCommonStapleIngredient(item));
+    .filter((item) => !isCommonStapleIngredient(item))
+    .filter((ingredient) => !pantryNames.some((pantryName) => ingredientsMatch(ingredient, pantryName)));
 
   const inferred = recipe.ingredients
     .map((item) => item.trim())
@@ -121,7 +122,9 @@ export function canonicalIngredient(value: string) {
     'ml','l','can','cans','package','packages','pkg','clove','cloves',
     'slice','slices','piece','pieces','pinch','dash',
     'small','medium','large','fresh','finely','roughly','chopped','diced','minced',
-    'sliced','grated','shredded','melted','softened','divided','boneless','skinless'
+    'sliced','grated','shredded','melted','softened','divided','boneless','skinless',
+    'cooked','uncooked','drained','rinsed','crushed','peeled','seeded','trimmed',
+    'packed','heaping','level','room','temperature','plus','more','for','serving'
   ]);
 
   return normalizeShoppingName(value)
@@ -141,7 +144,7 @@ export function canonicalIngredient(value: string) {
 function singularize(word: string) {
   if (word.length > 4 && word.endsWith('ies')) return word.slice(0, -3) + 'y';
   if (word.length > 4 && word.endsWith('oes')) return word.slice(0, -2);
-  if (word.length > 4 && word.endsWith('ses')) return word.slice(0, -2);
+  if (word.endsWith('sses')) return word.slice(0, -2);
   if (word.length > 3 && word.endsWith('s') && !word.endsWith('ss')) return word.slice(0, -1);
   return word;
 }
