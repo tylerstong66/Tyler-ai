@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { FeedbackButtons } from '@/src/components/FeedbackButtons';
 import { Card, Pill, PrimaryButton, SecondaryButton, colors } from '@/src/components/ui';
 import { useApp } from '@/src/context/AppContext';
@@ -46,6 +46,7 @@ export default function RecipeDetailScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
+      {recipe.imageUrl ? <Image source={{ uri: recipe.imageUrl }} style={styles.heroImage} resizeMode="cover" /> : <View style={styles.heroFallback}><Text style={styles.heroFallbackEmoji}>{recipe.category === 'dessert' ? '🍰' : recipe.category === 'breakfast' ? '☀️' : recipe.category === 'lunch' ? '🥪' : recipe.category === 'snack' ? '🍎' : '🍽️'}</Text></View>}
       <View>
         <View style={styles.badges}>
           {recipe.generated ? <Pill>AI creation</Pill> : null}
@@ -100,6 +101,9 @@ export default function RecipeDetailScreen() {
 
 const styles = StyleSheet.create({
   content: { paddingHorizontal: 20, paddingTop: 16, gap: 16, backgroundColor: colors.bg, paddingBottom: 44 },
+  heroImage: { width: '100%', height: 240, borderRadius: 24, backgroundColor: colors.greenSoft },
+  heroFallback: { width: '100%', height: 190, borderRadius: 24, backgroundColor: colors.greenSoft, alignItems: 'center', justifyContent: 'center' },
+  heroFallbackEmoji: { fontSize: 44 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bg },
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, marginBottom: 12 },
   title: { color: colors.text, fontSize: 31, lineHeight: 37, fontWeight: '900', letterSpacing: -0.5 },
