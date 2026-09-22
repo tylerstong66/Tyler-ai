@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TextInput } from 'react-native';
-import { Card, PrimaryButton, SecondaryButton, colors } from '@/src/components/ui';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { PrimaryButton, colors } from '@/src/components/ui';
 import { useApp } from '@/src/context/AppContext';
 
 const splitTerms = (value: string) => value.split(',').map((v) => v.trim()).filter(Boolean);
@@ -20,50 +20,150 @@ export default function ProfileScreen() {
   }, [state.profile]);
 
   function save() {
-    updateProfile({ likes: splitTerms(likes), dislikes: splitTerms(dislikes), allergies: splitTerms(allergies), dietaryNotes: notes.trim() });
+    updateProfile({
+      likes: splitTerms(likes),
+      dislikes: splitTerms(dislikes),
+      allergies: splitTerms(allergies),
+      dietaryNotes: notes.trim()
+    });
     Alert.alert('Saved', 'Your food profile will now guide recommendations.');
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-      <Card style={styles.card}>
-        <Text style={styles.title}>Foods you like</Text>
-        <Text style={styles.help}>Comma-separated. Example: chicken, spicy food, Italian</Text>
-        <TextInput value={likes} onChangeText={setLikes} style={styles.input} placeholder="Add favorites" placeholderTextColor={colors.muted} multiline />
-      </Card>
+    <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+      <View style={styles.header}>
+        <Text style={styles.eyebrow}>YOUR TASTE</Text>
+        <Text style={styles.title}>Make Dinner AI yours</Text>
+        <Text style={styles.sub}>Tell it what you enjoy, what to avoid, and anything else that should shape your recipes.</Text>
+      </View>
 
-      <Card style={styles.card}>
-        <Text style={styles.title}>Foods you dislike</Text>
-        <Text style={styles.help}>These are heavily penalized in recommendations.</Text>
-        <TextInput value={dislikes} onChangeText={setDislikes} style={styles.input} placeholder="e.g. mushrooms, olives" placeholderTextColor={colors.muted} multiline />
-      </Card>
+      <PreferenceSection
+        emoji="😍"
+        title="Foods you like"
+        help="These get a boost in future recommendations."
+        value={likes}
+        onChangeText={setLikes}
+        placeholder="Chicken, spicy food, Italian…"
+      />
 
-      <Card style={styles.card}>
-        <Text style={styles.title}>Allergies / ingredients to avoid</Text>
-        <Text style={styles.warning}>Recipes containing matching terms are hidden. Always verify ingredient labels yourself for serious allergies.</Text>
-        <TextInput value={allergies} onChangeText={setAllergies} style={styles.input} placeholder="e.g. peanuts, shellfish, dairy" placeholderTextColor={colors.muted} multiline />
-      </Card>
+      <PreferenceSection
+        emoji="🙅"
+        title="Foods you dislike"
+        help="Dinner AI will strongly avoid these."
+        value={dislikes}
+        onChangeText={setDislikes}
+        placeholder="Mushrooms, olives…"
+      />
 
-      <Card style={styles.card}>
-        <Text style={styles.title}>Other food preferences</Text>
-        <TextInput value={notes} onChangeText={setNotes} style={[styles.input, styles.notes]} placeholder="Vegetarian on weekdays, low sodium, toddler-friendly, etc." placeholderTextColor={colors.muted} multiline />
-      </Card>
+      <PreferenceSection
+        emoji="⚠️"
+        title="Allergies / avoid"
+        help="Matching recipes are filtered out. Always verify labels for serious allergies."
+        value={allergies}
+        onChangeText={setAllergies}
+        placeholder="Peanuts, shellfish, dairy…"
+        warning
+      />
+
+      <PreferenceSection
+        emoji="📝"
+        title="Other preferences"
+        help="Diet, family needs, nutrition goals, or anything else."
+        value={notes}
+        onChangeText={setNotes}
+        placeholder="Toddler-friendly, vegetarian weekdays, low sodium…"
+        tall
+      />
 
       <PrimaryButton label="Save food profile" onPress={save} />
-      <SecondaryButton label="Reset prototype data" onPress={() => Alert.alert('Reset Dinner AI?', 'This removes pantry items, favorites, preferences, and learning history.', [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Reset', style: 'destructive', onPress: resetData }
-      ])} />
+
+      <Pressable
+        onPress={() => Alert.alert(
+          'Reset Dinner AI?',
+          'This removes pantry items, favorites, preferences, and learning history.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Reset', style: 'destructive', onPress: resetData }
+          ]
+        )}
+        style={styles.reset}
+      >
+        <Text style={styles.resetText}>Reset app data</Text>
+      </Pressable>
     </ScrollView>
   );
 }
 
+function PreferenceSection({
+  emoji,
+  title,
+  help,
+  value,
+  onChangeText,
+  placeholder,
+  warning = false,
+  tall = false
+}: {
+  emoji: string;
+  title: string;
+  help: string;
+  value: string;
+  onChangeText: (value: string) => void;
+  placeholder: string;
+  warning?: boolean;
+  tall?: boolean;
+}) {
+  return (
+    <View style={styles.section}>
+      <View style={styles.sectionHeader}>
+        <View style={styles.iconCircle}><Text style={styles.icon}>{emoji}</Text></View>
+        <View style={styles.sectionCopy}>
+          <Text style={styles.sectionTitle}>{title}</Text>
+          <Text style={[styles.help, warning && styles.warning]}>{help}</Text>
+        </View>
+      </View>
+
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        style={[styles.input, tall && styles.inputTall]}
+        placeholder={placeholder}
+        placeholderTextColor={colors.muted}
+        multiline
+      />
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
-  content: { paddingHorizontal: 20, paddingTop: 16, gap: 14, backgroundColor: colors.bg, paddingBottom: 42 },
-  card: { gap: 9 },
-  title: { color: colors.text, fontSize: 18, lineHeight: 23, fontWeight: '900' },
-  help: { color: colors.muted, lineHeight: 20, fontSize: 13 },
-  warning: { color: colors.danger, lineHeight: 19, fontSize: 13 },
-  input: { minHeight: 50, borderWidth: 1, borderColor: colors.border, borderRadius: 16, padding: 14, color: colors.text, backgroundColor: colors.surface, textAlignVertical: 'top', fontSize: 15 },
-  notes: { minHeight: 90 }
+  content: { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 46, backgroundColor: colors.bg },
+  header: { marginBottom: 24 },
+  eyebrow: { color: colors.green, fontSize: 11, fontWeight: '900', letterSpacing: 1.7 },
+  title: { color: colors.text, fontSize: 30, lineHeight: 35, fontWeight: '900', letterSpacing: -0.7, marginTop: 6 },
+  sub: { color: colors.muted, lineHeight: 21, marginTop: 7, fontSize: 14.5, maxWidth: 540 },
+
+  section: { marginBottom: 25 },
+  sectionHeader: { flexDirection: 'row', gap: 12, alignItems: 'flex-start', marginBottom: 10 },
+  iconCircle: { width: 40, height: 40, borderRadius: 14, backgroundColor: colors.greenSoft, alignItems: 'center', justifyContent: 'center' },
+  icon: { fontSize: 18 },
+  sectionCopy: { flex: 1 },
+  sectionTitle: { color: colors.text, fontSize: 17, fontWeight: '900', lineHeight: 22 },
+  help: { color: colors.muted, fontSize: 12.5, lineHeight: 18, marginTop: 2 },
+  warning: { color: colors.danger },
+  input: {
+    minHeight: 58,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 17,
+    paddingHorizontal: 15,
+    paddingVertical: 13,
+    color: colors.text,
+    fontSize: 15,
+    lineHeight: 21,
+    textAlignVertical: 'top'
+  },
+  inputTall: { minHeight: 92 },
+  reset: { alignItems: 'center', paddingVertical: 22, marginTop: 3 },
+  resetText: { color: colors.danger, fontWeight: '800', fontSize: 13 }
 });
