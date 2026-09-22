@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
 import { DetectedIngredient } from '@/src/types';
+import { betaFetch, friendlyBetaError, reportClientError, sendBetaEvent } from '@/src/lib/beta';
 
 const configuredBaseUrl = process.env.EXPO_PUBLIC_AI_BASE_URL?.replace(/\/$/, '');
 const DEV_WEB_BASE_URL = Platform.OS === 'web' ? 'http://localhost:8787' : '';
@@ -19,7 +20,7 @@ export async function analyzeFridgePhoto(imageBase64: string, mimeType = 'image/
   const timer = setTimeout(() => controller.abort(), 90_000);
 
   try {
-    const response = await fetch(`${API_BASE_URL}/analyze-fridge`, {
+    const response = await betaFetch('/analyze-fridge', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ imageBase64, mimeType }),
@@ -38,10 +39,13 @@ export async function analyzeFridgePhoto(imageBase64: string, mimeType = 'image/
           .filter((item: DetectedIngredient | null): item is DetectedIngredient => Boolean(item))
       : [];
 
+    void sendBetaEvent('fridge_scan_completed', '/scan-fridge', { detected: ingredients.length });
     return { ingredients, model: typeof body?.model === 'string' ? body.model : undefined };
   } catch (error: any) {
+    void reportClientError(error, '/scan-fridge');
+    void sendBetaEvent('fridge_scan_failed', '/scan-fridge');
     if (error?.name === 'AbortError') throw new Error('The fridge scan timed out. Please try again.');
-    throw error;
+    throw new Error(friendlyBetaError(error, 'Dinner AI could not analyze that photo. Please try again.'));
   } finally {
     clearTimeout(timer);
   }
