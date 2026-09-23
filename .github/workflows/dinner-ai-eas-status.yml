@@ -20,6 +20,15 @@ jobs:
           node-version: 22
       - run: npm install
       - run: npm install --global eas-cli
+      - name: Inspect next EAS upload archive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          rm -rf /tmp/dinner-ai-eas-archive
+          eas build:inspect --platform android --stage archive --profile preview --output /tmp/dinner-ai-eas-archive --force
+          test -f /tmp/dinner-ai-eas-archive/src/lib/recommendations.ts
+          echo "Verified: src/lib/recommendations.ts is present in the EAS archive."
+
       - name: Show recent Android builds
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
