@@ -26,8 +26,10 @@ jobs:
         run: |
           rm -rf /tmp/dinner-ai-eas-archive
           eas build:inspect --platform android --stage archive --profile preview --output /tmp/dinner-ai-eas-archive --force
-          test -f /tmp/dinner-ai-eas-archive/src/lib/recommendations.ts
-          echo "Verified: src/lib/recommendations.ts is present in the EAS archive."
+          echo "Checking archived Dinner AI source files..."
+          find /tmp/dinner-ai-eas-archive -maxdepth 5 -type f -name 'recommendations.ts' -print
+          test -f /tmp/dinner-ai-eas-archive/Dinner-AI/src/lib/recommendations.ts
+          echo "Verified: Dinner-AI/src/lib/recommendations.ts is present in the EAS archive."
 
       - name: Show recent Android builds
         env:
