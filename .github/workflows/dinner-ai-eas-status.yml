@@ -40,12 +40,10 @@ jobs:
             echo "No EAS log URL found."
             exit 1
           fi
-          curl -fsSL "$LOG_URL" -o /tmp/eas-build.log
-          if gzip -t /tmp/eas-build.log 2>/dev/null; then
-            gzip -dc /tmp/eas-build.log > /tmp/eas-build.txt
-          else
-            cp /tmp/eas-build.log /tmp/eas-build.txt
-          fi
+          curl --compressed -fsSL "$LOG_URL" -o /tmp/eas-build.txt
+          echo "Downloaded EAS log type:"
+          file /tmp/eas-build.txt
+          xxd -l 24 /tmp/eas-build.txt || true
           echo "===== EAS bundle failure lines ====="
           grep -nEi "error|failed|unable to resolve|module not found|syntax|referenceerror|typeerror|bundle javascript|metro" /tmp/eas-build.txt | tail -160 || true
           echo "===== Raw EAS log tail ====="
