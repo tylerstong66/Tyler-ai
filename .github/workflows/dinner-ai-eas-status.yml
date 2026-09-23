@@ -1,74 +1,67 @@
 name: Dinner AI EAS Status
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - dinner-ai-app
     paths:
       - Dinner-AI/.eas-status-trigger
 
+permissions:
+  contents: read
+
 jobs:
-  status:
+  export-apk:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: Dinner-AI
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v6
+      - name: Check out Dinner AI
+        uses: actions/checkout@v5
+
+      - name: Use Node 22
+        uses: actions/setup-node@v6
         with:
           node-version: 22
-      - run: npm install
-      - run: npm install --global eas-cli
-      - name: Inspect next EAS upload archive
+          cache: npm
+          cache-dependency-path: Dinner-AI/package.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Setup EAS CLI
+        run: npm install --global eas-cli
+
+      - name: Verify and download stable-signed v0.9.4
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_BUILD_ID: 2b10edb4-9b0d-4b97-8afa-1acb0076b727
         run: |
-          rm -rf /tmp/dinner-ai-eas-archive
-          eas build:inspect --platform android --stage archive --profile preview --output /tmp/dinner-ai-eas-archive --force
-          echo "Checking archived Dinner AI source files..."
-          find /tmp/dinner-ai-eas-archive -maxdepth 5 -type f -name 'recommendations.ts' -print
-          test -f /tmp/dinner-ai-eas-archive/Dinner-AI/src/lib/recommendations.ts
-          echo "Verified: Dinner-AI/src/lib/recommendations.ts is present in the EAS archive."
-
-      - name: Show recent Android builds
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas build:list --platform android --limit 5 --json --non-interactive
-
-      - name: Inspect failed stable-signing build
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas build:view 7d2b8ff1-628a-4fb0-be23-df17670e7ba1 --json
-
-      - name: Download failed EAS log
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: |
-          eas build:view 7d2b8ff1-628a-4fb0-be23-df17670e7ba1 --json > /tmp/eas-build.json
-          LOG_URL=$(node -e "const f=require('/tmp/eas-build.json'); console.log(f.logFiles?.[0] || '')")
-          if [ -z "$LOG_URL" ]; then
-            echo "No EAS log URL found."
-            exit 1
-          fi
-          curl --compressed -fsSL "$LOG_URL" -o /tmp/eas-build.txt
-          echo "Downloaded EAS log type:"
-          file /tmp/eas-build.txt
-          xxd -l 24 /tmp/eas-build.txt || true
-          echo "===== EAS bundle failure lines ====="
-          grep -nEi "error|failed|unable to resolve|module not found|syntax|referenceerror|typeerror|bundle javascript|metro" /tmp/eas-build.txt | tail -160 || true
-          echo "===== Parsed EAS failure records ====="
+          eas build:view "$EAS_BUILD_ID" --json > /tmp/eas-build.json
           node - <<'NODE'
           const fs = require('fs');
-          const lines = fs.readFileSync('/tmp/eas-build.txt','utf8').split(/\r?\n/).filter(Boolean);
-          for (const line of lines) {
-            try {
-              const row = JSON.parse(line);
-              const phase = String(row.phase || '');
-              const msg = String(row.msg || '');
-              const failed = row.result === 'failure' || Number(row.level || 0) >= 40;
-              const interesting = failed || /BUNDLE|JAVASCRIPT|METRO/i.test(phase) || /unable to resolve|module not found|syntaxerror|referenceerror|typeerror|error:/i.test(msg);
-              if (interesting) console.log(JSON.stringify({time: row.time, phase, level: row.level, result: row.result, msg}));
-            } catch {}
+          const { execFileSync } = require('child_process');
+          const build = JSON.parse(fs.readFileSync('/tmp/eas-build.json', 'utf8'));
+          if (build.status !== 'FINISHED') {
+            throw new Error(`Expected a finished EAS build, received ${build.status}`);
           }
+          const url = build.artifacts?.applicationArchiveUrl || build.artifacts?.buildUrl;
+          if (!url) throw new Error('The finished EAS build did not include an APK URL.');
+          execFileSync('curl', [
+            '--fail', '--location', '--silent', '--show-error',
+            '--retry', '3', '--output', '/tmp/Dinner-AI-v0.9.4-Stable.apk', url,
+          ], { stdio: 'inherit' });
+          const size = fs.statSync('/tmp/Dinner-AI-v0.9.4-Stable.apk').size;
+          if (size < 10_000_000) throw new Error(`Downloaded APK is unexpectedly small: ${size} bytes`);
+          console.log(`Verified stable APK: ${size} bytes`);
           NODE
+
+      - name: Upload stable Dinner AI APK
+        uses: actions/upload-artifact@v6
+        with:
+          name: Dinner-AI-v0.9.4-Stable
+          path: /tmp/Dinner-AI-v0.9.4-Stable.apk
+          if-no-files-found: error
+          retention-days: 30
