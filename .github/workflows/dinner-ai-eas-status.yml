@@ -28,13 +28,13 @@ jobs:
       - name: Inspect failed stable-signing build
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas build:view bd0a41ac-96ab-46dd-bd1a-5cd8a18e81a1 --json
+        run: eas build:view 7d2b8ff1-628a-4fb0-be23-df17670e7ba1 --json
 
       - name: Download failed EAS log
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
-          eas build:view bd0a41ac-96ab-46dd-bd1a-5cd8a18e81a1 --json > /tmp/eas-build.json
+          eas build:view 7d2b8ff1-628a-4fb0-be23-df17670e7ba1 --json > /tmp/eas-build.json
           LOG_URL=$(node -e "const f=require('/tmp/eas-build.json'); console.log(f.logFiles?.[0] || '')")
           if [ -z "$LOG_URL" ]; then
             echo "No EAS log URL found."
