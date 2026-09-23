@@ -46,5 +46,18 @@ jobs:
           xxd -l 24 /tmp/eas-build.txt || true
           echo "===== EAS bundle failure lines ====="
           grep -nEi "error|failed|unable to resolve|module not found|syntax|referenceerror|typeerror|bundle javascript|metro" /tmp/eas-build.txt | tail -160 || true
-          echo "===== Raw EAS log tail ====="
-          tail -220 /tmp/eas-build.txt
+          echo "===== Parsed EAS failure records ====="
+          node - <<'NODE'
+          const fs = require('fs');
+          const lines = fs.readFileSync('/tmp/eas-build.txt','utf8').split(/\r?\n/).filter(Boolean);
+          for (const line of lines) {
+            try {
+              const row = JSON.parse(line);
+              const phase = String(row.phase || '');
+              const msg = String(row.msg || '');
+              const failed = row.result === 'failure' || Number(row.level || 0) >= 40;
+              const interesting = failed || /BUNDLE|JAVASCRIPT|METRO/i.test(phase) || /unable to resolve|module not found|syntaxerror|referenceerror|typeerror|error:/i.test(msg);
+              if (interesting) console.log(JSON.stringify({time: row.time, phase, level: row.level, result: row.result, msg}));
+            } catch {}
+          }
+          NODE
