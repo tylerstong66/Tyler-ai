@@ -8,3 +8,13 @@ server/
 *.log
 .env
 .env.*
+
+# Explicitly include Dinner AI application source even if parent repository ignore rules match names like lib/
+!app/
+!app/**
+!src/
+!src/**
+!assets/
+!assets/**
+!scripts/
+!scripts/**
