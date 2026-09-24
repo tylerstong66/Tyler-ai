@@ -71,7 +71,7 @@ export default function ScanFridgeScreen() {
   if (!permission.granted) return (
     <View style={styles.permission}>
       <Text style={styles.title}>Camera permission needed</Text>
-      <Text style={styles.muted}>Dinner AI needs camera access only when you choose to scan your fridge.</Text>
+      <Text style={styles.muted}>InDinecision needs camera access only when you choose to scan your fridge.</Text>
       <PrimaryButton
         label={permission.canAskAgain ? "Allow camera" : "Open phone settings"}
         onPress={() => permission.canAskAgain ? void requestPermission() : void Linking.openSettings()}
@@ -98,7 +98,7 @@ export default function ScanFridgeScreen() {
       {!busy && items.some((item) => item.confidence < 0.72) ? (
         <Card style={styles.reviewCard}>
           <Text style={styles.reviewTitle}>Review uncertain items</Text>
-          <Text style={styles.muted}>Low-confidence detections are left unchecked so Dinner AI does not add a guess to your Kitchen without you confirming it.</Text>
+          <Text style={styles.muted}>Low-confidence detections are left unchecked so InDinecision does not add a guess to your Kitchen without you confirming it.</Text>
         </Card>
       ) : null}
 

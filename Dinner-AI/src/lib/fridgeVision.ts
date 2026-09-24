@@ -45,7 +45,7 @@ export async function analyzeFridgePhoto(imageBase64: string, mimeType = 'image/
     void reportClientError(error, '/scan-fridge');
     void sendBetaEvent('fridge_scan_failed', '/scan-fridge');
     if (error?.name === 'AbortError') throw new Error('The fridge scan timed out. Please try again.');
-    throw new Error(friendlyBetaError(error, 'Dinner AI could not analyze that photo. Please try again.'));
+    throw new Error(friendlyBetaError(error, 'InDinecision could not analyze that photo. Please try again.'));
   } finally {
     clearTimeout(timer);
   }

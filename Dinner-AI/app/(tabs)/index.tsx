@@ -32,9 +32,12 @@ export default function HomeScreen() {
   return (
     <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
       <View style={styles.top}>
-        <Text style={styles.brand}>DINNER AI</Text>
-        <Text style={styles.hero}>What sounds good today?</Text>
-        <Text style={styles.sub}>Ideas built around what you have and what you actually like.</Text>
+        <View style={styles.brandRow}>
+          <Image source={require('../../assets/indinecision-icon.png')} style={styles.brandIcon} />
+          <Text style={styles.brand}>InDinecision</Text>
+        </View>
+        <Text style={styles.hero}>We pick. You cook.</Text>
+        <Text style={styles.sub}>Meals chosen around what you have and what you actually like.</Text>
       </View>
 
       <View style={styles.quickRow}>
@@ -88,7 +91,7 @@ export default function HomeScreen() {
       ) : (
         <View style={styles.emptyFeature}>
           <Text style={styles.emptyTitle}>Add a few kitchen items</Text>
-          <Text style={styles.emptyText}>Dinner AI will start ranking recipes around what you already have.</Text>
+          <Text style={styles.emptyText}>InDinecision will start ranking recipes around what you already have.</Text>
         </View>
       )}
 
@@ -130,7 +133,9 @@ function QuickAction({ icon, label, onPress }: { icon: string; label: string; on
 const styles = StyleSheet.create({
   content: { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 44, backgroundColor: colors.bg },
   top: { marginBottom: 20 },
-  brand: { color: colors.green, fontWeight: '900', fontSize: 11, letterSpacing: 1.9 },
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  brandIcon: { width: 30, height: 30, borderRadius: 8 },
+  brand: { color: colors.green, fontWeight: '900', fontSize: 16, letterSpacing: -0.3 },
   hero: { color: colors.text, fontSize: 34, lineHeight: 39, fontWeight: '900', letterSpacing: -0.9, marginTop: 7 },
   sub: { color: colors.muted, fontSize: 15.5, lineHeight: 22, marginTop: 8, maxWidth: 520 },
 

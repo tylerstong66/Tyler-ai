@@ -78,7 +78,7 @@ export default function RecipesScreen() {
       <View style={styles.header}>
         <Text style={styles.eyebrow}>DISCOVER</Text>
         <Text style={styles.title}>Recipes for your kitchen</Text>
-        <Text style={styles.sub}>Search the full Dinner AI cookbook, then narrow it by meal, cooking time, protein, or what you already have.</Text>
+        <Text style={styles.sub}>Search the full InDinecision cookbook, then narrow it by meal, cooking time, protein, or what you already have.</Text>
       </View>
 
       <View style={styles.searchWrap}>

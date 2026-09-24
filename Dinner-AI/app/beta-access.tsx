@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 import { PrimaryButton, colors } from '@/src/components/ui';
 import { redeemBetaCode, sendBetaEvent } from '@/src/lib/beta';
 
@@ -29,9 +29,9 @@ export default function BetaAccessScreen() {
   return (
     <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={styles.card}>
-        <View style={styles.icon}><Text style={styles.iconText}>β</Text></View>
+        <Image source={require('../assets/indinecision-icon.png')} style={styles.icon} />
         <Text style={styles.eyebrow}>PRIVATE TEST</Text>
-        <Text style={styles.title}>Welcome to Dinner AI Beta</Text>
+        <Text style={styles.title}>Welcome to InDinecision</Text>
         <Text style={styles.body}>Enter the beta code you were given. This helps us protect the AI service while a small group tests the app.</Text>
 
         <TextInput
@@ -58,8 +58,7 @@ export default function BetaAccessScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1, justifyContent: 'center', paddingHorizontal: 24, backgroundColor: colors.bg },
   card: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 28, padding: 24, gap: 14 },
-  icon: { width: 62, height: 62, borderRadius: 21, backgroundColor: colors.greenSoft, alignItems: 'center', justifyContent: 'center' },
-  iconText: { color: colors.greenDark, fontSize: 30, fontWeight: '900' },
+  icon: { width: 62, height: 62, borderRadius: 21 },
   eyebrow: { color: colors.green, fontWeight: '900', fontSize: 10, letterSpacing: 1.7, marginTop: 4 },
   title: { color: colors.text, fontSize: 30, lineHeight: 35, fontWeight: '900', letterSpacing: -0.7 },
   body: { color: colors.muted, fontSize: 15, lineHeight: 22 },

@@ -40,7 +40,7 @@ export default function RecipeDetailScreen() {
     Alert.alert(
       `${recipe!.category.charAt(0).toUpperCase() + recipe!.category.slice(1)} selected`,
       missing
-        ? 'Dinner AI added the missing ingredients to your shopping list.'
+        ? 'InDinecision added the missing ingredients to your shopping list.'
         : 'This meal was added to your learning history.'
     );
   }

@@ -50,7 +50,7 @@ export default function SurpriseScreen() {
       setSource('ai');
       setChosen(false);
     } catch (e: any) {
-      const text = e?.message === 'AI_BACKEND_NOT_CONFIGURED' ? 'AI backend is not configured, so Dinner AI used its local fallback.' : (e?.message || 'AI generation is unavailable right now.');
+      const text = e?.message === 'AI_BACKEND_NOT_CONFIGURED' ? 'AI backend is not configured, so InDinecision used its local fallback.' : (e?.message || 'AI generation is unavailable right now.');
       setMessage(text);
       setRecipe(localFallbackRecipe(state, nextTime, nextMeal));
       setSource('local');
@@ -64,7 +64,7 @@ export default function SurpriseScreen() {
   function choose() {
     markRecipeChosen(recipe);
     setChosen(true);
-    Alert.alert('Meal selected', missingIngredients.length ? 'Missing items were added to your shopping list.' : 'This choice was added to Dinner AI’s learning history.');
+    Alert.alert('Meal selected', missingIngredients.length ? 'Missing items were added to your shopping list.' : 'This choice was added to InDinecision’s learning history.');
   }
 
   function rate(rating: RecipeFeedbackRating) {

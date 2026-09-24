@@ -35,7 +35,7 @@ export default function FeedbackScreen() {
     <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
       <Text style={styles.eyebrow}>PRIVATE BETA</Text>
       <Text style={styles.title}>Send feedback</Text>
-      <Text style={styles.sub}>Tell us what happened in your own words. Dinner AI automatically includes the beta version and the screen you came from.</Text>
+      <Text style={styles.sub}>Tell us what happened in your own words. InDinecision automatically includes the beta version and the screen you came from.</Text>
 
       <Text style={styles.label}>What kind of feedback?</Text>
       <View style={styles.chips}>

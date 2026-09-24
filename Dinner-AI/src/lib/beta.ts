@@ -23,7 +23,7 @@ export async function markOnboardingComplete() {
 }
 
 export async function redeemBetaCode(code: string) {
-  if (!API_BASE_URL) throw new Error('Dinner AI beta service is not configured.');
+  if (!API_BASE_URL) throw new Error('InDinecision beta service is not configured.');
 
   const response = await fetchWithTimeout(`${API_BASE_URL}/beta/access`, {
     method: 'POST',
@@ -47,7 +47,7 @@ export async function clearBetaToken() {
 }
 
 export async function betaFetch(path: string, init: RequestInit = {}, timeoutMs = 15_000) {
-  if (!API_BASE_URL) throw new Error('Dinner AI beta service is not configured.');
+  if (!API_BASE_URL) throw new Error('InDinecision beta service is not configured.');
   const token = await getBetaToken();
   if (!token) throw new Error('BETA_ACCESS_REQUIRED');
 
@@ -123,10 +123,10 @@ export async function reportClientError(error: unknown, screen?: string, fatal =
 
 export function friendlyBetaError(error: any, fallback: string) {
   const message = typeof error?.message === 'string' ? error.message : '';
-  if (message === 'BETA_ACCESS_REQUIRED') return 'Your beta session has expired. Reopen Dinner AI and enter the beta access code again.';
+  if (message === 'BETA_ACCESS_REQUIRED') return 'Your beta session has expired. Reopen InDinecision and enter the beta access code again.';
   if (/rate limit|too many|daily limit/i.test(message)) return message;
-  if (/timed out|timeout/i.test(message)) return 'Dinner AI took too long to respond. Please try again.';
-  if (/network request failed|failed to fetch|network/i.test(message)) return 'Dinner AI could not reach the service. Check your internet connection and try again.';
+  if (/timed out|timeout/i.test(message)) return 'InDinecision took too long to respond. Please try again.';
+  if (/network request failed|failed to fetch|network/i.test(message)) return 'InDinecision could not reach the service. Check your internet connection and try again.';
   return message || fallback;
 }
 
@@ -151,7 +151,7 @@ async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: numbe
   try {
     return await fetch(url, { ...init, signal: controller.signal });
   } catch (error: any) {
-    if (error?.name === 'AbortError') throw new Error('Dinner AI request timed out. Please try again.');
+    if (error?.name === 'AbortError') throw new Error('InDinecision request timed out. Please try again.');
     throw error;
   } finally {
     clearTimeout(timer);

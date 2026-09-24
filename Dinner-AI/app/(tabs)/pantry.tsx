@@ -35,7 +35,7 @@ export default function PantryScreen() {
         <View style={styles.headerRow}>
           <View style={styles.headerCopy}>
             <Text style={styles.title}>What you have</Text>
-            <Text style={styles.sub}>Keep this current and Dinner AI can make smarter recommendations.</Text>
+            <Text style={styles.sub}>Keep this current and InDinecision can make smarter recommendations.</Text>
           </View>
           <View style={styles.totalBubble}>
             <Text style={styles.totalNumber}>{state.pantry.length}</Text>

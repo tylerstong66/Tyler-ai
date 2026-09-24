@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Dinner AI",
+    "name": "InDinecision",
     "slug": "dinner-ai",
-    "version": "0.9.4",
+    "version": "0.9.5",
     "orientation": "portrait",
     "scheme": "dinnerai",
     "userInterfaceStyle": "automatic",
@@ -11,7 +11,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow Dinner AI to use your camera to scan your fridge and food barcodes.",
+          "cameraPermission": "Allow InDinecision to use your camera to scan your fridge and food barcodes.",
           "barcodeScannerEnabled": true,
           "recordAudioAndroid": false
         }
@@ -27,18 +27,23 @@
     ],
     "android": {
       "package": "com.dinnerai.app",
-      "versionCode": 16,
+      "versionCode": 17,
       "permissions": [
         "CAMERA"
-      ]
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/indinecision-icon.png",
+        "backgroundColor": "#FFFDF8"
+      }
     },
     "ios": {
       "bundleIdentifier": "com.dinnerai.app",
-      "buildNumber": "16",
+      "buildNumber": "17",
       "supportsTablet": false,
       "infoPlist": {
-        "NSCameraUsageDescription": "Dinner AI uses the camera to scan your refrigerator and food barcodes."
-      }
+        "NSCameraUsageDescription": "InDinecision uses the camera to scan your refrigerator and food barcodes."
+      },
+      "icon": "./assets/indinecision-icon.png"
     },
     "web": {
       "bundler": "metro"
@@ -51,6 +56,7 @@
       "eas": {
         "projectId": "0cbf5170-095b-4c59-8ac7-2e15667ed41c"
       }
-    }
+    },
+    "icon": "./assets/indinecision-icon.png"
   }
 }

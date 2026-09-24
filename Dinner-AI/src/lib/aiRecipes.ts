@@ -65,7 +65,7 @@ export async function generateAIRecipe(state: AppState, timeBucket: TimeBucket, 
     void reportClientError(error, '/surprise');
     void sendBetaEvent('ai_recipe_failed', '/surprise', { category: mealCategory, timeBucket });
     if (error?.name === 'AbortError') throw new Error('Recipe generation timed out. Please try again.');
-    throw new Error(friendlyBetaError(error, 'Dinner AI could not create a recipe right now. Please try again.'));
+    throw new Error(friendlyBetaError(error, 'InDinecision could not create a recipe right now. Please try again.'));
   } finally {
     clearTimeout(timer);
   }

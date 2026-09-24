@@ -1,4 +1,4 @@
-# Dinner AI v0.6
+# InDinecision v0.9.5
 
 Phone-ready Expo/React Native app for meal recommendations, kitchen inventory, fridge-photo scanning, UPC scanning, AI-generated recipes, favorites, meal feedback, and shopping lists.
 
@@ -14,4 +14,6 @@ Use the `Dinner-AI` directory as the project root, then run:
 
 `eas build --platform android --profile preview`
 
-This GitHub copy omits custom icon/splash image assets so cloud upload is text-only; Expo can use platform defaults for a test APK. Custom artwork can be restored before store release.
+The approved logo and launcher icon are included in `assets/`. Version 0.9.5 keeps the existing `com.dinnerai.app` application ID and local storage keys so it can update the existing beta installation without clearing saved data.
+
+The app requires an authenticated Expo account to run the EAS build. Use the same Expo project already configured in `app.json`; the build produces the APK download link.

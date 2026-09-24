@@ -63,7 +63,7 @@ export default function ScanUpcScreen() {
     return (
       <View style={styles.permission}>
         <Text style={styles.title}>Camera permission needed</Text>
-        <Text style={styles.help}>Dinner AI uses the camera only when you choose to scan food or your fridge.</Text>
+        <Text style={styles.help}>InDinecision uses the camera only when you choose to scan food or your fridge.</Text>
         <PrimaryButton
           label={permission.canAskAgain ? "Allow camera" : "Open phone settings"}
           onPress={() => permission.canAskAgain ? void requestPermission() : void Linking.openSettings()}

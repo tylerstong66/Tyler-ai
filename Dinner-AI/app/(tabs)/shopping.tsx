@@ -32,7 +32,7 @@ export default function ShoppingScreen() {
       <View style={styles.header}>
         <Text style={styles.eyebrow}>SHOP</Text>
         <Text style={styles.title}>Your shopping list</Text>
-        <Text style={styles.sub}>Dinner AI adds genuinely missing recipe ingredients automatically.</Text>
+        <Text style={styles.sub}>InDinecision adds genuinely missing recipe ingredients automatically.</Text>
       </View>
 
       <View style={styles.addRow}>

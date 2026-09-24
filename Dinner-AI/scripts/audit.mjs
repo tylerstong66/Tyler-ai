@@ -44,8 +44,13 @@ assert(/^\d+$/.test(String(app.expo?.ios?.buildNumber || '')), 'iOS buildNumber 
 const atlasPath = path.join(root, 'assets/recipe-atlas.jpg');
 assert(fs.existsSync(atlasPath), 'Recipe photo atlas is missing.');
 assert(fs.statSync(atlasPath).size < 3_000_000, 'Recipe photo atlas is unexpectedly large.');
+assert(app.expo?.name === 'InDinecision', 'Display name must match the beta brand.');
+assert(app.expo?.android?.package === 'com.dinnerai.app', 'Changing the Android package would break beta upgrades.');
+for (const asset of ['assets/indinecision-icon.png', 'assets/indinecision-logo.png']) {
+  assert(fs.existsSync(path.join(root, asset)), `Missing brand asset: ${asset}`);
+}
 
-console.log(`Dinner AI audit passed: ${recipeIds.length} recipes, ${photoIds.length} mapped photos, version ${pkg.version}.`);
+console.log(`InDinecision audit passed: ${recipeIds.length} recipes, ${photoIds.length} mapped photos, version ${pkg.version}.`);
 
 function assert(condition, message) {
   if (!condition) {

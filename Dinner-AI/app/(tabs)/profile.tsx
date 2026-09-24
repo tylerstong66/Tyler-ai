@@ -35,7 +35,7 @@ export default function ProfileScreen() {
     <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <Text style={styles.eyebrow}>YOUR TASTE</Text>
-        <Text style={styles.title}>Make Dinner AI yours</Text>
+        <Text style={styles.title}>Make InDinecision yours</Text>
         <Text style={styles.sub}>Tell it what you enjoy, what to avoid, and anything else that should shape your recipes.</Text>
       </View>
 
@@ -51,7 +51,7 @@ export default function ProfileScreen() {
       <PreferenceSection
         emoji="🙅"
         title="Foods you dislike"
-        help="Dinner AI will strongly avoid these."
+        help="InDinecision will strongly avoid these."
         value={dislikes}
         onChangeText={setDislikes}
         placeholder="Mushrooms, olives…"
@@ -81,7 +81,7 @@ export default function ProfileScreen() {
 
       <View style={styles.betaPanel}>
         <Text style={styles.betaEyebrow}>PRIVATE BETA</Text>
-        <Text style={styles.betaTitle}>Help make Dinner AI better</Text>
+        <Text style={styles.betaTitle}>Help make InDinecision better</Text>
         <Text style={styles.help}>Report anything broken, confusing, unsafe, or missing. Feedback includes the app version and current screen.</Text>
         <Pressable onPress={() => router.push({ pathname: '/feedback', params: { from: '/(tabs)/profile' } })} style={styles.betaLink}>
           <Text style={styles.betaLinkText}>Send beta feedback</Text>
@@ -95,7 +95,7 @@ export default function ProfileScreen() {
 
       <Pressable
         onPress={() => Alert.alert(
-          'Reset Dinner AI?',
+          'Reset InDinecision?',
           'This removes pantry items, favorites, preferences, and learning history.',
           [
             { text: 'Cancel', style: 'cancel' },
