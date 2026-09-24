@@ -21,25 +21,15 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: Dinner-AI/package-lock.json
+      - name: Install app dependencies
+        run: npm ci
       - name: Install EAS CLI
         run: npm install --global eas-cli
-      - name: Report recent Android builds
+      - name: Verify project and report recent Android builds
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
-          eas build:list --platform android --limit 5 --json --non-interactive > /tmp/indinecision-builds.json
-          node - <<'NODE'
-          const fs = require('fs');
-          const raw = fs.readFileSync('/tmp/indinecision-builds.json', 'utf8');
-          const builds = JSON.parse(raw.slice(raw.indexOf('[')));
-          for (const build of builds) {
-            console.log(JSON.stringify({
-              id: build.id,
-              status: build.status,
-              createdAt: build.createdAt,
-              finishedAt: build.finishedAt,
-              version: build.appVersion,
-              profile: build.buildProfile
-            }));
-          }
-          NODE
+          eas project:info
+          eas build:list --platform android --limit 5 --non-interactive
