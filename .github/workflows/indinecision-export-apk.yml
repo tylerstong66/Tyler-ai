@@ -1,0 +1,57 @@
+name: Export InDinecision v0.9.5 APK
+
+on:
+  push:
+    branches: [dinner-ai-app]
+    paths:
+      - .github/workflows/indinecision-export-apk.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export-apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Dinner-AI
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: Dinner-AI/package-lock.json
+      - run: npm ci
+      - run: npm install --global eas-cli
+      - name: Download finished EAS build
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_BUILD_ID: 4fddeca0-7eda-48e6-9226-09ab51718869
+        run: |
+          eas build:view "$EAS_BUILD_ID" --json > /tmp/indinecision-build.json
+          node - <<'NODE'
+          const fs = require('fs');
+          const { execFileSync } = require('child_process');
+          const raw = fs.readFileSync('/tmp/indinecision-build.json', 'utf8');
+          const build = JSON.parse(raw.slice(raw.indexOf('{')));
+          if (build.status !== 'FINISHED' || build.appVersion !== '0.9.5' ||
+              build.appBuildVersion !== '17') {
+            throw new Error('Unexpected EAS build status or app version');
+          }
+          const url = build.artifacts?.applicationArchiveUrl || build.artifacts?.buildUrl;
+          if (!url) throw new Error('Finished EAS build has no APK URL');
+          execFileSync('curl', ['--fail', '--location', '--silent', '--show-error',
+            '--retry', '3', '--output', '/tmp/InDinecision-v0.9.5.apk', url], { stdio: 'inherit' });
+          const size = fs.statSync('/tmp/InDinecision-v0.9.5.apk').size;
+          if (size < 10_000_000) throw new Error('APK is unexpectedly small: ' + size);
+          console.log('Downloaded signed APK: ' + size + ' bytes');
+          NODE
+          unzip -t /tmp/InDinecision-v0.9.5.apk | tail -n 1
+      - uses: actions/upload-artifact@v6
+        with:
+          name: InDinecision-v0.9.5
+          path: /tmp/InDinecision-v0.9.5.apk
+          if-no-files-found: error
+          retention-days: 30
