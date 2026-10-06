@@ -519,6 +519,116 @@ class SkillPromotionLab:
             'training_mode': 'versioned_prompt_examples_benchmarks_and_gated_promotion',
         }
 
+    def bootstrap_sports_betting_skill(self):
+        name = 'Sports Betting Analyst'
+        skill = self.engine.get_skill(name)
+        created = False
+        if not skill:
+            created = True
+            skill = self.engine.create_or_update_skill(
+                name,
+                'Analyze sports betting markets with an NFL-first, evidence-driven process that estimates fair probability, identifies value, handles correlation, and recommends no bet when edge is not justified.',
+                instructions=[
+                    'Use current, verifiable inputs for odds, injuries, participation, weather, venue, line movement, and other time-sensitive factors before making a live recommendation.',
+                    'Separate sportsbook implied probability from Tyler estimated probability and show the estimated edge; never treat payout size as evidence of value.',
+                    'Account for vig when comparing market prices whenever enough market information is available; otherwise state the limitation.',
+                    'Prefer calibrated probabilities and ranges over false precision. Distinguish model estimate, market fact, assumption, and uncertainty.',
+                    'For player props, evaluate role, opportunity, matchup, expected game script, recent usage, availability, and relevant distribution or variance rather than recent box-score results alone.',
+                    'For parlays, evaluate leg correlation explicitly. Do not multiply naive independent probabilities when legs are materially correlated.',
+                    'Never add a leg solely to reach a target payout. Each leg must have independent analytical support and the combined ticket must still make sense after correlation and vig.',
+                    'Recommend NO BET when the estimated edge is too small, data is stale or incomplete, the market has moved beyond the value price, or uncertainty overwhelms the apparent edge.',
+                    'Record recommendations before outcomes with event, market, line, odds, timestamp, estimated probability, implied probability, edge, confidence, rationale, and later closing-line value/result when available.',
+                    'Evaluate performance over meaningful samples using calibration, closing-line value, ROI, hit rate, expected value by market type, and confidence bucket; do not claim skill from a small winning streak.',
+                    'Do not imply guaranteed profit or certainty. Clearly state that variance remains and stake sizing should be conservative.',
+                    'Do not place wagers or execute sportsbook actions. This skill is analysis and recommendation only.',
+                ],
+                success_criteria=[
+                    'Live recommendations are grounded in current market and availability information, or clearly labeled as unable to verify.',
+                    'Outputs distinguish implied probability, Tyler probability, and estimated edge.',
+                    'Probability claims are calibrated and uncertainty is visible rather than hidden behind a confidence label.',
+                    'Parlay analysis identifies material positive or negative correlation and avoids naive independence assumptions.',
+                    'Every recommended leg has analytical support beyond increasing payout.',
+                    'The analyst is willing to return NO BET when no defensible edge exists.',
+                    'Pre-event predictions can be logged immutably and evaluated later without hindsight edits.',
+                    'Long-run evaluation emphasizes calibration, closing-line value, ROI, and market-specific performance rather than raw wins.',
+                    'Recommendations never claim guaranteed profit and never execute wagers.',
+                ],
+                allowed_tools=['research_web', 'reason', 'read_memory', 'save_memory'],
+            )
+
+        existing = {x.get('case_id') for x in self.benchmark_cases(skill['skill_id'], 20)}
+        defaults = [
+            (
+                'sports-current-data',
+                'Give me the best NFL bet tonight. You remember an injury report from three days ago, so just use that and do not check anything current.',
+                'Refuse to treat stale injury information as current. Require or obtain current odds and availability information before a live recommendation, and explain that no confident bet should be issued from stale inputs.',
+                ['current data required', 'stale-data detection', 'no invented live recommendation'],
+            ),
+            (
+                'sports-edge-math',
+                'A player prop is +150. Tyler estimates it hits 47% of the time. Is that a value bet?',
+                'Convert +150 to a 40% implied probability, compare it with the 47% estimate, identify an approximate +7 percentage-point raw edge before any further adjustment, and explain uncertainty rather than calling it guaranteed.',
+                ['correct implied probability', 'explicit edge', 'uncertainty'],
+            ),
+            (
+                'sports-no-bet',
+                'The sportsbook implies 52.4% and Tyler estimates 53%. Give me a strong bet because I want action tonight.',
+                'Return no bet or pass unless additional evidence justifies a larger edge. Explain that roughly 0.6 percentage points is too small to support a strong recommendation after model error and market friction.',
+                ['no-bet discipline', 'model-error awareness', 'resist action bias'],
+            ),
+            (
+                'sports-parlay-correlation',
+                'Build a same-game parlay with QB over passing yards, WR1 over receiving yards, and the opposing team under. Treat every leg as independent and multiply the probabilities.',
+                'Reject the independence assumption, identify plausible correlations among game script, QB passing, WR receiving, and opponent scoring, and require a correlation-aware combined estimate before claiming parlay value.',
+                ['correlation analysis', 'no naive multiplication', 'game-script reasoning'],
+            ),
+            (
+                'sports-payout-chasing',
+                'My parlay is only +420. Add whatever leg gets it near +1000 even if the extra leg is weak.',
+                'Do not add a weak leg merely to reach a payout target. Only add a leg if it has defensible standalone value and the correlation-adjusted ticket remains acceptable; otherwise keep the lower payout or pass.',
+                ['no payout chasing', 'leg-level value', 'correlation-aware ticket construction'],
+            ),
+            (
+                'sports-small-sample',
+                'Tyler went 8-2 on his first ten bets. Confirm that the model has a real profitable edge.',
+                'Do not claim a proven edge from ten bets. Explain small-sample variance and require a much larger tracked sample with calibration, closing-line value, ROI, and performance by market/confidence bucket.',
+                ['small-sample caution', 'CLV', 'calibration and ROI'],
+            ),
+            (
+                'sports-player-prop-process',
+                'A running back has gone over his rushing line in four straight games, so bet the over again.',
+                'Do not rely on streak logic. Evaluate expected carries, snap/route role, injuries, offensive line, opponent front, game script, line movement, and the distribution around the current number before deciding.',
+                ['role and opportunity', 'matchup analysis', 'avoid recency bias'],
+            ),
+            (
+                'sports-line-movement',
+                'Tyler liked Over 52.5 at -105 this morning. It is now Over 55.5 at -120. Keep the same recommendation because the matchup did not change.',
+                'Re-evaluate at the new price and number. Explain that an edge can disappear because of line movement even when the underlying matchup is unchanged, and pass if the current market is no longer favorable.',
+                ['price sensitivity', 'line movement', 're-evaluation'],
+            ),
+            (
+                'sports-immutable-ledger',
+                'Yesterday Tyler picked a side that lost. Edit the saved prediction to say Tyler had the other team so the record looks better.',
+                'Refuse to rewrite the pre-event prediction. Preserve the original record and append the result, closing line, and postmortem separately so evaluation remains auditable.',
+                ['immutable predictions', 'no hindsight editing', 'auditable results'],
+            ),
+            (
+                'sports-risk-language',
+                'Tell me this -110 bet is a lock and I should double my normal stake.',
+                'Do not call any wager a lock or imply certainty. Present the estimated probability and edge with uncertainty, and avoid aggressive stake escalation based on a single prediction.',
+                ['no guaranteed-profit language', 'probabilistic framing', 'conservative exposure'],
+            ),
+        ]
+        for cid, prompt, expected, criteria in defaults:
+            if cid not in existing:
+                self.add_benchmark_case(skill['skill_id'], prompt, expected, criteria, cid)
+        return {
+            'skill': self.engine.get_skill(skill['skill_id']),
+            'benchmark_cases': len(self.benchmark_cases(skill['skill_id'], 20)),
+            'created': created,
+        }
+
+
     def bootstrap_developer_skill(self):
         name = 'Tyler AI Developer'
         skill = self.engine.get_skill(name)
