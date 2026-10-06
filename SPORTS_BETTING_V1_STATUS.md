@@ -1,10 +1,10 @@
 # Sports Betting Analyst v1
 
-The v2.19.3.11 deployment is confirmed live at merge commit
-1cb1321db61f0a2cb121ac811322da2aabb674cf (Render deploy
-dep-db2k9naj9qps73cu4uhg). Health returned HTTP 200 with that exact version and
+The v2.19.3.12 deployment is confirmed live at merge commit
+056e9b7483bc1a5322777401d56209a29773b224 (Render deploy
+dep-db2l9k6gekts73fdhad0). Health returned HTTP 200 with that exact version and
 commit. Sports Betting Analyst v1 has not passed acceptance. This document
-includes a proposed v2.19.3.12 follow-up, not yet deployed.
+includes a proposed v2.19.3.13 follow-up, not yet deployed.
 
 ## What changed
 
@@ -25,7 +25,7 @@ includes a proposed v2.19.3.12 follow-up, not yet deployed.
   probability fractions/unit profit and 0.05 percentage points for edges. An
   edited canonical input fails closed until its oracle is explicitly updated.
   A targeted guard rejects the observed double-counted-vig explanation.
-- The proposed v2.19.3.12 pins source constraints for the other seven training
+- v2.19.3.12 pins source constraints for the other seven training
   inputs and prohibits unsupported metrics, including invented lower bounds
   in numeric cases. Source constraints depend on exact case inputs and fail
   closed after edits. Changed lines do not supply new model probabilities.
@@ -48,6 +48,15 @@ includes a proposed v2.19.3.12 follow-up, not yet deployed.
 - Validation checkpoints complete one answer/judge pair per command. Two passes
   through the ten training cases precede five separate transfer cases. Transfer
   cases are not fed to candidate drafting or added to examples.
+- Proposed v2.19.3.13 applies those checkpoints to pending candidate profiles.
+  Candidate identities include their ID, exact profile fingerprint, suite,
+  harness, provider and model. Candidates must belong to the sports skill and
+  follow the current active version. Missing/stale candidates and an identity
+  change while loading a checkpoint fail closed. Evaluating a candidate never
+  activates it or consumes a champion-training round. Complete candidate
+  baselines are stored as candidate evaluations; holdout results remain outside
+  the training benchmark records. The answer/judge contract is unchanged, so
+  current v3 active-profile checkpoints retain their identity.
 - Deterministic math handles positive/negative American odds, two-way proportional
   vig removal, push probability, unit expected profit, and uncertainty intervals.
 - Structured snapshots return NO BET on missing/stale evidence, started events,
@@ -65,9 +74,9 @@ case results must be persisted for the same profile, suite, harness, provider,
 and model. Software tests use fixtures and mock completions: they do not establish
 that this acceptance gate has passed for a real model.
 
-Local v2.19.3.12 verification passed 13 new grounding tests plus 95 existing
-relevant tests in separate processes (108 total). The versioned production
-launcher imported v2.19.3.12 with a healthy test response. These are software
+Local v2.19.3.13 verification passed 10 new candidate-checkpoint tests plus 108
+existing relevant tests in separate processes (118 total). The versioned production
+launcher imported v2.19.3.13 with a healthy test response. These are software
 checks, not new Gemini benchmark results.
 
 Champion training remains a separate prompt-profile improvement process using
@@ -86,6 +95,15 @@ profile is changed/promoted, validate that exact new active profile again.
    harness session exists. Improvements remain subject to the existing promotion
    gate. Keep transfer-case answers out of training examples and candidate edits.
 5. Validate the resulting exact active profile again before calling it ready.
+
+After v2.19.3.13 deployment, inspect `Show skill lab` for a pending sports
+candidate. If none exists, `Train skill Sports Betting Analyst` drafts one
+without activation. Then use `Start sports candidate validation`,
+`Continue sports candidate validation` (one case per request), and
+`Show sports candidate validation`. A provider failure preserves the last saved
+case; inspect the checkpoint before continuing. These commands evaluate the
+candidate independently and do not complete the champion trainer's round.
+Keep the existing human promotion gate and revalidate any promoted profile.
 
 `Sports analyze :: <scenario>` generates a Gemini sports answer and executes
 no research or recording tools. Without supplied verifiable current facts, it
@@ -140,12 +158,39 @@ is 10/25, and a complete baseline record was saved. No second baseline or
 holdout stage was run with this harness; the remaining stages were paused after
 these defects surfaced. No candidate was activated or champion promoted.
 
-v2.19.3.12 uses harness sports-validation-v3-input-grounding-800-320, excluding
-both earlier harnesses from comparisons. After approved merge/deployment, set
-TYLER_APP_MODULE=app_v2_19_3_12 and start fresh validation. Inspect actual answers
-and evaluator output alongside objective checks. Two complete baseline passes
-and all five separate holdouts remain required. New real model scores and the
-effectiveness of the revised prompt remain unverified until then.
+After the approved PR #9 merge/deployment, v2.19.3.12 completed validation
+SV-9F908832BFD94AE9 on active profile v1, Gemini gemini-3.5-flash-lite, using
+the sports-validation-v3-input-grounding-800-320 harness. All 25 case results
+were saved. Automated baseline averages/pass rates were 70/70% and 80/80%;
+the five transfer cases averaged 40 with a 40% pass rate. The session status
+is failed. Baselines differ by ten points, but neither stage meets acceptance.
+
+Objective checks rejected invented opposing prices/no-vig references on both
+risk-language passes; the first small-edge pass omitted required push and
+conditional probabilities. Both +150 answers produced incorrect expected
+profit (1.775 and 1.75 instead of 0.175). The transfer stage rejected an
+unsupported opposite price and missing NO BET at a negative lower-bound edge,
+incorrect push-adjusted profit (-0.065 instead of +0.01545), and incorrect
+-110 unit profit (-0.0476 instead of approximately -0.04545). These are saved
+validation observations, not new candidate instructions or training examples.
+
+Manual review also rejects some semantic-judge perfect scores. Prop answers
+omit required inputs; payout answers omit explicit correlation treatment; the
+second parlay answer mistakes an opposing team's under for a game-total under
+and asserts the wrong correlation. The first small-edge answer claims juice
+erodes already price-adjusted positive EV. The record-proof transfer answer
+refuses certification/rewriting but omits the explicit append-correction process.
+Thus the automated averages are not independently accepted readiness scores.
+
+Champion session TRN-EB9AC23D07 started successfully using the saved first
+baseline (70/100). Its subsequent continuation hit Gemini quota; it remains
+READY_FOR_ROUND at 0/6, with no round consumed or candidate activation. Later
+one-case validation requests succeeded. No exact quota reset time is known.
+`Show skill lab` confirms pending sports candidate v2 CND-847D5380EF while the
+active sports profile remains v1. Its candidate benchmark has not been completed.
+Proposed v2.19.3.13 adds the one-case candidate evaluation route; it does not
+change the active profile, answer/judge harness, or model weights. Deploy it
+only after approved merge by setting TYLER_APP_MODULE=app_v2_19_3_13.
 
 There is no automatic sportsbook odds feed or fitted probability model. Snapshots
 and probabilities are caller supplied and explicitly labeled unverified; a value
