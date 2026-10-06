@@ -28,9 +28,10 @@ HOLDOUTS = [
 
 
 class SportsValidation:
-    def __init__(self, lab, get_rows, save_row, provider, model, now_fn):
+    def __init__(self, lab, get_rows, save_row, provider, model, now_fn, candidate_fn=None):
         self.lab, self.get_rows, self.save_row = lab, get_rows, save_row
         self.provider, self.model, self.now_fn = provider, model, now_fn
+        self.candidate_fn = candidate_fn
         self.lock = threading.RLock()
 
     def _records(self):
@@ -46,15 +47,27 @@ class SportsValidation:
         profile = self.lab.engine.get_skill("Sports Betting Analyst")
         if not profile:
             raise ValueError("Sports Betting Analyst has not been registered.")
+        candidate = self.candidate_fn() if self.candidate_fn else None
+        if self.candidate_fn:
+            if not candidate or candidate.get("status") != "candidate" or not candidate.get("candidate_id"):
+                raise ValueError("No pending sports candidate exists. Run: Train skill Sports Betting Analyst")
+            if candidate.get("skill_id") != profile.get("skill_id") or int(candidate.get("base_version") or 0) != int(profile["version"]):
+                raise ValueError("The sports candidate is stale or belongs to another skill.")
+            if int(candidate.get("candidate_version") or 0) != int(profile["version"]) + 1:
+                raise ValueError("The sports candidate version does not follow the active version.")
+            profile = self.lab._candidate_profile(candidate)
         cases = self.lab.benchmark_cases(profile["skill_id"], 20)
         if len(cases) < 10:
             raise ValueError("The complete sports training suite is required.")
-        return profile, cases, {
+        identity = {
             "profile_fingerprint": self.lab._profile_fingerprint(profile),
             "suite_hash": self.lab._suite_hash(profile["skill_id"]),
             "holdout_hash": _hash(HOLDOUTS), "harness_version": HARNESS_VERSION,
             "evaluation_provider": self.provider, "evaluation_model": self.model,
         }
+        if candidate:
+            identity.update(target_kind="candidate", candidate_id=candidate["candidate_id"])
+        return profile, cases, identity
 
     def latest(self):
         _, _, identity = self.identity()
@@ -81,7 +94,9 @@ class SportsValidation:
                 raise ValueError("Run: Start sports validation")
             if session["status"] != "running":
                 return session
-            profile, cases, _ = self.identity()
+            profile, cases, identity = self.identity()
+            if identity != session["identity"]:
+                raise ValueError("The sports evaluation identity changed while reading the checkpoint; start or inspect the matching session.")
             index = session["completed_cases"]
             sequence = [("baseline_1", c) for c in cases] + [("baseline_2", c) for c in cases] + [("holdout", c) for c in HOLDOUTS]
             stage, case = sequence[index]
@@ -99,7 +114,8 @@ class SportsValidation:
                 payload = {
                     "kind": "skill_benchmark_run", "run_id": "EVL-" + _hash([session["validation_id"], stage])[:10].upper(),
                     "skill_id": profile["skill_id"], "skill_name": profile["name"],
-                    "target_kind": "active", "target_version": profile["version"], "candidate_id": None,
+                    "target_kind": session["identity"].get("target_kind", "active"),
+                    "target_version": profile["version"], "candidate_id": session["identity"].get("candidate_id"),
                     "suite_hash": session["identity"]["suite_hash"],
                     "profile_fingerprint": session["identity"]["profile_fingerprint"],
                     "case_count": len(completed), "average_score": round(sum(r["score"] for r in completed) / len(completed), 1),
