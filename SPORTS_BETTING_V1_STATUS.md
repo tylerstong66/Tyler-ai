@@ -1,9 +1,10 @@
 # Sports Betting Analyst v1
 
-The v2.19.3.10 deployment is confirmed live at merge commit
-5f1535fa2105b2231da9e581be63165bdf03399d (Render deploy
-dep-db2jh9ajnfac73chkmu0). Health returned HTTP 200 with that exact version and
-commit. This document describes a proposed v2.19.3.11 follow-up, not yet deployed.
+The v2.19.3.11 deployment is confirmed live at merge commit
+1cb1321db61f0a2cb121ac811322da2aabb674cf (Render deploy
+dep-db2k9naj9qps73cu4uhg). Health returned HTTP 200 with that exact version and
+commit. Sports Betting Analyst v1 has not passed acceptance. This document
+includes a proposed v2.19.3.12 follow-up, not yet deployed.
 
 ## What changed
 
@@ -24,6 +25,20 @@ commit. This document describes a proposed v2.19.3.11 follow-up, not yet deploye
   probability fractions/unit profit and 0.05 percentage points for edges. An
   edited canonical input fails closed until its oracle is explicitly updated.
   A targeted guard rejects the observed double-counted-vig explanation.
+- The proposed v2.19.3.12 pins source constraints for the other seven training
+  inputs and prohibits unsupported metrics, including invented lower bounds
+  in numeric cases. Source constraints depend on exact case inputs and fail
+  closed after edits. Changed lines do not supply new model probabilities.
+  An all-null output template and explicit process instructions are applied
+  after the profile instructions. This changes the harness prompt, not the
+  active skill profile or model weights.
+- Runtime no-vig calculations require structured two-way quotes (`market_type:
+  "two_way"`, `odds`, `opposite_odds`) or an explicit `both sides <American odds>`
+  phrase. Arbitrary prose price roles are not inferred; unsupported opposing
+  metrics fail closed. This conservatively checks caller-supplied quotes, not
+  their provenance or market truth. Use structured snapshots for complex inputs.
+- Semantic evaluator output is preserved, including malformed responses, so
+  a judge-format failure can be diagnosed without relaxing its acceptance gate.
 - The semantic judge must separately pass completeness, math, facts and task
   requirements. Any failed dimension or reported weakness caps its score below
   80; a perfect score cannot override an objective audit failure.
@@ -50,10 +65,10 @@ case results must be persisted for the same profile, suite, harness, provider,
 and model. Software tests use fixtures and mock completions: they do not establish
 that this acceptance gate has passed for a real model.
 
-Local follow-up verification passed 25 new audit/integration tests plus 65
-existing relevant tests in separate processes (90 total), and the versioned
-production launcher imported v2.19.3.11 with a healthy test response. These are
-software checks, not new Gemini benchmark results.
+Local v2.19.3.12 verification passed 13 new grounding tests plus 95 existing
+relevant tests in separate processes (108 total). The versioned production
+launcher imported v2.19.3.12 with a healthy test response. These are software
+checks, not new Gemini benchmark results.
 
 Champion training remains a separate prompt-profile improvement process using
 the existing human approval gate. This work does not fine-tune model weights,
@@ -109,12 +124,28 @@ double-counted vig. Other answers also ended mid-sentence. Treat those scores as
 unreliable, not as a successful acceptance test. No second baseline or holdout
 stage was run; the stored checkpoint is 10/25 and remains historical evidence.
 
-v2.19.3.11 uses harness sports-validation-v2-complete-json-math-800-320, so the
-old checkpoint/baseline cannot silently become its comparison data. After an
-approved merge/deployment, set TYLER_APP_MODULE=app_v2_19_3_11 and start a fresh
-validation. Inspect the actual answers as well as programmatic and model scores.
-Two complete baseline passes and all five separate holdouts are still required.
-Quota availability and the new real model scores remain unverified until then.
+After PR #8 merged and v2.19.3.11 deployed, Gemini completed and production
+persisted the ten first-baseline cases in SV-96F0182E6E9448AA. Its automated
+average was 60/100 with a 60% pass rate. Four cases scored zero: changed-line
+arithmetic/opposing price, invented parlay probability, double-counted vig, and
+an unparseable semantic judge response. All answers were complete JSON.
+
+Manual inspection also rejected supposedly passing risk-language and player-prop
+answers: they invented opposing -110-like prices and no-vig references. The
+small-edge and positive-odds answers invented lower probability bounds; the
+line-change answer invented a fresh estimate/range. Some semantic answers omitted
+parts of the expected process (append-only postmortem, prop inputs, ROI/buckets).
+Thus even 60/100 is not an independently accepted score. The persisted checkpoint
+is 10/25, and a complete baseline record was saved. No second baseline or
+holdout stage was run with this harness; the remaining stages were paused after
+these defects surfaced. No candidate was activated or champion promoted.
+
+v2.19.3.12 uses harness sports-validation-v3-input-grounding-800-320, excluding
+both earlier harnesses from comparisons. After approved merge/deployment, set
+TYLER_APP_MODULE=app_v2_19_3_12 and start fresh validation. Inspect actual answers
+and evaluator output alongside objective checks. Two complete baseline passes
+and all five separate holdouts remain required. New real model scores and the
+effectiveness of the revised prompt remain unverified until then.
 
 There is no automatic sportsbook odds feed or fitted probability model. Snapshots
 and probabilities are caller supplied and explicitly labeled unverified; a value
