@@ -51,6 +51,9 @@ GEMINI_MODEL = re.sub(
 ) or "gemini-3.5-flash-lite"
 GEMINI_TIMEOUT_SECONDS = 90
 _TRAINING_PROVIDER_CONTEXT = ContextVar("tyler_training_provider", default=None)
+# Opt-in completion check for callers that must never grade truncated answers.
+# Existing non-sports callers retain their prior behavior.
+_REQUIRE_FINISHED_RESPONSE_CONTEXT = ContextVar("tyler_require_finished_response", default=False)
 
 
 def _gemini_key():
@@ -136,8 +139,12 @@ def _gemini_complete(messages, tokens=700, temperature=0.2, json_mode=False):
     if not getattr(response, "ok", False):
         raise RuntimeError(_gemini_error(response))
     try:
-        parts = response.json()["candidates"][0]["content"]["parts"]
-        text = "".join(str(part.get("text") or "") for part in parts).strip()
+        candidate = response.json()["candidates"][0]
+        if _REQUIRE_FINISHED_RESPONSE_CONTEXT.get() and candidate.get("finishReason") != "STOP":
+            raise RuntimeError("Gemini did not return a confirmed complete response; no sports case was graded or advanced.")
+        parts = candidate["content"]["parts"]
+        text = "".join(str(part.get("text") or "") for part in parts
+                       if not _REQUIRE_FINISHED_RESPONSE_CONTEXT.get() or not part.get("thought")).strip()
     except (KeyError, IndexError, TypeError, AttributeError):
         text = ""
     if not text:
