@@ -1,10 +1,11 @@
 # Sports Betting Analyst v1
 
-The v2.19.3.12 deployment is confirmed live at merge commit
-056e9b7483bc1a5322777401d56209a29773b224 (Render deploy
-dep-db2l9k6gekts73fdhad0). Health returned HTTP 200 with that exact version and
-commit. Sports Betting Analyst v1 has not passed acceptance. This document
-includes a proposed v2.19.3.13 follow-up, not yet deployed.
+Deployment verification on October 6, 2026 confirmed v2.19.3.13 at merge commit
+e66fe123a92ca12ebbd6a4562c76dec80b7cd361 (Render deploy
+dep-db2lofvlk1mc73cn55kg). A later configuration deployment
+dep-db2lt5navr4c73eihq9g selected gemini-3.5-flash on the same commit.
+Sports Betting Analyst v1 has not passed acceptance. This evidence snapshot
+includes a v2.19.3.14 follow-up whose live benchmark is still outstanding.
 
 ## What changed
 
@@ -48,7 +49,7 @@ includes a proposed v2.19.3.13 follow-up, not yet deployed.
 - Validation checkpoints complete one answer/judge pair per command. Two passes
   through the ten training cases precede five separate transfer cases. Transfer
   cases are not fed to candidate drafting or added to examples.
-- Proposed v2.19.3.13 applies those checkpoints to pending candidate profiles.
+- v2.19.3.13 applies those checkpoints to pending candidate profiles.
   Candidate identities include their ID, exact profile fingerprint, suite,
   harness, provider and model. Candidates must belong to the sports skill and
   follow the current active version. Missing/stale candidates and an identity
@@ -79,6 +80,17 @@ existing relevant tests in separate processes (118 total). The versioned product
 launcher imported v2.19.3.13 with a healthy test response. These are software
 checks, not new Gemini benchmark results.
 
+The v2.19.3.14 follow-up passes 12 additional tests (130 total relevant software
+tests). Sports answer/judge output caps are 2400/1200, including thought tokens,
+with Gemini 3 `thinkingConfig.thinkingLevel=LOW`. These settings apply within
+request-local sports completion contexts; other completion settings remain as
+before. `finishReason=STOP` is still mandatory, thought parts are excluded from
+answers, and incomplete answers or judges cannot advance a checkpoint. The new
+harness is sports-validation-v4-low-thinking-2400-1200, excluding earlier
+harness records from reuse. These tests do not establish better model results.
+Google's API documents ThinkingConfig at
+https://ai.google.dev/api/generate-content#ThinkingConfig .
+
 Champion training remains a separate prompt-profile improvement process using
 the existing human approval gate. This work does not fine-tune model weights,
 activate a challenger, place wagers, or certify profitable performance. If a
@@ -96,7 +108,7 @@ profile is changed/promoted, validate that exact new active profile again.
    gate. Keep transfer-case answers out of training examples and candidate edits.
 5. Validate the resulting exact active profile again before calling it ready.
 
-After v2.19.3.13 deployment, inspect `Show skill lab` for a pending sports
+With v2.19.3.13 or later, inspect `Show skill lab` for a pending sports
 candidate. If none exists, `Train skill Sports Betting Analyst` drafts one
 without activation. Then use `Start sports candidate validation`,
 `Continue sports candidate validation` (one case per request), and
@@ -188,9 +200,24 @@ READY_FOR_ROUND at 0/6, with no round consumed or candidate activation. Later
 one-case validation requests succeeded. No exact quota reset time is known.
 `Show skill lab` confirms pending sports candidate v2 CND-847D5380EF while the
 active sports profile remains v1. Its candidate benchmark has not been completed.
-Proposed v2.19.3.13 adds the one-case candidate evaluation route; it does not
-change the active profile, answer/judge harness, or model weights. Deploy it
-only after approved merge by setting TYLER_APP_MODULE=app_v2_19_3_13.
+v2.19.3.13 added the one-case candidate evaluation route without changing the
+active profile, answer/judge harness, or model weights.
+
+Candidate CND-847D5380EF completed its first ten-case Flash-Lite baseline in
+SV-D2BFF5260C4443EA at 70/100 with 70% passing. It still invented opposing prices,
+omitted small-edge calculations, and returned +150 expected profit of 1.175
+instead of 0.175. Its checkpoint was paused at 10/25; no holdouts were run and it
+was not activated. A newly drafted candidate CND-F5F24ABD95 saved two cases in
+SV-5275BCE07B524F0F; the first repeated the opposing-price error and the second
+passed ledger preservation. That run was paused at 2/25, not a complete baseline.
+
+After selecting Gemini 3.5 Flash, active-v1 session SV-41626A62F4AF4CB5 started
+with a separately pinned model identity. Its first completion did not return
+confirmed STOP under the 800/320 limits; no case was graded or advanced (0/25).
+The v2.19.3.14 follow-up supplies larger bounded budgets and explicit low thinking
+for Gemini 3 sports calls. Start fresh v4 validation after deploying
+TYLER_APP_MODULE=app_v2_19_3_14; the incomplete v3 Flash session is historical
+evidence, not comparison data. No profile promotion or weight fine-tuning occurred.
 
 There is no automatic sportsbook odds feed or fitted probability model. Snapshots
 and probabilities are caller supplied and explicitly labeled unverified; a value

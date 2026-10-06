@@ -54,6 +54,7 @@ _TRAINING_PROVIDER_CONTEXT = ContextVar("tyler_training_provider", default=None)
 # Opt-in completion check for callers that must never grade truncated answers.
 # Existing non-sports callers retain their prior behavior.
 _REQUIRE_FINISHED_RESPONSE_CONTEXT = ContextVar("tyler_require_finished_response", default=False)
+_SPORTS_THINKING_CONTEXT = ContextVar("tyler_sports_thinking", default=None)
 
 
 def _gemini_key():
@@ -121,6 +122,11 @@ def _gemini_complete(messages, tokens=700, temperature=0.2, json_mode=False):
         "temperature": max(0.0, min(float(temperature), 2.0)),
         "maxOutputTokens": max(1, min(int(tokens), 8192)),
     }
+    thinking = _SPORTS_THINKING_CONTEXT.get()
+    if thinking is not None:
+        if thinking != "LOW" or not GEMINI_MODEL.startswith("gemini-3"):
+            raise RuntimeError("The pinned sports thinking setting requires a Gemini 3 model.")
+        generation["thinkingConfig"] = {"thinkingLevel": thinking}
     if json_mode:
         generation["responseMimeType"] = "application/json"
     payload = {"contents": contents, "generationConfig": generation}

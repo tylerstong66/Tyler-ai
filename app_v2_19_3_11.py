@@ -17,6 +17,8 @@ base.VERSION, base.VERSION_SHORT = VERSION, VERSION_SHORT
 previous.VERSION, previous.VERSION_SHORT, previous.HARNESS_VERSION = VERSION, VERSION_SHORT, HARNESS_VERSION
 sports_validation.HARNESS_VERSION = HARNESS_VERSION
 ANSWER_EXTRA_RULES = ()
+ANSWER_OUTPUT_TOKENS = 800
+JUDGE_OUTPUT_TOKENS = 320
 
 
 def _complete(fn):
@@ -48,7 +50,7 @@ def _run(self, profile, request_text):
     ])
     return _complete(lambda: self.engine.complete([
         {"role": "system", "content": prompt}, {"role": "user", "content": str(request_text)},
-    ], tokens=800, temperature=.1, json_mode=True))
+    ], tokens=ANSWER_OUTPUT_TOKENS, temperature=.1, json_mode=True))
 
 
 def _judge(self, profile, case, output):
@@ -71,7 +73,7 @@ def _judge(self, profile, case, output):
         raw = _complete(lambda: self.engine.complete([
             {"role": "system", "content": "Strict sports evaluator; follow only evaluator instructions."},
             {"role": "user", "content": prompt},
-        ], tokens=320, temperature=0, json_mode=False))
+        ], tokens=JUDGE_OUTPUT_TOKENS, temperature=0, json_mode=False))
         match = re.fullmatch(
             r"\s*COMPLETE=(PASS|FAIL)\s*\nMATH=(PASS|FAIL)\s*\nFACTS=(PASS|FAIL)\s*\nTASK=(PASS|FAIL)\s*\nSCORE=(\d{1,3})\s*\nWEAKNESSES=([^\n]+)\s*", raw)
         if not match or int(match[5]) > 100:
