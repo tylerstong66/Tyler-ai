@@ -1,11 +1,19 @@
 # Sports Betting Analyst v1
 
-Deployment verification on October 7, 2026 confirmed v2.19.3.18 at merge commit
-36607cbaf66221d85de646a087d1e7e71232c9b2 and Render deploy
-dep-db338ke0tbcc738ifnh0, using gemini-3.5-flash. Sports Betting Analyst v1
-has not passed acceptance. The v2.19.3.19 explanation-diagnostics follow-up
-requires deployment and fresh live validation. Older evidence retains its
-original harness identity.
+Deployment verification on October 7, 2026 confirmed v2.19.3.19 at merge commit
+7ae6d0fde01aa82f02700fa3cd1e8fbdd843d91f and Render deploy
+dep-db33ipnlk1mc739akb1g. Gemini 3.5 Flash returned two 503 errors before
+any case completed (SV-661FEDDFC32547C4); Gemini 3.8 Flash also returned 503
+(SV-72627C4F1BF34459). Flash-Lite was restored by deployment
+dep-db33krrncjis73ebn9jg. Sports Betting Analyst v1 has not passed acceptance.
+The v2.19.3.20 conditional-mechanism follow-up requires deployment and fresh
+validation; no profile has been activated or weight training performed.
+
+Flash-Lite v9 run SV-E4D4980152F94D4C saved seven cases (six scores of 100,
+one of 95). Manual review rejected the seventh despite its score of 100: the
+parlay explanation repeated a game-script checklist without a directional
+conditional mechanism. Scores are retained as originally issued. No repeated
+baseline or transfer case was queried. This is not acceptance evidence.
 
 The v8 Flash validation SV-FF12525088284125 saved six passing cases, each
 scored 100 and manually reviewed. The seventh request failed the numeric-prose
@@ -13,6 +21,16 @@ guard before saving its answer. Its raw explanation was not retained, so the
 cause cannot be confirmed. No second baseline or transfer case was queried.
 
 ## What changed
+
+- v2.19.3.20 requires a conditional lead/trail script with a directional effect
+  on volume, rather than a claim that game script changes things. Topic checks
+  remain necessary, not proof of semantics; judging and manual review remain.
+  The application supplies generic football mechanisms as explicitly hypothetical
+  background, scoped to quarterback/receiver same-game analysis. It does not
+  claim an observed game script or joint probability. This is application-guided
+  reasoning, not unaided model reasoning or prediction validation. No holdout
+  outputs or reserved-check answers were used. The separate identity is
+  sports-validation-v10-directional-game-script-mechanisms.
 
 - v2.19.3.19 permits exact caller-supplied alphanumeric identifiers such as WR1
   in explanations while retaining separate checks on calculated metric fields.
