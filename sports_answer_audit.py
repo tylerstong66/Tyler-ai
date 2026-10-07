@@ -163,6 +163,10 @@ def audit_answer(output, case=None, input_text=None):
                     r"(?:overcome|cover|beat).{0,100}(?:vig|juice)|"
                     r"(?:erased|eroded).{0,60}(?:vig|juice)", data["rationale"], re.I | re.S):
                 errors.append("positive_ev_rationale_double_counts_vig")
+            if expected["expected_profit_per_unit"] > 0 and re.search(
+                    r"(?:variance|volatility).{0,80}(?:overwhelm|eras|erod|negat|cancel).{0,80}(?:ev|expectation|expected profit|edge)",
+                    data["rationale"] + " " + data["uncertainty"], re.I | re.S):
+                errors.append("positive_ev_explanation_confuses_variance_with_expectation")
     cid = (case or {}).get("case_id")
     if cid in (NO_BET_CASES | set(ORACLES)) and cid != "holdout-vig" and (no_vig is not None or opposite is not None):
         errors.append("opposite_price_not_supplied_for_case")

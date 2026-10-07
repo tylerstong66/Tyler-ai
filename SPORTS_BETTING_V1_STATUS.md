@@ -1,14 +1,24 @@
 # Sports Betting Analyst v1
 
-Deployment verification on October 6, 2026 confirmed v2.19.3.14 at merge commit
-13d357a98958a538d40d80c820c9780286864111. The latest configuration deployment,
-dep-db2m3549v7es738kcjo0, restored gemini-3.5-flash-lite. Sports Betting Analyst
-v1 has not passed acceptance. The October 7 v2.19.3.15 application-math follow-up
-is software-tested; its deployment and fresh live benchmark remain outstanding
+Deployment verification on October 7, 2026 confirmed v2.19.3.15 at merge commit
+a6fdadbb8df4aa9d1f297cc8c1c722901b7cb540 and Render deploy
+dep-db32jcu7bikc73bfa1hg, using gemini-3.5-flash-lite. Sports Betting Analyst
+v1 has not passed acceptance. The v2.19.3.16 explanation-coverage follow-up
+passes software tests; deployment and fresh live validation remain outstanding
 at this commit. Older evidence below retains its original harness identity.
 
 ## What changed
 
+- v2.19.3.16 adds scenario-intent topic checks to explanations and grading,
+  covering specific prop inputs, performance evidence, joint-ticket probability,
+  payout discipline and the meaning of positive point-estimate EV. Requirements
+  depend on input intent, not benchmark IDs. Missing topics score zero without
+  a semantic model call and remain saved feedback; live answers fail closed.
+  Coverage is only a necessary word-presence check, not proof of correctness:
+  semantic judging and manual review remain required. The new v6 identity
+  excludes earlier v5 scores. A guard rejects claims that outcome variance
+  erases positive expected value. Grading explicitly allows NO BET despite
+  positive estimated EV when the probability/evidence is unverified.
 - v2.19.3.15 derives named metrics with deterministic application math from
   conservatively parsed caller inputs. It has no dependency on benchmark case
   IDs or answer oracles. Structured JSON supports exact odds, win/push/loss
@@ -113,6 +123,12 @@ model metric fields, guarded decisions, provenance and checkpoint preservation.
 The sports workflow's nine isolated suites pass 128 tests. The production
 launcher also imports v2.19.3.15 and responds successfully to a local health
 check. These checks do not establish live acceptance or profitable predictions.
+
+v2.19.3.16 passes 13 additional checks (141 across ten isolated sports workflow
+suites) and local production-launcher health 200. Checks cover omitted prop
+factors, ROI/confidence groups, joint-ticket reasoning, explicit positive EV,
+live rejection, persisted failed feedback, and unchanged active profiles. A
+coverage pass still requires the semantic judge, which can reject wrong meaning.
 Google's API documents ThinkingConfig at
 https://ai.google.dev/api/generate-content#ThinkingConfig .
 
@@ -249,6 +265,20 @@ and probabilities are caller supplied and explicitly labeled unverified; a value
 candidate is not a verified live bet. Same-model rubric scoring tests behavior,
 not prediction accuracy. Repeated holdout inspection reduces its independence;
 use new reserved cases if holdout failures guide later instruction changes.
+
+The v5 application pipeline persisted the first ten cases of active-v1 session
+SV-494DBEA3227D4DFD: automated average 94/100 and 90% passing. All supplied-price
+and net-EV calculations were correct, including +150 net profit of 0.175 units
+and no invented opposing price on the risk-language case. Manual review rejects
+several perfect scores: the prop answer omitted carries, snap/route role and
+line movement; sample-size reasoning omitted ROI/confidence groups; payout
+reasoning omitted a whole-ticket estimate; correlation reasoning omitted the
+quarterback/receiver connection and joint estimate. The positive-odds answer
+also claimed variance overwhelms the apparent edge, while its judge incorrectly
+treated positive EV as requiring a bet despite unverified inputs. That case
+scored 45. The checkpoint is paused at 10/25; no v5 repeats or transfer cases
+were queried and no candidate was activated. Training-baseline omissions and
+the distinction between risk and expectation motivated v6's generic checks.
 
 The v4 budget/thinking deployment did not resolve the defect. Active-v1 Flash
 session SV-AC897E1E3C4A4E00 received provider 503 errors on its first case, and

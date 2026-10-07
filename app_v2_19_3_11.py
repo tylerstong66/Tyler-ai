@@ -17,6 +17,7 @@ base.VERSION, base.VERSION_SHORT = VERSION, VERSION_SHORT
 previous.VERSION, previous.VERSION_SHORT, previous.HARNESS_VERSION = VERSION, VERSION_SHORT, HARNESS_VERSION
 sports_validation.HARNESS_VERSION = HARNESS_VERSION
 ANSWER_EXTRA_RULES = ()
+JUDGE_EXTRA_RULES = ()
 ANSWER_OUTPUT_TOKENS = 800
 JUDGE_OUTPUT_TOKENS = 320
 
@@ -65,6 +66,7 @@ def _judge(self, profile, case, output):
             "A NO BET decision can be correct while its explanation is false; false explanations must FAIL.",
             "Raw break-even implied probability includes the offered juice; double-counting vig must FAIL.",
             "No-vig requires both opposite prices. Invented current facts/tools/model probabilities must FAIL.",
+            *JUDGE_EXTRA_RULES,
             "Return exactly six lines: COMPLETE=PASS or FAIL; MATH=PASS or FAIL; FACTS=PASS or FAIL; TASK=PASS or FAIL; SCORE=0-100 integer; WEAKNESSES=none or items separated by ||.",
             "A failure on any of the first four fields must have SCORE<80.",
             "INPUT: " + str(case["input"]), "EXPECTED: " + str(case["expected_behavior"]),
