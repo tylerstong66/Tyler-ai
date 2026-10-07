@@ -1,5 +1,20 @@
 # Sports Betting Analyst v1
 
+v2.19.3.23 is live at commit 8863a0eb81464391dc82d7946d86c4b5b95d707c,
+Render deploy dep-db3adfajnfac7397hgd0, using gemini-3.5-flash. Both status
+and health returned 200 after the provider requests finished; the post-deploy
+error-log query was empty. PR #20 merged after all twelve workflow jobs passed.
+The 188 local checks across seventeen isolated suites passed.
+
+Fresh session SV-1D08C5EC0F7A46D6 pins the v13 harness, Flash model, unchanged
+active v1 fingerprint, suite and holdout hashes. Its first request returned
+provider 503 high demand; one retry returned free-tier quota exhaustion.
+`Show sports validation` read back zero completed cases, an empty results list
+and the original timestamp. Neither attempt consumed a scored case. The exact
+quota reset time is unknown. Resume with `Continue sports validation` when the
+provider quota permits. No second baseline, transfer case or candidate promotion
+was performed. Sports acceptance remains incomplete.
+
 User confirmed Tyler's Render workspace on October 7. v2.19.3.22 deployed
 successfully at commit 35c965dd53a302ed6794ddf2e2be6a6b0c4e9e71, deploy
 dep-db3a97nlk1mc739uv160. Status and health returned 200 on that exact commit;
@@ -23,9 +38,9 @@ return/value are equivalent necessary topic labels; semantic review still checks
 meaning. Generic quote-change wording is removed from unrelated prompts, while
 changed-price guidance stays scenario-specific. The judge explicitly compares
 observed facts with the literal input. Separate identity:
-sports-validation-v13-negation-input-isolation. Deploy and fresh validation are
-required. A separately pinned stronger Flash run is planned; no threshold,
-profile, source oracle or reserved case has changed.
+sports-validation-v13-negation-input-isolation. Deployment is verified above;
+fresh stronger Flash validation is preserved at zero cases after provider
+failures. No threshold, profile, source oracle or reserved case has changed.
 
 October 7 continuation verified live v2.19.3.21 at commit
 52fbbf0926b3ed707a3d24e16d141b04efe96217. Session SV-E27788B13AEB47E2
