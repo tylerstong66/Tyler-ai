@@ -24,6 +24,7 @@ _OLD_RUN = SKILL_LAB._run
 EXPLANATION_REQUIREMENTS = lambda request_text, facts: []
 NUMERIC_PROSE_CHECK = lambda prose, request_text: bool(re.search(r"\d", prose))
 SAVE_EXPLANATION_CONTRACT_FAILURES = False
+EXPLANATION_BACKGROUND = lambda request_text, facts: []
 
 
 def _run(self, profile, request_text):
@@ -52,6 +53,7 @@ def _run(self, profile, request_text):
         "Application-calculated context: " + json.dumps(facts),
         "Required explanation checks (address EACH explicitly, using brief semicolon-separated clauses): "
         + " | ".join(EXPLANATION_REQUIREMENTS(request_text, facts)),
+        *EXPLANATION_BACKGROUND(request_text, facts),
         self._context(profile),
         *harness.ANSWER_EXTRA_RULES[-3:],
         "The three-key explanation contract above overrides any request for model-generated metrics.",
