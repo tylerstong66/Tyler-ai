@@ -22,6 +22,8 @@ for module in (previous, previous.previous, previous.previous.previous, harness,
 _LIVE_INPUT = ContextVar("sports_live_input", default=False)
 _OLD_RUN = SKILL_LAB._run
 EXPLANATION_REQUIREMENTS = lambda request_text, facts: []
+NUMERIC_PROSE_CHECK = lambda prose, request_text: bool(re.search(r"\d", prose))
+SAVE_EXPLANATION_CONTRACT_FAILURES = False
 
 
 def _run(self, profile, request_text):
@@ -65,15 +67,22 @@ def _run(self, profile, request_text):
         raise RuntimeError("Sports explanation must follow the three-key contract.")
     if answer["decision"] not in allowed:
         raise RuntimeError("Sports explanation violated the application decision gate.")
+    contract_errors = []
     for key in ("rationale", "uncertainty"):
-        if not isinstance(answer[key], str) or not answer[key].strip() or re.search(r"\d", answer[key]):
+        if not isinstance(answer[key], str) or not answer[key].strip():
             raise RuntimeError("Sports explanation must be nonempty prose without numerals.")
+        if NUMERIC_PROSE_CHECK(answer[key], request_text):
+            if _LIVE_INPUT.get() or not SAVE_EXPLANATION_CONTRACT_FAILURES:
+                raise RuntimeError("Sports explanation must be nonempty prose without numerals.")
+            contract_errors.append("unsupported_numeric_prose_in_" + key)
     if len((answer["rationale"] + " " + answer["uncertainty"]).split()) > 130:
         raise RuntimeError("Sports explanation exceeded its word budget.")
     answer["metrics"] = metrics
     answer["calculation_provenance"] = facts["provenance"]
     answer["calculation_assumptions"] = facts["assumptions"]
     answer["input_issues"] = facts["issues"]
+    if contract_errors:
+        answer["explanation_contract_errors"] = contract_errors
     answer["uncertainty"] += " " + " ".join([facts["provenance"], *facts["assumptions"], *facts["issues"]])
     return json.dumps(answer)
 
