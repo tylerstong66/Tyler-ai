@@ -1,14 +1,26 @@
 # Sports Betting Analyst v1
 
-Deployment verification on October 7, 2026 confirmed v2.19.3.17 at merge commit
-07de26d86d14a1533c44fa52a436b504f00a316c and Render deploy
-dep-db33123bc2fs73ceoi7g. Configuration deploy dep-db334q3tqb8s73e0sbn0
-selected gemini-3.5-flash on the same commit. Sports Betting Analyst v1 has not
-passed acceptance. The v2.19.3.18 scenario-scoped-grading follow-up
-passes software tests; deployment and fresh live validation remain outstanding
-at this commit. Older evidence below retains its original harness identity.
+Deployment verification on October 7, 2026 confirmed v2.19.3.18 at merge commit
+36607cbaf66221d85de646a087d1e7e71232c9b2 and Render deploy
+dep-db338ke0tbcc738ifnh0, using gemini-3.5-flash. Sports Betting Analyst v1
+has not passed acceptance. The v2.19.3.19 explanation-diagnostics follow-up
+requires deployment and fresh live validation. Older evidence retains its
+original harness identity.
+
+The v8 Flash validation SV-FF12525088284125 saved six passing cases, each
+scored 100 and manually reviewed. The seventh request failed the numeric-prose
+guard before saving its answer. Its raw explanation was not retained, so the
+cause cannot be confirmed. No second baseline or transfer case was queried.
 
 ## What changed
+
+- v2.19.3.19 permits exact caller-supplied alphanumeric identifiers such as WR1
+  in explanations while retaining separate checks on calculated metric fields.
+  Complete lab explanations containing unsupported numeric prose are preserved
+  as failed, zero-scored cases without calling a semantic judge. Live answers
+  still fail closed; incomplete provider calls still do not advance a checkpoint.
+  This adds diagnostics, not numeric correction or a lowered acceptance gate.
+  Its separate identity is sports-validation-v9-supplied-identifiers-failed-prose-records.
 
 - v2.19.3.18 scopes semantic grading to the supplied INPUT, EXPECTED behavior
   and CRITERIA. It removes the overgeneralized examples that caused a stronger
