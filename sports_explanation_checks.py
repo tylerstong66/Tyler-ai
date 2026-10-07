@@ -56,7 +56,7 @@ def topics(request_text, facts=None):
         if re.search(r"weak|add|target|payout", text):
             required.update(PAYOUT)
     if facts and (facts.get("metrics", {}).get("expected_profit_per_unit") or 0) > 0:
-        required["positive_ev_meaning"] = ("State that the supplied point estimate gives positive net expected profit at the offered price; NO BET may still reflect uncertainty, never a claim that variance or vig erases EV", r"positive.{0,35}(?:ev|expected (?:net )?profit|expectation)|(?:ev|expected (?:net )?profit|expectation).{0,35}positive")
+        required["positive_ev_meaning"] = ("State that the supplied point estimate gives positive net expected profit at the offered price; NO BET may still reflect uncertainty, never a claim that variance or vig erases EV", r"positive.{0,35}(?:ev|expected (?:net )?(?:profit|return|value)|expectation)|(?:ev|expected (?:net )?(?:profit|return|value)|expectation).{0,35}positive")
     return required
 
 
