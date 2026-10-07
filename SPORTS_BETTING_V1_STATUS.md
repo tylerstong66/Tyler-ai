@@ -1,13 +1,26 @@
 # Sports Betting Analyst v1
 
-Deployment verification on October 7, 2026 confirmed v2.19.3.19 at merge commit
-7ae6d0fde01aa82f02700fa3cd1e8fbdd843d91f and Render deploy
-dep-db33ipnlk1mc739akb1g. Gemini 3.5 Flash returned two 503 errors before
-any case completed (SV-661FEDDFC32547C4); Gemini 3.8 Flash also returned 503
-(SV-72627C4F1BF34459). Flash-Lite was restored by deployment
-dep-db33krrncjis73ebn9jg. Sports Betting Analyst v1 has not passed acceptance.
-The v2.19.3.20 conditional-mechanism follow-up requires deployment and fresh
-validation; no profile has been activated or weight training performed.
+Deployment verification on October 7, 2026 confirmed v2.19.3.20 at merge commit
+8702772e3b0157204b7254a1677952ed24332af7 and Render deploy
+dep-db33p8e7bikc73bj0cf0, using gemini-3.5-flash-lite. Sports Betting Analyst
+v1 has not passed acceptance. The v2.19.3.21 task-scoping follow-up passes 172
+software checks across 15 isolated suites plus launcher health; deployment and
+fresh live validation remain required.
+
+The complete v10 first baseline SV-18E5AAF6B4EA4713 scored 69.5/100, with
+seven of ten passing. Manual review found two application/grader false failures:
+the ledger answer explicitly refused rewriting and supplied append-only steps,
+and the sample-size answer supplied confidence tiers rather than the guard's
+narrow keyword buckets/groups/segments. The parlay failure was genuine: it
+still copied instructions instead of giving a conditional mechanism. Numeric
+cases were correct, including +150/0.47 EV of 0.175. Scores remain unchanged.
+No second baseline or transfer case was queried on this failed baseline.
+
+Earlier v9 deployment was commit 7ae6d0fde01aa82f02700fa3cd1e8fbdd843d91f.
+Gemini 3.5 Flash returned two 503 errors before any case completed
+(SV-661FEDDFC32547C4); Gemini 3.8 Flash also returned 503
+(SV-72627C4F1BF34459). Neither unavailable-provider attempt produced scores.
+No profile has been activated and no model weight training was performed.
 
 Flash-Lite v9 run SV-E4D4980152F94D4C saved seven cases (six scores of 100,
 one of 95). Manual review rejected the seventh despite its score of 100: the
@@ -21,6 +34,16 @@ guard before saving its answer. Its raw explanation was not retained, so the
 cause cannot be confirmed. No second baseline or transfer case was queried.
 
 ## What changed
+
+- v2.19.3.21 keeps record explanations on the historical-integrity request,
+  asks for direct refusal and relevant record uncertainty, and clarifies that the
+  required NO BET schema label is not a reason to reject a correct refusal.
+  Confidence/market tiers, bands and strata are accepted as equivalent groups;
+  the actual segmentation requirement remains. Football checks use topic labels
+  instead of imperative checklist text, and hypothetical background follows the
+  full profile context to discourage copying checklist commands. The stricter
+  directional conditional check remains. New identity:
+  sports-validation-v11-record-task-scoping-equivalent-groups.
 
 - v2.19.3.20 requires a conditional lead/trail script with a directional effect
   on volume, rather than a claim that game script changes things. Topic checks
