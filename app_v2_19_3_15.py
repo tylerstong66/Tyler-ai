@@ -46,7 +46,7 @@ def _run(self, profile, request_text):
         "Explain the supplied calculation's meaning without repeating numeric values. Never invent facts or estimates.",
         "rationale and uncertainty together must be <=130 words. Answer every requested behavioral point.",
         "Fulfill the checks with complete, scenario-specific explanations. Do not copy checklist directives such as Explain or Discuss as your answer.",
-        "Refer to the supplied bookmaker price/line only. A single quote change does not establish broad market consensus or independent verification.",
+        "Treat caller-supplied inputs as the only observed facts. If a quote, price change, injury report or probability is absent, say it is unknown; do not describe evidence or a change that was not supplied.",
         "Offered-price break-even already includes juice. Positive EV cannot be erased by subtracting vig again.",
         "Unverified probabilities and missing evidence can justify NO BET despite positive point-estimate EV.",
         "Outcome variance affects risk, not expected value. Missing model confidence is a reason to withhold a bet; never assert that variance erases an edge.",

@@ -1,5 +1,32 @@
 # Sports Betting Analyst v1
 
+User confirmed Tyler's Render workspace on October 7. v2.19.3.22 deployed
+successfully at commit 35c965dd53a302ed6794ddf2e2be6a6b0c4e9e71, deploy
+dep-db3a97nlk1mc739uv160. Status and health returned 200 on that exact commit;
+the post-deploy error-log query was empty.
+
+Fresh Flash-Lite session SV-9C187F95F3844502 completed ten first-baseline
+cases, averaging 60 with six passing. No repeated baseline or transfer case was
+queried. Manual review found an invented quote change in the player-prop answer
+despite its score of 100. Parlay and narrow-edge answers were falsely flagged
+for "risk rather than erasing" contrasts; the parlay still lacked a concrete
+conditional mechanism and the narrow-edge uncertainty needed semantic review.
+The positive-odds answer had correct 0.175 unit profit and positive expected
+return, but its synonym failed the topic regex. The stale-data answer genuinely
+claimed variance overwhelms an edge. Scores remain unchanged; this run is not
+accepted.
+
+v2.19.3.23 passes 188 tests across 17 isolated sports suites and local launcher
+health 200. Variance negation is scoped to the actual action so contrasts are
+allowed without hiding a later affirmative error in the same clause. Expected
+return/value are equivalent necessary topic labels; semantic review still checks
+meaning. Generic quote-change wording is removed from unrelated prompts, while
+changed-price guidance stays scenario-specific. The judge explicitly compares
+observed facts with the literal input. Separate identity:
+sports-validation-v13-negation-input-isolation. Deploy and fresh validation are
+required. A separately pinned stronger Flash run is planned; no threshold,
+profile, source oracle or reserved case has changed.
+
 October 7 continuation verified live v2.19.3.21 at commit
 52fbbf0926b3ed707a3d24e16d141b04efe96217. Session SV-E27788B13AEB47E2
 completed its first ten-case baseline: 79.5/100, eight of ten passing. The

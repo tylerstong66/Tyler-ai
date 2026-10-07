@@ -103,13 +103,17 @@ def _supplied_opposite(input_text):
 
 def _variance_erases_expectation(prose):
     """Flag an affirmative error, not a warning against making that error."""
-    pattern = r"(?:variance|volatility).{0,80}(?:overwhelm|eras|erod|negat|cancel).{0,80}(?:ev|expectation|expected profit|edge)"
+    pattern = (r"\b(?:variance|volatility)\b"
+               r"(?:(?!\b(?:variance|volatility)\b).){0,80}?"
+               r"(?P<action>overwhelm\w*|eras\w*|erod\w*|negat\w*|cancel\w*)"
+               r".{0,80}?\b(?:ev|expectation|expected profit|expected value|edge)\b")
     for clause in re.split(r"[;.!?]", prose):
         for match in re.finditer(pattern, clause, re.I):
             prefix, claim, suffix = clause[:match.start()], match[0], clause[match.end():]
             if re.search(r"(?:never (?:(?:a |the )?claim|claiming|implying|asserting|suggesting|imply|assert|suggest)|do not (?:claim|assert|say|imply|suggest)|not (?:claiming|asserting|implying|suggesting)|cannot (?:claim|assert|imply)|no claim|not because)(?:\s+that)?\s*$", prefix, re.I):
                 continue
-            if re.search(r"\b(?:does not|doesn't|cannot|can not|never|will not|won't|do not)\b", claim, re.I):
+            before_action = clause[match.start():match.start("action")]
+            if re.search(r"\b(?:does not|doesn't|cannot|can not|never|will not|won't|do not|rather than|instead of|without|not)(?:\s+\w+){0,2}\s*$", before_action, re.I):
                 continue
             if re.search(r"^.{0,15}\b(?:is false|is wrong|is incorrect|is a misconception)\b", suffix, re.I):
                 continue
