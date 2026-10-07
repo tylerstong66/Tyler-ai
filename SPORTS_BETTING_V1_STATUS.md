@@ -1,14 +1,31 @@
 # Sports Betting Analyst v1
 
-Deployment verification on October 6, 2026 confirmed v2.19.3.13 at merge commit
-e66fe123a92ca12ebbd6a4562c76dec80b7cd361 (Render deploy
-dep-db2lofvlk1mc73cn55kg). A later configuration deployment
-dep-db2lt5navr4c73eihq9g selected gemini-3.5-flash on the same commit.
-Sports Betting Analyst v1 has not passed acceptance. This evidence snapshot
-includes a v2.19.3.14 follow-up whose live benchmark is still outstanding.
+Deployment verification on October 6, 2026 confirmed v2.19.3.14 at merge commit
+13d357a98958a538d40d80c820c9780286864111. The latest configuration deployment,
+dep-db2m3549v7es738kcjo0, restored gemini-3.5-flash-lite. Sports Betting Analyst
+v1 has not passed acceptance. The October 7 v2.19.3.15 application-math follow-up
+is software-tested; its deployment and fresh live benchmark remain outstanding
+at this commit. Older evidence below retains its original harness identity.
 
 ## What changed
 
+- v2.19.3.15 derives named metrics with deterministic application math from
+  conservatively parsed caller inputs. It has no dependency on benchmark case
+  IDs or answer oracles. Structured JSON supports exact odds, win/push/loss
+  probabilities and intervals. Unsupported prose stays unknown; conflicting,
+  invalid and duplicate structured inputs fail closed before a model call.
+  Opposing prices require explicit same-market two-way quotes. Missing live
+  push probabilities leave EV/edge unknown; synthetic lab assumptions are
+  labeled separately. Inputs and probability models remain unverified.
+- The model now supplies only decision/rationale/uncertainty. Model-generated
+  metric fields and numeric prose are rejected, rather than repaired. The
+  application applies NO BET gates for missing math, nonpositive EV, inadequate
+  lower-bound edge and unverified live prose; changed prices require re-analysis.
+  All full profile instructions still reach the explanation. Existing strict
+  completion, objective audits and semantic judges remain. This evaluates the
+  application pipeline, not the model's unaided arithmetic or forecasting skill.
+  The separate identity is sports-validation-v5-application-math-low-2400-1200;
+  older scores are not reused. No active-profile promotion or weight training.
 - All sports profile instructions reach benchmark answers. The older compact
   context took the first ten instructions, omitting the final two rules.
 - Sports answers get 800 output tokens per case and judges get 320. Older
@@ -88,6 +105,14 @@ before. `finishReason=STOP` is still mandatory, thought parts are excluded from
 answers, and incomplete answers or judges cannot advance a checkpoint. The new
 harness is sports-validation-v4-low-thinking-2400-1200, excluding earlier
 harness records from reuse. These tests do not establish better model results.
+
+v2.19.3.15 passes 19 new checks, including independently computed Fraction-based
+arithmetic at seven other prices with three win/push pairs each, conservative
+source extraction, input conflicts, separate live/lab assumptions, rejected
+model metric fields, guarded decisions, provenance and checkpoint preservation.
+The sports workflow's nine isolated suites pass 128 tests. The production
+launcher also imports v2.19.3.15 and responds successfully to a local health
+check. These checks do not establish live acceptance or profitable predictions.
 Google's API documents ThinkingConfig at
 https://ai.google.dev/api/generate-content#ThinkingConfig .
 
@@ -224,6 +249,15 @@ and probabilities are caller supplied and explicitly labeled unverified; a value
 candidate is not a verified live bet. Same-model rubric scoring tests behavior,
 not prediction accuracy. Repeated holdout inspection reduces its independence;
 use new reserved cases if holdout failures guide later instruction changes.
+
+The v4 budget/thinking deployment did not resolve the defect. Active-v1 Flash
+session SV-AC897E1E3C4A4E00 received provider 503 errors on its first case, and
+the Gemini 3.8 Flash configuration pilot SV-61F61ED4543D4A83 also received a
+503 without advancing; each remains at 0/25. Restored Flash-Lite session
+SV-D3AD3510E252400D saved two cases: risk-language failed for invented opposing
+price/no-vig values, while ledger preservation scored 100. Its 2/25 checkpoint
+is paused historical evidence, not a complete benchmark. Those training-baseline
+source/arithmetic failures motivated the generic application-math design.
 
 Application-level append-only records are not a database-enforced immutable
 ledger: DB administrators can alter rows, and hashes detect changes only when

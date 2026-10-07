@@ -141,7 +141,10 @@ def audit_answer(output, case=None, input_text=None):
         elif not _close(no_vig, implied / (implied + opposite), "no_vig_probability"):
             errors.append("no_vig_normalization_wrong")
     if estimate is not None and implied is not None:
-        if implied == 0 or push is None or push >= 1 or estimate + push > 1:
+        if push is None and input_text is not None and case is None:
+            if any(metrics[key] is not None for key in ("conditional_probability", "edge_percentage_points", "lower_bound_edge_percentage_points", "expected_profit_per_unit")):
+                errors.append("push_unknown_requires_unknown_calculations")
+        elif implied == 0 or push is None or push >= 1 or estimate + push > 1:
             errors.append("win_push_or_break_even_invalid")
         else:
             expected = {"conditional_probability": estimate / (1 - push),
@@ -157,7 +160,8 @@ def audit_answer(output, case=None, input_text=None):
                     errors.append(key + "_inconsistent")
             if expected["expected_profit_per_unit"] > 0 and re.search(
                     r"(?:too thin|insufficient|not sufficient|does not provide|cannot).{0,160}"
-                    r"(?:overcome|cover|beat).{0,100}(?:vig|juice)", data["rationale"], re.I | re.S):
+                    r"(?:overcome|cover|beat).{0,100}(?:vig|juice)|"
+                    r"(?:erased|eroded).{0,60}(?:vig|juice)", data["rationale"], re.I | re.S):
                 errors.append("positive_ev_rationale_double_counts_vig")
     cid = (case or {}).get("case_id")
     if cid in (NO_BET_CASES | set(ORACLES)) and cid != "holdout-vig" and (no_vig is not None or opposite is not None):
