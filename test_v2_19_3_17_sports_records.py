@@ -4,7 +4,7 @@ import unittest
 
 import app_v2_19_3_17 as v
 from sports_explanation_checks import missing
-from sports_answer_audit import _variance_erases_expectation
+from sports_answer_audit import _variance_erases_expectation, _double_counts_vig
 from skill_lab import SkillPromotionLab
 from sports_validation import SportsValidation
 from test_v2_18_skill_lab import FakeEngine, MemoryStore
@@ -18,6 +18,17 @@ def data(prose):
 
 
 class RecordExplanationTests(unittest.TestCase):
+    def test_vig_guard_distinguishes_errors_from_negated_warnings(self):
+        for statement in ("Positive EV is not erased by standard vig.",
+                          "Never claim the edge is too thin to overcome juice.",
+                          "Do not claim positive EV is eroded by juice."):
+            with self.subTest(statement=statement):
+                self.assertFalse(_double_counts_vig(statement))
+        for statement in ("The positive edge is erased by standard vig.",
+                          "This edge is too thin to overcome sportsbook juice."):
+            with self.subTest(statement=statement):
+                self.assertTrue(_double_counts_vig(statement))
+
     def test_negated_variance_errors_are_not_rejected_as_affirmations(self):
         for statement in ("Never a claim that variance or vig erases EV.",
                           "Variance does not erase positive EV.", "Variance cannot erase expected profit.",

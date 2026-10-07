@@ -14,7 +14,7 @@ at this commit. Older evidence below retains its original harness identity.
   answers must provide a concrete conditional game-script link, rather than echo
   Explain/Discuss directives. The prompt asks for complete scenario-specific
   explanations and distinguishes a supplied quote change from market consensus.
-  A bug in the variance guard is fixed: negated warnings against erasing EV are
+  A bug in explanation guards is fixed: negated warnings against erasing EV are
   not affirmative errors. Tests include both negated warnings and real errors.
   The new identity is sports-validation-v7-application-math-process-coverage.
 - v2.19.3.16 adds scenario-intent topic checks to explanations and grading,
@@ -138,7 +138,7 @@ factors, ROI/confidence groups, joint-ticket reasoning, explicit positive EV,
 live rejection, persisted failed feedback, and unchanged active profiles. A
 coverage pass still requires the semantic judge, which can reject wrong meaning.
 
-v2.19.3.17 passes six additional record/negation/echo checks (147 across eleven
+v2.19.3.17 passes seven additional record/negation/echo checks (148 across eleven
 isolated sports workflow suites) and local production-launcher health 200.
 Google's API documents ThinkingConfig at
 https://ai.google.dev/api/generate-content#ThinkingConfig .

@@ -117,6 +117,22 @@ def _variance_erases_expectation(prose):
     return False
 
 
+def _double_counts_vig(prose):
+    pattern = (r"(?:too thin|insufficient|not sufficient|does not provide|cannot).{0,160}"
+               r"(?:overcome|cover|beat).{0,100}(?:vig|juice)|(?:erased|eroded).{0,60}(?:vig|juice)")
+    for clause in re.split(r"[;.!?]", prose):
+        for match in re.finditer(pattern, clause, re.I):
+            prefix, claim, suffix = clause[:match.start()], match[0], clause[match.end():]
+            if re.search(r"(?:never (?:a |the )?claim|do not (?:claim|assert|say)|not (?:claiming|asserting)|no claim).{0,35}$", prefix, re.I):
+                continue
+            if re.match(r"erased|eroded", claim, re.I) and re.search(r"\b(?:not|never|cannot|isn't|doesn't).{0,15}$", prefix, re.I):
+                continue
+            if re.search(r"^.{0,15}\b(?:is false|is wrong|is incorrect|is a misconception)\b", suffix, re.I):
+                continue
+            return True
+    return False
+
+
 def audit_answer(output, case=None, input_text=None):
     errors = []
     try:
@@ -174,10 +190,7 @@ def audit_answer(output, case=None, input_text=None):
             for key, value in expected.items():
                 if not _close(metrics[key], value, key):
                     errors.append(key + "_inconsistent")
-            if expected["expected_profit_per_unit"] > 0 and re.search(
-                    r"(?:too thin|insufficient|not sufficient|does not provide|cannot).{0,160}"
-                    r"(?:overcome|cover|beat).{0,100}(?:vig|juice)|"
-                    r"(?:erased|eroded).{0,60}(?:vig|juice)", data["rationale"], re.I | re.S):
+            if expected["expected_profit_per_unit"] > 0 and _double_counts_vig(data["rationale"]):
                 errors.append("positive_ev_rationale_double_counts_vig")
             if expected["expected_profit_per_unit"] > 0 and _variance_erases_expectation(
                     data["rationale"] + " " + data["uncertainty"]):
