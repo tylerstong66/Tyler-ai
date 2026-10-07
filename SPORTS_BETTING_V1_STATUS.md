@@ -1,14 +1,21 @@
 # Sports Betting Analyst v1
 
-Deployment verification on October 7, 2026 confirmed v2.19.3.16 at merge commit
-30c307a32775f2dab92b945b5e6e3da2460723af and Render deploy
-dep-db32qit9fdbs739pg2o0, using gemini-3.5-flash-lite. Sports Betting Analyst
-v1 has not passed acceptance. The v2.19.3.17 process-coverage follow-up
+Deployment verification on October 7, 2026 confirmed v2.19.3.17 at merge commit
+07de26d86d14a1533c44fa52a436b504f00a316c and Render deploy
+dep-db33123bc2fs73ceoi7g. Configuration deploy dep-db334q3tqb8s73e0sbn0
+selected gemini-3.5-flash on the same commit. Sports Betting Analyst v1 has not
+passed acceptance. The v2.19.3.18 scenario-scoped-grading follow-up
 passes software tests; deployment and fresh live validation remain outstanding
 at this commit. Older evidence below retains its original harness identity.
 
 ## What changed
 
+- v2.19.3.18 scopes semantic grading to the supplied INPUT, EXPECTED behavior
+  and CRITERIA. It removes the overgeneralized examples that caused a stronger
+  model to demand prop/parlay/sample topics on an unrelated risk-language case.
+  Relevant topic coverage, objective audits and strict completions remain; no
+  acceptance threshold is lowered. The separate identity is
+  sports-validation-v8-application-math-scoped-grading.
 - v2.19.3.17 extends intent-based coverage to preserved historical predictions,
   separately appended actual results, closing lines and postmortems. Correlation
   answers must provide a concrete conditional game-script link, rather than echo
@@ -140,6 +147,10 @@ coverage pass still requires the semantic judge, which can reject wrong meaning.
 
 v2.19.3.17 passes seven additional record/negation/echo checks (148 across eleven
 isolated sports workflow suites) and local production-launcher health 200.
+
+v2.19.3.18 passes four additional scope/identity/integration checks (152 across
+twelve isolated sports workflow suites) and local launcher health 200. These
+tests check retained relevant requirements, not a model's semantic reliability.
 Google's API documents ThinkingConfig at
 https://ai.google.dev/api/generate-content#ThinkingConfig .
 
@@ -302,6 +313,21 @@ instead of giving a concrete game-script link. The changed-line answer also
 inferred market consensus from a supplied quote, which is unsupported. This
 checkpoint is paused at 10/25; no repeats or transfer cases were queried and no
 profile was promoted. These training-baseline observations informed v7 checks.
+
+Active-v1 v7 Flash-Lite session SV-9A91B59A880B4C20 completed ten first-baseline
+cases: 89 average, 90% passing. Arithmetic and the negation checks passed;
+correlation scored zero because the answer copied Explain/Discuss directives
+instead of explaining the scenario. The coverage guard correctly caught that
+failure. The checkpoint is paused at 10/25 with no repeats or transfer cases.
+
+After switching to gemini-3.5-flash, separately identified v7 pilot
+SV-C9A1F2539BA140FD completed one case (1/25). Its risk-language answer correctly
+rejected locks and doubling stakes and left unsupplied metrics unknown. The
+semantic judge falsely scored 70 for missing carries, snap/route role, ROI,
+confidence buckets and joint-ticket probability, which that scenario did not
+request. The run is paused. This observed grader-scope defect motivated v8;
+saved v7 evidence is unchanged, no holds informed the revision, and active v1
+remains protected.
 
 The v4 budget/thinking deployment did not resolve the defect. Active-v1 Flash
 session SV-AC897E1E3C4A4E00 received provider 503 errors on its first case, and
