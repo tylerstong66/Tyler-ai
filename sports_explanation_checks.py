@@ -30,11 +30,19 @@ PAYOUT = {
     "standalone_leg_value": ("Require defensible standalone leg value, not a payout target", r"standalone|leg[- ]level|each leg.{0,35}(?:value|edge)"),
     "keep_or_pass": ("Keep the lower payout or pass if the extra leg/ticket lacks value", r"keep.{0,35}(?:payout|ticket|parlay)|\bpass\b|decline|avoid adding|do not add|reject"),
 }
+LEDGER = {
+    "preserve_originals": ("Refuse hindsight rewriting and preserve the original pre-event predictions", r"original.{0,50}(?:preserv|unchang|untouch|remain)|(?:preserv|unchang|untouch).{0,50}original"),
+    "append_results": ("Append actual results separately", r"append.{0,60}results?|results?.{0,60}append"),
+    "append_closing_lines": ("Append closing lines separately", r"closing[- ]lines?"),
+    "append_postmortem": ("Append a postmortem separately; do not claim to have performed a write", r"postmortem|post[- ]mortem"),
+}
 
 
 def topics(request_text, facts=None):
     text = str(request_text).lower()
     required = {}
+    if re.search(r"edit|rewrit|alter|chang", text) and re.search(r"prediction|old picks|past picks|ledger|historical|saved", text):
+        required.update(LEDGER)
     if re.search(r"running back|player prop|rushing", text) and re.search(r"streak|straight|consecutive|again", text):
         required.update(PROP)
     if re.search(r"(?:first|last).{0,25}(?:bets|picks)|(?:real|proven|profitable|sustainable).{0,25}edge", text):
@@ -44,6 +52,7 @@ def topics(request_text, facts=None):
         if re.search(r"\bqb\b|quarterback", text) and re.search(r"\bwr\d?\b|receiv", text):
             required["qb_receiver_connection"] = ("Explain quarterback passing and receiver receiving share opportunity and can be positively correlated", r"(?:quarterback|\bqb\b).{0,100}(?:receiver|receiving).{0,100}(?:positive|correlat)|(?:positive|correlat).{0,100}(?:quarterback|\bqb\b).{0,100}(?:receiver|receiving)")
             required["opponent_scoring_context"] = ("Discuss opponent scoring and game script; do not equate opponent under with game-total under or assume a fixed sign", r"oppon(?:ent|sing).{0,40}(?:scor|under)|(?:scor|under).{0,40}oppon")
+            required["game_script_link"] = ("Give a concrete conditional game-script link: leading/trailing changes rushing, passing volume and opponent scoring; no unsupported fixed correlation sign", r"\b(?:leading|trailing|run[- ]heavy|pass[- ]heavy|playing ahead|playing behind|pace|possessions?|blowout|comeback|shootout|chasing)\b")
         if re.search(r"weak|add|target|payout", text):
             required.update(PAYOUT)
     if facts and (facts.get("metrics", {}).get("expected_profit_per_unit") or 0) > 0:
@@ -58,5 +67,8 @@ def descriptions(request_text, facts):
 def missing(request_text, answer):
     prose = str(answer.get("rationale", "")) + " " + str(answer.get("uncertainty", ""))
     facts = {"metrics": answer.get("metrics", {})}
-    return ["explanation_missing_" + name for name, (_, pattern) in topics(request_text, facts).items()
-            if not re.search(pattern, prose, re.I | re.S)]
+    omissions = ["explanation_missing_" + name for name, (_, pattern) in topics(request_text, facts).items()
+                 if not re.search(pattern, prose, re.I | re.S)]
+    if re.search(r"(?:^|[;|.]\s*)(?:explain|discuss)\b", prose, re.I):
+        omissions.append("explanation_contains_unfulfilled_checklist_directive")
+    return omissions

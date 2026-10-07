@@ -40,10 +40,10 @@ class ExplanationCoverageTests(unittest.TestCase):
 
     def test_qb_receiver_and_opponent_context_are_separate_requirements(self):
         request = "Parlay QB passing over, WR1 receiving over and opposing team under, assume independent."
-        answer = explanation("Use a joint probability model for the ticket; quarterback passing and receiver receiving can be positively correlated; opponent scoring depends on game script.")
+        answer = explanation("Use a joint probability model for the ticket; quarterback passing and receiver receiving can be positively correlated; when leading, run-heavy play may lower passing volume while opponent scoring depends on game script.")
         self.assertEqual(missing(request, answer), [])
         delimited = explanation("Use a joint probability model for the ticket; game script matters.")
-        self.assertEqual(set(missing(request, delimited)), {"explanation_missing_qb_receiver_connection", "explanation_missing_opponent_scoring_context"})
+        self.assertEqual(set(missing(request, delimited)), {"explanation_missing_qb_receiver_connection", "explanation_missing_opponent_scoring_context", "explanation_missing_game_script_link"})
 
     def test_positive_ev_must_be_explicit_while_no_bet_is_allowed(self):
         answer = dict(explanation("Inputs are unverified; no wager justified."), metrics={"expected_profit_per_unit": .1})

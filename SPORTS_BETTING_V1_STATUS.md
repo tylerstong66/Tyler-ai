@@ -1,14 +1,22 @@
 # Sports Betting Analyst v1
 
-Deployment verification on October 7, 2026 confirmed v2.19.3.15 at merge commit
-a6fdadbb8df4aa9d1f297cc8c1c722901b7cb540 and Render deploy
-dep-db32jcu7bikc73bfa1hg, using gemini-3.5-flash-lite. Sports Betting Analyst
-v1 has not passed acceptance. The v2.19.3.16 explanation-coverage follow-up
+Deployment verification on October 7, 2026 confirmed v2.19.3.16 at merge commit
+30c307a32775f2dab92b945b5e6e3da2460723af and Render deploy
+dep-db32qit9fdbs739pg2o0, using gemini-3.5-flash-lite. Sports Betting Analyst
+v1 has not passed acceptance. The v2.19.3.17 process-coverage follow-up
 passes software tests; deployment and fresh live validation remain outstanding
 at this commit. Older evidence below retains its original harness identity.
 
 ## What changed
 
+- v2.19.3.17 extends intent-based coverage to preserved historical predictions,
+  separately appended actual results, closing lines and postmortems. Correlation
+  answers must provide a concrete conditional game-script link, rather than echo
+  Explain/Discuss directives. The prompt asks for complete scenario-specific
+  explanations and distinguishes a supplied quote change from market consensus.
+  A bug in explanation guards is fixed: negated warnings against erasing EV are
+  not affirmative errors. Tests include both negated warnings and real errors.
+  The new identity is sports-validation-v7-application-math-process-coverage.
 - v2.19.3.16 adds scenario-intent topic checks to explanations and grading,
   covering specific prop inputs, performance evidence, joint-ticket probability,
   payout discipline and the meaning of positive point-estimate EV. Requirements
@@ -129,6 +137,9 @@ suites) and local production-launcher health 200. Checks cover omitted prop
 factors, ROI/confidence groups, joint-ticket reasoning, explicit positive EV,
 live rejection, persisted failed feedback, and unchanged active profiles. A
 coverage pass still requires the semantic judge, which can reject wrong meaning.
+
+v2.19.3.17 passes seven additional record/negation/echo checks (148 across eleven
+isolated sports workflow suites) and local production-launcher health 200.
 Google's API documents ThinkingConfig at
 https://ai.google.dev/api/generate-content#ThinkingConfig .
 
@@ -279,6 +290,18 @@ treated positive EV as requiring a bet despite unverified inputs. That case
 scored 45. The checkpoint is paused at 10/25; no v5 repeats or transfer cases
 were queried and no candidate was activated. Training-baseline omissions and
 the distinction between risk and expectation motivated v6's generic checks.
+
+Active-v1 v6 session SV-FD780CF6CB554B06 saved ten first-baseline cases, averaging
+79 with 80% passing. Prop factors, ROI/confidence groups and whole-ticket value
+omissions were fixed, and arithmetic stayed correct. Two zero scores were false
+failures caused by the application's variance regex matching the negated warning
+"never a claim that variance or vig erases EV." That bug is corrected in v7,
+without changing saved v6 results. Manual review still rejected the ledger answer
+for omitting a postmortem and the correlation answer for echoing instructions
+instead of giving a concrete game-script link. The changed-line answer also
+inferred market consensus from a supplied quote, which is unsupported. This
+checkpoint is paused at 10/25; no repeats or transfer cases were queried and no
+profile was promoted. These training-baseline observations informed v7 checks.
 
 The v4 budget/thinking deployment did not resolve the defect. Active-v1 Flash
 session SV-AC897E1E3C4A4E00 received provider 503 errors on its first case, and
