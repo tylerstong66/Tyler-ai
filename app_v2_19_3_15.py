@@ -21,6 +21,7 @@ for module in (previous, previous.previous, previous.previous.previous, harness,
     module.HARNESS_VERSION = HARNESS_VERSION
 _LIVE_INPUT = ContextVar("sports_live_input", default=False)
 _OLD_RUN = SKILL_LAB._run
+EXPLANATION_REQUIREMENTS = lambda request_text, facts: []
 
 
 def _run(self, profile, request_text):
@@ -43,7 +44,10 @@ def _run(self, profile, request_text):
         "rationale and uncertainty together must be <=130 words. Answer every requested behavioral point.",
         "Offered-price break-even already includes juice. Positive EV cannot be erased by subtracting vig again.",
         "Unverified probabilities and missing evidence can justify NO BET despite positive point-estimate EV.",
+        "Outcome variance affects risk, not expected value. Missing model confidence is a reason to withhold a bet; never assert that variance erases an edge.",
         "Application-calculated context: " + json.dumps(facts),
+        "Required explanation checks (address EACH explicitly, using brief semicolon-separated clauses): "
+        + " | ".join(EXPLANATION_REQUIREMENTS(request_text, facts)),
         self._context(profile),
         *harness.ANSWER_EXTRA_RULES[-3:],
         "The three-key explanation contract above overrides any request for model-generated metrics.",
