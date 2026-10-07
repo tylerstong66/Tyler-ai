@@ -107,7 +107,7 @@ def _variance_erases_expectation(prose):
     for clause in re.split(r"[;.!?]", prose):
         for match in re.finditer(pattern, clause, re.I):
             prefix, claim, suffix = clause[:match.start()], match[0], clause[match.end():]
-            if re.search(r"(?:never (?:a |the )?claim|do not (?:claim|assert|say)|not (?:claiming|asserting)|cannot (?:claim|assert)|no claim|not because).{0,35}$", prefix, re.I):
+            if re.search(r"(?:never (?:(?:a |the )?claim|claiming|implying|asserting|suggesting|imply|assert|suggest)|do not (?:claim|assert|say|imply|suggest)|not (?:claiming|asserting|implying|suggesting)|cannot (?:claim|assert|imply)|no claim|not because)(?:\s+that)?\s*$", prefix, re.I):
                 continue
             if re.search(r"\b(?:does not|doesn't|cannot|can not|never|will not|won't|do not)\b", claim, re.I):
                 continue
@@ -172,6 +172,11 @@ def audit_answer(output, case=None, input_text=None):
             errors.append("no_vig_requires_opposite_price")
         elif not _close(no_vig, implied / (implied + opposite), "no_vig_probability"):
             errors.append("no_vig_normalization_wrong")
+    variance_error = _variance_erases_expectation(data["rationale"] + " " + data["uncertainty"])
+    if variance_error and not (estimate is not None and implied is not None and
+                               metrics["expected_profit_per_unit"] is not None and
+                               metrics["expected_profit_per_unit"] > 0):
+        errors.append("explanation_confuses_variance_with_expectation")
     if estimate is not None and implied is not None:
         if push is None and input_text is not None and case is None:
             if any(metrics[key] is not None for key in ("conditional_probability", "edge_percentage_points", "lower_bound_edge_percentage_points", "expected_profit_per_unit")):

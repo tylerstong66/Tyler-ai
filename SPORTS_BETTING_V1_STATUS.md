@@ -1,5 +1,28 @@
 # Sports Betting Analyst v1
 
+October 7 continuation verified live v2.19.3.21 at commit
+52fbbf0926b3ed707a3d24e16d141b04efe96217. Session SV-E27788B13AEB47E2
+completed its first ten-case baseline: 79.5/100, eight of ten passing. The
+second baseline and transfer stage were not queried. Saved scores remain
+unchanged. Manual review found the line-movement answer falsely inferred market
+consensus from a supplied quote despite its score of 95. The positive-odds zero
+was a false rejection of "never implying that variance or the vig erases an
+edge"; the calculated profit was correctly 0.175. The parlay zero combined a
+false syntactic rejection of a causal lead/running/passing-volume explanation
+with a genuine unsupported claim that variance overwhelms an apparent edge.
+The latter must still fail, regardless of the causal phrase fix.
+
+v2.19.3.22 passes 181 checks across 16 isolated sports suites plus production
+launcher health 200. It accepts equivalent causal connectors only with a
+lead/trail branch and directional passing/rushing consequence; semantic review
+still checks correctness. Negated implying/suggesting warnings are recognized
+without excusing a later affirmative error. Variance-versus-expectation checks
+also apply when numeric estimates are unknown. Quote changes receive scoped
+reassessment guidance and an affirmative consensus-inference guard. Its new
+identity is sports-validation-v12-quote-grounding-causal-language. Existing
+acceptance thresholds, profiles, stored scores and reserved cases are unchanged.
+Deployment and fresh live validation remain required; no readiness is claimed.
+
 Deployment verification on October 7, 2026 confirmed v2.19.3.20 at merge commit
 8702772e3b0157204b7254a1677952ed24332af7 and Render deploy
 dep-db33p8e7bikc73bj0cf0, using gemini-3.5-flash-lite. Sports Betting Analyst
