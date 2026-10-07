@@ -53,9 +53,9 @@ def _run(self, profile, request_text):
         "Application-calculated context: " + json.dumps(facts),
         "Required explanation checks (address EACH explicitly, using brief semicolon-separated clauses): "
         + " | ".join(EXPLANATION_REQUIREMENTS(request_text, facts)),
-        *EXPLANATION_BACKGROUND(request_text, facts),
         self._context(profile),
         *harness.ANSWER_EXTRA_RULES[-3:],
+        *EXPLANATION_BACKGROUND(request_text, facts),
         "The three-key explanation contract above overrides any request for model-generated metrics.",
     ])
     raw = harness._complete(lambda: self.engine.complete([
