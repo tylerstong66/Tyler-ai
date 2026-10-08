@@ -1,5 +1,27 @@
 # Sports Betting Analyst v1
 
+October 8 resumed Flash v13 session SV-1D08C5EC0F7A46D6 and completed its
+first ten-case baseline: automated average 75, seven of ten passing. No repeats
+or transfer cases were queried. Saved scores are unchanged. The changed-price
+answer genuinely claimed increased variance could erase the old edge and was
+scored 50. The parlay's zero combined a false rejection of the noun "lead" with
+an unsupported "highly likely" assertion about the receiver. The narrow-edge
+zero falsely rejected "rather than a claim that variance or vig erases" value;
+its application arithmetic was correct. Manual review rejects the stale-data
+answer despite its score of 100: old injury information does not establish
+"extreme variance." This baseline is not accepted.
+
+v2.19.3.24 adds final task-scoping and evidence-uncertainty guidance after the
+full profile context. Missing/stale evidence does not establish an increase in
+outcome variance; qualitative dependence does not establish a conditional
+probability or unsupported strength. The judge applies those distinctions.
+Necessary topic checks accept lead/ahead/behind alongside existing synonyms,
+while still requiring a directional conditional mechanism and semantic review.
+Negated claim phrases reach semantic review without hiding a later affirmative
+variance error. Acceptance thresholds, profile and reserved cases are unchanged.
+New identity: sports-validation-v14-evidence-uncertainty. Fresh deployment and
+validation are required; no promotion or profitability claim is made.
+
 v2.19.3.23 is live at commit 8863a0eb81464391dc82d7946d86c4b5b95d707c,
 Render deploy dep-db3adfajnfac7397hgd0, using gemini-3.5-flash. Both status
 and health returned 200 after the provider requests finished; the post-deploy

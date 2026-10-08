@@ -110,7 +110,7 @@ def _variance_erases_expectation(prose):
     for clause in re.split(r"[;.!?]", prose):
         for match in re.finditer(pattern, clause, re.I):
             prefix, claim, suffix = clause[:match.start()], match[0], clause[match.end():]
-            if re.search(r"(?:never (?:(?:a |the )?claim|claiming|implying|asserting|suggesting|imply|assert|suggest)|do not (?:claim|assert|say|imply|suggest)|not (?:claiming|asserting|implying|suggesting)|cannot (?:claim|assert|imply)|no claim|not because)(?:\s+that)?\s*$", prefix, re.I):
+            if re.search(r"(?:never (?:(?:a |the )?claim|claiming|implying|asserting|suggesting|imply|assert|suggest)|do not (?:claim|assert|say|imply|suggest)|not (?:claiming|asserting|implying|suggesting)|(?:not|rather than|instead of|without) (?:a |the )?claim|cannot (?:claim|assert|imply)|no claim|not because)(?:\s+that)?\s*$", prefix, re.I):
                 continue
             before_action = clause[match.start():match.start("action")]
             if re.search(r"\b(?:does not|doesn't|cannot|can not|never|will not|won't|do not|rather than|instead of|without|not)(?:\s+\w+){0,2}\s*$", before_action, re.I):
