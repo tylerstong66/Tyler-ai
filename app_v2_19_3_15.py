@@ -25,6 +25,7 @@ EXPLANATION_REQUIREMENTS = lambda request_text, facts: []
 NUMERIC_PROSE_CHECK = lambda prose, request_text: bool(re.search(r"\d", prose))
 SAVE_EXPLANATION_CONTRACT_FAILURES = False
 EXPLANATION_BACKGROUND = lambda request_text, facts: []
+EXPLANATION_FINAL_RULES = ()
 
 
 def _run(self, profile, request_text):
@@ -57,6 +58,7 @@ def _run(self, profile, request_text):
         *harness.ANSWER_EXTRA_RULES[-3:],
         *EXPLANATION_BACKGROUND(request_text, facts),
         "The three-key explanation contract above overrides any request for model-generated metrics.",
+        *EXPLANATION_FINAL_RULES,
     ])
     raw = harness._complete(lambda: self.engine.complete([
         {"role": "system", "content": prompt}, {"role": "user", "content": str(request_text)},
