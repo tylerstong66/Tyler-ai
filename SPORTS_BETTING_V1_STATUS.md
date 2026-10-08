@@ -1,5 +1,31 @@
 # Sports Betting Analyst v1
 
+v2.19.3.24 is deployed at dde52475b1258b7276ad7706563b6b4d20d396a0.
+Its Flash deploy dep-db3u83p42hec73f35oqg went live October 8 at 18:43:08 UTC;
+health and status returned 200 on that exact commit and v14 harness. All 195
+local checks across eighteen isolated suites and all twelve PR #22 workflow
+runs passed. Error-log queries after deployment were empty.
+
+Fresh Flash v14 session SV-B8D953BCD46941D5 saved one passing risk-language
+case (100). The next case hit provider quota exhaustion; a retry after a short
+pause returned the same error. Readback confirmed 1/25 with the same checkpoint.
+No quota reset time is known and no request allowance or billing was changed.
+
+The configured Flash-Lite model was then selected for a separate v14 session,
+SV-5962DB2746374758, on deploy dep-db3uaq67bikc73aef4p0. Status confirmed the
+same commit/harness and gemini-3.5-flash-lite. Its first four cases passed at
+100 each and were manually reviewed: risk language, original-record protection,
+changed-price reassessment, and player-prop process. Changed-price reasoning
+no longer attributed edge loss to variance, and the prop answer did not invent
+an observed quote change. One high-demand 503 on the changed-price case recovered
+on a single retry. The fifth case returned 503 high demand on both its initial
+request and single retry; no additional scored case was consumed. Readback
+confirmed the saved 4/25 checkpoint. Flash-Lite remains selected, and the Flash
+checkpoint remains separately preserved. Neither new first baseline is complete;
+no repeats or transfer cases were queried. Resume `Continue sports validation`
+when provider capacity permits. No model-weight training or promotion occurred,
+and Sports Betting Analyst v1 acceptance remains incomplete.
+
 October 8 resumed Flash v13 session SV-1D08C5EC0F7A46D6 and completed its
 first ten-case baseline: automated average 75, seven of ten passing. No repeats
 or transfer cases were queried. Saved scores are unchanged. The changed-price
@@ -19,8 +45,9 @@ Necessary topic checks accept lead/ahead/behind alongside existing synonyms,
 while still requiring a directional conditional mechanism and semantic review.
 Negated claim phrases reach semantic review without hiding a later affirmative
 variance error. Acceptance thresholds, profile and reserved cases are unchanged.
-New identity: sports-validation-v14-evidence-uncertainty. Fresh deployment and
-validation are required; no promotion or profitability claim is made.
+New identity: sports-validation-v14-evidence-uncertainty. Deployment is verified
+above; fresh validation is paused by provider limits. No promotion or
+profitability claim is made.
 
 v2.19.3.23 is live at commit 8863a0eb81464391dc82d7946d86c4b5b95d707c,
 Render deploy dep-db3adfajnfac7397hgd0, using gemini-3.5-flash. Both status
