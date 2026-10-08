@@ -1,5 +1,17 @@
 # Sports Betting Analyst v1
 
+October 8 afternoon resume advanced the existing v14 Flash-Lite checkpoint
+SV-5962DB2746374758 from 4/25 to 6/25. Small-sample evaluation and payout
+discipline each scored 100 and passed manual review, alongside the original
+four passing cases. The small-sample request recovered from one high-demand
+503 on a bounded retry. The seventh, correlation case returned provider 503
+high demand on both its initial request and retry after a pause; neither request
+produced a scored case. Readback verified six results, all scoring 100, the
+same model/harness/profile identity and the saved timestamp
+2026-10-08T19:48:16.196913+00:00. The run is paused at 6/25 with no repeat or
+transfer cases queried. No source code, runtime setting, threshold, profile,
+score or model weight was changed during this resume. Acceptance is incomplete.
+
 v2.19.3.24 is deployed at dde52475b1258b7276ad7706563b6b4d20d396a0.
 Its Flash deploy dep-db3u83p42hec73f35oqg went live October 8 at 18:43:08 UTC;
 health and status returned 200 on that exact commit and v14 harness. All 195
