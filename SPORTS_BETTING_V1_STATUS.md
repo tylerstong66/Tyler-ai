@@ -16,6 +16,7 @@ Commands (authenticated Tyler chat):
 sports paper schedule :: {"date":"2026-10-11"}
 sports paper analyze :: {"event_id":"401872981"}
 show latest sports paper prediction
+show sports paper evidence :: {"paper_prediction_id":"PP-..."}
 show sports paper trial
 sports paper quote :: {"paper_prediction_id":"PP-..."}
 sports paper settle :: {"paper_prediction_id":"PP-..."}
@@ -26,7 +27,9 @@ original forecast per event in the latest-1000-record read window, before
 kickoff, with model/profile identity and the frozen evidence snapshot. Home,
 away and tie probabilities are an experimental language-model hypothesis,
 not an empirically calibrated forecast. All decisions remain NO BET. The
-response's `sports_paper` field includes the full immutable snapshot.
+response's `sports_paper` field includes the full immutable snapshot. The
+evidence command displays the frozen record and its hash without a new fetch.
+Neutral-site designations are retained rather than assuming home advantage.
 
 Final-result retrieval requires a completed postgame event and matching team
 identities; settlement appends a linked result without rewriting the original.
@@ -38,7 +41,7 @@ observed pre-event price; verified closing-line value remains unknown because
 the feed's `close` field has no verified quote timestamp. Commands are manual;
 there is no scheduled collection or automatic settlement.
 
-All 251 local checks across 25 isolated suites pass, including 26 new checks
+All 254 local checks across 25 isolated suites pass, including 29 new checks
 for pre-event recording, final-only settlement, immutable originals, provenance,
 unknown quote age, duplicate rejection, scoring and existing promotion gates.
 The accepted 25-case behavioral benchmark below does not validate this new

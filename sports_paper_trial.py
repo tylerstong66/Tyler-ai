@@ -119,6 +119,8 @@ class NflPublicFeed:
         header = data.get("header", {})
         if str(header.get("id")) != identifier:
             raise ValueError("Feed returned a different event.")
+        if header.get("league", {}).get("abbreviation") != "NFL":
+            raise ValueError("Feed did not identify an NFL event.")
         competitions = header.get("competitions") or []
         if len(competitions) != 1:
             raise ValueError("NFL feed must contain one competition.")
@@ -143,8 +145,9 @@ class NflPublicFeed:
                 try:
                     if not re.fullmatch(r"[+-]?[0-9]+", str(value)):
                         raise ValueError("Invalid American odds.")
-                    prices[side] = int(value)
-                    implied_probability(prices[side])
+                    parsed = int(value)
+                    implied_probability(parsed)
+                    prices[side] = parsed
                 except (ValueError, TypeError):
                     break
             if len(prices) == 2:
@@ -165,6 +168,7 @@ class NflPublicFeed:
                 "event_start": competition["date"], "state": competition.get("status", {}).get("type", {}).get("state"),
                 "completed": competition.get("status", {}).get("type", {}).get("completed") is True,
                 "season": season, "week": week, "teams": teams,
+                "neutral_site": competition.get("neutralSite") if isinstance(competition.get("neutralSite"), bool) else None,
                 "venue": data.get("gameInfo", {}).get("venue"), "moneyline_quote": quote,
                 "publisher_predictor": data.get("predictor"), "reported_injuries": injuries,
                 "evidence": {"event_market_injuries": evidence},
