@@ -1,5 +1,49 @@
 # Sports Betting Analyst v1
 
+**Behavioral benchmark accepted: 25/25 passed and manually reviewed.**
+
+v2.19.3.30 deployed on 9ac0f310cb53003f7ceb38ee078226936d5c2b34 via
+Render dep-db44sp5g1s2s7388gg2g, live October 9 at 02:16:51 UTC. Health 200
+matched the exact commit; the post-deploy error-log query was empty. All twelve
+PR #31 workflows and 225 local checks across twenty-four isolated suites passed.
+Fresh Flash-Lite checkpoint SV-AB428ADF48AC4396 completed and saved all 25
+cases at 2026-10-09T02:23:54.628546+00:00. `Show sports validation` readback
+verified status passed, 25/25, repeat consistency, model/harness/profile/suite
+identity and the final metrics:
+
+| Stage | Cases | Average score | Pass rate |
+| --- | ---: | ---: | ---: |
+| First baseline | 10 | 98.5 | 100% |
+| Repeat baseline | 10 | 98.5 | 100% |
+| Reserved transfer cases | 5 | 99 | 100% |
+
+Manual review accepted all final answers, including conditional football
+mechanisms, missing-data discipline, price and line changes, positive-EV
+uncertainty, push-adjusted expectation, proportional no-vig normalization,
+refusal to multiply dependent marginal probabilities, and original-ledger
+protection. Arithmetic matched the supplied inputs. Reserved cases were only
+run after both passing baselines; no code/configuration change occurred during
+this complete run or after seeing their answers. No provider error or unscored
+response interrupted the v20 run.
+
+Three answers used exactly one recorded revision each: first-baseline
+correlation (SR-6E055BADCA4145E6, missing QB/receiver word coverage), repeat
+payout (SR-4D30ACE679494CFD, independence-prerequisite claim), and reserved
+negative odds (SR-BCE1E7E102BD4BF8, prose budget). All other answers used one
+initial generation. Saved final answers expose these identifiers and reasons;
+the runtime writes original and revised drafts as append-only diagnostic events.
+Acceptance applies to this full response pipeline, including its bounded
+revision step. Necessary checks and same-model judging were supplemented by
+manual review; these 25 synthetic behavioral cases do not establish forecast
+accuracy, future consistency or profitable wagering performance.
+
+Model remains gemini-3.5-flash-lite; harness sports-validation-v20-bounded-revision;
+profile f507edb72ab268412c6e1ea0231cb00cc85d0f092f6db1e4bec0c28ee288e038;
+suite 8c2def6bfb4d9e30b83cc795e726f244ca62d5e4c4c795c74a8b1523f7d6f84c;
+reserved set db8cd32fd66b9a064c3aa3156031c6125820d4239d4ec28aaa06b63c53c4d0c4.
+Profitability remains unproven; no wager, model-weight training, profile promotion
+or automatic activation occurred. Human promotion gates remain unchanged.
+
 v2.19.3.29 deployed on 4f9625b9613106d55a3e5afe8eae4a544864a66f via
 Render dep-db44o8jncjis73bptej0, live October 9 at 02:07:02 UTC; health 200
 matched the commit and post-deploy error logs were empty. All twelve PR #30
