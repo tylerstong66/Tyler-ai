@@ -24,7 +24,7 @@ ESPN = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/"
 
 def event_id(value):
     if not re.fullmatch(r"[0-9]{6,12}", str(value)):
-        raise ValueError("Supply an ESPN NFL event identifier from sports paper schedule.")
+        raise ValueError("Supply a public-feed event identifier from the paper schedule.")
     return str(value)
 
 
@@ -79,6 +79,8 @@ class InjuryTables(HTMLParser):
 
 
 class NflPublicFeed:
+    league = "NFL"
+    endpoint = ESPN
     def __init__(self, get=None, now_fn=None):
         self.get = get or requests.get
         self.now_fn = now_fn or (lambda: datetime.now(timezone.utc).isoformat())
@@ -100,9 +102,9 @@ class NflPublicFeed:
             day = datetime.strptime(str(date), "%Y-%m-%d").date()
         except ValueError:
             raise ValueError("Date must be YYYY-MM-DD.") from None
-        if not 0 <= (day - timestamp(self.now_fn()).date()).days <= 7:
+        if not 0 <= (day - self.schedule_today()).days <= 7:
             raise ValueError("Paper schedule supports today through seven days ahead.")
-        data, evidence = self._fetch(ESPN + "scoreboard", {"dates": day.strftime("%Y%m%d")})
+        data, evidence = self._fetch(self.endpoint + "scoreboard", {"dates": day.strftime("%Y%m%d")})
         events = []
         for item in data.get("events", []):
             if item.get("status", {}).get("type", {}).get("state") != "pre":
@@ -113,17 +115,20 @@ class NflPublicFeed:
                            "event_start": item["date"]})
         return {"events": events, "evidence": evidence}
 
+    def schedule_today(self):
+        return timestamp(self.now_fn()).date()
+
     def game(self, identifier):
         identifier = event_id(identifier)
-        data, evidence = self._fetch(ESPN + "summary", {"event": identifier})
+        data, evidence = self._fetch(self.endpoint + "summary", {"event": identifier})
         header = data.get("header", {})
         if str(header.get("id")) != identifier:
             raise ValueError("Feed returned a different event.")
-        if header.get("league", {}).get("abbreviation") != "NFL":
-            raise ValueError("Feed did not identify an NFL event.")
+        if header.get("league", {}).get("abbreviation") != self.league:
+            raise ValueError("Feed did not identify a " + self.league + " event.")
         competitions = header.get("competitions") or []
         if len(competitions) != 1:
-            raise ValueError("NFL feed must contain one competition.")
+            raise ValueError(self.league + " feed must contain one competition.")
         competition = competitions[0]
         teams = {}
         for item in competition.get("competitors", []):
@@ -135,7 +140,7 @@ class NflPublicFeed:
                                "record": [r.get("summary") for r in item.get("record", []) if r.get("type") == "total"],
                                "score": item.get("score")}
         if set(teams) != {"home", "away"}:
-            raise ValueError("NFL feed must identify exactly two opposing teams.")
+            raise ValueError(self.league + " feed must identify exactly two opposing teams.")
         quote = None
         for item in data.get("pickcenter", []):
             market = item.get("moneyline", {})
@@ -245,6 +250,23 @@ def validate_forecast(value):
 
 
 class PaperTrial:
+    prediction_category = PAPER_PREDICTIONS
+    result_category = PAPER_RESULTS
+    quote_category = PAPER_QUOTES
+    pipeline_version = PAPER_VERSION
+    id_prefix = "PP-"
+    settlement_policy = "Paper moneyline: tie is a push; actual bookmaker settlement rule unverified."
+    validate = staticmethod(validate_forecast)
+
+    def price_metrics(self, prices, forecast, side):
+        return price_analysis(prices[side], forecast["probabilities"][side], forecast["probabilities"]["tie"], prices["away" if side == "home" else "home"])
+
+    def outcome(self, record, game, scores):
+        return "tie" if scores["home"] == scores["away"] else max(scores, key=scores.get)
+
+    def record_extras(self, game):
+        return {}
+
     def __init__(self, ledger, feed, forecast_fn, model, profile_fn):
         self.ledger, self.feed, self.forecast_fn = ledger, feed, forecast_fn
         self.model, self.profile_fn = model, profile_fn
@@ -257,7 +279,7 @@ class PaperTrial:
         profile = copy.deepcopy(self.profile_fn())
         game = self.feed.pregame(identifier)
         # The forecast remains an experimental, uncalibrated hypothesis.
-        forecast = validate_forecast(self.forecast_fn(copy.deepcopy(game)))
+        forecast = self.validate(self.forecast_fn(copy.deepcopy(game)))
         with self.ledger.lock:
             if any(r["event_id"] == identifier for r in self.records()):
                 raise ValueError("An original paper forecast was saved concurrently; no second forecast recorded.")
@@ -270,24 +292,25 @@ class PaperTrial:
             prices = (game.get("moneyline_quote") or {}).get("prices")
             metrics = None
             if prices:
-                metrics = price_analysis(prices[side], forecast["probabilities"][side], forecast["probabilities"]["tie"], prices["away" if side == "home" else "home"])
-            record = {"paper_prediction_id": "PP-" + uuid.uuid4().hex[:16].upper(), "recorded_at": now.isoformat(),
-                      "pipeline_version": PAPER_VERSION, "model": self.model,
+                metrics = self.price_metrics(prices, forecast, side)
+            record = {"paper_prediction_id": self.id_prefix + uuid.uuid4().hex[:16].upper(), "recorded_at": now.isoformat(),
+                      "pipeline_version": self.pipeline_version, "model": self.model,
                       "profile_version": profile.get("version"), "profile_fingerprint": digest(profile),
                       "event_id": game["event_id"], "event": game["event"], "event_start": game["event_start"],
                       "selection_side": side, "selection": game["teams"][side]["name"],
                       "forecast": forecast, "snapshot": game, "hypothetical_price_metrics": metrics,
                       "decision": "NO BET", "trial_status": "PAPER FORECAST SAVED",
                       "probability_method": "experimental_uncalibrated_language_model_forecast",
-                      "settlement_policy": "Paper moneyline: tie is a push; actual bookmaker settlement rule unverified.",
-                      "closing_line": None, "profitability_proven": False, "wager_executed": False}
+                      "settlement_policy": self.settlement_policy,
+                      "closing_line": None, "profitability_proven": False, "wager_executed": False,
+                      **self.record_extras(game)}
             from skill_lab import _contains_secret_literal
             if _contains_secret_literal(json.dumps(record)):
                 raise ValueError("Paper records cannot contain credential literals.")
-            return self.ledger._append(PAPER_PREDICTIONS, record)
+            return self.ledger._append(self.prediction_category, record)
 
     def records(self):
-        return self.ledger._records(PAPER_PREDICTIONS)
+        return self.ledger._records(self.prediction_category)
 
     def latest(self):
         records = self.records()
@@ -306,7 +329,7 @@ class PaperTrial:
             raise ValueError("Only pre-event quotes can be captured; no retrospective closing quote is inferred.")
         if not game.get("moneyline_quote"):
             raise ValueError("Publisher has no usable moneyline quote; no quote was recorded.")
-        return self.ledger._append(PAPER_QUOTES, {"paper_prediction_id": identifier,
+        return self.ledger._append(self.quote_category, {"paper_prediction_id": identifier,
             "prediction_sha256": digest(record), "captured_at": self.ledger.now_fn(),
             "quote": game.get("moneyline_quote"), "evidence": game["evidence"],
             "verified_closing_line": False, "limitation": "Observed pre-event price only; publisher quote age unknown."})
@@ -328,16 +351,16 @@ class PaperTrial:
             raise ValueError("Invalid final scores.")
         if any(game["teams"][s]["id"] != record["snapshot"]["teams"][s]["id"] for s in scores):
             raise ValueError("Result team identities do not match the original prediction.")
-        outcome = "tie" if scores["home"] == scores["away"] else max(scores, key=scores.get)
+        outcome = self.outcome(record, game, scores)
         prices = (record["snapshot"].get("moneyline_quote") or {}).get("prices")
         profit = None
         if prices:
             from sports_betting import american_to_decimal
             profit = 0 if outcome == "tie" else american_to_decimal(prices[record["selection_side"]]) - 1 if outcome == record["selection_side"] else -1
         with self.ledger.lock:
-            if any(r["paper_prediction_id"] == identifier for r in self.ledger._records(PAPER_RESULTS)):
+            if any(r["paper_prediction_id"] == identifier for r in self.ledger._records(self.result_category)):
                 raise ValueError("Paper result already recorded; originals cannot be rewritten.")
-            return self.ledger._append(PAPER_RESULTS, {"paper_prediction_id": identifier,
+            return self.ledger._append(self.result_category, {"paper_prediction_id": identifier,
                 "prediction_sha256": digest(record), "settled_at": self.ledger.now_fn(),
                 "outcome": outcome, "scores": scores, "evidence": game["evidence"],
                 "hypothetical_flat_unit_profit": profit, "verified_closing_line": None,
@@ -346,7 +369,7 @@ class PaperTrial:
 
     def report(self):
         predictions = {r["paper_prediction_id"]: r for r in self.records()}
-        results = self.ledger._records(PAPER_RESULTS)
+        results = self.ledger._records(self.result_category)
         brier, profits, bins = [], [], {}
         for result in results:
             record = predictions.get(result["paper_prediction_id"])
@@ -361,8 +384,8 @@ class PaperTrial:
             p = probabilities[record["selection_side"]]
             bucket = min(int(p * 10), 9)
             bins.setdefault(bucket, []).append((p, result["outcome"] == record["selection_side"]))
-        return {"pipeline_version": PAPER_VERSION, "predictions_in_window": len(predictions),
-                "observed_pre_event_quotes_in_window": len(self.ledger._records(PAPER_QUOTES)),
+        return {"pipeline_version": self.pipeline_version, "predictions_in_window": len(predictions),
+                "observed_pre_event_quotes_in_window": len(self.ledger._records(self.quote_category)),
                 "settled_in_window": len(brier), "pending_in_window": len(predictions) - len(brier),
                 "multiclass_brier_score": sum(brier) / len(brier) if brier else None,
                 "hypothetical_flat_unit_roi": sum(profits) / len(profits) if profits else None,

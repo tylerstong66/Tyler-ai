@@ -1,5 +1,43 @@
 # Sports Betting Analyst v1
 
+## On-demand NHL paper trial
+
+v2.19.3.32 adds a separate `nhl-paper-v1` pipeline. ESPN event identities are
+cross-checked against the official NHL schedule and gamecenter. Two-way final
+winner probabilities include overtime and shootouts. Only regular-season or
+playoff games with decisive-winner rules are supported. Settlement retrieves
+the pinned official NHL game ID and requires a final/off state, matching team
+identities and unequal integer scores. NFL's existing tie/push policy is unchanged.
+
+Goalie-comparison leaders are season statistics, not confirmed starters. The
+optional official NHL preview remains labeled projected. Starting goalies,
+publisher quote age and executable availability remain unverified. The separate
+experimental NHL prompt does not change the accepted v20 behavioral harness,
+active profile or Gemini model. All records say NO BET; no wager is executed.
+
+Commands (authenticated Tyler chat):
+
+```text
+sports nhl paper schedule :: {"date":"2026-10-09"}
+sports nhl paper analyze :: {"event_id":"401892466"}
+show latest nhl paper prediction
+show nhl paper evidence :: {"paper_prediction_id":"NHP-..."}
+show nhl paper trial
+show sports paper trials
+sports nhl paper quote :: {"paper_prediction_id":"NHP-..."}
+sports nhl paper settle :: {"paper_prediction_id":"NHP-..."}
+```
+
+NHL predictions, quotes and linked results have separate protected categories.
+Reports keep NHL and NFL metrics separate. Binary NHL Brier score sums squared
+home/away errors, range 0–2. Hypothetical flat-unit ROI is descriptive only;
+verified CLV remains unknown. Commands are manual, with no automatic settlement.
+All 279 local checks across 26 isolated suites pass, including 25 NHL checks for
+official matching, final-only OT/SO scoring, rejected tied finals, frozen original
+preservation, duplicate rejection, Eastern schedule dates and protected records.
+The v2.19.3.32 launcher health check returned 200. Production forecast/result
+persistence must still be verified after deployment and the official final.
+
 ## On-demand NFL paper trial
 
 Production v2.19.3.31 is live on commit
