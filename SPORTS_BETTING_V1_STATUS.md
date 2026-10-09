@@ -1,5 +1,23 @@
 # Sports Betting Analyst v1
 
+v2.19.3.28 deployed on 02d3487253ddf323debcbf25e786bd63a1efe680 via
+Render dep-db44lbvlk1mc73eqigj0, live October 9 at 02:01:21 UTC; health
+200 matched the exact commit. All twelve PR #29 workflows passed. Fresh v18
+Flash-Lite checkpoint SV-05DCE1E22CD342DE completed its first ten cases,
+saved 2026-10-09T02:04:12.130820+00:00: nine passed, average 89.5. Manual
+review accepted all ten. Positive-odds arithmetic was correct, but a remaining
+auditor false negative misread "without implying that variance or juice erases
+expected value" as an affirmative error. Original scores remain unchanged;
+no repeats or reserved cases were queried. Acceptance is incomplete.
+
+v2.19.3.29 recognizes bounded reporting-verb denials using without, rather
+than and instead of, alongside the existing not forms. Later affirmative
+errors and unrelated negation still fail. No prompts, math, model, profile,
+thresholds or promotion gates changed. All 219 checks across twenty-three
+isolated suites pass; production launcher health is 200. New identity is
+sports-validation-v19-reporting-negation. Deployment and fresh acceptance
+remain to be verified.
+
 v2.19.3.27 deployed on 759e6c205f35987af7371c175900f075f738dfd2 via
 Render dep-db44i460tbcc73d3k7e0, live October 9 at 01:53:55 UTC. Health was
 200 on the exact commit and post-deploy error logs were empty. All twelve
