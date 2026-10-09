@@ -1,5 +1,19 @@
 # Sports Betting Analyst v1
 
+v2.19.3.25 addresses the two manually confirmed v14 baseline failures with
+request-scoped final explanation instructions placed after the full skill
+policy. Connected football tickets require an actual conditional directional
+mechanism and a joint model before claiming value; missing evidence cannot
+replace that explanation. Positive point-EV questions connect the supplied
+gap to probability-model error and requested recommendation strength, without
+inventing an error range, subtracting juice twice or changing owned arithmetic.
+The judge explicitly distinguishes this reasoning from generic uncertainty
+boilerplate. No decision gate, acceptance threshold, profile, saved score or
+reserved case changed. The task-rules hook defaults empty for older versions.
+All 202 local checks across nineteen isolated suites pass; the production
+launcher returns health 200. New identity is sports-validation-v15-task-mechanisms.
+Deployment and fresh behavioral acceptance remain to be verified.
+
 October 8 evening retry completed the first baseline for the existing v14
 Flash-Lite session SV-5962DB2746374758, advancing from 6/25 to 10/25 without
 provider errors. Eight of ten cases scored 100; correlation and narrow-edge
