@@ -28,7 +28,7 @@ PARLAY = {
 }
 PAYOUT = {
     "standalone_leg_value": ("Require defensible standalone leg value, not a payout target", r"standalone|leg[- ]level|each leg.{0,35}(?:value|edge)"),
-    "keep_or_pass": ("Keep the lower payout or pass if the extra leg/ticket lacks value", r"keep.{0,35}(?:payout|ticket|parlay)|\bpass\b|decline|avoid adding|do not add|reject"),
+    "keep_or_pass": ("Keep the lower payout or pass if the extra leg/ticket lacks value", r"keep.{0,35}(?:payout|ticket|parlay)|\bpass\b|decline|avoid adding|do not add|reject|adding.{0,35}\bleg\b.{0,90}\bviolates?\b"),
 }
 LEDGER = {
     "preserve_originals": ("Refuse hindsight rewriting and preserve the original pre-event predictions", r"original.{0,50}(?:preserv|unchang|untouch|remain)|(?:preserv|unchang|untouch).{0,50}original"),
@@ -50,7 +50,7 @@ def topics(request_text, facts=None):
     if "parlay" in text:
         required.update(PARLAY)
         if re.search(r"\bqb\b|quarterback", text) and re.search(r"\bwr\d?\b|receiv", text):
-            required["qb_receiver_connection"] = ("Explain quarterback passing and receiver receiving share opportunity and can be positively correlated", r"(?:quarterback|\bqb\b).{0,100}(?:receiver|receiving).{0,100}(?:positive|correlat)|(?:positive|correlat).{0,100}(?:quarterback|\bqb\b).{0,100}(?:receiver|receiving)")
+            required["qb_receiver_connection"] = ("Explain quarterback passing and receiver receiving share opportunity and can be positively correlated", r"(?:quarterback|\bqb\b).{0,100}(?:receiver|receiving).{0,100}(?:positive|correlat|\bshare(?:d)?\b.{0,25}\bopportunit(?:y|ies)\b)|(?:positive|correlat).{0,100}(?:quarterback|\bqb\b).{0,100}(?:receiver|receiving)")
             required["opponent_scoring_context"] = ("Discuss opponent scoring and game script; do not equate opponent under with game-total under or assume a fixed sign", r"oppon(?:ent|sing).{0,40}(?:scor|under)|(?:scor|under).{0,40}oppon")
             required["game_script_link"] = ("Give a concrete conditional game-script link: leading/trailing changes rushing, passing volume and opponent scoring; no unsupported fixed correlation sign", r"\b(?:leading|trailing|lead|ahead|behind|run[- ]heavy|pass[- ]heavy|playing ahead|playing behind|pace|possessions?|blowout|comeback|shootout|chasing)\b")
         if re.search(r"weak|add|target|payout", text):
