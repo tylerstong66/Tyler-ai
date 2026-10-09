@@ -2,6 +2,37 @@
 
 ## On-demand NHL paper trial
 
+Production v2.19.3.32 is live on commit
+d9087c14becf192f1361b27810428012814574df, Render deploy
+dep-db4kgfqj9qps73ctdsn0, finished 2026-10-09T20:02:53.738445Z.
+Health/status returned 200 with the exact commit. All twelve PR #36 workflow
+checks passed; post-deploy error logs were empty. Runtime remains
+gemini-3.5-flash-lite with sports-validation-v20-bounded-revision. Authenticated
+readback retained the original NFL hash
+e17f79c7846facf43e548def12f4a7399936fe354716bd5541bd0b42a005f06f,
+and initial separate reports showed NFL 1 pending / NHL 0 forecasts.
+
+The first actual NHL pregame forecast was saved through authenticated production
+chat: NHP-DCC1D93327A24ACD, recorded 2026-10-09T20:03:54.830516+00:00,
+for New York Rangers at Washington Capitals, ESPN 401892466 / official NHL
+2026020067, start 2026-10-09T23:00Z. Frozen evidence readback returned hash
+846bbeab229429869dcfcfc0acbc7b9351d2c1705d70d3a185d4ebec071bf43a.
+Experimental probabilities are home/Washington 0.45 and away/New York 0.55.
+Decision is NO BET, wager_executed=false, with no settled result.
+
+Source retrieval timestamps (UTC) are ESPN 20:03:52.246106, official schedule
+20:03:52.538232, official gamecenter 20:03:52.818474 and official projected
+lineup 20:03:53.076570. Publisher DraftKings prices were home -142 / away +120,
+with unverified quote age. confirmed_starting_goalies is null for both sides.
+Manual review flags the rationale's wording "featuring Igor Shesterkin in goal"
+as potentially implying a starter despite the explicit uncertainty statement;
+it must be read as projected roster evidence, not confirmation. "Strong early
+metrics" is vague and does not establish calibration. The original remains
+unchanged; no replacement forecast was generated to improve the narrative.
+Actual postgame persistence and live scoring still await the official final.
+After a fresh browser reload, combined reports showed NFL 1 pending / NHL 1
+pending, both 0 settled, with Brier/ROI/verified CLV null and no wagers executed.
+
 v2.19.3.32 adds a separate `nhl-paper-v1` pipeline. ESPN event identities are
 cross-checked against the official NHL schedule and gamecenter. Two-way final
 winner probabilities include overtime and shootouts. Only regular-season or
@@ -35,8 +66,8 @@ verified CLV remains unknown. Commands are manual, with no automatic settlement.
 All 279 local checks across 26 isolated suites pass, including 25 NHL checks for
 official matching, final-only OT/SO scoring, rejected tied finals, frozen original
 preservation, duplicate rejection, Eastern schedule dates and protected records.
-The v2.19.3.32 launcher health check returned 200. Production forecast/result
-persistence must still be verified after deployment and the official final.
+The v2.19.3.32 launcher health check returned 200. Production forecast persistence
+and frozen evidence readback are verified; result persistence awaits the final.
 
 ## On-demand NFL paper trial
 
