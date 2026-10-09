@@ -2,6 +2,35 @@
 
 ## On-demand NFL paper trial
 
+Production v2.19.3.31 is live on commit
+e17c01fa6b251160805a60d7d5251787d44ddc7e, Render deploy
+dep-db4fa0t9fdbs73bpa6tg, finished 2026-10-09T14:07:43.984917Z.
+Health and status both returned 200 with the exact deployed commit. All twelve
+PR #33 checks and all twelve PR #34 checks passed. Runtime model remains
+gemini-3.5-flash-lite and the accepted v20 behavioral harness remains unchanged.
+
+The first actual pregame paper forecast was saved and read back through
+authenticated production chat: PP-9E8F60202E16460C, recorded
+2026-10-09T14:08:42.434378+00:00, for Philadelphia Eagles at Jacksonville
+Jaguars (ESPN 401872981), kickoff 2026-10-11T13:30Z. The frozen evidence
+command returned hash
+e17f79c7846facf43e548def12f4a7399936fe354716bd5541bd0b42a005f06f.
+Experimental probabilities are home/Jacksonville 0.71, away/Philadelphia 0.28,
+tie 0.01. This is a separate forecasting prompt/pipeline; the saved active-profile
+version 1 and full-profile hash identify runtime context, not a claim that the
+behavioral benchmark validated these probabilities.
+
+ESPN evidence was retrieved at 14:08:39.056293 UTC, the official NFL practice
+report at 14:08:39.329216, weather-location evidence at 14:08:40.094853 and
+Open-Meteo forecast at 14:08:40.654735. The snapshot retains neutral_site=true,
+12 Eagles and 11 Jaguars practice entries, unknown final game statuses, and
+city-proxy weather. ESPN displayed DraftKings home -395 / away +310 with no
+verified quote update time. No bet was placed; the decision is NO BET and the
+record remains pending. Manual review found the answer grounded in the supplied
+predictor, publisher prices, practice statuses and neutral venue, with explicit
+uncalibrated-model/final-roster uncertainty. No additional forecast was generated
+after reviewing this one, and the original was not edited.
+
 v2.19.3.31 adds `nfl-paper-v1` without changing the accepted behavioral harness,
 active sports profile or model selection. The app fetches ESPN event/market/
 injury evidence, an official NFL practice report when available, and optional
@@ -754,7 +783,9 @@ Locks serialize writes within one process only; there are no cross-worker
 uniqueness guarantees. Empty/unknown save receipts fail closed; inspect storage
 before retrying an uncertain write. No schema or database permission changes
 were made. Validation checkpoint writes/readbacks have now been verified in
-production; sports prediction/result persistence still requires its own check.
+production. The new paper-prediction category has now been saved and read back
+in production; result persistence awaits a completed event. Final-only result
+append and original-byte preservation have been checked with software fixtures.
 
 Long-run performance requires genuinely pre-event out-of-sample paper records,
 calibration by market/confidence group, CLV, ROI, and uncertainty estimates.
