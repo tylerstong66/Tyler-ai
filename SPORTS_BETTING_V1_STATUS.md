@@ -1,5 +1,24 @@
 # Sports Betting Analyst v1
 
+v2.19.3.27 deployed on 759e6c205f35987af7371c175900f075f738dfd2 via
+Render dep-db44i460tbcc73d3k7e0, live October 9 at 01:53:55 UTC. Health was
+200 on the exact commit and post-deploy error logs were empty. All twelve
+PR #28 workflows passed. Fresh v17 Flash-Lite checkpoint SV-A1B6D256385B4AB5
+completed the first ten cases at 2026-10-09T01:57:41.980040+00:00: eight
+passed, average 78.5. Numeric cases passed; manual review accepted all ten
+answers. Two necessary topic checks falsely rejected semantic equivalents:
+"quarterback ... receiver ... share opportunity" and "Adding a leg ... violates"
+the standalone-value requirement. Original scores remain unchanged; no repeats
+or transfer cases were queried. Acceptance remains incomplete.
+
+v2.19.3.28 adds those bounded equivalents to topic coverage, retaining semantic
+judging and manual review. Disconnected participant mentions and an answer that
+merely mentions payout still fail the respective necessary checks. No prompt,
+math, profile, model, threshold or promotion gate changed; no reserved-case
+answers informed this change. All 216 local checks across twenty-two isolated
+suites and launcher health pass. New identity is sports-validation-v18-topic-
+equivalents. Deployment and fresh acceptance remain to be verified.
+
 v2.19.3.26 deployed on 7665c7043e6a84dbd6231600fad443b1ac5fc64b via
 Render dep-db44e6bbc2fs73aj09hg; live October 9 at 01:45:34 UTC, with health
 200 and empty recent error logs. All twelve PR #27 CI workflows passed.
