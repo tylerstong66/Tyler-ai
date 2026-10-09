@@ -1,5 +1,20 @@
 # Sports Betting Analyst v1
 
+October 8 evening retry completed the first baseline for the existing v14
+Flash-Lite session SV-5962DB2746374758, advancing from 6/25 to 10/25 without
+provider errors. Eight of ten cases scored 100; correlation and narrow-edge
+cases scored zero, giving an average of 80 and an 80% pass rate. Manual review
+confirmed the correlation answer did not provide a concrete directional,
+conditional game-script mechanism. The narrow-edge answer correctly preserved
+positive expected return and chose NO BET, but omitted the supplied 0.6-point
+edge and its sensitivity to model error; generic unverified-input language did
+not explain the requested strong-bet decision. Positive-odds arithmetic and
+stale-data handling passed manual review. Readback verified the original
+model, harness, profile and suite identity; checkpoint timestamp is
+2026-10-09T00:33:10.821160+00:00. Saved scores are unchanged. No repeat or
+reserved transfer cases were queried; this baseline is not accepted. No code,
+configuration, threshold, profile or model weight was changed during the retry.
+
 October 8 afternoon resume advanced the existing v14 Flash-Lite checkpoint
 SV-5962DB2746374758 from 4/25 to 6/25. Small-sample evaluation and payout
 discipline each scored 100 and passed manual review, alongside the original
