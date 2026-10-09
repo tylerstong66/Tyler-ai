@@ -1,5 +1,25 @@
 # Sports Betting Analyst v1
 
+v2.19.3.26 deployed on 7665c7043e6a84dbd6231600fad443b1ac5fc64b via
+Render dep-db44e6bbc2fs73aj09hg; live October 9 at 01:45:34 UTC, with health
+200 and empty recent error logs. All twelve PR #27 CI workflows passed.
+Fresh v16 Flash-Lite checkpoint SV-F510B7AE9E6D42DE completed its first ten
+cases: nine passed, average 89.5, saved at 2026-10-09T01:50:33.547480+00:00.
+Manual review found the answers sound, including unknown variance magnitude,
+dependent joint probability, directional game script and model-error sensitivity.
+The narrow-edge answer incorrectly received zero because the objective auditor
+misread an explicit "never because outcome variance ... erases expected profit"
+denial. Its original score remains saved unchanged; no repeats or transfer cases
+were queried. Readback verified the model, harness, profile and suite identity.
+This baseline does not meet the numeric acceptance gate.
+
+v2.19.3.27 adds only the bounded "never because" negation form to the expected-
+value audit. Regression checks preserve detection of later affirmative errors
+and unrelated uses of "never". Math, prompts, model, profile, thresholds and
+manual promotion remain unchanged. All 212 local checks across twenty-one
+isolated suites pass. New identity: sports-validation-v17-negation-scope.
+Deployment and fresh acceptance remain to be verified.
+
 v2.19.3.25 deployed on d5b8f33302584357b60eafd9803dd9897646eae1 via
 Render dep-db44a0dg1s2s7386ffc0; live October 9 at 01:36:39 UTC, with health
 200 and an empty post-deploy error-log query. All twelve PR #26 CI workflows
