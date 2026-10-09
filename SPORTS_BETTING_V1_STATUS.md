@@ -1,5 +1,32 @@
 # Sports Betting Analyst v1
 
+v2.19.3.25 deployed on d5b8f33302584357b60eafd9803dd9897646eae1 via
+Render dep-db44a0dg1s2s7386ffc0; live October 9 at 01:36:39 UTC, with health
+200 and an empty post-deploy error-log query. All twelve PR #26 CI workflows
+passed. Fresh v15 Flash-Lite session SV-F1E0D3901D0D4D9D completed its first
+ten cases: automated average 80 and eight passing. No repeats or transfer cases
+were queried. Correlation now supplied a directional lead/trail mechanism.
+Narrow-edge reasoning explained sensitivity to a slight probability error.
+Both numeric answers were incorrectly scored zero because the negation checker
+misread "never a claim that outcome variance ... erases expected value."
+Manual review also rejected perfect scores: the prop answer asserted variance
+was too high without evidence; payout wording implied independence was needed
+to evaluate joint probability. The positive-odds explanation additionally called
+unknown model error large relative to its gap. This baseline is not accepted;
+all saved scores remain unchanged.
+
+v2.19.3.26 scopes the negation fix to the outcome qualifier, preserving detection
+of later affirmative errors. New task rules distinguish unknown error/variance
+size from measured magnitude, state that joint distributions model dependence,
+and scope the marginal-gap example to requests for strong/confident bets.
+Necessary coverage checks catch the observed independence-prerequisite and
+missing-evidence-to-large-uncertainty claims, while semantic and manual review
+remain required. Owned math, profile, decision gates and acceptance thresholds
+are unchanged; no reserved-case answers informed these edits. All 209 local
+checks pass across twenty isolated suites; production-launcher health is 200.
+New identity: sports-validation-v16-uncertainty-scope. Deployment and fresh
+behavioral acceptance remain to be verified.
+
 v2.19.3.25 addresses the two manually confirmed v14 baseline failures with
 request-scoped final explanation instructions placed after the full skill
 policy. Connected football tickets require an actual conditional directional
