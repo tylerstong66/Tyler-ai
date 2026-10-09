@@ -1,5 +1,49 @@
 # Sports Betting Analyst v1
 
+## On-demand NFL paper trial
+
+v2.19.3.31 adds `nfl-paper-v1` without changing the accepted behavioral harness,
+active sports profile or model selection. The app fetches ESPN event/market/
+injury evidence, an official NFL practice report when available, and optional
+Open-Meteo city-proxy kickoff weather. Each source retains its URL, query
+parameters, retrieval timestamp and response hash. Retrieval time is not
+publication time. Unknown quote age, incomplete final availability, unverified
+venue coordinates/roof status and missing independent calibration stay explicit.
+
+Commands (authenticated Tyler chat):
+
+```text
+sports paper schedule :: {"date":"2026-10-11"}
+sports paper analyze :: {"event_id":"401872981"}
+show latest sports paper prediction
+show sports paper trial
+sports paper quote :: {"paper_prediction_id":"PP-..."}
+sports paper settle :: {"paper_prediction_id":"PP-..."}
+```
+
+The schedule supports today through seven days ahead. Analysis saves one
+original forecast per event in the latest-1000-record read window, before
+kickoff, with model/profile identity and the frozen evidence snapshot. Home,
+away and tie probabilities are an experimental language-model hypothesis,
+not an empirically calibrated forecast. All decisions remain NO BET. The
+response's `sports_paper` field includes the full immutable snapshot.
+
+Final-result retrieval requires a completed postgame event and matching team
+identities; settlement appends a linked result without rewriting the original.
+Reports calculate multiclass Brier score (sum across three outcomes, range
+0–2), confidence bins and descriptive flat-one-unit hypothetical ROI. A tie is
+a paper push; real bookmaker settlement rules are unverified. Prices are
+publisher-displayed, not verified executable quotes. Quote capture saves an
+observed pre-event price; verified closing-line value remains unknown because
+the feed's `close` field has no verified quote timestamp. Commands are manual;
+there is no scheduled collection or automatic settlement.
+
+All 251 local checks across 25 isolated suites pass, including 26 new checks
+for pre-event recording, final-only settlement, immutable originals, provenance,
+unknown quote age, duplicate rejection, scoring and existing promotion gates.
+The accepted 25-case behavioral benchmark below does not validate this new
+forecasting task. Forecast accuracy and profitable wagering remain unproven.
+
 **Behavioral benchmark accepted: 25/25 passed and manually reviewed.**
 
 v2.19.3.30 deployed on 9ac0f310cb53003f7ceb38ee078226936d5c2b34 via
