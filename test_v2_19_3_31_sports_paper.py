@@ -161,8 +161,8 @@ class PaperTests(unittest.TestCase):
 
 class FeedTests(unittest.TestCase):
     def summary(self):
-        return {"header": {"id": "401872981", "season": {"year": 2026, "type": 2}, "week": 5,
-                "competitions": [{"date": START, "status": {"type": {"state": "pre", "completed": False}},
+        return {"header": {"id": "401872981", "league": {"abbreviation": "NFL"}, "season": {"year": 2026, "type": 2}, "week": 5,
+                "competitions": [{"date": START, "neutralSite": True, "status": {"type": {"state": "pre", "completed": False}},
                 "competitors": [{"id": str(i), "homeAway": s, "team": {"displayName": s, "name": s}} for i,s in enumerate(("home", "away"))]}]},
                 "pickcenter": [{"provider": {"name": "DraftKings"}, "moneyline": {s: {"close": {"odds": p}} for s,p in (("home", "-125"), ("away", "+110"))}}]}
 
@@ -190,6 +190,15 @@ class FeedTests(unittest.TestCase):
     def test_started_event_cannot_be_forecast(self):
         d=self.summary();d["header"]["competitions"][0]["date"]=NOW
         with self.assertRaisesRegex(ValueError,"before"): self.feed(d).pregame("401872981")
+
+    def test_neutral_venue_preserved_and_other_league_rejected(self):
+        d=self.summary();self.assertTrue(self.feed(d).game("401872981")["neutral_site"])
+        d["header"]["league"]["abbreviation"]="NBA"
+        with self.assertRaisesRegex(ValueError,"NFL"): self.feed(d).game("401872981")
+
+    def test_invalid_second_price_cannot_be_captured(self):
+        d=self.summary();d["pickcenter"][0]["moneyline"]["away"]["close"]["odds"]="50"
+        self.assertIsNone(self.feed(d).game("401872981")["moneyline_quote"])
 
     def test_empty_official_status_remains_empty(self):
         parser=InjuryTables();parser.feed('<div class="d3-o-section-sub-title"><span>Eagles</span></div><table><tr><th>Player</th><th>Position</th><th>Injuries</th><th>Practice Status</th><th>Game Status</th></tr><tr><td>A Player</td><td>WR</td><td>Knee</td><td>Limited</td><td></td></tr></table>')
@@ -242,6 +251,13 @@ class RuntimeTests(unittest.TestCase):
     def test_paper_chat_requires_existing_authentication(self):
         response=v.app.test_client().post("/ui/chat",json={"message":"show sports paper trial"})
         self.assertEqual(response.status_code,401)
+
+    def test_frozen_evidence_command_reads_original_without_new_forecast(self):
+        r={"paper_prediction_id":"PP-TEST", "snapshot":game(), "forecast":forecast()}
+        with patch.object(v.PAPER_TRIAL,"_prediction",return_value=r):
+            payload,code=v.handle_message('show sports paper evidence :: {"paper_prediction_id":"PP-TEST"}')
+        self.assertEqual(code,200)
+        self.assertEqual(payload["sports_paper"],{"payload":r,"sha256":digest(r)})
 
 
 if __name__ == "__main__": unittest.main()

@@ -38,6 +38,7 @@ def forecast(game):
         "Do not invent observed facts, active rosters, usage, publication dates, quote freshness, stadium weather or independent calibration.",
         "Retrieval time is not publication/update time. Prices may be stale and are not executable quotes.",
         "Practice reports and blank game statuses do not confirm active players. City weather is not a stadium observation.",
+        "Home/away are designated sides; use neutral_site when assessing venue advantage and do not invent travel or crowd effects.",
         "Do not place wagers or imply guaranteed profit. The application's decision is always NO BET.",
     ])
     raw = harness._complete(lambda: ENGINE.complete([
@@ -90,6 +91,10 @@ def handle_message(message):
             result = PAPER_TRIAL.report()
         elif lower == "show latest sports paper prediction":
             result = PAPER_TRIAL.latest()
+        elif lower.startswith("show sports paper evidence ::"):
+            from sports_betting import digest
+            record = PAPER_TRIAL._prediction(arguments(text, "paper_prediction_id"))
+            result = {"payload": record, "sha256": digest(record)}
         elif lower.startswith("sports paper schedule ::"):
             result = FEED.schedule(arguments(text, "date"))
             used += ["fetch_public_nfl_schedule"]
@@ -106,7 +111,7 @@ def handle_message(message):
             return _OLD_HANDLE(message)
     except (ValueError, RuntimeError, TypeError, KeyError) as exc:
         return base.base_payload("sports_paper_trial", str(exc), success=False, used_tools=used), 409
-    reply = prediction_reply(result) if "paper_prediction_id" in result and "forecast" in result or result.get("trial_status") == "not_started" else json.dumps(result, indent=2, allow_nan=False)
+    reply = prediction_reply(result) if ("paper_prediction_id" in result and "forecast" in result) or result.get("trial_status") == "not_started" else json.dumps(result, indent=2, allow_nan=False)
     return base.base_payload("sports_paper_trial", reply, success=True, used_tools=used) | {"sports_paper": result}, 200
 
 
