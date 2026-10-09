@@ -1,5 +1,31 @@
 # Sports Betting Analyst v1
 
+v2.19.3.29 deployed on 4f9625b9613106d55a3e5afe8eae4a544864a66f via
+Render dep-db44o8jncjis73bptej0, live October 9 at 02:07:02 UTC; health 200
+matched the commit and post-deploy error logs were empty. All twelve PR #30
+workflows passed. Fresh v19 Flash-Lite checkpoint SV-3E9414CCA86041FD
+completed its first ten cases at 2026-10-09T02:12:30.864837+00:00: nine
+passed, average 89. The correlation response lacked an explicit conditional
+mechanism according to the necessary checker; manual review also found its
+opponent-scoring link generic despite a plausible lead/passing-volume example.
+One initial narrow-edge response exceeded the prose budget and produced no
+scored case; one retry passed. All numeric answers were correct. Original
+scores remain unchanged; no repeats or reserved cases were queried. This
+baseline is not accepted.
+
+v2.19.3.30 adds one bounded explanation revision before grading, for existing
+necessary coverage/EV-reasoning checks or excess length. It persists the original
+draft and revised response as append-only diagnostic events, and exposes the
+revision identifier/reasons in the final answer. A second bad response still
+fails unchanged checks; no judge score or reserved-case result triggers revision.
+The original request, application-owned math and decision gate remain unchanged.
+Correct answers use no extra model call. This is a runtime reliability change,
+not a model-weight/profile promotion. Earlier versions keep revision disabled.
+All 225 local checks across twenty-four isolated suites pass, including the
+bounded second-failure, immutable-input, persisted-draft and decision-gate tests.
+Launcher health is 200. New identity: sports-validation-v20-bounded-revision.
+Deployment and fresh behavioral acceptance remain to be verified.
+
 v2.19.3.28 deployed on 02d3487253ddf323debcbf25e786bd63a1efe680 via
 Render dep-db44lbvlk1mc73eqigj0, live October 9 at 02:01:21 UTC; health
 200 matched the exact commit. All twelve PR #29 workflows passed. Fresh v18

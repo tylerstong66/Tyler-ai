@@ -2,6 +2,7 @@
 import json
 import re
 import types
+import uuid
 from contextvars import ContextVar
 
 import app_v2_19_3_14 as previous
@@ -27,6 +28,7 @@ SAVE_EXPLANATION_CONTRACT_FAILURES = False
 EXPLANATION_BACKGROUND = lambda request_text, facts: []
 EXPLANATION_FINAL_RULES = ()
 EXPLANATION_TASK_RULES = lambda request_text, facts: []
+EXPLANATION_REVISION_CHECKS = None
 
 
 def _run(self, profile, request_text):
@@ -62,9 +64,42 @@ def _run(self, profile, request_text):
         *EXPLANATION_FINAL_RULES,
         *EXPLANATION_TASK_RULES(request_text, facts),
     ])
-    raw = harness._complete(lambda: self.engine.complete([
-        {"role": "system", "content": prompt}, {"role": "user", "content": str(request_text)},
-    ], tokens=harness.ANSWER_OUTPUT_TOKENS, temperature=.1, json_mode=True))
+    messages = [{"role": "system", "content": prompt}, {"role": "user", "content": str(request_text)}]
+    raw = harness._complete(lambda: self.engine.complete(
+        messages, tokens=harness.ANSWER_OUTPUT_TOKENS, temperature=.1, json_mode=True))
+    revision = None
+    if EXPLANATION_REVISION_CHECKS is not None:
+        try:
+            draft = json.loads(raw)
+        except (TypeError, ValueError):
+            draft = None
+        # A revision never changes the original inputs, owned math or decision
+        # gate. It is bounded to one extra response before any scoring occurs.
+        if (isinstance(draft, dict) and set(draft) == {"decision", "rationale", "uncertainty"}
+                and draft["decision"] in allowed
+                and all(isinstance(draft[k], str) and draft[k].strip() for k in ("rationale", "uncertainty"))):
+            reasons = list(EXPLANATION_REVISION_CHECKS(request_text, facts, draft))
+            if len((draft["rationale"] + " " + draft["uncertainty"]).split()) > 130:
+                reasons.append("explanation_word_budget_exceeded")
+            if reasons:
+                revision = {"revision_id": "SR-" + uuid.uuid4().hex[:16].upper(),
+                            "attempts": 1, "reasons": sorted(set(reasons))}
+                self._save("sports_explanation_revision", {
+                    **revision, "event": "requested", "created_at": self._now().isoformat(),
+                    "harness_version": sports_validation.HARNESS_VERSION,
+                    "input": str(request_text), "initial_output": raw,
+                })
+                messages = [*messages, {"role": "assistant", "content": raw}, {"role": "user", "content":
+                    "Revise the explanation once to satisfy the original request and contract. "
+                    "Return exactly decision, rationale, uncertainty as JSON; use at most one hundred words total. "
+                    "Do not change the original inputs or invent evidence. All final task rules still apply. "
+                    "The local response checks found: " + "; ".join(revision["reasons"])}]
+                raw = harness._complete(lambda: self.engine.complete(
+                    messages, tokens=harness.ANSWER_OUTPUT_TOKENS, temperature=.1, json_mode=True))
+                self._save("sports_explanation_revision", {
+                    **revision, "event": "response", "created_at": self._now().isoformat(),
+                    "harness_version": sports_validation.HARNESS_VERSION, "revised_output": raw,
+                })
     try:
         answer = json.loads(raw)
     except (TypeError, ValueError):
@@ -87,6 +122,8 @@ def _run(self, profile, request_text):
     answer["calculation_provenance"] = facts["provenance"]
     answer["calculation_assumptions"] = facts["assumptions"]
     answer["input_issues"] = facts["issues"]
+    if revision:
+        answer["explanation_revision"] = revision
     if contract_errors:
         answer["explanation_contract_errors"] = contract_errors
     answer["uncertainty"] += " " + " ".join([facts["provenance"], *facts["assumptions"], *facts["issues"]])
