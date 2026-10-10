@@ -12,6 +12,13 @@ NHL_PREDICTIONS = "sports_nhl_paper_prediction"
 NHL_RESULTS = "sports_nhl_paper_result"
 NHL_QUOTES = "sports_nhl_paper_quote"
 NHL_API = "https://api-web.nhle.com/v1/"
+# ESPN's legacy abbreviations differ from the official NHL feed for these teams.
+ESPN_NHL_ALIASES = {"NJ": "NJD", "SJ": "SJS", "TB": "TBL", "LA": "LAK"}
+
+
+def official_abbreviation(team):
+    abbreviation = team["abbreviation"]
+    return ESPN_NHL_ALIASES.get(abbreviation, abbreviation)
 
 
 class PreviewArticle(HTMLParser):
@@ -51,7 +58,7 @@ class NhlPublicFeed(NflPublicFeed):
             day = timestamp(game["event_start"]).astimezone(ZoneInfo("America/New_York")).strftime("%Y-%m-%d")
             schedule, evidence = self._fetch(NHL_API + "schedule/" + day)
             matches = [g for d in schedule.get("gameWeek", []) for g in d.get("games", [])
-                if all(g.get(s + "Team", {}).get("abbrev") == game["teams"][s]["abbreviation"] for s in ("home", "away"))
+                if all(g.get(s + "Team", {}).get("abbrev") == official_abbreviation(game["teams"][s]) for s in ("home", "away"))
                 and abs((timestamp(g["startTimeUTC"]) - timestamp(game["event_start"])).total_seconds()) <= 60]
             if len(matches) != 1:
                 raise ValueError("Official NHL schedule did not uniquely match both teams and start time.")
@@ -60,7 +67,7 @@ class NhlPublicFeed(NflPublicFeed):
         if not re.fullmatch(r"[0-9]{10}", str(official_id)):
             raise ValueError("Invalid official NHL game identifier.")
         data, evidence = self._fetch(NHL_API + "gamecenter/" + str(official_id) + "/landing")
-        if str(data.get("id")) != str(official_id) or any(data.get(s + "Team", {}).get("abbrev") != game["teams"][s]["abbreviation"] for s in ("home", "away")):
+        if str(data.get("id")) != str(official_id) or any(data.get(s + "Team", {}).get("abbrev") != official_abbreviation(game["teams"][s]) for s in ("home", "away")):
             raise ValueError("Official NHL game/team identities differ from publisher event.")
         if abs((timestamp(data["startTimeUTC"]) - timestamp(game["event_start"])).total_seconds()) > 60:
             raise ValueError("Official NHL start time differs from publisher event.")
