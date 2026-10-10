@@ -1,5 +1,148 @@
 # Sports Betting Analyst v1
 
+## Sourced cohorts, MLB and automated final collection (October 10)
+
+Runtime v2.19.3.33 was merged in PR #40 after all twelve applicable workflow
+checks passed. The sports regression suite passed 306 checks across 27 isolated
+suites, including 25 new source/identity/cohort/baseline/collector/authentication
+checks; six stable-launcher checks also passed. Runtime commit
+441ecebbb8a1a385032502f969c04ea7a76166a1 is live on Render deployment
+dep-db58p3vavr4c73frnlpg, completed 2026-10-10T19:06:33.077487Z.
+Public health/status returned HTTP 200 with that exact commit; unauthenticated
+`/ui/paper-results` returned 401, and the initial post-deploy error log was empty.
+The model, active profile and accepted v20 behavioral harness are unchanged.
+
+New forecasts use separate `nfl-evidence-paper-v2`, `nhl-evidence-paper-v2` and
+`mlb-evidence-paper-v1` cohorts. Original NFL/NHL categories and records remain
+unchanged. The experimental model returns probabilities and one to three
+supplied fact IDs. The application rejects invented IDs and free-text claims,
+then constructs the explanation from the corresponding sourced facts. This
+bounds claims; it does not fit or validate a predictive probability model.
+Retrieved season records, market quotes, explicit practice statuses, scoped NHL
+team goaltending totals, MLB probable pitchers and published batting orders are
+eligible facts. Missing offense, defense and recent-form statistics cannot
+support claims. Source URLs and retrieval timestamps are frozen in each record.
+
+The NHL reader retains official projected lineups as projections and reads
+PuckBank's published, dated starter reports. A relayed confirmation requires a
+unique match of teams/date/time, same-day publication no later than retrieval,
+an explicit will-start statement naming the goalie and opponent, and a supported
+primary-source URL. Old confirmations, likely/projected labels and ambiguous
+matches remain unconfirmed. PuckBank relay is not independent retrieval of the
+primary social report; other aggregators are not independent corroboration.
+Independently confirmed goalie fields remain null. Unknowns are preserved.
+
+MLB publisher events must uniquely match official teams/start time, including
+possible doubleheaders. Forecasts pin MLB gamePk for final retrieval, use
+home/away probabilities including extra innings, and remain NO BET. Probable
+pitchers are not confirmed starters; an active roster is not a batting order.
+Only nine distinct published hitters establish a published lineup. Regular-season
+and postseason games are supported; postponed, cancelled, suspended, abnormal
+final or tied final results stay pending for review. Pitcher settlement rules and
+publisher quote age remain unverified.
+
+The authenticated `/ui/paper-results` dashboard separates all five sport/cohort
+reports. It shows accuracy, confidence bins, hypothetical flat-unit returns and
+same-event market/favorite comparisons. Market probabilities use proportional
+normalization of two-way implied prices. NFL paired Brier is conditional on no
+tie and excludes tied results; full three-outcome Brier remains separate. Missing
+prices are excluded from paired comparisons. Metrics remain descriptive, with
+no verified closing-line value and no established profitable edge.
+
+A bounded, request-triggered collector processes pending records after their
+scheduled starts, requires confirmed finals and matching identities, and appends
+hash-linked results without model calls or forecast generation. Enabled by
+`SPORTS_AUTO_COLLECT_ENABLED=true`; public status exposes only aggregate health
+and cohort counts. It checks at most hourly, up to 48 eligible records per run,
+with one-process locking and the existing 1000-row read windows. No database
+schema, grants, credentials, wager execution or paid resources changed. The
+server request timeout is 180 seconds for bounded feed/model requests.
+
+The existing Tyler health task was extended to include result collection and
+rescheduled hourly, preserving its health checks. Automation ID
+6aae75a807f08191a0a719454b53f7fa, enabled, America/New_York, updated
+2026-10-10T19:08:03.919612Z. A separate task create was rejected because all five
+active task slots were occupied; the related health task was updated instead.
+Fresh public GETs wake the free service and start due collection. Notify only
+for new settled counts or persistent problems; no private route authentication,
+new forecasts or wagers are authorized by that task. Service sleep and scheduler
+availability can delay collection; exact settlement timing is not guaranteed.
+
+Authenticated chat commands:
+
+```text
+sports evidence paper schedule :: {"sport":"NFL","date":"2026-10-11"}
+sports evidence paper analyze :: {"sport":"NHL","event_id":"401892479"}
+sports evidence paper check :: {"sport":"NHL","event_id":"401892479"}
+show evidence paper evidence :: {"sport":"MLB","paper_prediction_id":"MBP-C7F56A7F932B43B7"}
+show evidence paper trials
+sports paper collect finals
+```
+
+Live authenticated readback verified 43 forecasts: NFL original 1, NHL original
+15, NFL sourced 13, NHL sourced 13 and MLB sourced 1. All 16 original hashes
+match their earlier readbacks. Full IDs, save/start timestamps and all 43 hashes
+are retained in [the readback audit](SPORTS_PAPER_READBACK_2026_10_10.json).
+Every record was saved before its scheduled start. The 13 NHL shadow forecasts
+cover every October 10 game still pregame at the new run; already-started
+Flyers/Bruins retains only its original forecast. NFL covers all 13 Sunday games,
+including a separate shadow for Eagles/Jaguars. MLB is White Sox at Guardians,
+ESPN 401907994 / MLB 849831, saved 19:06:56.767517 UTC for the 00:00 UTC start
+(October 10, 8pm Eastern). Two NFL HTTP 403 reads cleared on later authenticated
+retry; no record was saved by those failed feed reads.
+
+New cohorts observe later pregame quotes, so between-cohort differences cannot
+isolate a method improvement. Estimates largely reproduce margin-normalized
+market prices; no independent forecasting edge is established. Some NFL forecasts
+assign zero tie probability and others 1–2%; none is a fitted tie model, and saved
+values were not revised. Six same-day NHL starter reports qualified: Jake Allen
+(NJD), Yaroslav Askarov (SJS), Jacob Markstrom (FLA), Jacob Fowler (MTL), Ilya
+Sorokin (NYI) and Dustin Wolf (CGY). These remain publisher-relayed reports, not
+independently retrieved primary confirmations. The other 20 starter slots remain
+unconfirmed. NHL lineups remain projected. MLB's Gavin Williams and Sean Burke
+remain probable, and neither batting order was available at save time.
+Sorokin's frozen report preserves the Rosner source URL, publication
+2026-10-10T14:52:37.943Z and relay retrieval 2026-10-10T19:09:26.084356+00:00.
+
+The manual collector completed 2026-10-10T19:19:33.866759+00:00: one eligible
+pending game checked, zero errors, zero new finals and no duplicate append for
+the already-settled Rangers/Capitals result. Dashboard/status showed NFL original
+1 pending; NHL original 1 settled / 14 pending; NFL sourced 13 pending; NHL sourced
+13 pending; MLB sourced 1 pending. Actual wagers remain $0. The sole settled
+original NHL pick lost: Tyler Brier 0.605 versus market 0.381; Tyler 0/1, favorite
+1/1. This one-event sample cannot establish accuracy, calibration or profitability.
+Hourly future checks are enabled, with no exact completion-time guarantee.
+
+| Cohort | Event | Saved UTC | Frozen ID |
+| --- | --- | --- | --- |
+| MLB sourced | Chicago White Sox at Cleveland Guardians | 19:06:56 | MBP-C7F56A7F932B43B7 |
+| NFL sourced | Philadelphia Eagles at Jacksonville Jaguars | 19:09:48 | NEP-23B517A656874E27 |
+| NFL sourced | Chicago Bears at Green Bay Packers | 19:09:52 | NEP-8E2624C9B49048AF |
+| NFL sourced | Houston Texans at Tennessee Titans | 19:09:56 | NEP-A058C28591AE44E7 |
+| NFL sourced | Cincinnati Bengals at Miami Dolphins | 19:10:25 | NEP-F2B0823E93784E99 |
+| NFL sourced | Minnesota Vikings at New Orleans Saints | 19:11:46 | NEP-E75E04FBA0E644ED |
+| NFL sourced | Indianapolis Colts at Pittsburgh Steelers | 19:12:53 | NEP-B5B158DC5D2D47AC |
+| NFL sourced | New York Giants at Washington Commanders | 19:13:43 | NEP-B53C53E31E10411C |
+| NFL sourced | Denver Broncos at Los Angeles Chargers | 19:14:55 | NEP-E07F937E995641D0 |
+| NFL sourced | Detroit Lions at Arizona Cardinals | 19:16:05 | NEP-227C251F5DDF4244 |
+| NFL sourced | San Francisco 49ers at Seattle Seahawks | 19:16:49 | NEP-35ADB2BD69304201 |
+| NFL sourced | Baltimore Ravens at Atlanta Falcons | 19:17:33 | NEP-B56596B2CE1346B0 |
+| NFL sourced | Las Vegas Raiders at New England Patriots | 19:17:59 | NEP-28B471AD17DA4AFB |
+| NFL sourced | Cleveland Browns at New York Jets | 19:18:47 | NEP-7B336A35D9964BD6 |
+| NHL sourced | Vancouver Canucks at New Jersey Devils | 19:07:37 | HEP-B735F71A681A4978 |
+| NHL sourced | Edmonton Oilers at San Jose Sharks | 19:08:25 | HEP-28EA5FE1235B47F8 |
+| NHL sourced | Minnesota Wild at Florida Panthers | 19:08:29 | HEP-C527D985154046E1 |
+| NHL sourced | Utah Mammoth at Buffalo Sabres | 19:08:33 | HEP-6E387EA6376A4DEC |
+| NHL sourced | Detroit Red Wings at Montreal Canadiens | 19:08:52 | HEP-34E5AE9FDF6A45BB |
+| NHL sourced | Nashville Predators at Ottawa Senators | 19:08:56 | HEP-4468E0BDE80E4914 |
+| NHL sourced | Dallas Stars at Pittsburgh Penguins | 19:09:00 | HEP-B481E1BC91464532 |
+| NHL sourced | Carolina Hurricanes at Chicago Blackhawks | 19:09:05 | HEP-2561AF18497D4645 |
+| NHL sourced | Columbus Blue Jackets at St. Louis Blues | 19:09:18 | HEP-4D4767E36A5B4E17 |
+| NHL sourced | Toronto Maple Leafs at Colorado Avalanche | 19:09:22 | HEP-E5C8E395E9F04FEE |
+| NHL sourced | Tampa Bay Lightning at New York Islanders | 19:09:27 | HEP-783AAFB661F544DB |
+| NHL sourced | Anaheim Ducks at Calgary Flames | 19:09:32 | HEP-9EAE6003850846B6 |
+| NHL sourced | Los Angeles Kings at Vegas Golden Knights | 19:09:36 | HEP-2D5DDA5AE1A4452F |
+
 ## October 10 NHL slate and first live settlement
 
 All fourteen October 10 games received original pregame paper forecasts through
