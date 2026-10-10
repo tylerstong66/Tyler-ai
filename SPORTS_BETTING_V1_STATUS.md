@@ -1,5 +1,69 @@
 # Sports Betting Analyst v1
 
+## October 10 NHL slate and first live settlement
+
+All fourteen October 10 games received original pregame paper forecasts through
+authenticated production chat, saved between 16:31:55 and 16:39:37 UTC, before
+the first scheduled start at 17:00 UTC. Frozen evidence/hash commands were read
+back for every record. Nine forecasts used the previous deployed reader; five
+followed the publisher-alias fix below. Forecast prompt/model/profile stayed
+unchanged. Every record remains NO BET, with goalies unconfirmed, publisher
+quote age unknown, and projected previews distinguished from final lineups.
+
+| Event (away at home) | Experimental selected winner | Probability | Original ID |
+| --- | --- | --- | --- |
+| Flyers at Bruins | Boston | 62% | NHP-22969D738DC84E8A |
+| Canucks at Devils | New Jersey | 65% | NHP-E59016065B4F4586 |
+| Oilers at Sharks | Edmonton | 56% | NHP-9783ED14E4A04031 |
+| Wild at Panthers | Florida | 58% | NHP-A0346CCBAF454C33 |
+| Mammoth at Sabres | Buffalo | 52% | NHP-FBD2BB99D60843D8 |
+| Red Wings at Canadiens | Montreal | 62% | NHP-F6CA29CB6B2A4872 |
+| Predators at Senators | Ottawa | 58% | NHP-7A72AD110B4947A2 |
+| Stars at Penguins | Dallas | 58% | NHP-BB902068C7654E7E |
+| Hurricanes at Blackhawks | Carolina | 65% | NHP-7549ACB8DFBA476C |
+| Blue Jackets at Blues | St. Louis | 54% | NHP-1C468EE8BAE24E88 |
+| Maple Leafs at Avalanche | Colorado | 65% | NHP-0B478E4141264CAF |
+| Lightning at Islanders | Tampa Bay | 56% | NHP-4B06643158824AC6 |
+| Ducks at Flames | Anaheim | 55% | NHP-5F6E51BA84EF475F |
+| Kings at Golden Knights | Vegas | 65% | NHP-1166D9D003F14CD8 |
+
+Feed identity matching initially rejected NJ/SJ/TB/LA because the NHL uses
+NJD/SJS/TBL/LAK. The four explicit publisher aliases are now normalized only
+for official matching; original publisher evidence remains unchanged. Both
+teams, official ID, start time and decisive-winner rules still must match.
+Two transient HTTP 403 reads cleared on later retry; no original was created
+on those failed attempts. PR #38 passed all eleven applicable workflow checks;
+281 local checks across 26 isolated suites passed, including alias-specific
+pregame/pinned-final tests and opponent/time rejection.
+
+Alias fix commit f86f8cd2b6f7fc5bdf566bd6887cf4f131a579a3 is deployed on
+Render dep-db56jlks728c73c1ljo0, live 2026-10-10T16:38:28.767115Z.
+Health/status returned 200 with that exact commit and unchanged Flash-Lite/v20
+identities; the post-deploy error-log query was empty. No paid resources or
+additional services were created.
+
+The first real NHL final was appended at 2026-10-10T16:35:48.291816+00:00:
+NHP-DCC1D93327A24ACD, Capitals 3 / Rangers 1, outcome home, retrieved from
+official gamecenter 2026020067 at 16:35:47.689248 UTC. Result evidence hash is
+a001865a8ad398c945d6e9258f4cb6d7f79f5d985456bc072149e89d78ebc379.
+The result links to original hash
+846bbeab229429869dcfcfc0acbc7b9351d2c1705d70d3a185d4ebec071bf43a,
+which was re-read unchanged after settlement. NFL original hash
+e17f79c7846facf43e548def12f4a7399936fe354716bd5541bd0b42a005f06f
+also still matches. A fresh reload reports NHL 15 predictions / 1 settled /
+14 pending, Brier 0.605, hypothetical flat-unit ROI -1.0 on one result,
+verified CLV null, wager_executed=false. No actual money was wagered or lost.
+
+This verifies live official-final append and linked scoring, not predictive
+accuracy. One settled outcome cannot establish calibration or profitability.
+Forecast narratives still have quality limitations: named-goalie language can
+imply starters despite explicit uncertainty, and claims such as strong metrics,
+offensive depth or defensive liabilities may be vague or insufficiently sourced.
+The originals were preserved rather than revised after outcomes; future goalie
+confirmation and reasoning improvements require a separately identified cohort.
+Settlement commands remain manual. The historical launch notes below retain
+their original chronology; final persistence is now verified as stated above.
+
 ## On-demand NHL paper trial
 
 Production v2.19.3.32 is live on commit
