@@ -74,6 +74,25 @@ class FeedTests(unittest.TestCase):
             self.schedule={"gameWeek":[{"games":games}]}
             with self.subTest(count=len(games)),self.assertRaisesRegex(ValueError,"uniquely"): self.feed.game("401892466")
 
+    def test_publisher_aliases_match_schedule_and_pinned_final(self):
+        for espn,nhl in [("NJ","NJD"),("SJ","SJS"),("TB","TBL"),("LA","LAK")]:
+            with self.subTest(alias=espn):
+                self.espn["header"]["competitions"][0]["competitors"][0]["team"]["abbreviation"]=espn
+                self.data["homeTeam"]["abbrev"]=nhl
+                self.schedule={"gameWeek":[{"games":[copy.deepcopy(self.data)]}]}
+                original=self.feed.game("401892466")
+                self.assertEqual(original["teams"]["home"]["abbreviation"],espn)
+                self.data.update(gameState="OFF",homeTeam={**self.data["homeTeam"],"score":3},awayTeam={**self.data["awayTeam"],"score":1})
+                self.assertTrue(self.feed.final_game({"snapshot":original})["completed"])
+
+    def test_alias_does_not_relax_opponent_or_time_checks(self):
+        self.espn["header"]["competitions"][0]["competitors"][0]["team"]["abbreviation"]="SJ"
+        self.data["homeTeam"]["abbrev"]="SJS"
+        self.schedule={"gameWeek":[{"games":[copy.deepcopy(self.data)]}]}
+        for mutate in (lambda d:d["awayTeam"].update(abbrev="BOS"),lambda d:d.update(startTimeUTC="2026-10-09T22:00:00Z")):
+            d=copy.deepcopy(self.data);mutate(d);self.schedule={"gameWeek":[{"games":[d]}]}
+            with self.assertRaisesRegex(ValueError,"uniquely"):self.feed.game("401892466")
+
     def test_official_event_id_teams_time_and_rules_must_match(self):
         for mutate in (lambda d:d.update(id=2026020099),lambda d:d['homeTeam'].update(abbrev="OTHER"),
                        lambda d:d.update(startTimeUTC="2026-10-09T22:00:00Z"),lambda d:d.update(gameType=1),
