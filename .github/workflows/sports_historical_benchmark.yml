@@ -1,0 +1,23 @@
+name: Independent NFL historical benchmark
+on:
+  push:
+    paths: ['sports_historical_benchmark.py', 'test_sports_historical_benchmark.py', 'benchmarks/nfl_independent_v1/**', '.github/workflows/sports_historical_benchmark.yml']
+  pull_request:
+    paths: ['sports_historical_benchmark.py', 'test_sports_historical_benchmark.py', 'benchmarks/nfl_independent_v1/**', '.github/workflows/sports_historical_benchmark.yml']
+permissions:
+  contents: read
+jobs:
+  chronological-benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest -v test_sports_historical_benchmark.py
+      - name: Reproduce frozen historical benchmark without network or app credentials
+        run: |
+          python sports_historical_benchmark.py --snapshot benchmarks/nfl_independent_v1/games_2010_2025.csv --protocol benchmarks/nfl_independent_v1/protocol.json --output /tmp/nfl-benchmark-reproduction
+          cmp benchmarks/nfl_independent_v1/run_2026_10_11/model.json /tmp/nfl-benchmark-reproduction/model.json
+          cmp benchmarks/nfl_independent_v1/run_2026_10_11/report.json /tmp/nfl-benchmark-reproduction/report.json
+          cmp benchmarks/nfl_independent_v1/run_2026_10_11/test_predictions.jsonl /tmp/nfl-benchmark-reproduction/test_predictions.jsonl

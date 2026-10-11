@@ -1,0 +1,137 @@
+{
+  "version": "nfl-independent-baseline-v1",
+  "decision": "NO BET",
+  "production_promoted": false,
+  "model_sha256": "4366a2eb5958142f1e9166ca435ecde111c90ad4c1df3cdb21d61a9dcfbecf2a",
+  "protocol": {
+    "version": "nfl-independent-baseline-v1",
+    "frozen_before_first_test_score": true,
+    "created_at_utc": "2026-10-11T13:25:34.480990+00:00",
+    "history": {
+      "first": 2010,
+      "last": 2025
+    },
+    "train_seasons": [
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022
+    ],
+    "validation_seasons": [
+      2023,
+      2024
+    ],
+    "test_seasons": [
+      2025
+    ],
+    "penalties": [
+      0.001,
+      0.01,
+      0.1
+    ],
+    "result_delay_hours": 24,
+    "snapshot_sha256": "630be0adec995aa16c29f6cb863099220613e3394e5a9b8f206150e6a2974850",
+    "source": {
+      "sha": "aa16ebaf5b0c1b1b9d4482fce3b85e1a7983b83c",
+      "committed_at": "2026-10-11T13:15:14Z",
+      "url": "https://raw.githubusercontent.com/nflverse/nfldata/aa16ebaf5b0c1b1b9d4482fce3b85e1a7983b83c/data/games.csv",
+      "retrieved_at": "2026-10-11T13:22:53.146241+00:00",
+      "sha256": "55e3688c3d368b7b7df3aa3f57cb7360ac003ee38541b7b4cdd873d96ce61ed1",
+      "bytes": 2184004
+    },
+    "subset_rows": 4363,
+    "evaluation": "REG only; postseason updates rating state; test season prequential with frozen coefficients",
+    "selection_metric": "validation conditional log loss; no test-dependent tuning",
+    "injury_policy": "Disabled until verified publication and retrieval timestamps precede cutoff. Missing is not healthy.",
+    "market_policy": "Historical moneylines are evaluation only; timestamp/bookmaker unverified. No ROI/CLV calculation."
+  },
+  "selection": [
+    {
+      "penalty": 0.001,
+      "validation_conditional_log_loss": 0.6366167922131483
+    },
+    {
+      "penalty": 0.01,
+      "validation_conditional_log_loss": 0.6379520029789498
+    },
+    {
+      "penalty": 0.1,
+      "validation_conditional_log_loss": 0.6496521196362147
+    }
+  ],
+  "chosen_penalty": 0.001,
+  "train_games": 2335,
+  "validation_games": 544,
+  "refit_games": 2879,
+  "constant_home_probability": 0.5486062717770035,
+  "test": {
+    "games": 272,
+    "ties": 1,
+    "decisive_games": 271,
+    "correct": 175,
+    "decisive_accuracy": 0.6457564575645757,
+    "full_three_outcome_brier": 0.4462644027217304,
+    "full_three_outcome_log_loss": 0.6533995051697394,
+    "paired_priced_decisive_games": 271,
+    "paired": {
+      "model_brier": 0.4423131215726421,
+      "market_brier": 0.42427793670158404,
+      "constant_brier": 0.49719206398136656,
+      "model_log_loss": 0.6314415822420515,
+      "market_log_loss": 0.6093832198972614,
+      "constant_log_loss": 0.6903378477969577,
+      "model_win": 0.6457564575645757,
+      "favorite_win": 0.6531365313653137
+    },
+    "confidence_bins": [
+      {
+        "band": "0.5-0.6",
+        "count": 112,
+        "mean_conditional_probability": 0.5488630200931831,
+        "observed_win_rate": 0.5892857142857143
+      },
+      {
+        "band": "0.6-0.7",
+        "count": 68,
+        "mean_conditional_probability": 0.6466482873234025,
+        "observed_win_rate": 0.5882352941176471
+      },
+      {
+        "band": "0.7-0.8",
+        "count": 68,
+        "mean_conditional_probability": 0.7428898542093999,
+        "observed_win_rate": 0.7205882352941176
+      },
+      {
+        "band": "0.8-0.9",
+        "count": 23,
+        "mean_conditional_probability": 0.8417791489318074,
+        "observed_win_rate": 0.8695652173913043
+      }
+    ]
+  },
+  "week_block_brier_difference": {
+    "mean_model_minus_market": 0.01803518487105811,
+    "approximate_95_percent_interval": [
+      0.0028520856591873985,
+      0.03383173229525491
+    ],
+    "blocks": 18,
+    "draws": 2000,
+    "seed": 1729,
+    "limitation": "Week-block bootstrap on one held-out season; approximate, not proof of future profitability."
+  },
+  "limitations": [
+    "Retrospective snapshot; historical publication times and revisions are not verified.",
+    "Prior finals become available at kickoff plus 24 hours by assumption, not observed publication time.",
+    "Moneylines have no bookmaker or quote timestamps; evaluation baseline only, no ROI or closing-line value.",
+    "No injury, lineup, weather, quarterback or betting-price feature is fitted.",
+    "Earlier held-out outcomes update only the pregame state; coefficients stay frozen.",
+    "Historical held-out results are not a prospective live benchmark or proof of a profitable edge."
+  ]
+}
