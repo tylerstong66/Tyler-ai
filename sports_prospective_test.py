@@ -292,13 +292,17 @@ def run(root=ROOT,source_cache=None):
         stats_rows.extend({k:r[k] for k in STAT_FIELDS} for r in csv.DictReader(io.StringIO(raw.decode())))
         capture.retain(f'stats_team_week_{year}.csv',raw,{**e,'release_digest':asset['digest'],'updated_at':asset['updated_at']})
     # Filter only finals; live or unverified totals never become history.
-    final_ids={g.identifier for g in finals}
+    eligible_history=[g for g in historical if g.kickoff+timedelta(hours=48)<=now()]
+    final_ids={g.identifier for g in eligible_history}
     stats_rows=[r for r in stats_rows if r['game_id'] in final_ids]
     with Path('benchmarks/nfl_efficiency_v2/team_stats_2010_2024.csv').open(newline='') as stream:stats_rows=list(csv.DictReader(stream))+stats_rows
     stream=io.StringIO(newline='');writer=csv.DictWriter(stream,fieldnames=STAT_FIELDS);writer.writeheader();writer.writerows(stats_rows)
+    forecast_error=None
     with tempfile.TemporaryDirectory() as temporary:
         stats_file=Path(temporary)/'combined_stats.csv';stats_file.write_text(stream.getvalue())
-        stats=c.read_stats(stats_file,historical)
+        try:stats=c.read_stats(stats_file,eligible_history)
+        except ValueError as error:
+            stats={};forecast_error={'stage':'forecast_history','error':str(error)}
     current=now()
     targets=[game_from_row(r) for r in rows if r['game_type']=='REG' and current-timedelta(hours=24)<game_from_row(r).kickoff<=current+timedelta(hours=24)]
     dates=sorted({g.kickoff.astimezone(ZoneInfo('America/New_York')).strftime('%Y%m%d') for g in targets}|{b.utc(json.loads(p.read_text())['kickoff']).astimezone(ZoneInfo('America/New_York')).strftime('%Y%m%d') for p in (root/'predictions').glob('*.json') if not (root/'results'/p.name).exists()})
@@ -320,8 +324,12 @@ def run(root=ROOT,source_cache=None):
             capture.retain(f'availability_week_{week}.json',{'coverage':'unknown','error':str(error)},{'source_url':url,'retrieved_at':now().isoformat()})
     v2=json.loads(Path('benchmarks/nfl_efficiency_v2/run_2026_10_11/model.json').read_text())
     v1=json.loads(Path('benchmarks/nfl_independent_v1/run_2026_10_11/model.json').read_text())
-    new=forecast(root,capture,historical,stats,targets,events,v2,v1,availability_data)
+    if forecast_error:
+        new=[]
+        write_json(capture.folder/'enrollment.json',{'new_predictions':[],'excluded':[{'game_id':g.identifier,'reason':'incomplete_eligible_stats_history'} for g in targets if g.kickoff>now()]})
+    else:new=forecast(root,capture,historical,stats,targets,events,v2,v1,availability_data)
     outcomes,errors=settle(root,capture,events,finals)
+    if forecast_error:errors.append(forecast_error)
     write_json(capture.folder/'manifest.json',{'sources':capture.evidence,'new_predictions':new,'new_results':outcomes,'errors':errors})
     summary=report(root)
     print(json.dumps(summary,indent=2))

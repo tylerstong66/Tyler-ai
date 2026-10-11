@@ -45,6 +45,13 @@ class ProspectiveTests(unittest.TestCase):
         b_=p.pregame_features(self.history+[replace(self.target,home_score=99)],self.stats,self.target,self.clock.isoformat())
         self.assertEqual(a['x'],b_['x'])
 
+    def test_recent_final_does_not_require_not_yet_eligible_efficiency_stats(self):
+        recent=replace(self.target,identifier='recent',kickoff=self.clock-timedelta(hours=30),home_score=24,away_score=17)
+        actual=p.pregame_features(self.history+[recent],self.stats,self.target,self.clock.isoformat())
+        original=p.pregame_features(self.history,self.stats,self.target,self.clock.isoformat())
+        self.assertEqual(actual['x'][5:],original['x'][5:])
+        self.assertEqual(actual['prior_results_used'],original['prior_results_used']+1)
+
     def test_same_history_features_match_frozen_recipe(self):
         g=self.history[100]
         cutoff=g.kickoff-timedelta(seconds=1)
