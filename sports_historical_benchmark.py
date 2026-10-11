@@ -214,11 +214,13 @@ def objective(rows, weights, penalty):
     return loss / len(decisive) + penalty * sum(w * w for w in weights[1:]) / 2
 
 
-def fit(rows, penalty, max_iterations=60):
+def fit(rows, penalty, max_iterations=60, dimension=None):
     decisive = [r for r in rows if r["game"].outcome != "tie"]
     if penalty <= 0 or not decisive:
         raise ValueError("Positive regularization and decisive rows are required.")
-    n, dimension = len(decisive), len(FEATURES)
+    n, dimension = len(decisive), len(FEATURES) if dimension is None else dimension
+    if dimension < 1 or any(len(r["x"]) != dimension or not all(math.isfinite(x) for x in r["x"]) for r in decisive):
+        raise ValueError("Feature dimensions must match and values must be finite.")
     weights = [0.0] * dimension
     for iteration in range(max_iterations):
         gradient = [0.0] * dimension

@@ -1,0 +1,212 @@
+{
+  "2025_evaluated": false,
+  "actual_wagers": 0,
+  "prospective_predictions": 0,
+  "selected_penalty": 0.001,
+  "selection": [
+    {
+      "penalty": 0.001,
+      "validation": {
+        "confidence_bins": [
+          {
+            "band": "0.5-0.6",
+            "count": 215,
+            "mean_conditional_probability": 0.5524408593762015,
+            "observed_win_rate": 0.6046511627906976
+          },
+          {
+            "band": "0.6-0.7",
+            "count": 181,
+            "mean_conditional_probability": 0.6450016360246498,
+            "observed_win_rate": 0.6464088397790055
+          },
+          {
+            "band": "0.7-0.8",
+            "count": 109,
+            "mean_conditional_probability": 0.7453453108425677,
+            "observed_win_rate": 0.7339449541284404
+          },
+          {
+            "band": "0.8-0.9",
+            "count": 36,
+            "mean_conditional_probability": 0.8363149665768789,
+            "observed_win_rate": 0.7777777777777778
+          },
+          {
+            "band": "0.9-1.0",
+            "count": 3,
+            "mean_conditional_probability": 0.910472730746906,
+            "observed_win_rate": 1.0
+          }
+        ],
+        "correct": 358,
+        "decisive_accuracy": 0.6580882352941176,
+        "decisive_games": 544,
+        "full_three_outcome_brier": 0.44203213538602854,
+        "full_three_outcome_log_loss": 0.6371280346560747,
+        "games": 544,
+        "paired": {
+          "constant_brier": 0.4961278193764931,
+          "constant_log_loss": 0.689270110475584,
+          "favorite_win": 0.6966911764705882,
+          "market_brier": 0.4188711334144488,
+          "market_log_loss": 0.6074188483613876,
+          "model_brier": 0.4420040038991246,
+          "model_log_loss": 0.6326230393721087,
+          "model_win": 0.6580882352941176
+        },
+        "paired_priced_decisive_games": 544,
+        "ties": 0
+      }
+    },
+    {
+      "penalty": 0.01,
+      "validation": {
+        "confidence_bins": [
+          {
+            "band": "0.5-0.6",
+            "count": 244,
+            "mean_conditional_probability": 0.5527588169704596,
+            "observed_win_rate": 0.5901639344262295
+          },
+          {
+            "band": "0.6-0.7",
+            "count": 182,
+            "mean_conditional_probability": 0.6451102453712856,
+            "observed_win_rate": 0.6813186813186813
+          },
+          {
+            "band": "0.7-0.8",
+            "count": 93,
+            "mean_conditional_probability": 0.7453468979413255,
+            "observed_win_rate": 0.7311827956989247
+          },
+          {
+            "band": "0.8-0.9",
+            "count": 25,
+            "mean_conditional_probability": 0.8378496397973761,
+            "observed_win_rate": 0.84
+          }
+        ],
+        "correct": 357,
+        "decisive_accuracy": 0.65625,
+        "decisive_games": 544,
+        "full_three_outcome_brier": 0.44597008941278543,
+        "full_three_outcome_log_loss": 0.6411516570836812,
+        "games": 544,
+        "paired": {
+          "constant_brier": 0.4961278193764931,
+          "constant_log_loss": 0.689270110475584,
+          "favorite_win": 0.6966911764705882,
+          "market_brier": 0.4188711334144488,
+          "market_log_loss": 0.6074188483613876,
+          "model_brier": 0.4459171033640263,
+          "model_log_loss": 0.6366466617997152,
+          "model_win": 0.65625
+        },
+        "paired_priced_decisive_games": 544,
+        "ties": 0
+      }
+    },
+    {
+      "penalty": 0.1,
+      "validation": {
+        "confidence_bins": [
+          {
+            "band": "0.5-0.6",
+            "count": 356,
+            "mean_conditional_probability": 0.5460471847411653,
+            "observed_win_rate": 0.5674157303370787
+          },
+          {
+            "band": "0.6-0.7",
+            "count": 163,
+            "mean_conditional_probability": 0.6407068796792692,
+            "observed_win_rate": 0.7239263803680982
+          },
+          {
+            "band": "0.7-0.8",
+            "count": 25,
+            "mean_conditional_probability": 0.7337428439840131,
+            "observed_win_rate": 0.8
+          }
+        ],
+        "correct": 340,
+        "decisive_accuracy": 0.625,
+        "decisive_games": 544,
+        "full_three_outcome_brier": 0.4574083226576103,
+        "full_three_outcome_log_loss": 0.6536437674319484,
+        "games": 544,
+        "paired": {
+          "constant_brier": 0.4961278193764931,
+          "constant_log_loss": 0.689270110475584,
+          "favorite_win": 0.6966911764705882,
+          "market_brier": 0.4188711334144488,
+          "market_log_loss": 0.6074188483613876,
+          "model_brier": 0.4572809434004518,
+          "model_log_loss": 0.6491387721479824,
+          "model_win": 0.625
+        },
+        "paired_priced_decisive_games": 544,
+        "ties": 0
+      }
+    }
+  ],
+  "stats_team_rows": 8156,
+  "status": "development_only_no_edge_claim",
+  "train_games": 2335,
+  "v1_validation": {
+    "confidence_bins": [
+      {
+        "band": "0.5-0.6",
+        "count": 223,
+        "mean_conditional_probability": 0.5520853803758117,
+        "observed_win_rate": 0.5650224215246636
+      },
+      {
+        "band": "0.6-0.7",
+        "count": 183,
+        "mean_conditional_probability": 0.6448556163984047,
+        "observed_win_rate": 0.6721311475409836
+      },
+      {
+        "band": "0.7-0.8",
+        "count": 104,
+        "mean_conditional_probability": 0.7467081636998512,
+        "observed_win_rate": 0.75
+      },
+      {
+        "band": "0.8-0.9",
+        "count": 32,
+        "mean_conditional_probability": 0.8391913170594478,
+        "observed_win_rate": 0.75
+      },
+      {
+        "band": "0.9-1.0",
+        "count": 2,
+        "mean_conditional_probability": 0.9114886556765553,
+        "observed_win_rate": 1.0
+      }
+    ],
+    "correct": 353,
+    "decisive_accuracy": 0.6488970588235294,
+    "decisive_games": 544,
+    "full_three_outcome_brier": 0.44591689180336913,
+    "full_three_outcome_log_loss": 0.6411217874971142,
+    "games": 544,
+    "paired": {
+      "constant_brier": 0.4961278193764931,
+      "constant_log_loss": 0.689270110475584,
+      "favorite_win": 0.6966911764705882,
+      "market_brier": 0.4188711334144488,
+      "market_log_loss": 0.6074188483613876,
+      "model_brier": 0.44589384360417383,
+      "model_log_loss": 0.6366167922131483,
+      "model_win": 0.6488970588235294
+    },
+    "paired_priced_decisive_games": 544,
+    "ties": 0
+  },
+  "validation_games": 544,
+  "version": "nfl-efficiency-v2"
+}
