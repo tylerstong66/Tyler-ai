@@ -1,0 +1,30 @@
+{
+  "MLB": {
+    "home_offset": 25,
+    "k": 8,
+    "result_delay_hours": 12,
+    "sport": "MLB"
+  },
+  "NHL": {
+    "home_offset": 50,
+    "k": 20,
+    "result_delay_hours": 12,
+    "sport": "NHL"
+  },
+  "NO_BET": true,
+  "actual_wagers": 0,
+  "availability_effect_enabled": false,
+  "enrollment": "all verified eligible regular-season and playoff games within 24h; no cap; first review milestone 100 settled games per league",
+  "features": [
+    "intercept",
+    "elo_difference_200"
+  ],
+  "fit_season": 2025,
+  "frozen_at": "2026-10-11T15:58:50.971456+00:00",
+  "l2_penalty": 0.01,
+  "offseason_regression": 0.6666666666666666,
+  "result_delay_hours": 12,
+  "validation": "none; historical fitting is training only; upcoming forecasts are the prospective test",
+  "version": "nhl-mlb-independent-team-elo-v1",
+  "warmup_season": 2024
+}
