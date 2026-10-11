@@ -110,6 +110,14 @@ class ProspectiveTests(unittest.TestCase):
             event={**self.event(),'state':'post','completed':True,'home_score':24,'away_score':20}
             new,errors=p.settle(root,capture,[event],[game]);self.assertFalse(new);self.assertIn('hash mismatch',errors[0]['reason'])
 
+    def test_rescheduled_final_stays_pending(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);capture=self.capture(root);self.prepare_prediction(root,capture)
+            game=replace(self.target,kickoff=self.target.kickoff+timedelta(days=1),home_score=24,away_score=20)
+            event={**self.event(game),'state':'post','completed':True,'home_score':24,'away_score':20}
+            new,errors=p.settle(root,capture,[event],[game])
+            self.assertFalse(new);self.assertIn('saved prediction',errors[0]['reason'])
+
     def test_tie_keeps_full_scores_and_excludes_two_way_market(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);capture=self.capture(root);self.prepare_prediction(root,capture)

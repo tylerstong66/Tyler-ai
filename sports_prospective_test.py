@@ -221,6 +221,8 @@ def settle(root,capture,events,schedule):
         g=next((g for g in schedule if g.identifier==p['game_id']),None)
         if not g:errors.append({'game_id':p['game_id'],'reason':'final schedule missing'});continue
         try:
+            if (g.home,g.away,g.kickoff)!=(p['home'],p['away'],b.utc(p['kickoff'])):
+                raise ValueError('Final identity disagrees with saved prediction')
             match_event(g,[e])
             if (g.home_score,g.away_score)!=(e['home_score'],e['away_score']):raise ValueError('Final score sources disagree')
             if b.utc(p['generated_at'])>=g.kickoff:raise ValueError('Late prediction')
@@ -249,11 +251,14 @@ def report(root):
     value['state']='completed_100_game_test' if len(results)>=100 else 'collecting'
     value['full_three_outcome_metrics']={name:{metric:mean([r['scores'][name][metric] for r in results]) for metric in ['full_brier','full_log_loss']} for name in ['v2','v1']}
     value['week_block_brier_difference']=b.week_bootstrap([{'week':str(r['season'])+'/'+str(r['week']),'model_brier':r['scores']['v2']['binary_brier'],'market_brier':r['scores']['market']['binary_brier']} for r in paired]) if paired else None
+    if value['week_block_brier_difference']:
+        value['week_block_brier_difference']['limitation']='Approximate season/week-block uncertainty for the prospective sample; not proof of future profitability.'
     write_json(root/'summary.json',value)
     lines=['# Tyler NFL prospective paper test','',f"Recorded: **{len(predictions)}/100** · Settled: **{len(results)}** · Pending: **{len(predictions)-len(results)}**",'', '**NO BET — actual wagers $0.**', '', 'Frozen experimental v2 compared with frozen v1 and market odds observed before kickoff. QB/injury reports are evidence only; model effects remain disabled. Confirmed starters and final inactive lists are unknown unless explicitly captured.','', '| Model | Paired games | Brier (lower is better) | Log loss (lower is better) | Accuracy |','|---|---:|---:|---:|---:|']
     for name in ['v2','v1','market']:
         m=metrics[name];fmt=lambda x:'Pending' if x is None else f'{x:.4f}'
-        lines.append(f"| {name} | {len(paired)} | {fmt(m['binary_brier'])} | {fmt(m['conditional_log_loss'])} | {fmt(m['correct'])} |")
+        accuracy='Pending' if m['correct'] is None else f"{m['correct']:.1%}"
+        lines.append(f"| {name} | {len(paired)} | {fmt(m['binary_brier'])} | {fmt(m['conditional_log_loss'])} | {accuracy} |")
     lines+=['','| Game | Kickoff (Eastern) | V2 pick | V2 win probability | Saved (Eastern) |','|---|---|---|---:|---|']
     for pred in sorted(predictions,key=lambda x:(x['kickoff'],x['game_id'])):
         chosen='home' if pred['v2']['home']>=pred['v2']['away'] else 'away'
