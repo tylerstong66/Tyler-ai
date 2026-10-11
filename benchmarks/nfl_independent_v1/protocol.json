@@ -1,0 +1,47 @@
+{
+  "version": "nfl-independent-baseline-v1",
+  "frozen_before_first_test_score": true,
+  "created_at_utc": "2026-10-11T13:25:34.480990+00:00",
+  "history": {
+    "first": 2010,
+    "last": 2025
+  },
+  "train_seasons": [
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022
+  ],
+  "validation_seasons": [
+    2023,
+    2024
+  ],
+  "test_seasons": [
+    2025
+  ],
+  "penalties": [
+    0.001,
+    0.01,
+    0.1
+  ],
+  "result_delay_hours": 24,
+  "snapshot_sha256": "630be0adec995aa16c29f6cb863099220613e3394e5a9b8f206150e6a2974850",
+  "source": {
+    "sha": "aa16ebaf5b0c1b1b9d4482fce3b85e1a7983b83c",
+    "committed_at": "2026-10-11T13:15:14Z",
+    "url": "https://raw.githubusercontent.com/nflverse/nfldata/aa16ebaf5b0c1b1b9d4482fce3b85e1a7983b83c/data/games.csv",
+    "retrieved_at": "2026-10-11T13:22:53.146241+00:00",
+    "sha256": "55e3688c3d368b7b7df3aa3f57cb7360ac003ee38541b7b4cdd873d96ce61ed1",
+    "bytes": 2184004
+  },
+  "subset_rows": 4363,
+  "evaluation": "REG only; postseason updates rating state; test season prequential with frozen coefficients",
+  "selection_metric": "validation conditional log loss; no test-dependent tuning",
+  "injury_policy": "Disabled until verified publication and retrieval timestamps precede cutoff. Missing is not healthy.",
+  "market_policy": "Historical moneylines are evaluation only; timestamp/bookmaker unverified. No ROI/CLV calculation."
+}
