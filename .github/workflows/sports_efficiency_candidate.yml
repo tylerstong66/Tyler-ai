@@ -1,0 +1,21 @@
+name: NFL efficiency candidate
+on:
+  push:
+    paths: ['sports_efficiency_candidate.py', 'test_sports_efficiency_candidate.py', 'sports_historical_benchmark.py', 'benchmarks/nfl_efficiency_v2/**', '.github/workflows/sports_efficiency_candidate.yml']
+  pull_request:
+    paths: ['sports_efficiency_candidate.py', 'test_sports_efficiency_candidate.py', 'sports_historical_benchmark.py', 'benchmarks/nfl_efficiency_v2/**', '.github/workflows/sports_efficiency_candidate.yml']
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest -v test_sports_efficiency_candidate test_sports_historical_benchmark
+      - run: |
+          python sports_efficiency_candidate.py --output /tmp/nfl-efficiency
+          cmp benchmarks/nfl_efficiency_v2/run_2026_10_11/model.json /tmp/nfl-efficiency/model.json
+          cmp benchmarks/nfl_efficiency_v2/run_2026_10_11/report.json /tmp/nfl-efficiency/report.json

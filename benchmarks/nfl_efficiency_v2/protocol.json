@@ -1,0 +1,31 @@
+{
+  "version": "nfl-efficiency-v2",
+  "frozen_at": "2026-10-11T14:06:40.166180+00:00",
+  "stats_sha256": "b9614fd519f5c05f0b4c4257c5e295ff8de4f800ce3aad34292bc95f5c31f871",
+  "schedule_sha256": "630be0adec995aa16c29f6cb863099220613e3394e5a9b8f206150e6a2974850",
+  "penalties": [
+    0.001,
+    0.01,
+    0.1
+  ],
+  "train_seasons": [
+    2014,
+    2022
+  ],
+  "validation_seasons": [
+    2023,
+    2024
+  ],
+  "refit_seasons": [
+    2014,
+    2024
+  ],
+  "historical_stats_assumed_delay_hours": 48,
+  "history_window_games": 16,
+  "shrinkage_pseudo_plays": 200,
+  "2025_holdout": "already_inspected_excluded",
+  "fresh_test": "Only games kicking off after model freeze; prediction recorded before kickoff; first 100 eligible regular-season games; report coverage and paired Brier/log loss against v1 and timestamped market. No promotion based on accuracy alone.",
+  "quarterback_injury_effect": "disabled until timestamped training evidence exists; retain verified pregame observations as audit context",
+  "NO_BET": true,
+  "actual_wagers": 0
+}
