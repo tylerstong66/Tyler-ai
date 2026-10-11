@@ -1,0 +1,38 @@
+name: NFL prospective paper test
+on:
+  push:
+    branches: ['main']
+    paths: ['sports_prospective_test.py', '.github/workflows/nfl_prospective_paper.yml']
+  schedule:
+    - cron: '15 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: nfl-prospective-paper-test
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install requests==2.32.5
+      - name: Capture public data, freeze paper forecasts and verify finals
+        env:
+          GH_PUBLIC_READ_TOKEN: ${{ github.token }}
+        run: python sports_prospective_test.py
+      - name: Preserve audit data even when upstream sources fail
+        if: always()
+        run: |
+          git add benchmarks/nfl_prospective_v2
+          if ! git diff --cached --quiet; then
+            git config user.name github-actions\[bot\]
+            git config user.email 41898282+github-actions\[bot\]@users.noreply.github.com
+            git commit -m 'Record NFL prospective paper-test evidence'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi

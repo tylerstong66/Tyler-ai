@@ -1,0 +1,17 @@
+name: NFL prospective test checks
+on:
+  push:
+    paths: ['sports_prospective_test.py', 'test_sports_prospective_test.py', '.github/workflows/nfl_prospective_paper.yml', '.github/workflows/nfl_prospective_checks.yml']
+  pull_request:
+    paths: ['sports_prospective_test.py', 'test_sports_prospective_test.py', '.github/workflows/nfl_prospective_paper.yml', '.github/workflows/nfl_prospective_checks.yml']
+permissions:
+  contents: read
+jobs:
+  prospective:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest -v test_sports_prospective_test test_sports_efficiency_candidate test_sports_historical_benchmark
