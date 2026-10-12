@@ -1,0 +1,106 @@
+{
+  "NO_BET": true,
+  "actual_wagers": 0,
+  "availability": {
+    "effect_enabled": false,
+    "original_response_sha256": "a1d7acf5f740b620ba6f51a5ffda9c3c3fabe912d2f884939838b6aa889e2bda",
+    "pitcher_status": "probable_not_confirmed",
+    "probable_pitchers": {
+      "away": {
+        "fullName": "Yoshinobu Yamamoto",
+        "id": 808967,
+        "link": "/api/v1/people/808967"
+      },
+      "home": {
+        "fullName": "Logan Henderson",
+        "id": 701656,
+        "link": "/api/v1/people/701656"
+      }
+    },
+    "published_batting_orders": {
+      "away": null,
+      "home": null
+    },
+    "retrieved_at": "2026-10-12T00:32:41.960547+00:00",
+    "source_url": "https://statsapi.mlb.com/api/v1.1/game/849812/feed/live"
+  },
+  "away": "LAD",
+  "away_id": "119",
+  "event_id": "401908031",
+  "features": [
+    1.0,
+    0.11363528435886906
+  ],
+  "fixed_elo": {
+    "away": 0.43174404347375184,
+    "home": 0.5682559565262482
+  },
+  "game_id": "849812",
+  "generated_at": "2026-10-12T00:32:42.081276+00:00",
+  "home": "MIL",
+  "home_id": "158",
+  "kickoff": "2026-10-12T21:00:00+00:00",
+  "market": null,
+  "market_observed_at": "2026-10-12T00:32:41.784594+00:00",
+  "model": {
+    "away": 0.4390311664686416,
+    "home": 0.5609688335313584
+  },
+  "model_sha256": "ebc0c1eddd34864c6653c997ab2fed9ad44956eb47c2d02abae867a8f78ab418",
+  "prior_results_used": 7392,
+  "recorded_at": "2026-10-12T00:32:42.108690+00:00",
+  "season": 2026,
+  "sha256": "5ebe735414c9afeaea5d8fc1851d7abe3861341497bcdc8e54c40a00a5cb1221",
+  "source_snapshots": [
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/3c9cbc15032b76a2144db5261eed059f50d2ba980287b4de05d1851cb52c1858.json",
+      "response_sha256": "0a42217749065968596f7e9312b1c0ef47d95cf16cbc66cdbff851e36d813611",
+      "retrieved_at": "2026-10-12T00:32:41.037905+00:00",
+      "sha256": "3c9cbc15032b76a2144db5261eed059f50d2ba980287b4de05d1851cb52c1858",
+      "source_url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&startDate=2026-03-01&endDate=2026-10-11&hydrate=linescore"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/6ff461f57d167266d1fca4802de9a933af8d06b9d7256b36b9e631e7d1d55e9b.json",
+      "response_sha256": "6360ce48408a3c4817948207cc386c288358a5ecd911c19f0b40fed72f1ea3fb",
+      "retrieved_at": "2026-10-12T00:32:41.400906+00:00",
+      "sha256": "6ff461f57d167266d1fca4802de9a933af8d06b9d7256b36b9e631e7d1d55e9b",
+      "source_url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-10-11&hydrate=probablePitcher,linescore,team"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/3e00889090ac8c3cbba10fa5ab9bf4d9ba28af110436d6a6c632c990503296fa.json",
+      "response_sha256": "5b9b5c5d99bdfdb3a43903abe1232fb4852ad3815ceb48f32f37ea1f582a21e1",
+      "retrieved_at": "2026-10-12T00:32:41.480401+00:00",
+      "sha256": "3e00889090ac8c3cbba10fa5ab9bf4d9ba28af110436d6a6c632c990503296fa",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20261011"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/075a586b665154c01184b269a6750618dfd1be0fd1b945f0a606ba0ccb65b480.json",
+      "response_sha256": "e4b183af1a91949a8621526cc9bf21a2405bb0c59523c165cc8a58e49964e9f3",
+      "retrieved_at": "2026-10-12T00:32:41.670442+00:00",
+      "sha256": "075a586b665154c01184b269a6750618dfd1be0fd1b945f0a606ba0ccb65b480",
+      "source_url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-10-12&hydrate=probablePitcher,linescore,team"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/362358b7d2bdbeeed184e92c42392823770c809a70b0273fec37d36581359b89.json",
+      "response_sha256": "dea8562074900192641a8eeb7595de3d93254e18916f82f025f7587b6114a18c",
+      "retrieved_at": "2026-10-12T00:32:41.784594+00:00",
+      "sha256": "362358b7d2bdbeeed184e92c42392823770c809a70b0273fec37d36581359b89",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20261012"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/0a776496293a76fe59ca05260efa6abd80d7f933daaf87f351bc5c2907477e60.json",
+      "response_sha256": "a1d7acf5f740b620ba6f51a5ffda9c3c3fabe912d2f884939838b6aa889e2bda",
+      "retrieved_at": "2026-10-12T00:32:41.960547+00:00",
+      "sha256": "0a776496293a76fe59ca05260efa6abd80d7f933daaf87f351bc5c2907477e60",
+      "source_url": "https://statsapi.mlb.com/api/v1.1/game/849812/feed/live"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/0bb11b8dcf9f251f43a981f9bda8dea1335263650d8a3d86173ad178444eefbd.json",
+      "response_sha256": "f07bc2e63b3cecefecadfac20be4f7f93cfa7465c5dd947fb6a76c8319881054",
+      "retrieved_at": "2026-10-12T00:32:42.079382+00:00",
+      "sha256": "0bb11b8dcf9f251f43a981f9bda8dea1335263650d8a3d86173ad178444eefbd",
+      "source_url": "https://statsapi.mlb.com/api/v1.1/game/849820/feed/live"
+    }
+  ],
+  "sport": "MLB"
+}
