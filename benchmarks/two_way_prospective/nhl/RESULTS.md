@@ -1,6 +1,6 @@
 # Tyler NHL prospective paper test
 
-Recorded: **17** · Settled: **4** · Pending: **13**
+Recorded: **22** · Settled: **6** · Pending: **16**
 
 **NO BET — actual wagers $0.**
 
@@ -8,9 +8,9 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 
 | Model | Paired games | Brier | Log loss | Accuracy |
 |---|---:|---:|---:|---:|
-| model | 4 | 0.4555 | 0.6486 | 75.0% |
-| fixed_elo | 4 | 0.4152 | 0.6085 | 75.0% |
-| market | 4 | 0.4516 | 0.6421 | 50.0% |
+| model | 6 | 0.4666 | 0.6596 | 83.3% |
+| fixed_elo | 6 | 0.4330 | 0.6263 | 66.7% |
+| market | 6 | 0.4769 | 0.6683 | 50.0% |
 
 | Game | Start (Eastern) | Model pick | Win probability |
 |---|---|---|---:|
@@ -31,5 +31,10 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | PIT at CHI | Oct 13 08:00 PM | PIT | 52.8% |
 | MIN at WPG | Oct 13 08:15 PM | MIN | 50.6% |
 | COL at DAL | Oct 13 08:30 PM | DAL | 50.6% |
+| VGK at NSH | Oct 13 08:45 PM | VGK | 52.2% |
+| TOR at UTA | Oct 13 09:00 PM | UTA | 55.7% |
+| CGY at ANA | Oct 13 09:45 PM | ANA | 57.2% |
+| EDM at LAK | Oct 13 10:30 PM | EDM | 52.4% |
+| BOS at SJS | Oct 13 11:00 PM | SJS | 50.0% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
