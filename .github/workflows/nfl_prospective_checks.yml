@@ -1,9 +1,9 @@
 name: NFL prospective test checks
 on:
   push:
-    paths: ['sports_prospective_test.py', 'test_sports_prospective_test.py', 'sports_benchmark_review.py', 'test_sports_benchmark_review.py', '.github/workflows/nfl_prospective_paper.yml', '.github/workflows/nfl_prospective_checks.yml']
+    paths: ['sports_prospective_test.py', 'test_sports_prospective_test.py', 'sports_benchmark_review.py', 'sports_market_evidence.py', 'sports_benchmark_coverage.py', 'test_sports_benchmark_coverage.py', 'test_sports_benchmark_review.py', '.github/workflows/nfl_prospective_paper.yml', '.github/workflows/nfl_prospective_checks.yml']
   pull_request:
-    paths: ['sports_prospective_test.py', 'test_sports_prospective_test.py', 'sports_benchmark_review.py', 'test_sports_benchmark_review.py', '.github/workflows/nfl_prospective_paper.yml', '.github/workflows/nfl_prospective_checks.yml']
+    paths: ['sports_prospective_test.py', 'test_sports_prospective_test.py', 'sports_benchmark_review.py', 'sports_market_evidence.py', 'sports_benchmark_coverage.py', 'test_sports_benchmark_coverage.py', 'test_sports_benchmark_review.py', '.github/workflows/nfl_prospective_paper.yml', '.github/workflows/nfl_prospective_checks.yml']
 permissions:
   contents: read
 jobs:
@@ -14,4 +14,4 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m unittest -v test_sports_benchmark_review test_sports_prospective_test test_sports_efficiency_candidate test_sports_historical_benchmark
+      - run: python -m unittest -v test_sports_benchmark_coverage test_sports_benchmark_review test_sports_prospective_test test_sports_efficiency_candidate test_sports_historical_benchmark

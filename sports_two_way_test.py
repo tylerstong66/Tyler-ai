@@ -9,6 +9,7 @@ from zoneinfo import ZoneInfo
 from concurrent.futures import ThreadPoolExecutor
 import sports_historical_benchmark as b
 import sports_prospective_test as n
+import sports_market_evidence as m
 
 ROOT=Path('benchmarks/two_way_prospective')
 CLUBS='ANA BOS BUF CAR CBJ CGY CHI COL DAL DET EDM FLA LAK MIN MTL NJD NSH NYI NYR OTT PHI PIT SEA SJS STL TBL TOR UTA VAN VGK WPG WSH'.split()
@@ -113,11 +114,8 @@ def espn_events(data,sport):
     for e in data.get('events',[]):
         co=e['competitions'][0];sides={r['homeAway']:r for r in co['competitors']}
         alias=lambda s:ALIASES[sport].get(sides[s]['team']['abbreviation'],sides[s]['team']['abbreviation'])
-        odds=[]
-        for o in co.get('odds',[]):
-            ml=o.get('moneyline',{});h,a=[ml.get(s,{}).get('close',{}).get('odds') for s in ['home','away']]
-            if h is not None and a is not None:odds.append({'provider':o.get('provider',{}).get('name'),'home_moneyline':b.price(str(h)),'away_moneyline':b.price(str(a))})
-        records.append({'event_id':e['id'],'kickoff':b.utc(e['date']).isoformat(),'home':alias('home'),'away':alias('away'),'home_name':sides['home']['team']['displayName'],'away_name':sides['away']['team']['displayName'],'home_score':int(sides['home'].get('score',0)),'away_score':int(sides['away'].get('score',0)),'state':e['status']['type']['state'],'completed':e['status']['type'].get('completed',False),'neutral':co.get('neutralSite'),'odds':odds})
+        odds,diagnostics=m.parse_odds(co.get('odds',[]))
+        records.append({'event_id':e['id'],'kickoff':b.utc(e['date']).isoformat(),'home':alias('home'),'away':alias('away'),'home_name':sides['home']['team']['displayName'],'away_name':sides['away']['team']['displayName'],'home_score':int(sides['home'].get('score',0)),'away_score':int(sides['away'].get('score',0)),'state':e['status']['type']['state'],'completed':e['status']['type'].get('completed',False),'neutral':co.get('neutralSite'),'odds':odds,'odds_diagnostics':diagnostics})
     return records
 
 
@@ -151,12 +149,14 @@ def match_final(g,events,sport,pred):
 
 
 def record_forecasts(root,capture,history,games,events,model,config,availability):
-    new=[];excluded=[]
+    new=[];excluded=[];decisions=[]
     for g in sorted(games,key=lambda g:(g['kickoff'],g['game_id'])):
         path=root/'predictions'/(g['game_id']+'.json')
-        if path.exists():continue
+        if path.exists():
+            decisions.append({'game_id':g['game_id'],'decision':'already_enrolled'});continue
         clock=n.now()
-        if not clock<b.utc(g['kickoff'])<=clock+timedelta(hours=24):continue
+        if not clock<b.utc(g['kickoff'])<=clock+timedelta(hours=24):
+            decisions.append({'game_id':g['game_id'],'decision':'already_started' if b.utc(g['kickoff'])<=clock else 'outside_24h_window','checked_at':clock.isoformat()});continue
         try:
             e=match(g,events,config['sport'])
             if g['state']!='pre' or e['state']!='pre':raise ValueError('Game has started or is not normally scheduled')
@@ -167,7 +167,11 @@ def record_forecasts(root,capture,history,games,events,model,config,availability
             if b.utc(data['recorded_at'])>=b.utc(g['kickoff']) or clock<b.utc(model['frozen_at']):raise ValueError('Recording outside frozen pregame window')
             if any(b.utc(s['retrieved_at'])>clock for s in capture.evidence):raise ValueError('Future source snapshot')
             data['sha256']=b.sha256(b.canonical(data));n.write_json(path,data,exclusive=True);new.append(g['game_id'])
-        except ValueError as error:excluded.append({'game_id':g['game_id'],'reason':str(error)})
+            decisions.append({'game_id':g['game_id'],'decision':'enrolled','checked_at':clock.isoformat(),'priced':data['market'] is not None})
+        except ValueError as error:
+            excluded.append({'game_id':g['game_id'],'reason':str(error)})
+            decisions.append({'game_id':g['game_id'],'decision':'excluded','reason':str(error),'checked_at':clock.isoformat()})
+    n.write_json(capture.folder/'enrollment.json',{'new_predictions':new,'excluded':excluded,'decisions':decisions})
     return new,excluded
 
 
@@ -222,7 +226,10 @@ def report(root,sport):
 
 
 def read_capture(capture,url,parser,name):
-    raw,e=capture.get(url);data=parser(json.loads(raw));capture.retain(name,data,e);return data
+    raw,e=capture.get(url);data=parser(json.loads(raw))
+    if 'scoreboard' in url:
+        for event in data:event['market_observed_at']=e['retrieved_at']
+    capture.retain(name,data,e);return data
 
 
 def availability_snapshot(capture,g,sport):
@@ -292,8 +299,10 @@ def run_sport(sport,source_cache=None):
                 availability[g['game_id']]={'coverage':'unknown','effect_enabled':False,'error':str(error)}
                 optional_errors.append({'stage':'availability','game_id':g['game_id'],'error':str(error)})
     new,excluded=record_forecasts(root,capture,combined,games,events,model,config,availability)
+    followups,quote_errors=m.collect_followups(root,capture,events,n.now)
     settled,errors=settle(root,capture,games,events,sport)
-    n.write_json(capture.folder/'manifest.json',{'sources':capture.evidence,'history_games':len(combined),'new_predictions':new,'new_results':settled,'excluded':excluded,'errors':errors,'optional_availability_errors':optional_errors,'collection_completed':True})
+    errors.extend(quote_errors)
+    n.write_json(capture.folder/'manifest.json',{'sources':capture.evidence,'history_games':len(combined),'new_predictions':new,'new_results':settled,'new_market_followups':followups,'excluded':excluded,'errors':errors,'optional_availability_errors':optional_errors,'collection_completed':True})
     return report(root,sport)
 
 
