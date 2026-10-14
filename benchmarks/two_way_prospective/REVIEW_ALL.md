@@ -6,7 +6,7 @@
 |---|---:|---:|---:|---:|---|---|
 | NFL | 13 | 13 | 0 | 12 | collecting | [Review](../nfl_prospective_v2/REVIEW.md) |
 | NHL | 22 | 24 | 2 | 22 | collecting | [Review](nhl/REVIEW.md) |
-| MLB | 4 | 5 | 1 | 2 | collecting | [Review](mlb/REVIEW.md) |
+| MLB | 4 | 6 | 2 | 2 | collecting | [Review](mlb/REVIEW.md) |
 
 [Forecast and odds coverage audit](COVERAGE_ALL.md)
 

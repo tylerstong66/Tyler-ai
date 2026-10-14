@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-14T15:53:19.627044+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
+Evidence through **2026-10-14T17:11:22.082976+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 5 / 4 / 1 |
+| Recorded / settled / pending | 6 / 4 / 2 |
 | Started games in retained official schedules / enrolled | 4 / 4 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 3 / 5 |
+| Enrollment-time priced forecasts | 4 / 6 |
 | Settled with enrollment prices / decisive market-paired | 2 / 2 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -30,11 +30,12 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 | 849811 | Milwaukee Brewers at Los Angeles Dodgers | 2026-10-15T00:00:00+00:00 | enrolled | — |
 | 849812 | Los Angeles Dodgers at Milwaukee Brewers | 2026-10-12T21:00:00+00:00 | enrolled | — |
 | 849813 | Cleveland Guardians at Tampa Bay Rays | 2026-10-14T00:00:00+00:00 | enrolled | — |
+| 849818 | Tampa Bay Rays at Cleveland Guardians | 2026-10-15T17:00:00+00:00 | enrolled | — |
 | 849820 | Cleveland Guardians at Tampa Bay Rays | 2026-10-13T00:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 16. Latest: `20261014T155317410949Z`.
+Audited capture manifests: 17. Latest: `20261014T171119124323Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
