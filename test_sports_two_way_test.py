@@ -143,6 +143,60 @@ class TwoWayTests(unittest.TestCase):
                 self.assertEqual(self.final(root,capture,g,self.event(g,**edits))[0],[])
                 self.assertFalse((root/'results/1.json').exists())
 
+    def test_nhl_final_time_revision_keeps_all_other_guards(self):
+        g=self.game(completed=True,state='post')
+        revised=(b.utc(g['kickoff'])+timedelta(minutes=15)).isoformat()
+        cases=[{'event_id':'other'},{'home':'WRONG'},{'neutral':True},
+               {'away_score':8},{'completed':False},{'state':'in'},
+               {'kickoff':(b.utc(g['kickoff'])+timedelta(minutes=15,seconds=1)).isoformat()}]
+        for edit in cases:
+            with self.subTest(edit=edit),tempfile.TemporaryDirectory() as tmp:
+                root=Path(tmp);capture=self.capture(root);self.record(root,capture)
+                e=self.event(g,kickoff=revised,**{k:v for k,v in edit.items() if k!='kickoff'})
+                if 'kickoff' in edit:e['kickoff']=edit['kickoff']
+                self.assertEqual(self.final(root,capture,g,e)[0],[])
+                self.assertFalse((root/'results/1.json').exists())
+        with self.assertRaises(ValueError):p.match_final(g,[self.event(g),self.event(g)],'NHL',self.event(g))
+        # A revised official time is still a different saved forecast identity.
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);capture=self.capture(root);self.record(root,capture)
+            changed={**g,'kickoff':revised}
+            self.assertEqual(self.final(root,capture,changed,self.event(changed))[0],[])
+
+    def test_time_revision_remains_ineligible_for_enrollment_and_mlb(self):
+        g=self.game();e=self.event(g,kickoff=(b.utc(g['kickoff'])+timedelta(minutes=15)).isoformat())
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);capture=self.capture(root)
+            new,excluded=self.record(root,capture,[g],[e])
+            self.assertEqual(new,[]);self.assertTrue(excluded)
+        with self.assertRaises(ValueError):p.match_final(g,[e],'MLB',e)
+
+    def test_saved_nhl_time_revisions_settle_from_archived_evidence(self):
+        league=p.ROOT/'nhl'
+        manifest=json.loads((league/'captures/20261014T115856760081Z/manifest.json').read_text())
+        sources=[s for s in manifest['sources'] if '/schedule/2026-10-13' in s['source_url'] or 'scoreboard?dates=20261013' in s['source_url']]
+        for source in sources:self.assertEqual(b.sha256(Path(source['path']).read_bytes()),source['sha256'])
+        games=json.loads(Path(sources[0]['path']).read_text())
+        events=json.loads(Path(sources[1]['path']).read_text())
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);capture=self.capture(root);capture.evidence=sources
+            originals={}
+            for identifier in ['2026020100','2026020105']:
+                originals[identifier]=(league/'predictions'/(identifier+'.json')).read_bytes()
+                path=root/'predictions'/(identifier+'.json');path.parent.mkdir(exist_ok=True);path.write_bytes(originals[identifier])
+                pred=json.loads(originals[identifier]);game=next(g for g in games if g['game_id']==identifier)
+                with self.assertRaises(ValueError):p.match(game,events,'NHL')
+                self.assertEqual(p.match_final(game,events,'NHL',pred)['event_id'],pred['event_id'])
+            new,errors=p.settle(root,capture,games,events,'NHL')
+            self.assertEqual(set(new),set(originals));self.assertEqual(errors,[])
+            for identifier,original in originals.items():
+                self.assertEqual((root/'predictions'/(identifier+'.json')).read_bytes(),original)
+                result=json.loads((root/'results'/(identifier+'.json')).read_text())
+                self.assertEqual(result['outcome'],'away')
+                self.assertEqual(result['match_verification']['start_time_difference_seconds'],900)
+                self.assertEqual(result['match_verification']['method'],'nhl_saved_event_bounded_start_time')
+            self.assertEqual(p.settle(root,capture,games,events,'NHL'),([],[]))
+
     def test_tampered_and_late_predictions_stay_pending(self):
         for edit in [{'model':{'home':.99,'away':.01}},{'recorded_at':self.game()['kickoff']},{'generated_at':self.game()['kickoff']}]:
             with self.subTest(edit=edit),tempfile.TemporaryDirectory() as tmp:
