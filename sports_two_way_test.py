@@ -130,6 +130,26 @@ def match(g,events,sport):
     return matches[0]
 
 
+def match_final(g,events,sport,pred):
+    """Allow a small NHL provider time revision only for the saved final event.
+
+    Enrollment still uses exact start times. Official identity/time must already
+    match the immutable forecast, and settle() separately requires equal scores.
+    MLB retains exact times to avoid confusing doubleheaders or resumptions.
+    """
+    if sport!='NHL':return match(g,events,sport)
+    pinned=[e for e in events if e['event_id']==pred['event_id']]
+    if len(pinned)!=1:raise ValueError('Unique saved ESPN final event required')
+    e=pinned[0]
+    difference=abs(b.utc(e['kickoff'])-b.utc(g['kickoff']))
+    if difference:
+        if not g['completed'] or not e['completed'] or e['state']!='post' or difference>timedelta(minutes=15):
+            raise ValueError('NHL final start-time revision exceeds verification policy')
+    # Validate the same matchup and venue at the provider's revised timestamp;
+    # the original official and saved timestamps remain untouched.
+    return match({**g,'kickoff':e['kickoff']},pinned,sport)
+
+
 def record_forecasts(root,capture,history,games,events,model,config,availability):
     new=[];excluded=[]
     for g in sorted(games,key=lambda g:(g['kickoff'],g['game_id'])):
@@ -159,7 +179,7 @@ def settle(root,capture,games,events,sport):
         if not g or not g['completed']:continue
         try:
             if any(g[s+'_id']!=pred[s+'_id'] for s in ['home','away']) or b.utc(g['kickoff'])!=b.utc(pred['kickoff']):raise ValueError('Final identity differs from saved forecast')
-            e=match(g,events,sport)
+            e=match_final(g,events,sport,pred)
             if e['event_id']!=pred['event_id'] or not e['completed'] or e['state']!='post':continue
             if any(g[s+'_score']!=e[s+'_score'] for s in ['home','away']):raise ValueError('Final scores disagree')
             if not all(isinstance(g[s+'_score'],int) and not isinstance(g[s+'_score'],bool) and g[s+'_score']>=0 for s in ['home','away']):raise ValueError('Malformed final scores')
@@ -172,7 +192,8 @@ def settle(root,capture,games,events,sport):
             probs={k:pred[k]['home'] for k in ['model','fixed_elo']}
             if pred['market']:probs['market']=pred['market']['conditional_home_probability']
             for key,probability in probs.items():scores[key]={'brier':2*(probability-(outcome=='home'))**2,'log_loss':b.conditional_loss(probability,outcome),'correct':('home' if probability>=.5 else 'away')==outcome}
-            record={'sport':sport,'game_id':g['game_id'],'outcome':outcome,'home_score':g['home_score'],'away_score':g['away_score'],'verified_at':n.now().isoformat(),'prediction_sha256':digest,'scores':scores,'source_snapshots':capture.evidence}
+            verification={'method':'exact_kickoff' if b.utc(g['kickoff'])==b.utc(e['kickoff']) else 'nhl_saved_event_bounded_start_time','event_id':e['event_id'],'official_kickoff':g['kickoff'],'espn_kickoff':e['kickoff'],'start_time_difference_seconds':abs((b.utc(e['kickoff'])-b.utc(g['kickoff'])).total_seconds())}
+            record={'sport':sport,'game_id':g['game_id'],'outcome':outcome,'home_score':g['home_score'],'away_score':g['away_score'],'verified_at':n.now().isoformat(),'prediction_sha256':digest,'scores':scores,'source_snapshots':capture.evidence,'match_verification':verification}
             n.write_json(root/'results'/path.name,record,exclusive=True);new.append(g['game_id'])
         except ValueError as error:errors.append({'game_id':g['game_id'],'reason':str(error)})
     return new,errors
