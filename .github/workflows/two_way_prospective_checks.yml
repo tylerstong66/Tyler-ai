@@ -1,9 +1,9 @@
 name: NHL and MLB prospective checks
 on:
   push:
-    paths: ['sports_two_way_test.py', 'test_sports_two_way_test.py', 'benchmarks/two_way_prospective/**', '.github/workflows/two_way_prospective_checks.yml', '.github/workflows/nfl_prospective_paper.yml']
+    paths: ['sports_two_way_test.py', 'test_sports_two_way_test.py', 'sports_benchmark_review.py', 'test_sports_benchmark_review.py', 'benchmarks/two_way_prospective/**', '.github/workflows/two_way_prospective_checks.yml', '.github/workflows/nfl_prospective_paper.yml']
   pull_request:
-    paths: ['sports_two_way_test.py', 'test_sports_two_way_test.py', 'benchmarks/two_way_prospective/**', '.github/workflows/two_way_prospective_checks.yml', '.github/workflows/nfl_prospective_paper.yml']
+    paths: ['sports_two_way_test.py', 'test_sports_two_way_test.py', 'sports_benchmark_review.py', 'test_sports_benchmark_review.py', 'benchmarks/two_way_prospective/**', '.github/workflows/two_way_prospective_checks.yml', '.github/workflows/nfl_prospective_paper.yml']
 permissions:
   contents: read
 jobs:
@@ -14,4 +14,4 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m unittest test_sports_two_way_test.py test_sports_prospective_test.py test_sports_historical_benchmark.py test_sports_efficiency_candidate.py
+      - run: python -m unittest test_sports_benchmark_review.py test_sports_two_way_test.py test_sports_prospective_test.py test_sports_historical_benchmark.py test_sports_efficiency_candidate.py
