@@ -1,6 +1,6 @@
 # Tyler MLB prospective paper test
 
-Recorded: **5** · Settled: **3** · Pending: **2**
+Recorded: **5** · Settled: **4** · Pending: **1**
 
 **NO BET — actual wagers $0.**
 

@@ -1,0 +1,72 @@
+{
+  "away_score": 1,
+  "game_id": "849813",
+  "home_score": 3,
+  "outcome": "home",
+  "prediction_sha256": "ef44b23e716ac906a7823538bb85fadb8745e5bd26ce34e079516d808f253578",
+  "scores": {
+    "fixed_elo": {
+      "brier": 0.3088841380193183,
+      "correct": true,
+      "log_loss": 0.4992119605935648
+    },
+    "model": {
+      "brier": 0.34824395231910416,
+      "correct": true,
+      "log_loss": 0.5400472029412179
+    }
+  },
+  "source_snapshots": [
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/e98ef23b47fc7c1bd48e438fcc3d9db063aacdaf5f813bd8c342170c49330cf8.json",
+      "response_sha256": "3d38f138a6223f134ed88591ef0cf64976cf2097e8a08d0f311a7fec7f077ccb",
+      "retrieved_at": "2026-10-14T06:12:43.988877+00:00",
+      "sha256": "e98ef23b47fc7c1bd48e438fcc3d9db063aacdaf5f813bd8c342170c49330cf8",
+      "source_url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&startDate=2026-03-01&endDate=2026-10-14&hydrate=linescore"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/6bc4b0a2eadf6f175465c842f1d36e7830503fdc217a44b646c89b480af71579.json",
+      "response_sha256": "5e828f31304bbea7ffc6237dc58ba4a20d56be987021651c462f1ffb0ad8c455",
+      "retrieved_at": "2026-10-14T06:12:44.502992+00:00",
+      "sha256": "6bc4b0a2eadf6f175465c842f1d36e7830503fdc217a44b646c89b480af71579",
+      "source_url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-10-13&hydrate=probablePitcher,linescore,team"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/97b354786bb05cd62cef7a8d318ed314006f96535d62cc78f3874018e3537689.json",
+      "response_sha256": "9191d17eb1294119cdba1f04cc7155edadb4d6b4cd835da730e27b27b4c6331a",
+      "retrieved_at": "2026-10-14T06:12:44.614537+00:00",
+      "sha256": "97b354786bb05cd62cef7a8d318ed314006f96535d62cc78f3874018e3537689",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20261013"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/de6fd5554adc76bb069c7d7384a84d422b76e4aa2e6bb498125f1d720066bf52.json",
+      "response_sha256": "54106347c768a5b268d972e4b6e6f50acf7a29ac14e8ab528fd62520ac4b9b12",
+      "retrieved_at": "2026-10-14T06:12:44.795160+00:00",
+      "sha256": "de6fd5554adc76bb069c7d7384a84d422b76e4aa2e6bb498125f1d720066bf52",
+      "source_url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-10-14&hydrate=probablePitcher,linescore,team"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/e9bd9bc44c37e27b94ac14ddef0bbe20c921f734e733e9836d24c258e8e92579.json",
+      "response_sha256": "ae492bd04204822bcfddf6d15de8f419c8e7d376f85902d955c2341cbe79038d",
+      "retrieved_at": "2026-10-14T06:12:44.923937+00:00",
+      "sha256": "e9bd9bc44c37e27b94ac14ddef0bbe20c921f734e733e9836d24c258e8e92579",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20261014"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/597856f3ff63af6956b1edcc83e1713c5105ad92b01da97e0dc4fa86d1b2bc09.json",
+      "response_sha256": "013672a9cbce4b377406f56864644f2666a4830cea86bca0ad9de98905cb7ce4",
+      "retrieved_at": "2026-10-14T06:12:45.146883+00:00",
+      "sha256": "597856f3ff63af6956b1edcc83e1713c5105ad92b01da97e0dc4fa86d1b2bc09",
+      "source_url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-10-15&hydrate=probablePitcher,linescore,team"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/12b60e8b08bc26180cd94fe0cfe7702dec92d7c33da366e8a252cf238a456555.json",
+      "response_sha256": "d127f04d087f34bceeac4c46cb6657e4a677e38200d06ba6a45b2f0fb13c7d13",
+      "retrieved_at": "2026-10-14T06:12:45.280777+00:00",
+      "sha256": "12b60e8b08bc26180cd94fe0cfe7702dec92d7c33da366e8a252cf238a456555",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20261015"
+    }
+  ],
+  "sport": "MLB",
+  "verified_at": "2026-10-14T06:12:45.283054+00:00"
+}
