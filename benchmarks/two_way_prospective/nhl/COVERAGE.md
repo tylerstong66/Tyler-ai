@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-14T20:43:05.522969+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-14T23:55:15.871776+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 24 / 22 / 2 |
-| Started games in retained official schedules / enrolled | 22 / 22 |
+| Recorded / settled / pending | 30 / 22 / 8 |
+| Started games in retained official schedules / enrolled | 23 / 23 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 24 / 24 |
+| Enrollment-time priced forecasts | 30 / 30 |
 | Settled with enrollment prices / decisive market-paired | 22 / 22 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -49,10 +49,16 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 | 2026020105 | BOS at SJS | 2026-10-14T03:00:00+00:00 | enrolled | — |
 | 2026020106 | MTL at WSH | 2026-10-14T23:30:00+00:00 | enrolled | — |
 | 2026020107 | DAL at COL | 2026-10-15T00:30:00+00:00 | enrolled | — |
+| 2026020108 | BUF at TOR | 2026-10-15T23:00:00+00:00 | enrolled | — |
+| 2026020109 | NYI at OTT | 2026-10-15T23:00:00+00:00 | enrolled | — |
+| 2026020110 | PHI at DET | 2026-10-15T23:30:00+00:00 | enrolled | — |
+| 2026020111 | SEA at TBL | 2026-10-15T23:00:00+00:00 | enrolled | — |
+| 2026020112 | VAN at FLA | 2026-10-15T23:00:00+00:00 | enrolled | — |
+| 2026020113 | NYR at NJD | 2026-10-15T23:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 18. Latest: `20261014T204303783608Z`.
+Audited capture manifests: 19. Latest: `20261014T235514265160Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
