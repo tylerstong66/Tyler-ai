@@ -1,8 +1,8 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-10-14T15:32:55.226923+00:00",
-  "capture_count": 15,
+  "as_of_evidence_at": "2026-10-14T15:53:19.627044+00:00",
+  "capture_count": 16,
   "cohort_started_at": "2026-10-11T15:59:30.281973+00:00",
   "completion_note": "Only manifests without an explicit incomplete state are audited; legacy manifests are retained.",
   "decisive_market_paired": 2,
@@ -30,9 +30,12 @@
       "game_id": "849811",
       "home": "Los Angeles Dodgers",
       "kickoff": "2026-10-15T00:00:00+00:00",
-      "latest_saved_decision": null,
+      "latest_saved_decision": {
+        "decision": "already_enrolled",
+        "game_id": "849811"
+      },
       "lead_hours": 22.76505797833333,
-      "pregame_schedule_observations_in_window": 9,
+      "pregame_schedule_observations_in_window": 11,
       "recorded_at": "2026-10-14T01:14:05.791278+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -80,7 +83,7 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "775b57166c0c03f39c3250839acc5279b52f60934289d17183cc4883df8ccf7c",
+  "input_digest": "ccdb5d3b75f9ca1005834534eefe9e32e4433667308b2a4f012c351bec4ec65c",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -109,9 +112,24 @@
       "to": "2026-10-13T00:41:35.771663+00:00"
     }
   ],
-  "latest_capture": "20261014T153253366286Z",
-  "latest_enrollment_decisions": [],
-  "latest_official_schedule_observed_at": "2026-10-14T15:32:55.159429+00:00",
+  "latest_capture": "20261014T155317410949Z",
+  "latest_enrollment_decisions": [
+    {
+      "decision": "already_enrolled",
+      "game_id": "849811"
+    },
+    {
+      "checked_at": "2026-10-14T15:53:19.628691+00:00",
+      "decision": "outside_24h_window",
+      "game_id": "849818"
+    },
+    {
+      "checked_at": "2026-10-14T15:53:19.628727+00:00",
+      "decision": "outside_24h_window",
+      "game_id": "849810"
+    }
+  ],
+  "latest_official_schedule_observed_at": "2026-10-14T15:53:19.585383+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [
     {
