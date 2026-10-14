@@ -31,3 +31,6 @@ Frozen experimental v2 compared with frozen v1 and market odds observed before k
 Probabilities include a small tie allowance. These picks are experimental model outputs, not wagering recommendations. Source timing and scheduling delays can leave coverage gaps; missed games are logged rather than backfilled after kickoff.
 
 [Machine-readable summary](summary.json) · [Predictions](predictions) · [Result records](results) · [Source captures](captures)
+
+
+[Full benchmark review, calibration and uncertainty](REVIEW.md)

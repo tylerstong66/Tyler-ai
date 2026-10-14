@@ -40,3 +40,6 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | DAL at COL | Oct 14 08:30 PM | COL | 53.9% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
+
+
+[Full benchmark review, calibration and uncertainty](REVIEW.md)
