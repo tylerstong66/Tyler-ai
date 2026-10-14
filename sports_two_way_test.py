@@ -217,6 +217,7 @@ def report(root,sport):
         side='home' if pred['model']['home']>=.5 else 'away';date=b.utc(pred['kickoff']).astimezone(ZoneInfo('America/New_York')).strftime('%b %d %I:%M %p')
         lines.append(f"| {pred['away']} at {pred['home']} | {date} | {pred[side]} | {pred['model'][side]:.1%} |")
     lines+=['','All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.','']
+    lines+=['', '[Full benchmark review, calibration and uncertainty](REVIEW.md)', '']
     (root/'RESULTS.md').write_text('\n'.join(lines));return summary
 
 

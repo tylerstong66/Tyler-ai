@@ -265,6 +265,7 @@ def report(root):
         eastern=lambda x:b.utc(x).astimezone(ZoneInfo('America/New_York')).strftime('%b %d %I:%M %p')
         lines.append(f"| {pred['away']} at {pred['home']} | {eastern(pred['kickoff'])} | {pred[chosen]} | {pred['v2'][chosen]:.1%} | {eastern(pred['generated_at'])} |")
     lines+=['','Probabilities include a small tie allowance. These picks are experimental model outputs, not wagering recommendations. Source timing and scheduling delays can leave coverage gaps; missed games are logged rather than backfilled after kickoff.','', '[Machine-readable summary](summary.json) · [Predictions](predictions) · [Result records](results) · [Source captures](captures)','']
+    lines+=['', '[Full benchmark review, calibration and uncertainty](REVIEW.md)', '']
     (root/'RESULTS.md').write_text('\n'.join(lines))
     return value
 

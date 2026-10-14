@@ -2,7 +2,7 @@ name: Sports prospective paper tests
 on:
   push:
     branches: ['main']
-    paths: ['sports_prospective_test.py', 'sports_two_way_test.py', '.github/workflows/nfl_prospective_paper.yml']
+    paths: ['sports_prospective_test.py', 'sports_two_way_test.py', 'sports_benchmark_review.py', '.github/workflows/nfl_prospective_paper.yml']
   schedule:
     - cron: '15 * * * *'
   workflow_dispatch:
@@ -28,6 +28,9 @@ jobs:
       - name: Capture all eligible NHL and MLB games and verify finals
         if: always()
         run: python sports_two_way_test.py
+      - name: Review saved NFL, NHL and MLB benchmark results
+        if: always()
+        run: python sports_benchmark_review.py
       - name: Preserve audit data even when upstream sources fail
         if: always()
         run: |
