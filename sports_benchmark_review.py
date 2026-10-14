@@ -392,7 +392,7 @@ def run(base=Path('.')):
         else:
             paired = next(iter(data['paired_market'].values()))['games']
             lines.append(f"| {sport} | {data['settled']} | {data['recorded']} | {data['pending']} | {paired} | {data['review_status']} | [Review]({links[sport]}) |")
-    lines += ['', 'Each sport is a separate prospective cohort. Counts are games, not the number of model scores. These cohorts are not pooled or described as unique games across cohorts.', '', LIMITATION, '']
+    lines += ['', '[Forecast and odds coverage audit](COVERAGE_ALL.md)', '', 'Each sport is a separate prospective cohort. Counts are games, not the number of model scores. These cohorts are not pooled or described as unique games across cohorts.', '', LIMITATION, '']
     (base/'benchmarks/two_way_prospective/REVIEW_ALL.md').write_text('\n'.join(lines))
     return index
 

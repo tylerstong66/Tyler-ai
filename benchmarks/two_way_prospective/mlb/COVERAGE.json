@@ -1,0 +1,188 @@
+{
+  "NO_BET": true,
+  "actual_wagers": 0,
+  "as_of_evidence_at": "2026-10-14T15:32:55.226923+00:00",
+  "capture_count": 15,
+  "cohort_started_at": "2026-10-11T15:59:30.281973+00:00",
+  "completion_note": "Only manifests without an explicit incomplete state are audited; legacy manifests are retained.",
+  "decisive_market_paired": 2,
+  "enrollment_priced": 3,
+  "followup_quotes_separate_from_original_metrics": [],
+  "games": [
+    {
+      "away": "Los Angeles Dodgers",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-10-11T16:01:40.323980+00:00",
+      "game_id": "849809",
+      "home": "Milwaukee Brewers",
+      "kickoff": "2026-10-12T00:00:00+00:00",
+      "latest_saved_decision": null,
+      "lead_hours": 7.97023246888889,
+      "pregame_schedule_observations_in_window": 5,
+      "recorded_at": "2026-10-11T16:01:47.163112+00:00",
+      "started_by_as_of": true,
+      "status": "enrolled"
+    },
+    {
+      "away": "Milwaukee Brewers",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-10-14T01:14:05.586733+00:00",
+      "game_id": "849811",
+      "home": "Los Angeles Dodgers",
+      "kickoff": "2026-10-15T00:00:00+00:00",
+      "latest_saved_decision": null,
+      "lead_hours": 22.76505797833333,
+      "pregame_schedule_observations_in_window": 9,
+      "recorded_at": "2026-10-14T01:14:05.791278+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
+      "away": "Los Angeles Dodgers",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-10-12T00:32:41.670442+00:00",
+      "game_id": "849812",
+      "home": "Milwaukee Brewers",
+      "kickoff": "2026-10-12T21:00:00+00:00",
+      "latest_saved_decision": null,
+      "lead_hours": 20.454969808333335,
+      "pregame_schedule_observations_in_window": 5,
+      "recorded_at": "2026-10-12T00:32:42.108690+00:00",
+      "started_by_as_of": true,
+      "status": "enrolled"
+    },
+    {
+      "away": "Cleveland Guardians",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-10-13T00:41:39.719048+00:00",
+      "game_id": "849813",
+      "home": "Tampa Bay Rays",
+      "kickoff": "2026-10-14T00:00:00+00:00",
+      "latest_saved_decision": null,
+      "lead_hours": 23.30558842055556,
+      "pregame_schedule_observations_in_window": 7,
+      "recorded_at": "2026-10-13T00:41:39.881686+00:00",
+      "started_by_as_of": true,
+      "status": "enrolled"
+    },
+    {
+      "away": "Cleveland Guardians",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-10-12T00:32:41.670442+00:00",
+      "game_id": "849820",
+      "home": "Tampa Bay Rays",
+      "kickoff": "2026-10-13T00:00:00+00:00",
+      "latest_saved_decision": null,
+      "lead_hours": 23.454962712222223,
+      "pregame_schedule_observations_in_window": 5,
+      "recorded_at": "2026-10-12T00:32:42.134236+00:00",
+      "started_by_as_of": true,
+      "status": "enrolled"
+    }
+  ],
+  "input_digest": "775b57166c0c03f39c3250839acc5279b52f60934289d17183cc4883df8ccf7c",
+  "input_integrity": "verified",
+  "largest_capture_intervals": [
+    {
+      "from": "2026-10-12T07:21:47.631288+00:00",
+      "hours": 10.555993372777777,
+      "to": "2026-10-12T17:55:09.207430+00:00"
+    },
+    {
+      "from": "2026-10-13T07:43:07.278901+00:00",
+      "hours": 8.274935418611111,
+      "to": "2026-10-13T15:59:37.046408+00:00"
+    },
+    {
+      "from": "2026-10-13T00:41:35.771663+00:00",
+      "hours": 7.025418677222222,
+      "to": "2026-10-13T07:43:07.278901+00:00"
+    },
+    {
+      "from": "2026-10-12T00:32:40.669978+00:00",
+      "hours": 6.818600363888889,
+      "to": "2026-10-12T07:21:47.631288+00:00"
+    },
+    {
+      "from": "2026-10-12T17:55:09.207430+00:00",
+      "hours": 6.774045620277778,
+      "to": "2026-10-13T00:41:35.771663+00:00"
+    }
+  ],
+  "latest_capture": "20261014T153253366286Z",
+  "latest_enrollment_decisions": [],
+  "latest_official_schedule_observed_at": "2026-10-14T15:32:55.159429+00:00",
+  "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
+  "market_gaps": [
+    {
+      "away": "LAD",
+      "enrollment_diagnosis": {
+        "status": "no_usable_pair_in_reduced_snapshot_raw_schema_unavailable"
+      },
+      "forecast_recorded_at": "2026-10-12T00:32:42.108690+00:00",
+      "game_id": "849812",
+      "home": "MIL",
+      "kickoff": "2026-10-12T21:00:00+00:00",
+      "later_archived_pregame_quote": {
+        "market": {
+          "away_moneyline": -136,
+          "conditional_home_probability": 0.44894232232536907,
+          "home_moneyline": 113,
+          "provider": "DraftKings"
+        },
+        "observed_at": "2026-10-12T07:21:49.547508+00:00",
+        "source_snapshot": {
+          "path": "benchmarks/two_way_prospective/mlb/snapshots/8e86c6c2b43af82a5a3c7e3210c8991f7413588fc8cebff2f779787405184cf7.json",
+          "response_sha256": "11a24def496b0e5f21b11239aaaaa71d111c297727bd82e16d003b7e713edc6b",
+          "retrieved_at": "2026-10-12T07:21:49.547508+00:00",
+          "sha256": "8e86c6c2b43af82a5a3c7e3210c8991f7413588fc8cebff2f779787405184cf7",
+          "source_url": "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20261012"
+        },
+        "usage": "historical_evidence_only_not_backfilled"
+      },
+      "settled": true
+    },
+    {
+      "away": "CLE",
+      "enrollment_diagnosis": {
+        "status": "no_usable_pair_in_reduced_snapshot_raw_schema_unavailable"
+      },
+      "forecast_recorded_at": "2026-10-13T00:41:39.881686+00:00",
+      "game_id": "849813",
+      "home": "TB",
+      "kickoff": "2026-10-14T00:00:00+00:00",
+      "later_archived_pregame_quote": {
+        "market": {
+          "away_moneyline": 119,
+          "conditional_home_probability": 0.5630832299476779,
+          "home_moneyline": -143,
+          "provider": "DraftKings"
+        },
+        "observed_at": "2026-10-13T07:43:09.630071+00:00",
+        "source_snapshot": {
+          "path": "benchmarks/two_way_prospective/mlb/snapshots/48773e281c1c683565a093ba43311196913e46d2fb7ec63fbc6171299095fbfe.json",
+          "response_sha256": "561609d48540410122ab5b4b98d1877496dea59bddef2944ddc27c83edb3c68a",
+          "retrieved_at": "2026-10-13T07:43:09.630071+00:00",
+          "sha256": "48773e281c1c683565a093ba43311196913e46d2fb7ec63fbc6171299095fbfe",
+          "source_url": "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20261013"
+        },
+        "usage": "historical_evidence_only_not_backfilled"
+      },
+      "settled": true
+    }
+  ],
+  "minimum_forecast_lead_hours": 7.97023246888889,
+  "observed_missing_started_games": [],
+  "pending": 1,
+  "report_version": "prospective-coverage-v1",
+  "saved": 5,
+  "saved_collector_errors": [],
+  "saved_exclusions": [],
+  "saved_failed_attempts": [],
+  "settled": 4,
+  "settled_enrollment_priced": 2,
+  "settled_ties_with_prices": 0,
+  "sport": "MLB",
+  "started_schedule_games_enrolled": 4,
+  "started_schedule_games_in_scope": 4
+}

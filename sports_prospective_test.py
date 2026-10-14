@@ -13,6 +13,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 import sports_historical_benchmark as b
 import sports_efficiency_candidate as c
+import sports_market_evidence as m
 
 ROOT = Path('benchmarks/nfl_prospective_v2')
 FIELDS = ['game_id','season','week','game_type','gameday','gametime','home_team','away_team','location','home_score','away_score','home_moneyline','away_moneyline']
@@ -88,14 +89,8 @@ def normalized_events(data):
         sides = {x['homeAway']:x for x in co['competitors']}
         alias = lambda t: {'WSH':'WAS','LAR':'LA'}.get(t,t)
         home, away = [alias(sides[s]['team']['abbreviation']) for s in ('home','away')]
-        odds = []
-        for o in co.get('odds',[]):
-            ml = o.get('moneyline',{})
-            h, a = [ml.get(s,{}).get('close',{}).get('odds') for s in ('home','away')]
-            # "close" is ESPN's current quote slot, not a verified closing line.
-            if h is not None and a is not None:
-                odds.append({'provider':o.get('provider',{}).get('name'),'home_moneyline':b.price(str(h)),'away_moneyline':b.price(str(a)), 'quote_kind':'observed_current_quote_not_verified_closing_line'})
-        events.append({'event_id':e['id'],'kickoff':b.utc(e['date']).isoformat(),'home':home,'away':away,'state':e['status']['type']['state'],'completed':e['status']['type'].get('completed',False),'home_score':int(sides['home'].get('score',0)),'away_score':int(sides['away'].get('score',0)),'neutral':co.get('neutralSite'), 'odds':odds})
+        odds, diagnostics = m.parse_odds(co.get('odds', []))
+        events.append({'event_id':e['id'],'kickoff':b.utc(e['date']).isoformat(),'home':home,'away':away,'state':e['status']['type']['state'],'completed':e['status']['type'].get('completed',False),'home_score':int(sides['home'].get('score',0)),'away_score':int(sides['away'].get('score',0)),'neutral':co.get('neutralSite'), 'odds':odds, 'odds_diagnostics':diagnostics})
     return events
 
 
@@ -178,15 +173,18 @@ def binary_market(odds):
 
 def forecast(root, capture, history, stats, targets, events, v2, v1, availability_data):
     folder=root/'predictions';folder.mkdir(parents=True,exist_ok=True)
-    exclusions=[];new=[]
+    exclusions=[];new=[];decisions=[]
     count=len(list(folder.glob('*.json')))
     for g in sorted(targets,key=lambda g:(g.kickoff,g.identifier)):
         path=folder/(g.identifier+'.json')
-        if path.exists():continue
+        if path.exists():
+            decisions.append({'game_id':g.identifier,'decision':'already_enrolled'});continue
         generated=now()
         if g.kickoff <= generated:
-            exclusions.append({'game_id':g.identifier,'reason':'already_started'});continue
-        if count>=100:break
+            exclusions.append({'game_id':g.identifier,'reason':'already_started'})
+            decisions.append({'game_id':g.identifier,'decision':'already_started','checked_at':generated.isoformat()});continue
+        if count>=100:
+            decisions.append({'game_id':g.identifier,'decision':'frozen_100_forecast_cap','checked_at':generated.isoformat()});continue
         try:
             e=match_event(g,events)
             if e['state']!='pre' or e['completed']:raise ValueError('ESPN does not confirm scheduled/unstarted')
@@ -196,7 +194,7 @@ def forecast(root, capture, history, stats, targets, events, v2, v1, availabilit
             # Metadata and both models are committed as ONE immutable artifact.
             base=b.probabilities(v1['weights'],{'x':row['x'][:5]},v1['tie_probability'])
             market=binary_market(e['odds'])
-            payload={'game_id':g.identifier,'event_id':e['event_id'],'home':g.home,'away':g.away,'season':g.season,'week':g.week,'kickoff':g.kickoff.isoformat(),'generated_at':generated.isoformat(),'cutoff':generated.isoformat(),'v2_model_sha256':b.sha256(b.canonical(v2)),'v1_model_sha256':b.sha256(b.canonical(v1)),'features':row['x'],'v2':b.probabilities(v2['weights'],row,v2['tie_probability']),'v1':base,'market':market,'market_observed_at':next(x['retrieved_at'] for x in capture.evidence if 'scoreboard' in x['source_url']),'source_snapshots':capture.evidence,'availability':availability_data.get(g.identifier,{'coverage':'unknown','observations':[],'injury_effect_enabled':False}),'prior_results_used':row['prior_results_used'],'latest_result_available_at':row['latest_result_available_at'],'efficiency_prior_games':row['efficiency_prior_games'],'NO_BET':True,'actual_wagers':0}
+            payload={'game_id':g.identifier,'event_id':e['event_id'],'home':g.home,'away':g.away,'season':g.season,'week':g.week,'kickoff':g.kickoff.isoformat(),'generated_at':generated.isoformat(),'cutoff':generated.isoformat(),'v2_model_sha256':b.sha256(b.canonical(v2)),'v1_model_sha256':b.sha256(b.canonical(v1)),'features':row['x'],'v2':b.probabilities(v2['weights'],row,v2['tie_probability']),'v1':base,'market':market,'market_observed_at':e.get('market_observed_at') or next(x['retrieved_at'] for x in capture.evidence if 'scoreboard' in x['source_url']),'source_snapshots':capture.evidence,'availability':availability_data.get(g.identifier,{'coverage':'unknown','observations':[],'injury_effect_enabled':False}),'prior_results_used':row['prior_results_used'],'latest_result_available_at':row['latest_result_available_at'],'efficiency_prior_games':row['efficiency_prior_games'],'NO_BET':True,'actual_wagers':0}
             if generated<b.utc(v2['frozen_at']):raise ValueError('Model not frozen')
             if any(b.utc(s['retrieved_at'])>generated for s in capture.evidence):raise ValueError('Source retrieved after generation')
             recorded=now()
@@ -204,8 +202,11 @@ def forecast(root, capture, history, stats, targets, events, v2, v1, availabilit
             payload['recorded_at']=recorded.isoformat()
             payload['sha256']=b.sha256(b.canonical(payload))
             write_json(path,payload,exclusive=True);new.append(g.identifier);count+=1
-        except ValueError as error:exclusions.append({'game_id':g.identifier,'reason':str(error)})
-    write_json(capture.folder/'enrollment.json',{'new_predictions':new,'excluded':exclusions})
+            decisions.append({'game_id':g.identifier,'decision':'enrolled','checked_at':generated.isoformat(),'priced':market is not None})
+        except ValueError as error:
+            exclusions.append({'game_id':g.identifier,'reason':str(error)})
+            decisions.append({'game_id':g.identifier,'decision':'excluded','reason':str(error),'checked_at':generated.isoformat()})
+    write_json(capture.folder/'enrollment.json',{'new_predictions':new,'excluded':exclusions,'decisions':decisions})
     return new
 
 
@@ -315,7 +316,9 @@ def run(root=ROOT,source_cache=None):
     events=[]
     for day in dates:
         raw,e=capture.get(f'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates={day}')
-        normalized=normalized_events(json.loads(raw));events.extend(normalized);capture.retain('espn_'+day+'.json',normalized,e)
+        normalized=normalized_events(json.loads(raw))
+        for event in normalized:event['market_observed_at']=e['retrieved_at']
+        events.extend(normalized);capture.retain('espn_'+day+'.json',normalized,e)
     availability_data={}
     for week in sorted({g.week for g in targets if g.kickoff>now()}):
         # URL format may change: report failure stays explicit unknown evidence.
@@ -334,9 +337,11 @@ def run(root=ROOT,source_cache=None):
         new=[]
         write_json(capture.folder/'enrollment.json',{'new_predictions':[],'excluded':[{'game_id':g.identifier,'reason':'incomplete_eligible_stats_history'} for g in targets if g.kickoff>now()]})
     else:new=forecast(root,capture,historical,stats,targets,events,v2,v1,availability_data)
+    followups,quote_errors=m.collect_followups(root,capture,events,now)
     outcomes,errors=settle(root,capture,events,finals)
+    errors.extend(quote_errors)
     if forecast_error:errors.append(forecast_error)
-    write_json(capture.folder/'manifest.json',{'sources':capture.evidence,'new_predictions':new,'new_results':outcomes,'errors':errors})
+    write_json(capture.folder/'manifest.json',{'sources':capture.evidence,'new_predictions':new,'new_results':outcomes,'errors':errors,'new_market_followups':followups,'collection_completed':True})
     summary=report(root)
     print(json.dumps(summary,indent=2))
     return summary
