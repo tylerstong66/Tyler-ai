@@ -1,12 +1,12 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-10-15T19:08:22.326829+00:00",
-  "capture_count": 26,
+  "as_of_evidence_at": "2026-10-15T22:19:23.181558+00:00",
+  "capture_count": 27,
   "cohort_started_at": "2026-10-11T15:59:30.281973+00:00",
   "completion_note": "Only manifests without an explicit incomplete state are audited; legacy manifests are retained.",
-  "decisive_market_paired": 3,
-  "enrollment_priced": 5,
+  "decisive_market_paired": 4,
+  "enrollment_priced": 6,
   "followup_quotes_separate_from_original_metrics": [],
   "games": [
     {
@@ -35,7 +35,7 @@
         "game_id": "849810"
       },
       "lead_hours": 19.33145354138889,
-      "pregame_schedule_observations_in_window": 14,
+      "pregame_schedule_observations_in_window": 16,
       "recorded_at": "2026-10-15T04:40:06.767251+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -88,6 +88,25 @@
     {
       "away": "Tampa Bay Rays",
       "exclusion_reasons": [],
+      "first_observed_in_window": "2026-10-15T22:19:23.020395+00:00",
+      "game_id": "849817",
+      "home": "Cleveland Guardians",
+      "kickoff": "2026-10-16T22:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-10-15T22:19:23.185274+00:00",
+        "decision": "enrolled",
+        "game_id": "849817",
+        "priced": true
+      },
+      "lead_hours": 23.676880326944442,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-10-15T22:19:23.230823+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
+      "away": "Tampa Bay Rays",
+      "exclusion_reasons": [],
       "first_observed_in_window": "2026-10-14T17:11:21.909646+00:00",
       "game_id": "849818",
       "home": "Cleveland Guardians",
@@ -117,7 +136,7 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "11c457d3d6874947d34059f7f3c392833f4e094eefebd44c99432f0b13a81003",
+  "input_digest": "ea37a0b63e788c3030af726da1a2f0dcccc1b73b03b55441bbe6a97abbdd9483",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -146,8 +165,8 @@
       "to": "2026-10-13T00:41:35.771663+00:00"
     }
   ],
-  "latest_attempted_capture": "20261015T190819814924Z",
-  "latest_capture": "20261015T190819814924Z",
+  "latest_attempted_capture": "20261015T221920847439Z",
+  "latest_capture": "20261015T221920847439Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
@@ -158,17 +177,18 @@
       "game_id": "849810"
     },
     {
-      "checked_at": "2026-10-15T19:08:22.328519+00:00",
-      "decision": "outside_24h_window",
-      "game_id": "849817"
+      "checked_at": "2026-10-15T22:19:23.185274+00:00",
+      "decision": "enrolled",
+      "game_id": "849817",
+      "priced": true
     },
     {
-      "checked_at": "2026-10-15T19:08:22.328553+00:00",
+      "checked_at": "2026-10-15T22:19:23.231319+00:00",
       "decision": "outside_24h_window",
       "game_id": "849808"
     }
   ],
-  "latest_official_schedule_observed_at": "2026-10-15T19:08:22.246025+00:00",
+  "latest_official_schedule_observed_at": "2026-10-15T22:19:23.020395+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [
     {
@@ -232,7 +252,7 @@
   "observed_missing_started_games": [],
   "pending": 2,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-10-15T19:08:22.326829+00:00",
+    "as_of_evidence_at": "2026-10-15T22:19:23.181558+00:00",
     "games": [
       {
         "away": "Milwaukee Brewers",
@@ -242,25 +262,38 @@
         "home": "Los Angeles Dodgers",
         "issues": [],
         "kickoff": "2026-10-16T00:00:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-15T19:08:22.157361+00:00",
+        "latest_scoreboard_observed_at": "2026-10-15T22:19:22.925096+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "Tampa Bay Rays",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "849817",
+        "home": "Cleveland Guardians",
+        "issues": [],
+        "kickoff": "2026-10-16T22:00:00+00:00",
+        "latest_scoreboard_observed_at": "2026-10-15T22:19:23.143671+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "separate_followup_recorded": false
       }
     ],
     "limitation": "Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.",
-    "observed_games": 1,
-    "ready_games": 1,
+    "observed_games": 2,
+    "ready_games": 2,
     "status": "ready_as_of_snapshot",
     "window_hours": 24
   },
   "report_version": "prospective-coverage-v1",
-  "saved": 7,
+  "saved": 8,
   "saved_collector_errors": [],
   "saved_exclusions": [],
   "saved_failed_attempts": [],
-  "settled": 5,
-  "settled_enrollment_priced": 3,
+  "settled": 6,
+  "settled_enrollment_priced": 4,
   "settled_ties_with_prices": 0,
   "sport": "MLB",
   "started_schedule_games_enrolled": 6,
