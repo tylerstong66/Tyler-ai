@@ -30,7 +30,7 @@ def recent_pitcher_usage(upcoming_game_id, pitching_side, candidate_ids=(), *,
     if isinstance(lookback_days, bool) or not isinstance(lookback_days, int) or not 1 <= lookback_days <= 7:
         raise ValueError("Lookback days must be between 1 and 7.")
     reader = reader or OfficialMlbReader()
-    upcoming, _ = reader.load("game/" + str(upcoming_game_id) + "/feed/live")
+    upcoming, _ = reader.load("game/" + str(upcoming_game_id) + "/feed/live", api_version="v1.1")
     gd = upcoming.get("gameData", {})
     if upcoming.get("gamePk") != upcoming_game_id or gd.get("status", {}).get("abstractGameState") != "Preview":
         raise ValueError("Upcoming official MLB game identity/pregame status not verified.")
@@ -78,7 +78,7 @@ def recent_pitcher_usage(upcoming_game_id, pitching_side, candidate_ids=(), *,
         if status.get("abstractGameState") != "Final" or status.get("detailedState") != "Final":
             failed_games.append({"game_id": pk, "reason": "not_verified_final"})
             continue
-        feed, receipt = reader.load("game/" + str(pk) + "/feed/live")
+        feed, receipt = reader.load("game/" + str(pk) + "/feed/live", api_version="v1.1")
         fd = feed.get("gameData", {})
         if (feed.get("gamePk") != pk or
                 fd.get("teams", {}).get(match_side, {}).get("id") != team_id or
