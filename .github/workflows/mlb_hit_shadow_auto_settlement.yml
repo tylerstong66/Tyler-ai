@@ -1,0 +1,43 @@
+name: MLB hitter shadow official final collection
+on:
+  schedule:
+    - cron: '17 */3 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: mlb-hitter-shadow-official-final-collection
+  cancel-in-progress: false
+jobs:
+  settle-after-final:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Verify settlement remains separate and non-wagering
+        run: python -m unittest -v test_sports_mlb_prop_prospective test_sports_mlb_prop_settlement_job
+      - name: Read public official MLB finals and create new settlement files only
+        run: python sports_mlb_prop_settlement_job.py --root benchmarks/mlb_hitter_props_shadow_v1
+      - name: Commit only newly created official final settlement files
+        shell: bash
+        run: |
+          if [ ! -d benchmarks/mlb_hitter_props_shadow_v1/settlements ]; then
+            echo "No completed official finals to record."
+            exit 0
+          fi
+          git add -A benchmarks/mlb_hitter_props_shadow_v1/settlements/
+          if git diff --cached --quiet; then
+            echo "No new final results."
+            exit 0
+          fi
+          git diff --cached --name-only | grep -v '^benchmarks/mlb_hitter_props_shadow_v1/settlements/' && exit 1 || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Settle officially final MLB hitter conditional shadow trials [no bets]"
+          git push origin HEAD:main
