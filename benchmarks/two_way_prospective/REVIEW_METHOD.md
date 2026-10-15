@@ -71,4 +71,12 @@ the milestone unverifiable (`review_due=null`), not an inferred zero.
 This reporting flag does not alter existing enrollment rules, authorize
 retraining, stop the monitor, or establish profitability.
 
+The separate [first-100-enrolled checkpoint](CHECKPOINT_METHOD.md) waits for
+the first 100 forecasts ordered by enrollment time to settle, then preserves
+its exact inputs and report. Later games do not replace delayed games or
+silently change that review window. Checkpoint integrity errors remain visible
+and fail the command without erasing verified cumulative metrics or reports
+for other leagues. Neither checkpoint completion nor this cumulative flag
+authorizes promotion or wagers.
+
 **NO BET — actual wagers $0.**

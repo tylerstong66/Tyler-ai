@@ -8,7 +8,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-VERSION = 'prospective-review-v1'
+VERSION = 'prospective-review-v2'
+CHECKPOINT_VERSION = 'first-100-enrolled-v1'
 MILESTONE = 100
 BOOTSTRAP_DRAWS = 2000
 MIN_BLOCKS = 5
@@ -265,8 +266,8 @@ def collection_evidence(root, sport):
                                'Manifest completion alone does not imply absence of per-game errors.'}
 
 
-def review(root, sport, models):
-    predictions, rows = load_rows(root, sport, models)
+def summarize(root, sport, models, predictions, rows):
+    """Score an explicit forecast/result window using the same cumulative rules."""
     decisive = [r for r in rows if r['outcome'] != 'tie']
     paired = [r for r in decisive if 'market' in r['binary']]
     model_calibration = {model: calibration([(r['probabilities'][model]['conditional_home'], r['outcome'] == 'home') for r in decisive]) for model in models}
@@ -277,7 +278,7 @@ def review(root, sport, models):
             'review_milestone': MILESTONE, 'review_due': len(rows) >= MILESTONE,
             'review_status': 'ready_for_human_review' if len(rows) >= MILESTONE else 'collecting',
             'latest_result_verified_at': max((r['verified_at'] for r in rows), key=utc, default=None),
-            'input_sha256': digest({'predictions': predictions, 'results': [json.loads(p.read_text()) for p in sorted((root/'results').glob('*.json'))]}),
+            'input_sha256': window_digest(root, predictions),
             'all_settled_three_outcome': subset_metrics(rows, models, 'full') if sport == 'NFL' else None,
             'all_decisive': subset_metrics(decisive, models, 'binary'),
             'paired_market': subset_metrics(paired, (*models, 'market'), 'binary'),
@@ -289,6 +290,63 @@ def review(root, sport, models):
             'brier_scale': 'sum over outcomes; two-way Brier = 2*(p-y)^2, range 0 to 2',
             'probability_policy': 'Saved pregame probabilities only; NFL binary metrics condition on no tie.',
             'limitation': LIMITATION, 'NO_BET': True, 'actual_wagers': 0}
+
+
+def window_digest(root, predictions):
+    results = [json.loads(p.read_text()) for p in sorted((root/'results').glob('*.json')) if p.stem in predictions]
+    return digest({'predictions':predictions, 'results':results})
+
+
+def review(root, sport, models):
+    predictions, rows = load_rows(root, sport, models)
+    return summarize(root, sport, models, predictions, rows)
+
+
+def checkpoint(root, sport, models):
+    """Preserve derived reports only; never write forecasts, results or model files."""
+    predictions, rows = load_rows(root, sport, models)
+    identifiers = sorted(predictions, key=lambda key:(utc(predictions[key]['recorded_at']),key))[:MILESTONE]
+    selected = {key:predictions[key] for key in identifiers}
+    selected_rows = [row for row in rows if row['game_id'] in selected]
+    folder = root/'checkpoints/first_100_enrolled'
+    json_path, md_path = folder/'REVIEW.json', folder/'REVIEW.md'
+    state = {'version':CHECKPOINT_VERSION,'target':MILESTONE,'selected_forecasts':len(selected),
+             'settled_selected':len(selected_rows),'pending_selected':len(selected)-len(selected_rows),
+             'additional_forecasts_needed':MILESTONE-len(selected),'promotion_allowed':False,
+             'selection_rule':'First 100 by recorded_at in UTC, then game_id; never by outcome, price or settlement order.'}
+    # Check saved snapshots before testing current counts, so deletions cannot turn
+    # a previously completed window into an apparently harmless collecting state.
+    if json_path.exists() or md_path.exists():
+        if not json_path.is_file() or not md_path.is_file():
+            raise IntegrityError('Incomplete saved first-100 checkpoint; preserve files for review')
+        saved = json.loads(json_path.read_text())
+        if not isinstance(saved,dict):
+            raise IntegrityError('Malformed saved first-100 checkpoint')
+        expected_digest = digest({k:v for k,v in saved.items() if k!='checkpoint_sha256'})
+        if (saved.get('checkpoint_sha256') != expected_digest or
+            saved.get('markdown_sha256') != hashlib.sha256(md_path.read_bytes()).hexdigest() or
+            saved.get('checkpoint_version') != CHECKPOINT_VERSION or saved.get('sport') != sport or
+            saved.get('checkpoint_game_ids') != identifiers or len(selected_rows) != MILESTONE or
+            saved.get('input_sha256') != window_digest(root,selected)):
+            raise IntegrityError('Saved first-100 checkpoint or its selected inputs changed; no overwrite permitted')
+        return {**state,'status':'preserved','report_path':'checkpoints/first_100_enrolled/REVIEW.md',
+                'checkpoint_sha256':saved['checkpoint_sha256']}
+    if len(selected) < MILESTONE:
+        return {**state,'status':'collecting_forecasts'}
+    if len(selected_rows) < MILESTONE:
+        return {**state,'status':'awaiting_selected_results'}
+    snapshot = summarize(root,sport,models,selected,selected_rows)
+    snapshot.update(report_version=VERSION,checkpoint_version=CHECKPOINT_VERSION,checkpoint_game_ids=identifiers,
+                    checkpoint_selection_rule=state['selection_rule'],promotion_allowed=False,
+                    checkpoint_note='Fixed first-enrollment window added after early results were observed; not a preregistered confirmatory test. Collection continues and this report never authorizes promotion or wagers.')
+    markdown = ('# Saved first-100-enrolled checkpoint\n\n'+snapshot['checkpoint_note']+'\n\n'+
+                snapshot['checkpoint_selection_rule']+'\n\n'+render(snapshot))
+    snapshot['markdown_sha256'] = hashlib.sha256(markdown.encode()).hexdigest()
+    snapshot['checkpoint_sha256'] = digest(snapshot)
+    write(json_path,snapshot)
+    md_path.write_text(markdown)
+    return {**state,'status':'preserved','report_path':'checkpoints/first_100_enrolled/REVIEW.md',
+            'checkpoint_sha256':snapshot['checkpoint_sha256']}
 
 
 def fmt(value, percent=False):
@@ -305,6 +363,17 @@ def render(data):
               '', 'Brier is the sum over outcomes (range 0–2); lower Brier and log loss are better.',
               'Accuracy uses the highest-probability outcome. Two-way ties at 50% select home; NFL three-way ties in probability use home, away, tie order.',
               '', f"Uncertainty unit: {data['block_unit']}. CIs require at least {MIN_BLOCKS} blocks."]
+    fixed = data.get('first_100_checkpoint')
+    if fixed:
+        lines += ['', '## First-100-enrolled checkpoint', '',
+                  f"Status: **{fixed['status']}**. This is separate from the cumulative 100-settlement flag."]
+        if fixed['status'] == 'integrity_error':
+            lines += ['Saved checkpoint integrity error: '+fixed['error']+'. Checkpoint metrics withheld; saved files were not overwritten.']
+        else:
+            lines += [f"Selected: {fixed['selected_forecasts']} / {fixed['target']}; settled among selected: {fixed['settled_selected']}; pending among selected: {fixed['pending_selected']}.",
+                      fixed['selection_rule']]
+            if fixed.get('report_path'):
+                lines += [f"[Preserved checkpoint review]({fixed['report_path']}). Later games do not change this window."]
     sections = [('All settled games — three outcomes, including NFL ties', 'all_settled_three_outcome'),
                 ('All decisive games — conditional two-way scores', 'all_decisive'),
                 ('Same-game comparisons with saved market odds — decisive games only', 'paired_market')]
@@ -363,6 +432,10 @@ def run(base=Path('.')):
         root = base / folder
         try:
             data = review(root, sport, models)
+            try:
+                data['first_100_checkpoint'] = checkpoint(root,sport,models)
+            except (ValueError, KeyError, TypeError, OSError) as error:
+                data['first_100_checkpoint'] = {'status':'integrity_error','error':str(error),'promotion_allowed':False}
         except (ValueError, KeyError, TypeError, OSError) as error:
             data = {'sport': sport, 'input_integrity': 'error', 'error': str(error), 'review_due': None,
                     'NO_BET': True, 'actual_wagers': 0}
@@ -377,6 +450,7 @@ def run(base=Path('.')):
         item['review_path'] = COHORTS[data['sport']][0]+'/REVIEW.json'
         if data['input_integrity'] == 'verified':
             item['market_paired_games'] = next(iter(data['paired_market'].values()))['games']
+            item['first_100_checkpoint'] = data['first_100_checkpoint']
         index_rows.append(item)
     index = {'report_version': VERSION, 'leagues': index_rows, 'NO_BET': True, 'actual_wagers': 0,
              'limitation': LIMITATION}
@@ -392,7 +466,16 @@ def run(base=Path('.')):
         else:
             paired = next(iter(data['paired_market'].values()))['games']
             lines.append(f"| {sport} | {data['settled']} | {data['recorded']} | {data['pending']} | {paired} | {data['review_status']} | [Review]({links[sport]}) |")
-    lines += ['', '[Forecast and odds coverage audit](COVERAGE_ALL.md)', '', 'Each sport is a separate prospective cohort. Counts are games, not the number of model scores. These cohorts are not pooled or described as unique games across cohorts.', '', LIMITATION, '']
+    lines += ['', '## First-100-enrolled checkpoints', '',
+              '| Sport | Status | Selected | Settled in window | Pending in window |',
+              '|---|---|---:|---:|---:|']
+    for data in reports:
+        fixed=data.get('first_100_checkpoint',{})
+        lines.append(f"| {data['sport']} | {fixed.get('status','unavailable')} | {fixed.get('selected_forecasts','Unavailable')} | {fixed.get('settled_selected','Unavailable')} | {fixed.get('pending_selected','Unavailable')} |")
+    lines += ['', 'The fixed checkpoint waits for the first 100 enrolled forecasts to settle, even if later games finish sooner. '
+              'Its saved inputs and report are checked on later runs and never silently replaced. '
+              '[Checkpoint method](CHECKPOINT_METHOD.md). No automatic promotion or wagers.',
+              '', '[Forecast and odds coverage audit](COVERAGE_ALL.md)', '', 'Each sport is a separate prospective cohort. Counts are games, not the number of model scores. These cohorts are not pooled or described as unique games across cohorts.', '', LIMITATION, '']
     (base/'benchmarks/two_way_prospective/REVIEW_ALL.md').write_text('\n'.join(lines))
     return index
 
@@ -401,4 +484,6 @@ if __name__ == '__main__':
     result = run()
     print(json.dumps([{'sport': d['sport'], 'input_integrity': d['input_integrity'],
                        'settled': d.get('settled'), 'review_due': d['review_due']} for d in result['leagues']]))
-    raise SystemExit(0 if all(d['input_integrity'] == 'verified' for d in result['leagues']) else 1)
+    raise SystemExit(0 if all(d['input_integrity'] == 'verified' and
+                             d.get('first_100_checkpoint',{}).get('status') != 'integrity_error'
+                             for d in result['leagues']) else 1)

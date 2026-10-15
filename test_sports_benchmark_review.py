@@ -1,5 +1,7 @@
 import json
 import math
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -212,6 +214,121 @@ class ReviewTests(unittest.TestCase):
             self.assertIsNone(data['collection_completed'])
             self.assertEqual(data['excluded'][0]['game_id'], 'late')
             self.assertEqual(data['newer_saved_collection_failure']['error'], 'upstream unavailable')
+
+    def checkpoint(self, root, sport='NHL'):
+        return r.checkpoint(root,sport,r.COHORTS[sport][1])
+
+    def add_window(self, root, sport='NHL', count=100):
+        for i in range(count):
+            self.add_game(root,sport,identifier=f'{i:03d}',
+                          outcome='tie' if sport=='NFL' and i==0 else 'home',
+                          market=None if i==1 else .5)
+
+    def test_checkpoint_does_not_substitute_later_settlements_for_pending_window(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);self.add_window(root,count=101)
+            (root/'results/099.json').unlink()
+            cumulative=self.review(root)
+            self.assertEqual(cumulative['settled'],100);self.assertTrue(cumulative['review_due'])
+            fixed=self.checkpoint(root)
+            self.assertEqual(fixed['status'],'awaiting_selected_results')
+            self.assertEqual((fixed['selected_forecasts'],fixed['settled_selected'],fixed['pending_selected']),(100,99,1))
+            self.assertFalse((root/'checkpoints').exists())
+
+    def test_checkpoint_before_100_forecasts_cannot_create_completion_artifacts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);self.add_window(root,count=99)
+            fixed=self.checkpoint(root)
+            self.assertEqual(fixed['status'],'collecting_forecasts')
+            self.assertEqual(fixed['additional_forecasts_needed'],1)
+            self.assertEqual(fixed['settled_selected'],99)
+            self.assertFalse((root/'checkpoints').exists())
+
+    def test_complete_checkpoint_retains_ties_unpriced_games_and_original_bytes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);self.add_window(root,'NFL')
+            originals={str(p):p.read_bytes() for kind in ['predictions','results'] for p in (root/kind).glob('*.json')}
+            first=self.checkpoint(root,'NFL')
+            self.assertEqual(first['status'],'preserved')
+            folder=root/'checkpoints/first_100_enrolled'
+            before={p.name:p.read_bytes() for p in folder.iterdir()}
+            data=json.loads((folder/'REVIEW.json').read_text())
+            self.assertEqual(data['checkpoint_game_ids'],[f'{i:03d}' for i in range(100)])
+            self.assertEqual(data['all_settled_three_outcome']['v2']['games'],100)
+            self.assertEqual(data['all_decisive']['v2']['games'],99)
+            self.assertEqual(data['paired_market']['v2']['games'],98)
+            self.assertFalse(data['promotion_allowed']);self.assertTrue(data['NO_BET']);self.assertEqual(data['actual_wagers'],0)
+            self.assertEqual(originals,{path:Path(path).read_bytes() for path in originals})
+            self.add_game(root,'NFL',identifier='100',outcome='away')
+            r.write(root/'captures/20990101T000000Z/manifest.json',{'errors':['later transient source error']})
+            second=self.checkpoint(root,'NFL')
+            self.assertEqual(second,first)
+            self.assertEqual(before,{p.name:p.read_bytes() for p in folder.iterdir()})
+            self.assertEqual(self.review(root,'NFL')['settled'],101)
+
+    def test_checkpoint_uses_utc_enrollment_order_not_filename_or_kickoff(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);self.add_window(root,count=101)
+            path=root/'predictions/100.json';pred=json.loads(path.read_text())
+            # 07:59:59 -04:00 is earlier in UTC despite its smaller local hour.
+            pred['generated_at']='2026-10-11T07:59:58-04:00'
+            pred['recorded_at']='2026-10-11T07:59:59-04:00'
+            pred.pop('sha256');pred['sha256']=r.digest(pred);r.write(path,pred)
+            result_path=root/'results/100.json';result=json.loads(result_path.read_text())
+            result['prediction_sha256']=pred['sha256'];r.write(result_path,result)
+            self.checkpoint(root)
+            data=json.loads((root/'checkpoints/first_100_enrolled/REVIEW.json').read_text())
+            self.assertEqual(data['checkpoint_game_ids'][0],'100')
+            self.assertNotIn('099',data['checkpoint_game_ids'])
+
+    def test_saved_checkpoint_rejects_changed_inputs_selection_and_missing_records(self):
+        for change in ['outcome','earlier_enrollment','deleted_forecast_and_result']:
+            with self.subTest(change=change),tempfile.TemporaryDirectory() as tmp:
+                root=Path(tmp);self.add_window(root);self.checkpoint(root)
+                folder=root/'checkpoints/first_100_enrolled'
+                before={p.name:p.read_bytes() for p in folder.iterdir()}
+                if change=='outcome':self.add_game(root,identifier='000',outcome='away')
+                elif change=='earlier_enrollment':self.add_game(root,identifier='-1')
+                else:
+                    (root/'predictions/099.json').unlink();(root/'results/099.json').unlink()
+                with self.assertRaises(r.IntegrityError):self.checkpoint(root)
+                self.assertEqual(before,{p.name:p.read_bytes() for p in folder.iterdir()})
+
+    def test_checkpoint_corruption_never_rewrites_saved_reports(self):
+        for change in ['json','markdown','missing_markdown','malformed_json']:
+            with self.subTest(change=change),tempfile.TemporaryDirectory() as tmp:
+                root=Path(tmp);self.add_window(root);self.checkpoint(root)
+                folder=root/'checkpoints/first_100_enrolled'
+                if change=='json':
+                    path=folder/'REVIEW.json';data=json.loads(path.read_text());data['settled']=1;r.write(path,data)
+                elif change=='markdown':(folder/'REVIEW.md').write_text('changed')
+                elif change=='missing_markdown':(folder/'REVIEW.md').unlink()
+                else:(folder/'REVIEW.json').write_text('[]')
+                before={p.name:p.read_bytes() for p in folder.iterdir()}
+                with self.assertRaises(r.IntegrityError):self.checkpoint(root)
+                self.assertEqual(before,{p.name:p.read_bytes() for p in folder.iterdir()})
+
+    def test_checkpoint_failure_keeps_cumulative_metrics_and_other_leagues_visible(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            base=Path(tmp)
+            for sport,(folder,_) in r.COHORTS.items():
+                if sport=='NHL':self.add_window(base/folder)
+                else:self.add_game(base/folder,sport)
+            root=base/r.COHORTS['NHL'][0];self.checkpoint(root)
+            (root/'checkpoints/first_100_enrolled/REVIEW.md').write_text('corrupt')
+            index=r.run(base)
+            leagues={data['sport']:data for data in index['leagues']}
+            self.assertEqual(leagues['NHL']['first_100_checkpoint']['status'],'integrity_error')
+            self.assertEqual(leagues['NHL']['settled'],100)
+            self.assertEqual(leagues['NHL']['input_integrity'],'verified')
+            self.assertEqual(leagues['NFL']['settled'],1);self.assertEqual(leagues['MLB']['settled'],1)
+            markdown=(root/'REVIEW.md').read_text()
+            self.assertIn('Checkpoint metrics withheld',markdown)
+            self.assertIn('corrupt',(root/'checkpoints/first_100_enrolled/REVIEW.md').read_text())
+            command=subprocess.run([sys.executable,str(Path(r.__file__).resolve())],cwd=base,
+                                   text=True,capture_output=True,check=False)
+            self.assertEqual(command.returncode,1,command.stderr)
+            self.assertEqual({row['sport'] for row in json.loads(command.stdout)},{'NFL','NHL','MLB'})
 
 
 if __name__ == '__main__':unittest.main()
