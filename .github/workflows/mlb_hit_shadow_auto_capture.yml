@@ -28,14 +28,7 @@ jobs:
           if [ ! -d benchmarks/mlb_hitter_props_shadow_v1/predictions ]; then exit 0; fi
           git add -A benchmarks/mlb_hitter_props_shadow_v1/predictions/
           if git diff --cached --quiet; then exit 0; fi
-          python - <<'PY'
-          import subprocess
-          from sports_mlb_prop_batch_capture import ensure_publishable_before_events
-          p=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
-          prefix='benchmarks/mlb_hitter_props_shadow_v1/predictions/'
-          assert p and all(s.startswith(prefix) and s.endswith('.json') for s in p)
-          ensure_publishable_before_events([{'path':s} for s in p],safety_seconds=180)
-          PY
+          python sports_mlb_prop_publish_guard.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Freeze MLB hitter shadow pregame data [no bets]"
