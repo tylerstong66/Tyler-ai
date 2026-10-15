@@ -1,0 +1,49 @@
+name: MLB auto bullpen source audit (read only)
+on:
+  push:
+    branches: ['ops/tyler-render-smoke-20261015']
+    paths:
+      - .github/workflows/mlb_auto_bullpen_live_audit.yml
+permissions:
+  contents: read
+jobs:
+  public-source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read current reviewed main-branch research code
+        run: |
+          git fetch origin main
+          git checkout --detach origin/main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Inspect upcoming real matchup and automatically selected relievers
+        run: |
+          python - <<'PY'
+          from sports_mlb_name_lookup import resolve_named_pregame
+          from sports_mlb_auto_bullpen import auto_bullpen_matchup
+          resolved = resolve_named_pregame('2026-10-15', 'Andrew Vaughn',
+              team_name='Milwaukee Brewers', starter_name='Tyler Glasnow',
+              game_id=849810)
+          result = auto_bullpen_matchup(
+              resolved['game_id'],resolved['hitter_id'],resolved['hitter_side'],
+              auto_select=True)
+          d = result['auto_bullpen_discovery']
+          print('LIVE_GAME',result['game_id'],'HITTER',result['hitter']['name'],
+                'STARTER',result['probable_starter']['name'])
+          print('BULLPEN_CANDIDATES',[
+              {'name': p['pitcher_name'], 'relief_appearances':p['verified_relief_appearances'],
+               'pitches':p['pitches_thrown_in_relief']} for p in d['selection']])
+          print('COVERAGE', d['historical_game_coverage_complete'],
+                'FINAL_GAMES',d['verified_final_games'],
+                'INCOMPLETE_GAMES',len(d['incomplete_games']))
+          assert result['decision']=='RESEARCH ONLY - NO BET'
+          assert result['wager_executed'] is False
+          assert result['estimated_home_run_probability'] is None
+          assert result['estimated_relief_appearance_probability'] is None
+          assert result['reliever_ids_analyzed']==[p['pitcher_id'] for p in d['selection']]
+          print('LIVE_AUTO_BULLPEN_RESEARCH_PASS')
+          PY
