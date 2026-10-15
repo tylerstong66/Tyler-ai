@@ -35,6 +35,13 @@ def main():
         "stat_keys": sorted(set().union(
             *(set(x.get("stat", {})) for x in s.get("splits", []) if isinstance(x.get("stat"), dict))))[:45]
     } for s in groups]))
+    for group in groups:
+        print("SPLIT_META", group.get("type", {}).get("displayName"), json.dumps([
+            {"season": x.get("season"), "team": x.get("team"),
+             "opponent": x.get("opponent"), "gameType": x.get("gameType"),
+             "stat": {k: x.get("stat", {}).get(k) for k in
+                      ("plateAppearances", "atBats", "hits", "homeRuns")}}
+            for x in group.get("splits", [])][:8]))
     team = pull("teams/119/roster", {"rosterType": "active", "date": "2026-10-15"})
     print("roster count", len(team.get("roster", [])))
     if team.get("roster"):
@@ -51,7 +58,20 @@ def main():
     game_id = event.get("gamePk")
     print("schedule gamePk", game_id, "gameDate", event.get("gameDate"),
           "status", event.get("status", {}))
-    feed = pull("game/" + str(game_id) + "/feed/live")
+    feed = None
+    for version in ("v1", "v1.1"):
+        url = "https://statsapi.mlb.com/api/" + version + "/game/" + str(game_id) + "/feed/live"
+        response = requests.get(url, timeout=15, allow_redirects=False)
+        print("HISTORICAL_FEED", version, response.status_code, len(response.content))
+        if response.status_code == 200:
+            feed = response.json()
+            break
+    if feed is None:
+        fallback = pull("game/" + str(game_id) + "/boxscore")
+        print("FALLBACK_BOXSCORE_TOP", sorted(fallback.keys()),
+              "home player count", len(fallback.get("teams", {}).get("home", {}).get("players", {})))
+        print("AUDIT_PARTIAL - historic feed unavailable, boxscore fallback inspected")
+        return
     print("feed gamePk", feed.get("gamePk"),
           "game type", feed.get("gameData", {}).get("game", {}).get("type"),
           "status", feed.get("gameData", {}).get("status", {}))
