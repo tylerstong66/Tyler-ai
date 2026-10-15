@@ -1,0 +1,43 @@
+name: MLB contextual research live-data audit
+on:
+  push:
+    branches: ['ops/tyler-render-smoke-20261015']
+    paths:
+      - .github/workflows/mlb_contextual_live_audit.yml
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git fetch origin feature/mlb-hitter-season-context-v1
+          git checkout --detach origin/feature/mlb-hitter-season-context-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: |
+          python - <<'PY'
+          from sports_mlb_name_lookup import resolve_named_pregame
+          from sports_mlb_contextual import contextual_mlb_research
+          x=resolve_named_pregame("2026-10-15","Andrew Vaughn",
+             team_name="Milwaukee Brewers",starter_name="Tyler Glasnow",game_id=849810)
+          r=contextual_mlb_research(x["game_id"],x["hitter_id"],x["hitter_side"])
+          s=r["hitter_season_context"]
+          print("HITTER",r["hitter"]["name"],"STARTER",r["probable_starter"]["name"])
+          print("BATS",s["hitter"]["hand"],"THROWS",s["opposing_probable_starter"]["hand"])
+          print("SEASON_TOTALS",[{
+              "year":p["season"],"hits":p["hits"],"at_bats":p["ab"],
+              "home_runs":p["hr"],"pa":p["pa"],"aggregation":p["aggregation"]}
+              if p else None for p in s["season_statistics"]])
+          print("AUTO_RELIEF_NAMES",[p["pitcher_name"] for p in r["auto_bullpen_discovery"]["selection"]])
+          assert r["decision"]=="RESEARCH ONLY - NO BET"
+          assert r["estimated_hit_probability"] is None
+          assert r["estimated_home_run_probability"] is None
+          assert r["wager_executed"] is False
+          assert s["hitter"]["hand"] in ("R","L","S",None)
+          print("MLB_LIVE_CONTEXTUAL_RESEARCH_PASS")
+          PY
