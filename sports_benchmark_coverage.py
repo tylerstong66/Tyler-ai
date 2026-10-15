@@ -18,6 +18,58 @@ LIMITATION = ('Coverage is limited to retained official schedule snapshots since
               'remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.')
 
 
+def pregame_readiness(schedule, predictions, events, followups, as_of):
+    """Check the next 24h against only the latest audited capture's scoreboard.
+
+    Historical quotes cannot make a missing latest event look ready. This is
+    read-only snapshot evidence, not live availability or forecast enrollment.
+    """
+    rows = []
+    for identifier, item in sorted(schedule.items()):
+        game = item['game']; kickoff = r.utc(game['kickoff'])
+        if not as_of < kickoff <= as_of+timedelta(hours=24):
+            continue
+        pred = predictions.get(identifier); issues = []
+        if game.get('state') != 'pre': issues.append('official_game_not_pregame')
+        if pred is None: issues.append('forecast_not_enrolled')
+        elif (r.utc(pred['kickoff']) != kickoff or any(
+                pred.get(side+'_id', pred[side]) != game.get(side+'_id', game[side])
+                for side in ('home', 'away'))):
+            issues.append('official_identity_differs_from_forecast')
+        matches = [(at, event) for at, event in events if
+                   (event['event_id'] == pred['event_id'] if pred else
+                    r.utc(event['kickoff']) == kickoff and all(
+                        event.get(side+'_name', event[side]) == game.get(side+'_name', game[side])
+                        for side in ('home', 'away')))]
+        quote_at = None; priced_now = False
+        if len(matches) != 1:
+            issues.append('latest_scoreboard_event_missing_or_ambiguous')
+        else:
+            at, event = matches[0]; quote_at = at.isoformat()
+            if event.get('state') != 'pre' or event.get('completed') is not False:
+                issues.append('latest_scoreboard_not_pregame')
+            if r.utc(event['kickoff']) != kickoff or (pred and any(event[side] != pred[side] for side in ('home', 'away'))):
+                issues.append('latest_scoreboard_identity_conflict')
+            if event.get('odds'):
+                m.market(event['odds'][0])
+                priced_now = True
+            else: issues.append('latest_scoreboard_market_pair_missing')
+        enrollment_priced = pred is not None and pred.get('market') is not None
+        followup = identifier in followups
+        if pred and not enrollment_priced and not followup:
+            issues.append('pregame_market_evidence_not_recorded')
+        rows.append({'game_id': identifier, 'home': game.get('home_name', game['home']),
+                     'away': game.get('away_name', game['away']), 'kickoff': game['kickoff'],
+                     'enrolled': pred is not None, 'enrollment_priced': enrollment_priced,
+                     'separate_followup_recorded': followup, 'latest_scoreboard_priced': priced_now,
+                     'latest_scoreboard_observed_at': quote_at, 'issues': issues, 'ready': not issues})
+    return {'as_of_evidence_at': as_of.isoformat(), 'window_hours': 24,
+            'observed_games': len(rows), 'ready_games': sum(row['ready'] for row in rows),
+            'status': ('no_upcoming_games_observed' if not rows else
+                       'ready_as_of_snapshot' if all(row['ready'] for row in rows) else 'attention'),
+            'games': rows, 'limitation': 'Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.'}
+
+
 def stamp(folder):
     from datetime import datetime, timezone
     return datetime.strptime(folder.name, '%Y%m%dT%H%M%S%fZ').replace(tzinfo=timezone.utc)
@@ -30,7 +82,7 @@ def audit(root, sport, models, base=Path('.')):
     start = r.utc(json.loads(start_file.read_text())['started_at' if sport == 'NFL' else 'frozen_at'])
     snapshots, schedule, timeline = {}, {}, defaultdict(list)
     captures, exclusions, errors, input_files = [], [], [], []
-    latest_decisions = []; saved_decisions = {}
+    latest_decisions = []; saved_decisions = {}; latest_events = []; audited_paths = []
     observed, schedule_times = [], []
 
     def read_source(source):
@@ -53,6 +105,7 @@ def audit(root, sport, models, base=Path('.')):
             errors.append({'capture': path.parent.name, 'error': 'collection_incomplete'})
             continue
         capture_time = stamp(path.parent)
+        audited_paths.append(path); latest_events = []
         captures.append(capture_time)
         input_files.append({'path': str(path.relative_to(root)), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
         enrollment = path.parent/'enrollment.json'
@@ -71,6 +124,7 @@ def audit(root, sport, models, base=Path('.')):
                 rows = json.loads(read_source(source))
                 for event in rows:
                     timeline[str(event['event_id'])].append((at, event, source))
+                    latest_events.append((at, event))
                 continue
             is_nfl = sport == 'NFL' and '/nfldata/' in url and source['path'].endswith('.csv')
             is_two_way = sport != 'NFL' and ('api-web.nhle.com/v1/schedule/' in url or
@@ -170,6 +224,8 @@ def audit(root, sport, models, base=Path('.')):
     settled_priced = sum(identifier in result_ids and pred.get('market') is not None for identifier, pred in predictions.items())
     decisive_paired = sum(row['game_id'] in predictions and row['outcome'] != 'tie' and predictions[row['game_id']].get('market') is not None for row in results)
     leads = [g['lead_hours'] for g in games if g['lead_hours'] is not None]
+    readiness = pregame_readiness(schedule, predictions, latest_events,
+                                  {row['game_id'] for row in followups}, as_of)
     return {'sport': sport, 'input_integrity': 'verified', 'report_version': VERSION,
             'cohort_started_at': start.isoformat(), 'as_of_evidence_at': as_of.isoformat(),
             'latest_official_schedule_observed_at': max(schedule_times).isoformat(),
@@ -181,9 +237,11 @@ def audit(root, sport, models, base=Path('.')):
             'started_schedule_games_in_scope': len(due),
             'started_schedule_games_enrolled': sum(g['status'] == 'enrolled' for g in due),
             'observed_missing_started_games': missing, 'games': games, 'market_gaps': market_gaps,
+            'pregame_readiness': readiness,
             'capture_count': len(captures), 'largest_capture_intervals': capture_gaps[:5],
             'minimum_forecast_lead_hours': min(leads) if leads else None,
-            'latest_capture': manifests[-1].parent.name, 'latest_enrollment_decisions': latest_decisions, 'saved_exclusions': exclusions,
+            'latest_capture': audited_paths[-1].parent.name, 'latest_attempted_capture': manifests[-1].parent.name,
+            'latest_enrollment_decisions': latest_decisions, 'saved_exclusions': exclusions,
             'saved_collector_errors': errors, 'saved_failed_attempts': failed_attempts,
             'completion_note': 'Saved NFL manifests before coverage-v1 lack a completion flag; successful workflow corroboration remains required.' if sport == 'NFL' else 'Only manifests without an explicit incomplete state are audited; legacy manifests are retained.',
             'input_digest': r.digest({'files': input_files, 'predictions': {k: v['sha256'] for k, v in predictions.items()},
@@ -213,6 +271,15 @@ def render(data):
     if not data['market_gaps']:
         lines += ['| None | — | — | — | — |']
     lines += ['', 'Later archived pairs explain timing gaps; they are not retrospectively inserted into forecasts or scored market comparisons.', '',
+              '## Next 24-hour pregame readiness', '',
+              f"As of retained evidence: {data['pregame_readiness']['as_of_evidence_at']}. "
+              f"Ready: {data['pregame_readiness']['ready_games']} / {data['pregame_readiness']['observed_games']} observed games. "
+              f"Status: {data['pregame_readiness']['status']}.", '',
+              '| Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |',
+              '|---|---|---|---|---|---|']
+    for row in data['pregame_readiness']['games']:
+        lines.append(f"| {row['game_id']} | {row['away']} at {row['home']} | {row['enrollment_priced']} | {row['separate_followup_recorded']} | {row['latest_scoreboard_priced']} | {', '.join(row['issues']) or 'None'} |")
+    lines += ['', data['pregame_readiness']['limitation'], '',
               '## Schedule audit', '', '| Game | Matchup | Start (UTC) | Decision | Exclusion evidence |', '|---|---|---|---|---|']
     for row in data['games']:
         lines.append(f"| {row['game_id']} | {row['away']} at {row['home']} | {row['kickoff']} | {row['status'].replace('_', ' ')} | {', '.join(row['exclusion_reasons']) or '—'} |")
@@ -236,14 +303,16 @@ def run(base=Path('.')):
         r.write(root/'COVERAGE.json', data)
         (root/'COVERAGE.md').write_text(render(data)); reports.append(data)
     lines = ['# Forecast and odds coverage audit', '', '**NO BET — actual wagers $0.**', '',
-             '| Cohort | Saved | Settled | Market-paired | Observed missing started games | Report |', '|---|---:|---:|---:|---:|---|']
+             '| Cohort | Saved | Settled | Market-paired | Observed missing started games | Upcoming ready / observed | Report |', '|---|---:|---:|---:|---:|---|---|']
     links = {'NFL': '../nfl_prospective_v2/COVERAGE.md', 'NHL': 'nhl/COVERAGE.md', 'MLB': 'mlb/COVERAGE.md'}
     for data in reports:
         if data['input_integrity'] == 'verified':
-            lines.append(f"| {data['sport']} | {data['saved']} | {data['settled']} | {data['decisive_market_paired']} | {len(data['observed_missing_started_games'])} | [Audit]({links[data['sport']]}) |")
+            ready = data.get('pregame_readiness')
+            cell = f"{ready['ready_games']} / {ready['observed_games']} ({ready['status']})" if ready else 'Unavailable'
+            lines.append(f"| {data['sport']} | {data['saved']} | {data['settled']} | {data['decisive_market_paired']} | {len(data['observed_missing_started_games'])} | {cell} | [Audit]({links[data['sport']]}) |")
         else:
-            lines.append(f"| {data['sport']} | Unavailable | Unavailable | Unavailable | Unavailable | [Integrity error]({links[data['sport']]}) |")
-    lines += ['', LIMITATION, '', '[Scoring reviews](REVIEW_ALL.md) · [Coverage methodology](COVERAGE_METHOD.md)', '']
+            lines.append(f"| {data['sport']} | Unavailable | Unavailable | Unavailable | Unavailable | Unavailable | [Integrity error]({links[data['sport']]}) |")
+    lines += ['', 'Upcoming checks cover the next 24 hours as of each report\'s retained evidence timestamp; they do not certify live source availability or wagering readiness.', '', LIMITATION, '', '[Scoring reviews](REVIEW_ALL.md) · [Coverage methodology](COVERAGE_METHOD.md)', '']
     (base/'benchmarks/two_way_prospective/COVERAGE_ALL.md').write_text('\n'.join(lines))
     return reports
 
