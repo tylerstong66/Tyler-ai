@@ -1,0 +1,55 @@
+{
+  "actual_wager": 0,
+  "condition": "at_least_one_official_at_bat",
+  "conditional_at_bat_probabilities": {
+    "hit": 0.48,
+    "hr": 0.046
+  },
+  "event_start_utc": "2026-10-16T00:00:00+00:00",
+  "frozen_at_utc": "2026-10-15T19:32:38.108030+00:00",
+  "game_id": 849810,
+  "historical_input_sha256": "dc7bb9d6992f3e98b456b1b89ee4f816f8b324732e24029c30f53d8f3e6d0b9d",
+  "hitter_id": 500743,
+  "hitter_name": "Miguel Rojas",
+  "hitter_side": "home",
+  "hitter_team_id": 119,
+  "model": "mlb_hitter_game_frequency_shadow_v1",
+  "model_calibrated": false,
+  "official_historical_at_bat_eligible_games": 205,
+  "official_historical_games_observed": 219,
+  "opponent_team_id": 158,
+  "record_digest_sha256": "48a622d278d13ef5860ba484c1a66d51b631d9076be27ea83a1989325d3c2d38",
+  "schema": "mlb_hit_prop_shadow_ledger_v1",
+  "source_capture_started_at_utc": "2026-10-15T19:32:37.860821+00:00",
+  "source_receipts": {
+    "active_roster": {
+      "data_through": "2026-10-15T19:32:37.964806+00:00",
+      "response_sha256": "df77368fb35a1757cc1c5007df36523ed45a4cee6a29e1ca8db91a44063b26d4",
+      "retrieved_at": "2026-10-15T19:32:37.964806+00:00",
+      "source_url": "https://statsapi.mlb.com/api/v1/teams/119/roster?date=2026-10-15&rosterType=active"
+    },
+    "hitter_game_logs": [
+      {
+        "data_through": "2026-10-15T19:32:38.049531+00:00",
+        "response_sha256": "c2983cc57cc49b339376c683dea8ef3aa26a196b283b7b0eb1d6ee20f5199729",
+        "retrieved_at": "2026-10-15T19:32:38.049531+00:00",
+        "source_url": "https://statsapi.mlb.com/api/v1/people/500743/stats?gameType=R&group=hitting&season=2025&stats=gameLog"
+      },
+      {
+        "data_through": "2026-10-15T19:32:38.104134+00:00",
+        "response_sha256": "61bcf914204df95e16e4b895952311a3440f6f8616d6fc4afa58839b6d099350",
+        "retrieved_at": "2026-10-15T19:32:38.104134+00:00",
+        "source_url": "https://statsapi.mlb.com/api/v1/people/500743/stats?gameType=R&group=hitting&season=2026&stats=gameLog"
+      }
+    ],
+    "pregame_game": {
+      "data_through": "2026-10-15T19:32:37.915013+00:00",
+      "response_sha256": "1f5149364637fe6e3375a48129b1608a5213122f799c38047292e88c9ed5a910",
+      "retrieved_at": "2026-10-15T19:32:37.915013+00:00",
+      "source_url": "https://statsapi.mlb.com/api/v1.1/game/849810/feed/live"
+    }
+  },
+  "sportsbook_wager_eligible": false,
+  "status": "IMMUTABLE_PREGAME_SHADOW_NO_BET",
+  "training_game_day_before": "2026-10-15"
+}
