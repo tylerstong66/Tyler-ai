@@ -55,6 +55,9 @@ class Reader:
         return self.now
 
     def load(self, path, params=None, api_version="v1"):
+        expected = "v1.1" if path.startswith("game/") and path.endswith("/feed/live") else "v1"
+        if api_version != expected:
+            raise AssertionError("Incorrect official MLB API version for " + path)
         self.calls.append((path, params))
         if "/stats" in path:
             if params["opposingPlayerId"] == 30001:
