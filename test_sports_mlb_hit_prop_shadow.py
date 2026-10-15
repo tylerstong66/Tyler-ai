@@ -71,10 +71,10 @@ def sample():
     start=date(2025,5,1)
     for i in range(45):
         day=(start+timedelta(days=i)).isoformat()
-        rows.append(game_row(day,800000+i,hits=1 if i%3 else 0,hr=1 if i%13==0 else 0))
+        rows.append(game_row(day,800000+i,hits=1 if (i%3 or i%13==0) else 0,hr=1 if i%13==0 else 0))
     for i in range(18):
         day=(date(2026,5,1)+timedelta(days=i)).isoformat()
-        rows.append(game_row(day,900000+i,hits=1 if i%2 else 0,hr=1 if i%11==0 else 0,season=2026))
+        rows.append(game_row(day,900000+i,hits=1 if (i%2 or i%11==0) else 0,hr=1 if i%11==0 else 0,season=2026))
     return parse_hitter_game_log(envelope(rows[:45]),HITTER,2025)+parse_hitter_game_log(envelope(rows[45:]),HITTER,2026)
 
 
