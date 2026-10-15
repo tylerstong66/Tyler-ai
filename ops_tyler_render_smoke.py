@@ -36,13 +36,20 @@ def main():
             raise RuntimeError("Research command absent from deployed module.")
         if obj.get("sports_mlb_full_research_betting_enabled") is not False:
             raise RuntimeError("Sports betting must remain disabled.")
-    if EXPECTED == "2.19.3.36":
+    if EXPECTED in ("2.19.3.36", "2.19.3.37"):
         if obj.get("sports_mlb_named_research_command_supported") is not True:
             raise RuntimeError("Named MLB research command not active.")
         if obj.get("sports_mlb_named_research_predictive_edge_proven") is not False:
             raise RuntimeError("Named MLB research must not claim proven predictive edge.")
         if obj.get("sports_mlb_named_research_wager_execution_enabled") is not False:
             raise RuntimeError("Named MLB research must not execute wagers.")
+    if EXPECTED == "2.19.3.37":
+        if obj.get("sports_mlb_auto_bullpen_research_supported") is not True:
+            raise RuntimeError("MLB auto-bullpen research not registered.")
+        if obj.get("sports_mlb_auto_bullpen_probabilities_calibrated") is not False:
+            raise RuntimeError("MLB auto-bullpen must not claim calibrated probabilities.")
+        if obj.get("sports_mlb_auto_bullpen_wager_execution_enabled") is not False:
+            raise RuntimeError("MLB auto-bullpen wager execution must be disabled.")
     health = get("/health")
     health.raise_for_status()
     if health.json().get("status") != "healthy":
@@ -57,7 +64,7 @@ def main():
     print("/chat unauthenticated", unauthorized.status_code, flush=True)
     if unauthorized.status_code != 401:
         raise RuntimeError("New MLB research chat command is not protected.")
-    if EXPECTED == "2.19.3.36":
+    if EXPECTED in ("2.19.3.36", "2.19.3.37"):
         named = requests.post(BASE + "/chat",
             json={"message": 'sports mlb full research by name :: {"date":"2026-10-15","hitter_name":"Andrew Vaughn","team_name":"Milwaukee Brewers"}'},
             timeout=30, allow_redirects=False,
