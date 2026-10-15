@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 from sports_mlb_sources import OfficialMlbReader, pregame_research, utc
+from sports_mlb_combined import complete_matchup_research
 
 
 def run():
@@ -49,6 +50,26 @@ def run():
                   "no_bet", result["decision"])
             if result["decision"] != "RESEARCH ONLY - NO BET":
                 raise RuntimeError("Unexpected wagering decision")
+            home_id = gd["teams"]["home"]["id"]
+            home_roster, _ = reader.load("teams/" + str(home_id) + "/roster", {
+                "rosterType": "active",
+                "date": start.astimezone(ZoneInfo("America/New_York")).date().isoformat()})
+            pitchers = [r.get("person", {}).get("id") for r in home_roster.get("roster", [])
+                if r.get("position", {}).get("abbreviation") == "P"
+                and r.get("person", {}).get("id") != probable["id"]]
+            if not pitchers:
+                reasons.append(str(pk) + ": no distinct pitcher roster candidate"); continue
+            candidate_id = pitchers[0]
+            full = complete_matchup_research(pk, hitter_id, "away", [candidate_id], reader=reader)
+            candidate = full["recent_bullpen_research"]["candidates"][0]
+            print("FULL_WORKFLOW_SUCCESS", "gamePk", pk, "candidate_id", candidate_id,
+                  "pitcher_workload_games", candidate["recorded_appearances"],
+                  "pitches_in_window", candidate["pitches_thrown_observed"],
+                  "recent_coverage_complete", candidate["coverage_complete"],
+                  "matching_source_ids", full["coverage"]["historical_pitcher_matchups"],
+                  "no_wager", not full["wager_executed"])
+            if full["decision"] != "RESEARCH ONLY - NO BET" or full["wager_executed"]:
+                raise RuntimeError("Full research unexpectedly attempted wagering")
             return
         except Exception as exc:
             reasons.append(str(pk) + ": " + type(exc).__name__ + " " + str(exc)[:150])
