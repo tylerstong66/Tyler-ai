@@ -1,8 +1,8 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-10-15T04:40:06.728554+00:00",
-  "capture_count": 20,
+  "as_of_evidence_at": "2026-10-15T09:55:39.828838+00:00",
+  "capture_count": 21,
   "cohort_started_at": "2026-10-11T15:59:30.281973+00:00",
   "completion_note": "Only manifests without an explicit incomplete state are audited; legacy manifests are retained.",
   "decisive_market_paired": 3,
@@ -31,13 +31,11 @@
       "home": "Los Angeles Dodgers",
       "kickoff": "2026-10-16T00:00:00+00:00",
       "latest_saved_decision": {
-        "checked_at": "2026-10-15T04:40:06.731539+00:00",
-        "decision": "enrolled",
-        "game_id": "849810",
-        "priced": true
+        "decision": "already_enrolled",
+        "game_id": "849810"
       },
       "lead_hours": 19.33145354138889,
-      "pregame_schedule_observations_in_window": 2,
+      "pregame_schedule_observations_in_window": 4,
       "recorded_at": "2026-10-15T04:40:06.767251+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -99,7 +97,7 @@
         "game_id": "849818"
       },
       "lead_hours": 23.810525229166664,
-      "pregame_schedule_observations_in_window": 5,
+      "pregame_schedule_observations_in_window": 7,
       "recorded_at": "2026-10-14T17:11:22.109175+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -119,7 +117,7 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "f976fb6198723a5da2f33599a13cec365ece341cdc4f2a2557661cfd9d8a596f",
+  "input_digest": "9f3ef3998182c3bd3ffeca3a75af2072cad051600682b38d92483b6d3bf3f3b9",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -148,34 +146,28 @@
       "to": "2026-10-13T00:41:35.771663+00:00"
     }
   ],
-  "latest_capture": "20261015T044003019188Z",
+  "latest_capture": "20261015T095537391763Z",
   "latest_enrollment_decisions": [
-    {
-      "decision": "already_enrolled",
-      "game_id": "849811"
-    },
     {
       "decision": "already_enrolled",
       "game_id": "849818"
     },
     {
-      "checked_at": "2026-10-15T04:40:06.731539+00:00",
-      "decision": "enrolled",
-      "game_id": "849810",
-      "priced": true
+      "decision": "already_enrolled",
+      "game_id": "849810"
     },
     {
-      "checked_at": "2026-10-15T04:40:06.767701+00:00",
+      "checked_at": "2026-10-15T09:55:39.829862+00:00",
       "decision": "outside_24h_window",
       "game_id": "849817"
     },
     {
-      "checked_at": "2026-10-15T04:40:06.767725+00:00",
+      "checked_at": "2026-10-15T09:55:39.829879+00:00",
       "decision": "outside_24h_window",
       "game_id": "849808"
     }
   ],
-  "latest_official_schedule_observed_at": "2026-10-15T04:40:06.547489+00:00",
+  "latest_official_schedule_observed_at": "2026-10-15T09:55:39.720163+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [
     {

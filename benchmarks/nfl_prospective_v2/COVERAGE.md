@@ -2,7 +2,7 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-15T04:39:58.233938+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-10-15T09:55:36.250318+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
@@ -44,7 +44,7 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Capture freshness
 
-Audited capture manifests: 22. Latest: `20261015T043954961921Z`.
+Audited capture manifests: 23. Latest: `20261015T095534015510Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
