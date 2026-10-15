@@ -138,13 +138,13 @@ def extract_injuries(html, source, game):
             if d.get('@type')=='NewsArticle':articles.append(d)
         except (ValueError,AttributeError):pass
     if len(articles)!=1:
-        return {'coverage':'unknown','observations':[],'reason':'official publication metadata unavailable'}
+        return {'coverage':'unknown','observations':[],'reason':'official publication metadata unavailable','injury_effect_enabled':False}
     article=articles[0]
     if f'Week {game.week}' not in article.get('headline',''):
-        return {'coverage':'unknown','observations':[],'reason':'report week mismatch'}
+        return {'coverage':'unknown','observations':[],'reason':'report week mismatch','injury_effect_enabled':False}
     published=article.get('dateModified') or article.get('datePublished')
     if not published or b.utc(published).year!=game.season or b.utc(published)>b.utc(source['retrieved_at']):
-        return {'coverage':'unknown','observations':[],'reason':'publication not verified for season'}
+        return {'coverage':'unknown','observations':[],'reason':'publication not verified for season','injury_effect_enabled':False}
     observations=[];team=None
     for line in unescape(article.get('articleBody','')).splitlines():
         line=line.strip()

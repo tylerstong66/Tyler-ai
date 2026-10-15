@@ -142,6 +142,23 @@ class ProspectiveTests(unittest.TestCase):
     def test_market_normalization(self):
         self.assertAlmostEqual(p.binary_market([{'home_moneyline':-100,'away_moneyline':100}])['conditional_home_probability'],.5)
 
+    def test_unverified_injury_publications_keep_effects_explicitly_disabled(self):
+        source={'source_url':'https://www.nfl.com/news/test','retrieved_at':self.clock.isoformat(),'sha256':'a'*64}
+        article={'@type':'NewsArticle','headline':'NFL Week 5 injury report','dateModified':'2026-10-10T10:00:00Z','articleBody':'EAGLES\nOUT: QB Example Player (ankle)'}
+        cases=[('', 'official publication metadata unavailable'),
+               ({**article,'headline':'NFL Week 6 injury report'}, 'report week mismatch'),
+               ({**article,'dateModified':'2025-10-10T10:00:00Z'}, 'publication not verified for season'),
+               ({**article,'dateModified':'2026-10-12T10:00:00Z'}, 'publication not verified for season'),
+               ({**article,'dateModified':None}, 'publication not verified for season')]
+        for data,reason in cases:
+            with self.subTest(reason=reason,data=data):
+                html='<script type="application/ld+json">'+json.dumps(data)+'</script>' if data else ''
+                availability=p.extract_injuries(html,source,self.target)
+                self.assertEqual(availability['coverage'],'unknown')
+                self.assertEqual(availability['observations'],[])
+                self.assertEqual(availability['reason'],reason)
+                self.assertIs(availability['injury_effect_enabled'],False)
+
     def test_real_artifacts_were_all_pre_kickoff_and_hash_valid(self):
         files=list(p.ROOT.glob('predictions/*.json'));self.assertGreaterEqual(len(files),12)
         for path in files:
@@ -151,7 +168,14 @@ class ProspectiveTests(unittest.TestCase):
             self.assertLess(b.utc(d['generated_at']),b.utc(d['kickoff']))
             self.assertEqual(d['v2_model_sha256'],b.sha256(b.canonical(self.v2)))
             for s in d['source_snapshots']:self.assertLessEqual(b.utc(s['retrieved_at']),b.utc(d['generated_at']))
-            self.assertEqual(d['availability']['injury_effect_enabled'],False)
+            if digest=='ff7e1ac7c355589e75e00c7acce782a2a26600447910716f90b5e5aa698318b1':
+                # Preserve this exact pre-fix artifact; every new artifact must
+                # carry the explicit flag, including all unknown-coverage paths.
+                self.assertEqual(d['game_id'],'2026_06_SEA_DEN')
+                self.assertEqual(d['availability'],{'coverage':'unknown','observations':[],
+                                                  'reason':'publication not verified for season'})
+            else:
+                self.assertIs(d['availability']['injury_effect_enabled'],False)
 
 
 if __name__=='__main__':unittest.main()
