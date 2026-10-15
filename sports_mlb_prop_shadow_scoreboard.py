@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from sports_mlb_hit_prop_shadow import PRIORS
+from sports_mlb_shadow_uncertainty import clustered_brier_difference
 from sports_mlb_prop_prospective import _verify
 from sports_mlb_sources import utc
 
@@ -128,12 +129,14 @@ def official_shadow_scoreboard(root=DEFAULT_ROOT):
                 raise ValueError("Result label or probability conflicts with original freeze.")
             if abs(scores[kind]["brier_error"]-(p-label)**2)>1e-7:
                 raise ValueError("Recorded Brier loss does not match frozen event forecast.")
-            outcomes[kind].append({"event":kind,"probability":p,"outcome":label})
+            outcomes[kind].append({"event":kind,"game_id":game,"probability":p,"outcome":label})
     metrics={kind:_report_metric(outcomes[kind]) for kind in outcomes}
     for kind in metrics:
         item=metrics[kind]
         if item["eligible_player_games"]>0:
             item["model_improved_over_fixed_reference"]=item["brier"]<item["fixed_reference_brier"]
+        item["game_cluster_uncertainty"]=clustered_brier_difference(
+            outcomes[kind],reference_probability=PRIORS[kind])
     return {
         "status":"PROSPECTIVE_FREEZE_SCORING_DIAGNOSTIC_NO_BET",
         "report_created_utc":datetime.now(timezone.utc).isoformat(),
@@ -154,6 +157,7 @@ def official_shadow_scoreboard(root=DEFAULT_ROOT):
             "Scores apply only when official at-bats are positive; actual bookmaker prop void rules are not represented.",
             "Current model is a fixed conditional baseline, not validated or compared with any real sportsbook odds.",
             "A small score advantage over exploratory priors does not prove significant calibration or profitability.",
+            "Game-cluster uncertainty intervals require 30 distinct final MLB games and 150 eligible player-games per prop event.",
         ],
     }
 
