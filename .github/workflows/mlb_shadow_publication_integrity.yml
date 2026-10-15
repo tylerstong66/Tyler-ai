@@ -1,0 +1,38 @@
+name: MLB shadow publication integrity audit
+on:
+  push:
+    branches:
+      - feature/mlb-shadow-publication-integrity-v1
+    paths:
+      - sports_mlb_prop_publish_guard.py
+      - sports_mlb_shadow_publication_audit.py
+      - test_sports_mlb_shadow_publication.py
+      - .github/workflows/mlb_shadow_publication_integrity.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - sports_mlb_prop_publish_guard.py
+      - sports_mlb_shadow_publication_audit.py
+      - test_sports_mlb_shadow_publication.py
+      - .github/workflows/mlb_shadow_publication_integrity.yml
+  schedule:
+    - cron: '41 12 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Test pregame file mutation suppression and Git provenance
+        run: python -m unittest -v test_sports_mlb_shadow_publication
+      - name: Verify complete Git history and original pregame bytes
+        run: python sports_mlb_shadow_publication_audit.py
