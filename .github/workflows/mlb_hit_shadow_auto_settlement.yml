@@ -27,6 +27,8 @@ jobs:
         run: python -m unittest -v test_sports_mlb_prop_prospective test_sports_mlb_prop_settlement_job
       - name: Read public official MLB finals and create new settlement files only
         run: python sports_mlb_prop_settlement_job.py --root benchmarks/mlb_hitter_props_shadow_v1
+      - name: Summarize frozen player-games, pending finals and model diagnostic
+        run: python sports_mlb_prop_shadow_scoreboard.py
       - name: Commit only newly created official final settlement files
         shell: bash
         run: |
