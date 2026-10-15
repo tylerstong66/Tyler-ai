@@ -1,0 +1,368 @@
+{
+  "NO_BET": true,
+  "actual_wagers": 0,
+  "block_unit": "Eastern scheduled game date",
+  "brier_scale": "sum over two outcomes; range 0 to 2",
+  "calibration": {
+    "elo_prior_calibration": {
+      "bins": [
+        {
+          "games": 0,
+          "lower": 0.0,
+          "mean_probability": null,
+          "observed_rate": null,
+          "observed_rate_wilson95": null,
+          "upper": 0.2
+        },
+        {
+          "games": 35,
+          "lower": 0.2,
+          "mean_probability": 0.3711792859182615,
+          "observed_rate": 0.4,
+          "observed_rate_wilson95": [
+            0.2555072885938059,
+            0.5642729098710749
+          ],
+          "upper": 0.4
+        },
+        {
+          "games": 864,
+          "lower": 0.4,
+          "mean_probability": 0.5292284684888846,
+          "observed_rate": 0.5034722222222222,
+          "observed_rate_wilson95": [
+            0.4701918568159988,
+            0.536721848376368
+          ],
+          "upper": 0.6
+        },
+        {
+          "games": 412,
+          "lower": 0.6,
+          "mean_probability": 0.6486534365819034,
+          "observed_rate": 0.5728155339805825,
+          "observed_rate_wilson95": [
+            0.5245937266463008,
+            0.6196920311282055
+          ],
+          "upper": 0.8
+        },
+        {
+          "games": 1,
+          "lower": 0.8,
+          "mean_probability": 0.8150905209989657,
+          "observed_rate": 0.0,
+          "observed_rate_wilson95": [
+            0,
+            0.7934506856227626
+          ],
+          "upper": 1.0
+        }
+      ],
+      "games": 1312,
+      "limitation": "Fixed five bins. Wilson bin intervals assume independent observations; descriptive only."
+    },
+    "fixed_elo": {
+      "bins": [
+        {
+          "games": 0,
+          "lower": 0.0,
+          "mean_probability": null,
+          "observed_rate": null,
+          "observed_rate_wilson95": null,
+          "upper": 0.2
+        },
+        {
+          "games": 70,
+          "lower": 0.2,
+          "mean_probability": 0.3504092752280713,
+          "observed_rate": 0.38571428571428573,
+          "observed_rate_wilson95": [
+            0.280476913015389,
+            0.5028426441069578
+          ],
+          "upper": 0.4
+        },
+        {
+          "games": 737,
+          "lower": 0.4,
+          "mean_probability": 0.5208731709809201,
+          "observed_rate": 0.5115332428765265,
+          "observed_rate_wilson95": [
+            0.47547857994792386,
+            0.5474682999783985
+          ],
+          "upper": 0.6
+        },
+        {
+          "games": 501,
+          "lower": 0.6,
+          "mean_probability": 0.665292089110622,
+          "observed_rate": 0.5568862275449101,
+          "observed_rate_wilson95": [
+            0.5131189340615897,
+            0.5997877993377462
+          ],
+          "upper": 0.8
+        },
+        {
+          "games": 4,
+          "lower": 0.8,
+          "mean_probability": 0.8235012037608876,
+          "observed_rate": 0.5,
+          "observed_rate_wilson95": [
+            0.15003898915214947,
+            0.8499610108478506
+          ],
+          "upper": 1.0
+        }
+      ],
+      "games": 1312,
+      "limitation": "Fixed five bins. Wilson bin intervals assume independent observations; descriptive only."
+    },
+    "ridge_recipe": {
+      "bins": [
+        {
+          "games": 0,
+          "lower": 0.0,
+          "mean_probability": null,
+          "observed_rate": null,
+          "observed_rate_wilson95": null,
+          "upper": 0.2
+        },
+        {
+          "games": 5,
+          "lower": 0.2,
+          "mean_probability": 0.3879658690046368,
+          "observed_rate": 0.0,
+          "observed_rate_wilson95": [
+            0,
+            0.43448246478317476
+          ],
+          "upper": 0.4
+        },
+        {
+          "games": 980,
+          "lower": 0.4,
+          "mean_probability": 0.5404473159637531,
+          "observed_rate": 0.5020408163265306,
+          "observed_rate_wilson95": [
+            0.4707899051782006,
+            0.5332757905333775
+          ],
+          "upper": 0.6
+        },
+        {
+          "games": 327,
+          "lower": 0.6,
+          "mean_probability": 0.6316674101432578,
+          "observed_rate": 0.5902140672782875,
+          "observed_rate_wilson95": [
+            0.5361628675753487,
+            0.642170283929633
+          ],
+          "upper": 0.8
+        },
+        {
+          "games": 0,
+          "lower": 0.8,
+          "mean_probability": null,
+          "observed_rate": null,
+          "observed_rate_wilson95": null,
+          "upper": 1.0
+        }
+      ],
+      "games": 1312,
+      "limitation": "Fixed five bins. Wilson bin intervals assume independent observations; descriptive only."
+    }
+  },
+  "candidate_minus_fixed_elo": {
+    "elo_prior_calibration": {
+      "blocks": 167,
+      "bootstrap_draws": 2000,
+      "ci95": {
+        "accuracy": [
+          -0.010903852041932144,
+          0.011345477613811649
+        ],
+        "brier": [
+          -0.007187617141270009,
+          -0.0021444050184220654
+        ],
+        "log_loss": [
+          -0.008313846005180191,
+          -0.0025014146016919072
+        ]
+      },
+      "games": 1312,
+      "interval_method": "percentile block bootstrap",
+      "mean": {
+        "accuracy": 0.0,
+        "brier": -0.0046679323267861655,
+        "log_loss": -0.0053773307337380855
+      },
+      "minimum_blocks": 5,
+      "uncertainty_status": "available_descriptive"
+    },
+    "ridge_recipe": {
+      "blocks": 167,
+      "bootstrap_draws": 2000,
+      "ci95": {
+        "accuracy": [
+          -0.010248527316829015,
+          0.029028516800308286
+        ],
+        "brier": [
+          -0.011282067007982073,
+          -0.0015437672283699247
+        ],
+        "log_loss": [
+          -0.01295879415049596,
+          -0.001994365146141809
+        ]
+      },
+      "games": 1312,
+      "interval_method": "percentile block bootstrap",
+      "mean": {
+        "accuracy": 0.009146341463414634,
+        "brier": -0.006459959785311778,
+        "log_loss": -0.007417631859563521
+      },
+      "minimum_blocks": 5,
+      "uncertainty_status": "available_descriptive"
+    }
+  },
+  "excluded": [],
+  "limitations": [
+    "Years denote league season labels, not calendar-year boundaries: NHL validation runs October 2025 through April 2026.",
+    "2024 starts with equal 1500 ratings: no earlier warmup archive is used.",
+    "2025 was already training data for the live baseline; this is not independent validation of that baseline.",
+    "Earlier validation results may update Elo after the frozen delay; validation outcomes never fit calibration parameters.",
+    "Historical schedules/results may have been revised and do not prove original publication times.",
+    "Selection on these validation scores has selection bias; paired intervals are descriptive and unadjusted.",
+    "Selected parameters are a development artifact trained on 2024 only, not a deployed or prospective model.",
+    "No market-price, lineup, injury, profitability or betting-edge evaluation. Any future model needs separate freezing and prospective enrollment."
+  ],
+  "metrics": {
+    "elo_prior_calibration": {
+      "blocks": 167,
+      "bootstrap_draws": 2000,
+      "ci95": {
+        "accuracy": [
+          0.5095119515931272,
+          0.5653172758367851
+        ],
+        "brier": [
+          0.4883551576087365,
+          0.5103380704149725
+        ],
+        "log_loss": [
+          0.6814441315533298,
+          0.7042044698431916
+        ]
+      },
+      "games": 1312,
+      "interval_method": "percentile block bootstrap",
+      "mean": {
+        "accuracy": 0.538109756097561,
+        "brier": 0.4994965202680934,
+        "log_loss": 0.6929866546156268
+      },
+      "minimum_blocks": 5,
+      "uncertainty_status": "available_descriptive"
+    },
+    "fixed_elo": {
+      "blocks": 167,
+      "bootstrap_draws": 2000,
+      "ci95": {
+        "accuracy": [
+          0.5102024897322424,
+          0.5646241891088151
+        ],
+        "brier": [
+          0.4909923749090106,
+          0.5174302155635573
+        ],
+        "log_loss": [
+          0.6843016487457116,
+          0.7124060669034232
+        ]
+      },
+      "games": 1312,
+      "interval_method": "percentile block bootstrap",
+      "mean": {
+        "accuracy": 0.538109756097561,
+        "brier": 0.5041644525948796,
+        "log_loss": 0.6983639853493648
+      },
+      "minimum_blocks": 5,
+      "uncertainty_status": "available_descriptive"
+    },
+    "ridge_recipe": {
+      "blocks": 167,
+      "bootstrap_draws": 2000,
+      "ci95": {
+        "accuracy": [
+          0.5212006097142612,
+          0.5730686350268297
+        ],
+        "brier": [
+          0.4882437737777964,
+          0.5066373253120833
+        ],
+        "log_loss": [
+          0.6812837878951862,
+          0.700153283684555
+        ]
+      },
+      "games": 1312,
+      "interval_method": "percentile block bootstrap",
+      "mean": {
+        "accuracy": 0.5472560975609756,
+        "brier": 0.4977044928095678,
+        "log_loss": 0.6909463534898014
+      },
+      "minimum_blocks": 5,
+      "uncertainty_status": "available_descriptive"
+    }
+  },
+  "models_fit_on_training_only": {
+    "elo_prior_calibration": {
+      "converged": true,
+      "iterations": 3,
+      "penalty": 0.01,
+      "slope_prior": 1,
+      "weights": [
+        0.0429150047149621,
+        0.7576252148575554
+      ]
+    },
+    "ridge_recipe": {
+      "converged": true,
+      "iterations": 3,
+      "penalty": 0.01,
+      "weights": [
+        0.2561241691997487,
+        0.6107928174778942
+      ]
+    }
+  },
+  "promotion_allowed": false,
+  "protocol_sha256": "4ec1c2b8a4cea91f83b029f2c279c1742f8cf0b00b5c4d208f559aea786e071a",
+  "result_delay_hours": 12,
+  "score_rows_sha256": "63b78c6b5a54710223c0d3c503e30fd6d9e9f510ba47de09b155975ae48078bb",
+  "selected_development_candidate": "ridge_recipe",
+  "sport": "NHL",
+  "training": {
+    "first_start": "2024-10-04T17:00:00+00:00",
+    "games": 1312,
+    "last_start": "2025-04-18T01:30:00+00:00"
+  },
+  "training_season": 2024,
+  "validation": {
+    "first_start": "2025-10-07T21:00:00+00:00",
+    "games": 1312,
+    "last_start": "2026-04-17T02:00:00+00:00"
+  },
+  "validation_season": 2025
+}

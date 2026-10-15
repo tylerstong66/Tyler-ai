@@ -1,0 +1,36 @@
+{
+  "NO_BET": true,
+  "actual_wagers": 0,
+  "calibration_prior": [
+    0.0,
+    1.0
+  ],
+  "candidate_order": [
+    "fixed_elo",
+    "ridge_recipe",
+    "elo_prior_calibration"
+  ],
+  "files_sha256": {
+    "benchmarks/two_way_prospective/mlb/history.json": "8020971c50aae2122c86ae6cd91dbde40f58930af331cd9985ad6f2d6d18429f",
+    "benchmarks/two_way_prospective/nhl/history.json": "f2766508bd45c90d949ba6bf187482e2ef8d47a8dfff62dff6829ba8e77eb6c7",
+    "benchmarks/two_way_prospective/protocol.json": "19879bada5722a35fd884f8a9f45dce7c7dd117c11c0409d40dde5fc84ea6627"
+  },
+  "l2_penalty": 0.01,
+  "limitations": [
+    "Years denote league season labels, not calendar-year boundaries: NHL validation runs October 2025 through April 2026.",
+    "2024 starts with equal 1500 ratings: no earlier warmup archive is used.",
+    "2025 was already training data for the live baseline; this is not independent validation of that baseline.",
+    "Earlier validation results may update Elo after the frozen delay; validation outcomes never fit calibration parameters.",
+    "Historical schedules/results may have been revised and do not prove original publication times.",
+    "Selection on these validation scores has selection bias; paired intervals are descriptive and unadjusted.",
+    "Selected parameters are a development artifact trained on 2024 only, not a deployed or prospective model.",
+    "No market-price, lineup, injury, profitability or betting-edge evaluation. Any future model needs separate freezing and prospective enrollment."
+  ],
+  "promotion_allowed": false,
+  "scope": "2024-season fit, 2025-season retrospective development validation only; never read 2026-season replay data or existing live model weights. Candidate family specified before this experiment was run, after the 2026 replay was inspected; not preregistration or blind evaluation. No new hyperparameter search. All training outcomes must be eligible before validation starts. Regular-season decisive nonambiguous games scored; all eligible finals update Elo after a 12-hour assumed delay.",
+  "selection_metric": "validation mean log loss; exact ties prefer candidate_order",
+  "source_commit": "87031c4c755d57daac85e4e41f8c212b6a46e98a",
+  "training_season": 2024,
+  "validation_season": 2025,
+  "version": "two-way-challenger-development-v1"
+}
