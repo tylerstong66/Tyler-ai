@@ -1,0 +1,41 @@
+name: Public MLB scoreboard HTTP source integration
+on:
+  push:
+    branches: ['ops/tyler-render-smoke-20261015']
+    paths:
+      - .github/workflows/mlb_scoreboard_public_feed_integration.yml
+permissions:
+  contents: read
+jobs:
+  verify-public-scoreboard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git fetch origin main
+          git checkout --detach origin/main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Retrieve real published GitHub scoreboard over HTTPS and check integrity
+        run: |
+          python - <<'PY'
+          from sports_mlb_prop_scoreboard_reader import load_published_shadow_scoreboard
+          result=load_published_shadow_scoreboard()
+          print('LIVE_PUBLIC_GITHUB_SCOREBOARD_COUNTS',{
+              'frozen':result['frozen_player_game_forecasts'],
+              'games':result['distinct_official_games'],
+              'pending':result['pending'],
+              'scored':result['scored'],
+              'ineligible':result['ineligible'],
+              'as_of':result['published_at_utc'],
+              'may_be_stale':result['may_be_stale'],
+          })
+          assert result['frozen_player_game_forecasts']>=7
+          assert result['distinct_official_games']>=1
+          assert result['no_wagers'] is True
+          assert result['proven_betting_edge'] is False
+          print('LIVE_PUBLIC_SCOREBOARD_SOURCE_VALIDATION_PASS')
+          PY
