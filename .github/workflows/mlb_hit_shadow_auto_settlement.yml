@@ -1,5 +1,8 @@
 name: MLB hitter shadow official final collection
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/mlb_hit_shadow_auto_settlement.yml']
   schedule:
     - cron: '17 */3 * * *'
   workflow_dispatch:
