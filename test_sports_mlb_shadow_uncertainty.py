@@ -43,7 +43,7 @@ class ClusterIntervals(unittest.TestCase):
         self.assertFalse(one["prospective_publication_attested"])
 
     def test_30_games_but_too_few_player_games_stays_descriptive(self):
-        games=[{"game_id":100+i,"probability":0.09,"outcome":i%17==0}
+        games=[{"game_id":100+i,"probability":0.09,"outcome":int(i%17==0)}
                for i in range(MIN_DISTINCT_GAMES)]
         out=clustered_brier_difference(games,reference_probability=0.08)
         self.assertEqual(out["eligible_player_games"],MIN_DISTINCT_GAMES)
