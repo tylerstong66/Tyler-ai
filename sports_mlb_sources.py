@@ -240,7 +240,7 @@ def pregame_research(game_id, hitter_id, hitter_side, reliever_ids=(), *, reader
     # Own payload plus complete unedited capture receipts; never claim data source
     # proves who will actually start/relieve or what the sportsbook offers.
     result["official_data"] = {
-        "api_origin": ORIGIN, "game_feed_capture": event_evidence,
+        "api_origins": [ORIGIN, "https://statsapi.mlb.com/api/v1.1/"], "game_feed_capture": event_evidence,
         "capture_receipts": list(reader.audit),
         "historical_seasons": list(seasons), "stat_game_type": "R",
         "rosters_are_active_not_confirmed_lineups": True,
