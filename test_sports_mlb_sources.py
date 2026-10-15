@@ -28,11 +28,20 @@ def fixture():
     }
 
 
-def stats(pa=12, ab=11, hits=4, hr=1):
-    return {"stats": [{"type": {"displayName": "vsPlayerTotal"},
-                       "group": {"displayName": "hitting"},
-                       "splits": [{"stat": {"plateAppearances": pa, "atBats": ab,
-                                             "hits": hits, "homeRuns": hr}}]}]}
+def stats(pa=12, ab=11, hits=4, hr=1, year=2025):
+    item = {"plateAppearances": pa, "atBats": ab, "hits": hits, "homeRuns": hr}
+    return {"stats": [
+        {"type": {"displayName": "vsPlayerTotal"}, "group": {"displayName": "hitting"},
+         "splits": [{"stat": {"plateAppearances": 999, "atBats": 999,
+                               "hits": 999, "homeRuns": 999}}]},
+        {"type": {"displayName": "vsPlayer"}, "group": {"displayName": "hitting"},
+         "splits": [
+             {"season": str(year), "gameType": "R", "team": {"id": 158},
+              "opponent": {"id": 119}, "stat": item},
+             {"season": "2018", "gameType": "W", "team": {"id": 111},
+              "opponent": {"id": 147}, "stat": {"plateAppearances": 100,
+                  "atBats": 100, "hits": 100, "homeRuns": 100}}]}]}
+
 
 
 class Reader:
@@ -45,16 +54,16 @@ class Reader:
     def clock(self):
         return self.now
 
-    def load(self, path, params=None):
+    def load(self, path, params=None, api_version="v1"):
         self.calls.append((path, params))
         if "/stats" in path:
             if params["opposingPlayerId"] == 30001:
                 data = {"stats": []}  # Do NOT fabricate missing BvP samples
             else:
-                data = stats() if params["season"] == 2025 else stats(6, 5, 2, 0)
+                data = stats(year=2025) if params["season"] == 2025 else stats(6, 5, 2, 0, year=2026)
         else:
             data = self.rows[path]
-        url = "https://statsapi.mlb.com/api/v1/" + path
+        url = "https://statsapi.mlb.com/api/" + api_version + "/" + path
         e = {"source_url": url, "retrieved_at": self.now.isoformat(),
              "data_through": self.now.isoformat(), "response_sha256": "testhash"}
         self.audit.append(e)
@@ -62,22 +71,25 @@ class Reader:
 
 
 class OfficialStatsTests(unittest.TestCase):
-    def test_paired_season_totals_are_selected_without_double_count(self):
+    def test_season_and_game_type_are_filtered_even_when_server_ignores_params(self):
         d = stats()
-        d["stats"].insert(0, {"type": {"displayName": "vsPlayer"},
-                              "group": {"displayName": "hitting"},
-                              "splits": [{"stat": {"hits": 100}}]})
-        self.assertEqual(official_counts(d)["hits"], 4)
+        self.assertEqual(official_counts(d, 2025)["hits"], 4)
+        self.assertIsNone(official_counts(d, 2026))
+        self.assertIsNone(official_counts(d, 2025, "W"))
+        self.assertEqual(official_counts(d, 2018, "W")["hits"], 100)
 
-    def test_no_stat_vs_ambiguous_and_invalid_totals(self):
-        self.assertIsNone(official_counts({"stats": []}))
-        with self.assertRaisesRegex(ValueError, "Ambiguous"):
-            official_counts({"stats": [stats()["stats"][0], stats()["stats"][0]]})
+    def test_no_stat_duplicate_and_invalid_totals_fail_closed(self):
+        self.assertIsNone(official_counts({"stats": []}, 2025))
+        d = stats()
+        d["stats"][1]["splits"].append(copy.deepcopy(d["stats"][1]["splits"][0]))
+        with self.assertRaisesRegex(ValueError, "Duplicate"):
+            official_counts(d, 2025)
+        d = stats(); del d["stats"][1]["splits"][0]["stat"]["plateAppearances"]
         with self.assertRaisesRegex(ValueError, "Incomplete"):
-            official_counts({"stats": [{"type": {"displayName": "vsPlayerTotal"},
-                                      "group": {"displayName": "hitting"}, "splits": [{"stat": {"hits": 1}}]}]})
+            official_counts(d, 2025)
         with self.assertRaisesRegex(ValueError, "Inconsistent"):
-            official_counts(stats(pa=2, ab=2, hits=3, hr=1))
+            official_counts(stats(pa=2, ab=2, hits=3, hr=1), 2025)
+
 
 
 class PregameTests(unittest.TestCase):
