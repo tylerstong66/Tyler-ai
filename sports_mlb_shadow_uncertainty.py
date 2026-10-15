@@ -20,6 +20,10 @@ def clustered_brier_difference(rows, *, reference_probability):
     and at-bat-eligible player-games have accrued. Within-game player
     outcomes are resampled together to avoid naive independence assumptions.
     """
+    if (isinstance(reference_probability,bool) or
+            not isinstance(reference_probability,(int,float)) or
+            not 0<reference_probability<1):
+        raise ValueError("Invalid fixed reference probability.")
     groups=defaultdict(list)
     for row in rows:
         if not isinstance(row,dict):
@@ -33,10 +37,6 @@ def clustered_brier_difference(rows, *, reference_probability):
             raise ValueError("Invalid immutable game-cluster outcome or event probability.")
         diff=(reference_probability-y)**2-(p-y)**2
         groups[gid].append(diff)
-    if (isinstance(reference_probability,bool) or
-            not isinstance(reference_probability,(int,float)) or
-            not 0<reference_probability<1):
-        raise ValueError("Invalid fixed reference probability.")
     game_count=len(groups)
     observations=sum(len(v) for v in groups.values())
     differences=[x for arr in groups.values() for x in arr]
