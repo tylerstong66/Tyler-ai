@@ -47,7 +47,7 @@
     "completion_note": "Manifest completion alone does not imply absence of per-game errors.",
     "errors": [],
     "excluded": [],
-    "latest_manifest": "benchmarks/two_way_prospective/nhl/captures/20261015T150151667229Z/manifest.json",
+    "latest_manifest": "benchmarks/two_way_prospective/nhl/captures/20261015T160022015561Z/manifest.json",
     "newer_saved_collection_failure": null,
     "optional_availability_errors": []
   },
@@ -156,6 +156,17 @@
       "games": 24,
       "limitation": "Fixed five bins. Wilson bin intervals assume independent observations; descriptive only."
     }
+  },
+  "first_100_checkpoint": {
+    "additional_forecasts_needed": 65,
+    "pending_selected": 11,
+    "promotion_allowed": false,
+    "selected_forecasts": 35,
+    "selection_rule": "First 100 by recorded_at in UTC, then game_id; never by outcome, price or settlement order.",
+    "settled_selected": 24,
+    "status": "collecting_forecasts",
+    "target": 100,
+    "version": "first-100-enrolled-v1"
   },
   "full_outcome_calibration": null,
   "input_integrity": "verified",
@@ -316,7 +327,7 @@
   "pending": 11,
   "probability_policy": "Saved pregame probabilities only; NFL binary metrics condition on no tie.",
   "recorded": 35,
-  "report_version": "prospective-review-v1",
+  "report_version": "prospective-review-v2",
   "review_due": false,
   "review_milestone": 100,
   "review_status": "collecting",

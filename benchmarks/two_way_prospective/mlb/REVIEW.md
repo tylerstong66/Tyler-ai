@@ -13,6 +13,12 @@ Accuracy uses the highest-probability outcome. Two-way ties at 50% select home; 
 
 Uncertainty unit: Eastern scheduled game date. CIs require at least 5 blocks.
 
+## First-100-enrolled checkpoint
+
+Status: **collecting_forecasts**. This is separate from the cumulative 100-settlement flag.
+Selected: 7 / 100; settled among selected: 5; pending among selected: 2.
+First 100 by recorded_at in UTC, then game_id; never by outcome, price or settlement order.
+
 ## All decisive games — conditional two-way scores
 
 | Model | Games | Blocks | Brier | Log loss | Accuracy | 95% Brier CI | 95% Log loss CI | 95% Accuracy CI |
@@ -64,7 +70,7 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/two_way_prospective/mlb/captures/20261015T150152738325Z/manifest.json.
+Latest saved manifest: benchmarks/two_way_prospective/mlb/captures/20261015T160022986839Z/manifest.json.
 Manifest completion field: True. Errors: []. Exclusions: [].
 Optional availability errors: [].
 Newer saved collection failure: null.
