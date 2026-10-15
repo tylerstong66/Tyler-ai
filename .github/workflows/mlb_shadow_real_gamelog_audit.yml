@@ -1,0 +1,48 @@
+name: MLB hit HR shadow public data diagnostic
+on:
+  push:
+    branches: ['ops/tyler-render-smoke-20261015']
+    paths: ['.github/workflows/mlb_shadow_real_gamelog_audit.yml']
+permissions:
+  contents: read
+jobs:
+  publicly-sourced-retrospective:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git fetch origin feature/mlb-hitter-prop-shadow-baseline-v1
+          git checkout --detach origin/feature/mlb-hitter-prop-shadow-baseline-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Diagnose real 2025 and 2026 hitter game logs
+        run: |
+          python - <<'PY'
+          from sports_mlb_name_lookup import resolve_named_pregame
+          from sports_mlb_hit_prop_shadow import (
+              retrieve_game_logs, conditional_shadow_forecast,
+              retrospective_walk_forward)
+          who=resolve_named_pregame('2026-10-15','Andrew Vaughn',
+              team_name='Milwaukee Brewers',starter_name='Tyler Glasnow',
+              game_id=849810)
+          rows, receipts=retrieve_game_logs(who['hitter_id'],[2025,2026])
+          forecast=conditional_shadow_forecast(rows,who['game_start'])
+          results=retrospective_walk_forward(rows,evaluation_season=2026)
+          print('OFFICIAL_PLAYER',who['hitter_name'],'GAME',who['game_id'])
+          print('OFFICIAL_GAME_LOG_ROWS',len(rows),'RECEIPTS',len(receipts))
+          print('SHADOW_CONDITIONAL_READY',forecast['model_ready'],
+                'TRAINING_GAMES',forecast['at_bat_eligible_history'])
+          print('SHADOW_CONDITIONAL_VALUES',forecast['estimates'])
+          print('RETROSPECTIVE_BRIER_DIAGNOSTIC',results['outcomes'])
+          print('RETROSPECTIVE_NOT_PROSPECTIVE',not results['prospective_validation'])
+          assert results['prospective_validation'] is False
+          assert results['sportsbook_value_established'] is False
+          assert results['no_wagers'] is True
+          assert forecast['status']=='EXPERIMENTAL CONDITIONAL FREQUENCY - NO BET'
+          assert forecast['actual_wager']==0
+          assert results['outcomes']['hit']['n_games_with_at_least_one_ab']>0
+          print('MLB_SHADOW_PUBLIC_DIAGNOSTIC_COMPLETE')
+          PY
