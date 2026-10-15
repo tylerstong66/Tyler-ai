@@ -17,11 +17,13 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: pip install -r requirements.txt
-      - run: python -m unittest -v test_sports_mlb_prop_batch_capture
+      - run: python -m unittest -v test_sports_mlb_prop_batch_capture test_sports_mlb_shadow_publication
       - run: python sports_mlb_prop_batch_capture.py --per-side 3
       - name: Commit immutable, early forecasts
         run: |
@@ -32,4 +34,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Freeze MLB hitter shadow pregame data [no bets]"
+          python sports_mlb_shadow_publication_audit.py
           git push origin HEAD:main
