@@ -1,0 +1,39 @@
+name: MLB 1+ hit and HR shadow model safeguards
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - sports_mlb_hit_prop_shadow.py
+      - sports_mlb_prop_shadow_diagnostics.py
+      - test_sports_mlb_hit_prop_shadow.py
+      - .github/workflows/mlb_hitter_prop_shadow_checks.yml
+  push:
+    branches:
+      - feature/mlb-hitter-prop-shadow-baseline-v1
+    paths:
+      - sports_mlb_hit_prop_shadow.py
+      - sports_mlb_prop_shadow_diagnostics.py
+      - test_sports_mlb_hit_prop_shadow.py
+      - .github/workflows/mlb_hitter_prop_shadow_checks.yml
+permissions:
+  contents: read
+jobs:
+  deterministic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Run hitter-model identity, sample, doubleheader and leakage tests
+        run: python -m unittest -v test_sports_mlb_hit_prop_shadow
+      - name: Verify no wagering, sportsbook integration or model promotion
+        run: |
+          python - <<'PY'
+          from sports_mlb_hit_prop_shadow import MODEL_NAME, PRIORS
+          assert MODEL_NAME == 'mlb_hitter_game_frequency_shadow_v1'
+          assert PRIORS == {'hit':0.60,'hr':0.08}
+          print('STATIC_PARAMETERS_FROZEN')
+          PY
