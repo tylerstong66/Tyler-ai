@@ -110,6 +110,61 @@ class MarketEvidenceTests(unittest.TestCase):
 
 
 class CoverageAuditTests(unittest.TestCase):
+    def preflight_fixture(self):
+        at=r.utc('2026-10-15T10:00:00Z')
+        game={'game_id':'1','home':'H','away':'A','kickoff':'2026-10-15T20:00:00Z','state':'pre'}
+        pred={**game,'event_id':'e1','market':{'saved':True}}
+        event={**game,'event_id':'e1','completed':False,
+               'odds':[{'home_moneyline':-120,'away_moneyline':100}]}
+        return at,{'1':{'game':game}},{'1':pred},[(at,event)]
+
+    def test_pregame_readiness_distinguishes_saved_followup_and_latest_prices(self):
+        at,schedule,predictions,events=self.preflight_fixture()
+        data=c.pregame_readiness(schedule,predictions,events,set(),at)
+        self.assertEqual((data['ready_games'],data['observed_games']),(1,1))
+        self.assertEqual(data['status'],'ready_as_of_snapshot')
+        predictions['1']['market']=None
+        data=c.pregame_readiness(schedule,predictions,events,set(),at)
+        self.assertEqual(data['ready_games'],0)
+        self.assertIn('pregame_market_evidence_not_recorded',data['games'][0]['issues'])
+        self.assertEqual(c.pregame_readiness(schedule,predictions,events,{'1'},at)['ready_games'],1)
+        events[0][1]['odds']=[]
+        data=c.pregame_readiness(schedule,predictions,events,{'1'},at)
+        self.assertEqual(data['ready_games'],0)
+        self.assertTrue(data['games'][0]['separate_followup_recorded'])
+        self.assertIn('latest_scoreboard_market_pair_missing',data['games'][0]['issues'])
+
+    def test_readiness_requires_enrollment_unique_event_and_exact_current_identity(self):
+        for fault in ('unenrolled','missing','duplicate','official_time','official_team','espn_time','espn_team','started','abnormal'):
+            with self.subTest(fault=fault):
+                at,schedule,predictions,events=self.preflight_fixture()
+                if fault=='unenrolled':predictions={}
+                elif fault=='missing':events=[]
+                elif fault=='duplicate':events=events+events
+                elif fault=='official_time':schedule['1']['game']['kickoff']='2026-10-15T20:15:00Z'
+                elif fault=='official_team':schedule['1']['game']['home']='OTHER'
+                elif fault=='espn_time':events[0][1]['kickoff']='2026-10-15T20:15:00Z'
+                elif fault=='espn_team':events[0][1]['away']='OTHER'
+                elif fault=='started':events[0][1]['state']='in'
+                elif fault=='abnormal':schedule['1']['game']['state']='in'
+                self.assertEqual(c.pregame_readiness(schedule,predictions,events,set(),at)['ready_games'],0)
+
+    def test_readiness_window_is_future_24h_and_empty_is_explicit(self):
+        at,schedule,predictions,events=self.preflight_fixture()
+        for hours,expected in [(0,0),(24,1),(24.01,0),(-1,0)]:
+            with self.subTest(hours=hours):
+                stamp=(at+timedelta(hours=hours)).isoformat()
+                schedule['1']['game']['kickoff']=stamp;predictions['1']['kickoff']=stamp;events[0][1]['kickoff']=stamp
+                data=c.pregame_readiness(schedule,predictions,events,set(),at)
+                self.assertEqual(data['observed_games'],expected)
+                if not expected:self.assertEqual(data['status'],'no_upcoming_games_observed')
+
+    def test_readiness_uses_official_ids_for_mlb_name_abbreviation_differences(self):
+        at,schedule,predictions,events=self.preflight_fixture()
+        schedule['1']['game'].update(home='home numeric code',away='away numeric code',home_id='1',away_id='2')
+        predictions['1'].update(home_id='1',away_id='2')
+        self.assertEqual(c.pregame_readiness(schedule,predictions,events,set(),at)['ready_games'],1)
+
     def test_archived_counts_missing_odds_and_later_prices_without_writes(self):
         for sport, (folder, models) in r.COHORTS.items():
             original = Path(folder)
@@ -188,6 +243,38 @@ class CoverageAuditTests(unittest.TestCase):
             self.assertEqual(data['games'][0]['status'], 'awaiting_enrollment')
             self.assertEqual(data['observed_missing_started_games'], [])
             self.assertEqual(data['saved_collector_errors'][0]['error'], 'collection_incomplete')
+            self.assertEqual(data['latest_capture'],'20261012T100000000000Z')
+            self.assertEqual(data['latest_attempted_capture'],'20261013T100000000000Z')
+
+    def test_readiness_does_not_reuse_older_scoreboard_when_latest_event_is_absent(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);self.fixture(root,observation='2026-10-12T10:00:00Z')
+            # Keep both captures pregame. A historical priced event is not
+            # evidence that the latest completed capture still lists the event.
+            latest=root/'captures/20261013T100000000000Z/manifest.json'
+            shutil.rmtree(latest.parent)
+            old=root/'captures/20261012T100000000000Z/manifest.json'
+            manifest=json.loads(old.read_text())
+            event={'event_id':'e1','home':'H','away':'A','kickoff':'2026-10-12T21:00:00Z',
+                   'state':'pre','completed':False,'odds':[{'home_moneyline':-120,'away_moneyline':100}]}
+            cap=n.Capture(root/'captures/20261012T110000000000Z')
+            # Retain the official schedule unchanged but no latest ESPN event.
+            cap.evidence=list(manifest['sources'])
+            cap.retain('espn.json',[],{'source_url':'https://example.com/scoreboard','retrieved_at':'2026-10-12T11:00:00Z'})
+            n.write_json(cap.folder/'manifest.json',{'sources':cap.evidence,'collection_completed':True})
+            older=root/'older-espn.json';n.write_json(older,[event])
+            manifest['sources'].append({'source_url':'https://example.com/scoreboard','path':str(older),
+                                        'sha256':hashlib.sha256(older.read_bytes()).hexdigest(),'retrieved_at':'2026-10-12T10:00:00Z'})
+            n.write_json(old,manifest)
+            pred={k:event[k] for k in ['event_id','home','away','kickoff']}
+            pred.update(game_id='1',generated_at='2026-10-12T09:00:00Z',recorded_at='2026-10-12T09:00:01Z',
+                        NO_BET=True,actual_wagers=0,model={'home':.5,'away':.5},fixed_elo={'home':.5,'away':.5},
+                        market={'conditional_home_probability':.5},market_observed_at='2026-10-12T09:00:00Z')
+            pred['sha256']=r.digest(pred);n.write_json(root/'predictions/1.json',pred)
+            data=c.audit(root,'NHL',('model','fixed_elo'))
+            self.assertEqual(data['pregame_readiness']['observed_games'],1)
+            self.assertEqual(data['pregame_readiness']['ready_games'],0)
+            self.assertIn('latest_scoreboard_event_missing_or_ambiguous',data['pregame_readiness']['games'][0]['issues'])
 
     def test_one_bad_cohort_does_not_suppress_other_audits(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -14,6 +14,14 @@ This denominator is limited to official games actually present in retained snaps
 
 The report lists the largest intervals between audited capture directories (explicitly incomplete manifests are skipped). These expose possible collection delay; they neither measure continuous uptime nor prove scheduler failure. Source observation timestamps can precede capture creation when a verified cache is reused. No historical forecast is reconstructed, generated or backfilled by this audit.
 
+## Upcoming pregame checks
+
+Each cohort report includes `pregame_readiness` for observed official games starting after the evidence cutoff and within its next 24 hours. A game passes these snapshot checks only when it has a saved forecast, matching official identity/start time, a unique matching pregame/uncompleted ESPN event in the latest audited capture, a usable current moneyline pair there, and either an enrollment-time price or a separately verified pregame follow-up quote. MLB official team IDs are compared with the saved IDs rather than equating team names with publisher abbreviations.
+
+Historical scoreboard events cannot substitute for an event missing from the latest audited capture. Missing forecasts, latest prices, conflicting identities and abnormal game states remain explicit issues. An empty observed upcoming schedule is labeled `no_upcoming_games_observed`, not a successful readiness check. The audit does not enroll games or capture follow-up quotes itself, and it does not remove NFL's frozen enrollment cap.
+
+These checks describe retained evidence at the reported timestamp. They do not certify current source availability, lineup confirmation, future collection, forecast quality or wagering readiness. `latest_capture` identifies the latest audited manifest; `latest_attempted_capture` separately exposes a newer explicitly incomplete attempt. NFL legacy manifests still require successful workflow corroboration as described in each report.
+
 ## Prices at enrollment versus later prices
 
 Original forecasts and benchmark metrics continue to use only their immutable enrollment-time market field. NFL's priced ties count as priced coverage but are excluded from decisive binary market comparisons. NHL/MLB games count once, regardless of model count.
