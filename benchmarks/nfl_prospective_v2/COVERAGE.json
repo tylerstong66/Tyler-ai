@@ -1,12 +1,12 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-10-14T23:55:13.963760+00:00",
-  "capture_count": 21,
+  "as_of_evidence_at": "2026-10-15T04:39:58.233938+00:00",
+  "capture_count": 22,
   "cohort_started_at": "2026-10-11T15:19:59+00:00",
   "completion_note": "Saved NFL manifests before coverage-v1 lack a completion flag; successful workflow corroboration remains required.",
   "decisive_market_paired": 12,
-  "enrollment_priced": 13,
+  "enrollment_priced": 14,
   "followup_quotes_separate_from_original_metrics": [],
   "games": [
     {
@@ -190,9 +190,28 @@
       "recorded_at": "2026-10-11T15:28:40.291256+00:00",
       "started_by_as_of": true,
       "status": "enrolled"
+    },
+    {
+      "away": "SEA",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-10-15T04:39:56.144448+00:00",
+      "game_id": "2026_06_SEA_DEN",
+      "home": "DEN",
+      "kickoff": "2026-10-16T00:15:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-10-15T04:39:58.238136+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_06_SEA_DEN",
+        "priced": true
+      },
+      "lead_hours": 19.58380712027778,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-10-15T04:39:58.294367+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
     }
   ],
-  "input_digest": "3e8a835c2d4c1901b722cc7f96df826848ad8d8f14a2b25875e921e8966150bd",
+  "input_digest": "21cd2c8b1b80aa515ce848b3ffba8115b5b5ec4eab29e24fa8c9ded0db726afd",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -221,16 +240,23 @@
       "to": "2026-10-13T00:40:30.994313+00:00"
     }
   ],
-  "latest_capture": "20261014T235512065219Z",
-  "latest_enrollment_decisions": [],
-  "latest_official_schedule_observed_at": "2026-10-14T23:55:12.914315+00:00",
+  "latest_capture": "20261015T043954961921Z",
+  "latest_enrollment_decisions": [
+    {
+      "checked_at": "2026-10-15T04:39:58.238136+00:00",
+      "decision": "enrolled",
+      "game_id": "2026_06_SEA_DEN",
+      "priced": true
+    }
+  ],
+  "latest_official_schedule_observed_at": "2026-10-15T04:39:56.144448+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [],
   "minimum_forecast_lead_hours": 1.5221828808333333,
   "observed_missing_started_games": [],
-  "pending": 0,
+  "pending": 1,
   "report_version": "prospective-coverage-v1",
-  "saved": 13,
+  "saved": 14,
   "saved_collector_errors": [
     {
       "capture": "20261011T201726017233Z",

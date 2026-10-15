@@ -1,12 +1,12 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-10-14T23:55:19.241119+00:00",
-  "capture_count": 19,
+  "as_of_evidence_at": "2026-10-15T04:40:06.728554+00:00",
+  "capture_count": 20,
   "cohort_started_at": "2026-10-11T15:59:30.281973+00:00",
   "completion_note": "Only manifests without an explicit incomplete state are audited; legacy manifests are retained.",
-  "decisive_market_paired": 2,
-  "enrollment_priced": 4,
+  "decisive_market_paired": 3,
+  "enrollment_priced": 5,
   "followup_quotes_separate_from_original_metrics": [],
   "games": [
     {
@@ -26,6 +26,25 @@
     {
       "away": "Milwaukee Brewers",
       "exclusion_reasons": [],
+      "first_observed_in_window": "2026-10-15T04:40:05.541073+00:00",
+      "game_id": "849810",
+      "home": "Los Angeles Dodgers",
+      "kickoff": "2026-10-16T00:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-10-15T04:40:06.731539+00:00",
+        "decision": "enrolled",
+        "game_id": "849810",
+        "priced": true
+      },
+      "lead_hours": 19.33145354138889,
+      "pregame_schedule_observations_in_window": 2,
+      "recorded_at": "2026-10-15T04:40:06.767251+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
+      "away": "Milwaukee Brewers",
+      "exclusion_reasons": [],
       "first_observed_in_window": "2026-10-14T01:14:05.586733+00:00",
       "game_id": "849811",
       "home": "Los Angeles Dodgers",
@@ -37,7 +56,7 @@
       "lead_hours": 22.76505797833333,
       "pregame_schedule_observations_in_window": 15,
       "recorded_at": "2026-10-14T01:14:05.791278+00:00",
-      "started_by_as_of": false,
+      "started_by_as_of": true,
       "status": "enrolled"
     },
     {
@@ -80,7 +99,7 @@
         "game_id": "849818"
       },
       "lead_hours": 23.810525229166664,
-      "pregame_schedule_observations_in_window": 3,
+      "pregame_schedule_observations_in_window": 5,
       "recorded_at": "2026-10-14T17:11:22.109175+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -100,7 +119,7 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "db405b059275d7b021e60212b8796ca58c015f68036b85b1a8a90eaea991bcd7",
+  "input_digest": "f976fb6198723a5da2f33599a13cec365ece341cdc4f2a2557661cfd9d8a596f",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -129,7 +148,7 @@
       "to": "2026-10-13T00:41:35.771663+00:00"
     }
   ],
-  "latest_capture": "20261014T235516034843Z",
+  "latest_capture": "20261015T044003019188Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
@@ -140,12 +159,23 @@
       "game_id": "849818"
     },
     {
-      "checked_at": "2026-10-14T23:55:19.242653+00:00",
+      "checked_at": "2026-10-15T04:40:06.731539+00:00",
+      "decision": "enrolled",
+      "game_id": "849810",
+      "priced": true
+    },
+    {
+      "checked_at": "2026-10-15T04:40:06.767701+00:00",
       "decision": "outside_24h_window",
-      "game_id": "849810"
+      "game_id": "849817"
+    },
+    {
+      "checked_at": "2026-10-15T04:40:06.767725+00:00",
+      "decision": "outside_24h_window",
+      "game_id": "849808"
     }
   ],
-  "latest_official_schedule_observed_at": "2026-10-14T23:55:19.201799+00:00",
+  "latest_official_schedule_observed_at": "2026-10-15T04:40:06.547489+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [
     {
@@ -209,14 +239,14 @@
   "observed_missing_started_games": [],
   "pending": 2,
   "report_version": "prospective-coverage-v1",
-  "saved": 6,
+  "saved": 7,
   "saved_collector_errors": [],
   "saved_exclusions": [],
   "saved_failed_attempts": [],
-  "settled": 4,
-  "settled_enrollment_priced": 2,
+  "settled": 5,
+  "settled_enrollment_priced": 3,
   "settled_ties_with_prices": 0,
   "sport": "MLB",
-  "started_schedule_games_enrolled": 4,
-  "started_schedule_games_in_scope": 4
+  "started_schedule_games_enrolled": 5,
+  "started_schedule_games_in_scope": 5
 }

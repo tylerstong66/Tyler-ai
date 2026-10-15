@@ -1,6 +1,6 @@
 # Tyler MLB prospective paper test
 
-Recorded: **6** · Settled: **4** · Pending: **2**
+Recorded: **7** · Settled: **5** · Pending: **2**
 
 **NO BET — actual wagers $0.**
 
@@ -8,9 +8,9 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 
 | Model | Paired games | Brier | Log loss | Accuracy |
 |---|---:|---:|---:|---:|
-| model | 2 | 0.5323 | 0.7260 | 50.0% |
-| fixed_elo | 2 | 0.5549 | 0.7496 | 50.0% |
-| market | 2 | 0.6075 | 0.8024 | 50.0% |
+| model | 3 | 0.5310 | 0.7246 | 33.3% |
+| fixed_elo | 3 | 0.5258 | 0.7200 | 66.7% |
+| market | 3 | 0.6618 | 0.8580 | 33.3% |
 
 | Game | Start (Eastern) | Model pick | Win probability |
 |---|---|---|---:|
@@ -20,6 +20,7 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | CLE at TB | Oct 13 08:00 PM | TB | 58.3% |
 | MIL at LAD | Oct 14 08:00 PM | LAD | 51.4% |
 | TB at CLE | Oct 15 01:00 PM | CLE | 50.5% |
+| MIL at LAD | Oct 15 08:00 PM | LAD | 51.4% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
 

@@ -2,7 +2,7 @@
 
 **NO BET — actual wagers $0.**
 
-Recorded: **13** · Settled: **13** · Pending: **0**
+Recorded: **14** · Settled: **13** · Pending: **1**
 
 100-settlement milestone: **collecting**. This flag requests human review; it does not authorize model promotion or wagering.
 
@@ -101,7 +101,7 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/nfl_prospective_v2/captures/20261014T235512065219Z/manifest.json.
+Latest saved manifest: benchmarks/nfl_prospective_v2/captures/20261015T043954961921Z/manifest.json.
 Manifest completion field: True. Errors: []. Exclusions: [].
 Optional availability errors: [].
 Newer saved collection failure: null.

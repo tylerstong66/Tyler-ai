@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-14T23:55:15.871776+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-15T04:40:02.907152+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 30 / 22 / 8 |
-| Started games in retained official schedules / enrolled | 23 / 23 |
+| Recorded / settled / pending | 35 / 24 / 11 |
+| Started games in retained official schedules / enrolled | 24 / 24 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 30 / 30 |
-| Settled with enrollment prices / decisive market-paired | 22 / 22 |
+| Enrollment-time priced forecasts | 35 / 35 |
+| Settled with enrollment prices / decisive market-paired | 24 / 24 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -55,10 +55,15 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 | 2026020111 | SEA at TBL | 2026-10-15T23:00:00+00:00 | enrolled | — |
 | 2026020112 | VAN at FLA | 2026-10-15T23:00:00+00:00 | enrolled | — |
 | 2026020113 | NYR at NJD | 2026-10-15T23:00:00+00:00 | enrolled | — |
+| 2026020114 | WPG at CHI | 2026-10-16T00:00:00+00:00 | enrolled | — |
+| 2026020115 | SJS at NSH | 2026-10-16T00:00:00+00:00 | enrolled | — |
+| 2026020116 | STL at MIN | 2026-10-16T00:00:00+00:00 | enrolled | — |
+| 2026020117 | UTA at EDM | 2026-10-16T01:00:00+00:00 | enrolled | — |
+| 2026020118 | CGY at VGK | 2026-10-16T02:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 19. Latest: `20261014T235514265160Z`.
+Audited capture manifests: 20. Latest: `20261015T043958446964Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

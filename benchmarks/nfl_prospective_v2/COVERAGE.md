@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-14T23:55:13.963760+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-10-15T04:39:58.233938+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 13 / 13 / 0 |
+| Recorded / settled / pending | 14 / 13 / 1 |
 | Started games in retained official schedules / enrolled | 13 / 13 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 13 / 13 |
+| Enrollment-time priced forecasts | 14 / 14 |
 | Settled with enrollment prices / decisive market-paired | 13 / 12 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -40,10 +40,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 | 2026_05_MIN_NO | MIN at NO | 2026-10-11T17:00:00+00:00 | enrolled | — |
 | 2026_05_NYG_WAS | NYG at WAS | 2026-10-11T17:00:00+00:00 | enrolled | — |
 | 2026_05_SF_SEA | SF at SEA | 2026-10-11T20:25:00+00:00 | enrolled | — |
+| 2026_06_SEA_DEN | SEA at DEN | 2026-10-16T00:15:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 21. Latest: `20261014T235512065219Z`.
+Audited capture manifests: 22. Latest: `20261015T043954961921Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

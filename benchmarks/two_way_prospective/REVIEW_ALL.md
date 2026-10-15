@@ -4,9 +4,9 @@
 
 | Sport | Settled | Recorded | Pending | Market-paired | 100-game review | Report |
 |---|---:|---:|---:|---:|---|---|
-| NFL | 13 | 13 | 0 | 12 | collecting | [Review](../nfl_prospective_v2/REVIEW.md) |
-| NHL | 22 | 30 | 8 | 22 | collecting | [Review](nhl/REVIEW.md) |
-| MLB | 4 | 6 | 2 | 2 | collecting | [Review](mlb/REVIEW.md) |
+| NFL | 13 | 14 | 1 | 12 | collecting | [Review](../nfl_prospective_v2/REVIEW.md) |
+| NHL | 24 | 35 | 11 | 24 | collecting | [Review](nhl/REVIEW.md) |
+| MLB | 5 | 7 | 2 | 3 | collecting | [Review](mlb/REVIEW.md) |
 
 [Forecast and odds coverage audit](COVERAGE_ALL.md)
 

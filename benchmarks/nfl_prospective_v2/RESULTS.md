@@ -1,6 +1,6 @@
 # Tyler NFL prospective paper test
 
-Recorded: **13/100** · Settled: **13** · Pending: **0**
+Recorded: **14/100** · Settled: **13** · Pending: **1**
 
 **NO BET — actual wagers $0.**
 
@@ -27,6 +27,7 @@ Frozen experimental v2 compared with frozen v1 and market odds observed before k
 | SF at SEA | Oct 11 04:25 PM | SEA | 62.6% | Oct 11 11:28 AM |
 | BAL at ATL | Oct 11 08:20 PM | BAL | 56.4% | Oct 11 11:28 AM |
 | BUF at LA | Oct 12 08:15 PM | BUF | 50.3% | Oct 11 08:32 PM |
+| SEA at DEN | Oct 15 08:15 PM | SEA | 54.9% | Oct 15 12:39 AM |
 
 Probabilities include a small tie allowance. These picks are experimental model outputs, not wagering recommendations. Source timing and scheduling delays can leave coverage gaps; missed games are logged rather than backfilled after kickoff.
 
