@@ -1,0 +1,34 @@
+name: MLB published shadow scoreboard read-only audit
+on:
+  push:
+    branches: ['ops/tyler-render-smoke-20261015']
+    paths: ['.github/workflows/mlb_published_shadow_scoreboard_audit.yml']
+permissions:
+  contents: read
+jobs:
+  scoreboard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git fetch origin main
+          git checkout --detach origin/main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Summarize immutable frozen predictions and pending official outcomes
+        run: |
+          python - <<'PY'
+          from sports_mlb_prop_shadow_scoreboard import official_shadow_scoreboard
+          r=official_shadow_scoreboard()
+          print("ACTUAL_FROZEN_COUNT",r["frozen_player_game_forecasts"])
+          print("ACTUAL_DISTINCT_GAMES",r["distinct_official_game_ids"])
+          print("ACTUAL_PENDING",r["pending"],"SCORED",r["scored"],"INELIGIBLE",r["ineligible"])
+          print("SCORECARD_METRICS",r["metrics"])
+          assert not r["proven_betting_edge"]
+          assert r["no_wagers"]
+          assert r["frozen_player_game_forecasts"]>=7
+          print("READ_ONLY_FROZEN_SCOREBOARD_PASS")
+          PY
