@@ -2,7 +2,7 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-15T14:03:34.051974+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-15T14:08:36.817330+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
@@ -20,6 +20,26 @@ Evidence through **2026-10-15T14:03:34.051974+00:00**; cohort began 2026-10-11T1
 | None | — | — | — | — |
 
 Later archived pairs explain timing gaps; they are not retrospectively inserted into forecasts or scored market comparisons.
+
+## Next 24-hour pregame readiness
+
+As of retained evidence: 2026-10-15T14:08:36.817330+00:00. Ready: 11 / 11 observed games. Status: ready_as_of_snapshot.
+
+| Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
+|---|---|---|---|---|---|
+| 2026020108 | BUF at TOR | True | False | True | None |
+| 2026020109 | NYI at OTT | True | False | True | None |
+| 2026020110 | PHI at DET | True | False | True | None |
+| 2026020111 | SEA at TBL | True | False | True | None |
+| 2026020112 | VAN at FLA | True | False | True | None |
+| 2026020113 | NYR at NJD | True | False | True | None |
+| 2026020114 | WPG at CHI | True | False | True | None |
+| 2026020115 | SJS at NSH | True | False | True | None |
+| 2026020116 | STL at MIN | True | False | True | None |
+| 2026020117 | UTA at EDM | True | False | True | None |
+| 2026020118 | CGY at VGK | True | False | True | None |
+
+Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
 ## Schedule audit
 
@@ -63,7 +83,7 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Capture freshness
 
-Audited capture manifests: 22. Latest: `20261015T140332701575Z`.
+Audited capture manifests: 23. Latest: `20261015T140834960708Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

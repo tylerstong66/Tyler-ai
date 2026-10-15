@@ -2,11 +2,13 @@
 
 **NO BET — actual wagers $0.**
 
-| Cohort | Saved | Settled | Market-paired | Observed missing started games | Report |
-|---|---:|---:|---:|---:|---|
-| NFL | 14 | 13 | 12 | 0 | [Audit](../nfl_prospective_v2/COVERAGE.md) |
-| NHL | 35 | 24 | 24 | 0 | [Audit](nhl/COVERAGE.md) |
-| MLB | 7 | 5 | 3 | 0 | [Audit](mlb/COVERAGE.md) |
+| Cohort | Saved | Settled | Market-paired | Observed missing started games | Upcoming ready / observed | Report |
+|---|---:|---:|---:|---:|---|---|
+| NFL | 14 | 13 | 12 | 0 | 1 / 1 (ready_as_of_snapshot) | [Audit](../nfl_prospective_v2/COVERAGE.md) |
+| NHL | 35 | 24 | 24 | 0 | 11 / 11 (ready_as_of_snapshot) | [Audit](nhl/COVERAGE.md) |
+| MLB | 7 | 5 | 3 | 0 | 2 / 2 (ready_as_of_snapshot) | [Audit](mlb/COVERAGE.md) |
+
+Upcoming checks cover the next 24 hours as of each report's retained evidence timestamp; they do not certify live source availability or wagering readiness.
 
 Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.
 

@@ -2,7 +2,7 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-15T14:03:32.546220+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-10-15T14:08:34.805017+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
@@ -22,6 +22,16 @@ A priced NFL tie is excluded only from binary decisive market comparisons.
 | None | — | — | — | — |
 
 Later archived pairs explain timing gaps; they are not retrospectively inserted into forecasts or scored market comparisons.
+
+## Next 24-hour pregame readiness
+
+As of retained evidence: 2026-10-15T14:08:34.805017+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
+
+| Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
+|---|---|---|---|---|---|
+| 2026_06_SEA_DEN | SEA at DEN | True | False | True | None |
+
+Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
 ## Schedule audit
 
@@ -44,7 +54,7 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Capture freshness
 
-Audited capture manifests: 24. Latest: `20261015T140330720175Z`.
+Audited capture manifests: 25. Latest: `20261015T140831565518Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
