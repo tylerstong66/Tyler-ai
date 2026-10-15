@@ -57,7 +57,7 @@ class OfficialReader:
                                "player":{"id":683734},
                                "team":{"id":158},
                                "stat":{"atBats":4,"plateAppearances":4,
-                                       "hits":1 if i%2 else 0,"homeRuns":1 if i%13==1 else 0}})
+                                       "hits":1 if (i%2 or i%13==1) else 0,"homeRuns":1 if i%13==1 else 0}})
             data={"stats":[{"type":{"displayName":"gameLog"},
                             "group":{"displayName":"hitting"},"splits":splits}]}
         else:
