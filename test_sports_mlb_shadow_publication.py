@@ -84,6 +84,19 @@ class GitRepoTest(unittest.TestCase):
         self.assertEqual(review["status"],"GIT_HISTORY_REVIEW_FOUND_PROBLEMS")
         self.assertIn("MODIFIED_OR_NO_FULL_GIT_HISTORY",review["records"][0]["status"])
 
+    def test_git_commit_second_precision_is_flagged_not_falsely_failed(self):
+        special=value()
+        special.pop("record_digest_sha256")
+        special["frozen_at_utc"]="2026-10-15T19:32:00.500000+00:00"
+        self.stage(_seal(special))
+        self.commit(time="2026-10-15T19:32:00+00:00")
+        history=audit_forecast_publication(repo=self.root)
+        self.assertEqual(history["git_metadata_pregame"],1)
+        self.assertEqual(history["subsecond_metadata_order_uncertain"],1)
+        self.assertEqual(history["records"][0]["status"],
+                         "GIT_COMMIT_METADATA_PREGAME_SUBSECOND_ORDER_UNKNOWN")
+        self.assertEqual(history["independently_attested_publish_times"],0)
+
     def test_after_start_original_commit_metadata_is_not_pregame(self):
         self.stage()
         self.commit(time="2026-10-16T00:05:00+00:00")
