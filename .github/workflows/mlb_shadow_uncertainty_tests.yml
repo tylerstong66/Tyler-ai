@@ -1,0 +1,29 @@
+name: MLB game-cluster uncertainty benchmark safeguards
+on:
+  push:
+    branches: [feature/mlb-shadow-game-cluster-uncertainty-v1]
+    paths:
+      - sports_mlb_shadow_uncertainty.py
+      - sports_mlb_prop_shadow_scoreboard.py
+      - test_sports_mlb_shadow_uncertainty.py
+      - .github/workflows/mlb_shadow_uncertainty_tests.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - sports_mlb_shadow_uncertainty.py
+      - sports_mlb_prop_shadow_scoreboard.py
+      - test_sports_mlb_shadow_uncertainty.py
+      - .github/workflows/mlb_shadow_uncertainty_tests.yml
+permissions:
+  contents: read
+jobs:
+  game-cluster-diagnostics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: python -m unittest -v test_sports_mlb_shadow_uncertainty test_sports_mlb_prop_shadow_scoreboard
