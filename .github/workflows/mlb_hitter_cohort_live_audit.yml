@@ -1,0 +1,40 @@
+name: MLB 2026 hitter prop cohort live retrospective audit
+on:
+  push:
+    branches: ['ops/tyler-render-smoke-20261015']
+    paths: ['.github/workflows/mlb_hitter_cohort_live_audit.yml']
+permissions:
+  contents: read
+jobs:
+  cohort:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git fetch origin feature/mlb-hitter-prop-cohort-review-v1
+          git checkout --detach origin/feature/mlb-hitter-prop-cohort-review-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Evaluate multiple preselected current-roster hitters
+        run: |
+          python - <<'PY'
+          from sports_mlb_prop_cohort_diagnostics import roster_review
+          r=roster_review(849810,2026,hitters_per_team=5)
+          print('FIXED_ROSTER_COHORT_HITTER_IDS',r['hitter_ids'])
+          print('NUMBER_OF_HITTERS',r['hitter_count'])
+          for item in r['per_hitter']:
+              print('HITTER',item['hitter_name'],
+                    'HIT_N',item['outcomes']['hit']['n_games_with_at_least_one_ab'],
+                    'HIT_BRIER',item['outcomes']['hit']['model_brier'],
+                    'BASE_BRIER',item['outcomes']['hit']['fixed_prior_brier'],
+                    'HR_BRIER',item['outcomes']['hr']['model_brier'],
+                    'HR_BASE',item['outcomes']['hr']['fixed_prior_brier'])
+          print('POOLED_BRIER',r['pooled'])
+          assert not r['independently_frozen_prospective']
+          assert not r['model_approved_for_sportsbook_value']
+          assert not r['wager_execution']
+          print('MLB_COHORT_RETROSPECTIVE_DIAGNOSTIC_PASS')
+          PY
