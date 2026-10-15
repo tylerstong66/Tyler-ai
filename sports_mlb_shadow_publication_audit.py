@@ -9,6 +9,7 @@ import argparse
 import json
 import subprocess
 from pathlib import Path
+from datetime import timedelta
 from sports_mlb_prop_prospective import _verify
 from sports_mlb_sources import utc
 
@@ -68,18 +69,24 @@ def audit_forecast_publication(*, repo="."):
         if len(timestamp)!=2:
             raise ValueError("Missing author/committer timestamp metadata.")
         author,committer=(utc(ts) for ts in timestamp)
+        # Git commit dates have second precision; preserve ambiguous subsecond
+        # ordering instead of treating it as definite pre/post freeze evidence.
+        precise_order_unresolved = frozen > author or frozen > committer
         chronological=(frozen<event and author<event and committer<event
-                       and frozen<=committer and frozen<=author)
+                       and frozen<committer+timedelta(seconds=1)
+                       and frozen<author+timedelta(seconds=1))
         records.append({
             "path":relative,"game_id":core["game_id"],"hitter_id":core["hitter_id"],
             "first_commit_sha":sha,"change_count":1,"status":
-                "GIT_COMMIT_METADATA_PREGAME_NOT_INDEPENDENTLY_ATTESTED" if chronological
+                "GIT_COMMIT_METADATA_PREGAME_SUBSECOND_ORDER_UNKNOWN" if chronological and precise_order_unresolved
+                else "GIT_COMMIT_METADATA_PREGAME_NOT_INDEPENDENTLY_ATTESTED" if chronological
                 else "GIT_METADATA_NOT_PREGAME",
             "frozen_at_utc":frozen.isoformat(),
             "author_date_utc":author.isoformat(),
             "committer_date_utc":committer.isoformat(),
             "event_start_utc":event.isoformat(),
             "metadata_pregame":chronological,
+            "subsecond_order_not_resolved":precise_order_unresolved,
             "original_committed_blob_unchanged":True,
         })
         if chronological:
@@ -94,9 +101,11 @@ def audit_forecast_publication(*, repo="."):
         "verified_unchanged_git_blobs":sum(x.get("original_committed_blob_unchanged") is True for x in records),
         "distinct_official_games":len({x["game_id"] for x in records if "game_id" in x}),
         "independently_attested_publish_times":0,
+        "subsecond_metadata_order_uncertain":sum(x.get("subsecond_order_not_resolved") is True for x in records),
         "prospective_proof_established":False,
         "limitations":[
             "Git author/committer timestamps can be set by the committer; they are not independent GitHub server push receipts.",
+            "Git commit timestamps have whole-second resolution, making the subsecond ordering of freeze and commit dates uncertain.",
             "Full repository history is required; a shallow checkout cannot establish no modifications.",
             "Event time is the official first pitch scheduled at freeze, not independently verified actual first pitch.",
             "Original content hashes and Git history preserve a useful auditable trail, but do not alone certify a prospective betting edge."
