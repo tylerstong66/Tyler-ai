@@ -35,28 +35,53 @@ def positive_id(value, name):
     return value
 
 
-def official_counts(data):
-    """Choose an *explicit* total, never add individual season/game splits twice."""
+def official_counts(data, season, game_type="R"):
+    """Filter true vsPlayer season/game-type splits rather than unscoped totals.
+
+    MLB API responses were independently checked on 2026-10-15. The server may
+    return other seasons/game types even when the query supplies both filters.
+    """
+    if isinstance(season, bool) or not isinstance(season, int) or not 1900 <= season <= 2100:
+        raise ValueError("Invalid requested MLB season.")
+    if game_type not in {"R", "F", "D", "L", "W"}:
+        raise ValueError("Invalid requested MLB game type.")
     groups = data.get("stats")
     if not isinstance(groups, list):
         raise ValueError("Malformed MLB player statistics.")
-    candidates = [split.get("stat") for group in groups if
-                  group.get("type", {}).get("displayName", "").lower() == "vsplayertotal"
-                  and group.get("group", {}).get("displayName", "").lower() == "hitting"
-                  for split in group.get("splits", [])]
-    if not candidates:
+    totals, seen = [], set()
+    for group in groups:
+        if not isinstance(group, dict):
+            raise ValueError("Malformed MLB stats group.")
+        if (group.get("type", {}).get("displayName", "").lower() != "vsplayer" or
+                group.get("group", {}).get("displayName", "").lower() != "hitting"):
+            continue
+        splits = group.get("splits", [])
+        if not isinstance(splits, list):
+            raise ValueError("Malformed MLB vsPlayer splits.")
+        for split in splits:
+            if not isinstance(split, dict):
+                raise ValueError("Malformed MLB vsPlayer split.")
+            if str(split.get("season")) != str(season) or split.get("gameType") != game_type:
+                continue
+            team = split.get("team", {}).get("id")
+            opponent = split.get("opponent", {}).get("id")
+            if not isinstance(team, int) or not isinstance(opponent, int):
+                raise ValueError("Matched MLB season lacks source team identity.")
+            if (team, opponent) in seen:
+                raise ValueError("Duplicate season/game-type matchup split identity.")
+            seen.add((team, opponent))
+            row = split.get("stat")
+            fields = ("plateAppearances", "atBats", "hits", "homeRuns")
+            if not isinstance(row, dict) or any(isinstance(row.get(field), bool) or
+                    not isinstance(row.get(field), int) or row[field] < 0 for field in fields):
+                raise ValueError("Incomplete or invalid MLB per-season counting statistics.")
+            pa, ab, hits, hr = [row[field] for field in fields]
+            if not 0 <= hr <= hits <= ab <= pa:
+                raise ValueError("Inconsistent MLB per-season vs-player statistics.")
+            totals.append({"pa": pa, "ab": ab, "hits": hits, "home_runs": hr})
+    if not totals:
         return None
-    if len(candidates) != 1 or not isinstance(candidates[0], dict):
-        raise ValueError("Ambiguous MLB vsPlayerTotal statistical splits.")
-    row = candidates[0]
-    fields = ["plateAppearances", "atBats", "hits", "homeRuns"]
-    if any(not isinstance(row.get(field), int) or isinstance(row.get(field), bool) or row[field] < 0
-           for field in fields):
-        raise ValueError("Incomplete or invalid MLB vs-player counting statistics.")
-    pa, ab, hits, hr = [row[field] for field in fields]
-    if not 0 <= hr <= hits <= ab <= pa:
-        raise ValueError("Inconsistent MLB vs-player statistics.")
-    return {"pa": pa, "ab": ab, "hits": hits, "home_runs": hr}
+    return {key: sum(row[key] for row in totals) for key in ("pa", "ab", "hits", "home_runs")}
 
 
 class OfficialMlbReader:
@@ -66,13 +91,15 @@ class OfficialMlbReader:
         self.clock = clock or (lambda: datetime.now(timezone.utc))
         self.audit = []
 
-    def load(self, path, params=None):
+    def load(self, path, params=None, api_version="v1"):
         if not isinstance(path, str) or not path or any(c not in
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/-."
                 for c in path) or ".." in path or path.startswith("/"):
             raise ValueError("Invalid fixed-origin MLB path.")
+        if api_version not in ("v1", "v1.1"):
+            raise ValueError("Unsupported fixed-origin MLB API version.")
         params = params or {}
-        url = ORIGIN + path
+        url = "https://statsapi.mlb.com/api/" + api_version + "/" + path
         response = self.get(url, params=params, timeout=12, allow_redirects=False)
         if response.status_code != 200:
             raise RuntimeError("MLB StatsAPI HTTP " + str(response.status_code))
@@ -117,7 +144,7 @@ def _counts_for_pair(reader, hitter_id, pitcher_id, seasons):
         data, evidence = reader.load("people/" + str(hitter_id) + "/stats", {
             "stats": "vsPlayer", "group": "hitting", "opposingPlayerId": pitcher_id,
             "season": season, "gameType": "R"})
-        counts = official_counts(data)
+        counts = official_counts(data, season, "R")
         if counts:
             totals.append(counts)
             urls.append(evidence)
@@ -151,7 +178,7 @@ def pregame_research(game_id, hitter_id, hitter_side, reliever_ids=(), *, reader
     if len(set(reliever_ids)) != len(reliever_ids):
         raise ValueError("Duplicate relief pitcher IDs.")
     reader = reader or OfficialMlbReader()
-    game, event_evidence = reader.load("game/" + str(game_id) + "/feed/live")
+    game, event_evidence = reader.load("game/" + str(game_id) + "/feed/live", api_version="v1.1")
     gd = game.get("gameData", {})
     if (game.get("gamePk") != game_id or gd.get("game", {}).get("type") not in ALLOWED_TYPES
             or gd.get("status", {}).get("abstractGameState") != "Preview"
