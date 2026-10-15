@@ -95,6 +95,13 @@ class PregameTests(unittest.TestCase):
         self.assertIsNone(out["estimated_home_run_probability"])
         self.assertTrue(out["official_data"]["rosters_are_active_not_confirmed_lineups"])
 
+    def test_utc_midnight_uses_eastern_roster_date(self):
+        reader = Reader()
+        reader.rows["game/849831/feed/live"]["gameData"]["datetime"]["dateTime"] = "2026-10-16T00:30:00Z"
+        pregame_research(849831, 10001, "away", reader=reader)
+        roster_calls = [params for path, params in reader.calls if "/roster" in path]
+        self.assertEqual([p["date"] for p in roster_calls], ["2026-10-15", "2026-10-15"])
+
     def test_missing_official_probable_pitcher_fails_closed(self):
         r = Reader()
         del r.rows["game/849831/feed/live"]["gameData"]["probablePitchers"]["home"]
