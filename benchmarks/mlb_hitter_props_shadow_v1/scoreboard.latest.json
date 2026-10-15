@@ -1,0 +1,65 @@
+{
+  "benchmark": {
+    "distinct_official_game_ids": 1,
+    "distinct_official_game_ids_with_eligible_settlements": 0,
+    "frozen_player_game_forecasts": 7,
+    "independent_github_commit_time_attestation_included": false,
+    "ineligible": 0,
+    "limitations": [
+      "A sealed content digest is not independently verified publication time: check GitHub server commit timestamps for genuine prospective evidence.",
+      "Player-game outcomes from the same MLB game share conditions and cannot be treated as independent games.",
+      "Scores apply only when official at-bats are positive; actual bookmaker prop void rules are not represented.",
+      "Current model is a fixed conditional baseline, not validated or compared with any real sportsbook odds.",
+      "A small score advantage over exploratory priors does not prove significant calibration or profitability."
+    ],
+    "market_odds_available": false,
+    "metrics": {
+      "hit": {
+        "brier": null,
+        "eligible_player_games": 0,
+        "fixed_reference_brier": null,
+        "fixed_reference_log_loss": null,
+        "log_loss": null,
+        "model_improved_over_fixed_reference": null,
+        "predictive_edge_established": false
+      },
+      "hr": {
+        "brier": null,
+        "eligible_player_games": 0,
+        "fixed_reference_brier": null,
+        "fixed_reference_log_loss": null,
+        "log_loss": null,
+        "model_improved_over_fixed_reference": null,
+        "predictive_edge_established": false
+      }
+    },
+    "model_is_calibrated": false,
+    "no_wagers": true,
+    "pending": 7,
+    "per_game": {
+      "849810": {
+        "ineligible": 0,
+        "pending": 7,
+        "predictions": 7,
+        "scored": 0
+      }
+    },
+    "proven_betting_edge": false,
+    "scored": 0,
+    "status": "PROSPECTIVE_FREEZE_SCORING_DIAGNOSTIC_NO_BET"
+  },
+  "benchmark_sha256": "e6a191a91bf36c9c5ac20ac5ce0f1cc4fd003a589c5df683a58a8785d3063947",
+  "limitations": [
+    "The feed reports only the GitHub repository snapshot as of its publication time.",
+    "GitHub scheduled jobs may run late, so actual final results may appear later.",
+    "It is NOT a live sportsbook feed or a validated profitable betting model.",
+    "Probability scoring is conditional on at least one official at-bat.",
+    "Git commit metadata is not independent proof of publication timestamp."
+  ],
+  "no_wagers": true,
+  "published_at_utc": "2026-10-15T19:55:43.329766+00:00",
+  "schema": "tyler_mlb_shadow_public_scoreboard_v1",
+  "source": "public_github_main_scheduled_snapshot",
+  "source_git_revision": "76acec173856797a13be79b13188ab5887099a28",
+  "source_is_not_live_official_MLB_api": true
+}
