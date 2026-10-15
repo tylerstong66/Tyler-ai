@@ -1,0 +1,223 @@
+{
+  "NO_BET": true,
+  "actual_wagers": 0,
+  "ambiguous_history_policy": "Do not score ambiguous resumptions; update ratings only after their later retained start plus the frozen delay.",
+  "block_unit": "Eastern scheduled game date",
+  "brier_scale": "sum over two outcomes; range 0 to 2; lower is better",
+  "calibration": {
+    "fixed_elo": {
+      "bins": [
+        {
+          "games": 0,
+          "lower": 0.0,
+          "mean_probability": null,
+          "observed_rate": null,
+          "observed_rate_wilson95": null,
+          "upper": 0.2
+        },
+        {
+          "games": 82,
+          "lower": 0.2,
+          "mean_probability": 0.3667023189872901,
+          "observed_rate": 0.3048780487804878,
+          "observed_rate_wilson95": [
+            0.21583396436990138,
+            0.4113857912164793
+          ],
+          "upper": 0.4
+        },
+        {
+          "games": 1914,
+          "lower": 0.4,
+          "mean_probability": 0.5174668852460724,
+          "observed_rate": 0.5250783699059561,
+          "observed_rate_wilson95": [
+            0.5026787372647122,
+            0.5473775380120939
+          ],
+          "upper": 0.6
+        },
+        {
+          "games": 455,
+          "lower": 0.6,
+          "mean_probability": 0.6387992898125808,
+          "observed_rate": 0.5846153846153846,
+          "observed_rate_wilson95": [
+            0.5388117396884721,
+            0.6290022154800604
+          ],
+          "upper": 0.8
+        },
+        {
+          "games": 0,
+          "lower": 0.8,
+          "mean_probability": null,
+          "observed_rate": null,
+          "observed_rate_wilson95": null,
+          "upper": 1.0
+        }
+      ],
+      "games": 2451,
+      "limitation": "Fixed five bins. Wilson bin intervals assume independent observations; descriptive only."
+    },
+    "model": {
+      "bins": [
+        {
+          "games": 0,
+          "lower": 0.0,
+          "mean_probability": null,
+          "observed_rate": null,
+          "observed_rate_wilson95": null,
+          "upper": 0.2
+        },
+        {
+          "games": 0,
+          "lower": 0.2,
+          "mean_probability": null,
+          "observed_rate": null,
+          "observed_rate_wilson95": null,
+          "upper": 0.4
+        },
+        {
+          "games": 2257,
+          "lower": 0.4,
+          "mean_probability": 0.5360541643995065,
+          "observed_rate": 0.5223748338502436,
+          "observed_rate_wilson95": [
+            0.501747188106413,
+            0.5429264441847622
+          ],
+          "upper": 0.6
+        },
+        {
+          "games": 194,
+          "lower": 0.6,
+          "mean_probability": 0.6187343518492002,
+          "observed_rate": 0.6030927835051546,
+          "observed_rate_wilson95": [
+            0.5328865308240661,
+            0.6692955610308692
+          ],
+          "upper": 0.8
+        },
+        {
+          "games": 0,
+          "lower": 0.8,
+          "mean_probability": null,
+          "observed_rate": null,
+          "observed_rate_wilson95": null,
+          "upper": 1.0
+        }
+      ],
+      "games": 2451,
+      "limitation": "Fixed five bins. Wilson bin intervals assume independent observations; descriptive only."
+    }
+  },
+  "evaluation_eligible_before": "2026-10-11T15:59:30.281973+00:00",
+  "evaluation_season": 2026,
+  "excluded": [
+    {
+      "game_id": "824912",
+      "reason": "ambiguous_resumption"
+    }
+  ],
+  "first_start": "2026-03-26T00:05:00+00:00",
+  "input_manifest_sha256": "9c1819abc77a65e58295dee0fb9ef3298ba0f2b71eae9c1babcf75af1fe6aafc",
+  "last_start": "2026-10-11T00:00:00+00:00",
+  "limitation": "Retrospective reconstruction, not a blind holdout or prospective forecast. These outcomes existed before model freezing and this diagnostic was selected afterward. Revised historical snapshots cannot establish original publication times; kickoff plus 12 hours is the frozen availability assumption, not an observed final publication time. No historical market-price comparison, injury/lineup effects, model selection, promotion, wagers or profits are established. Block intervals are descriptive, not sequential tests.",
+  "metrics": {
+    "fixed_elo": {
+      "blocks": 194,
+      "bootstrap_draws": 2000,
+      "ci95": {
+        "accuracy": [
+          0.5345583876583871,
+          0.5730384573731341
+        ],
+        "brier": [
+          0.4857346418118212,
+          0.4986058934044218
+        ],
+        "log_loss": [
+          0.6787508747726696,
+          0.6918481394619544
+        ]
+      },
+      "games": 2451,
+      "interval_method": "percentile block bootstrap",
+      "mean": {
+        "accuracy": 0.5540595675234599,
+        "brier": 0.4923237323491223,
+        "log_loss": 0.6854550167459098
+      },
+      "minimum_blocks": 5,
+      "uncertainty_status": "available_descriptive"
+    },
+    "model": {
+      "blocks": 194,
+      "bootstrap_draws": 2000,
+      "ci95": {
+        "accuracy": [
+          0.5299239453234135,
+          0.5712555883956032
+        ],
+        "brier": [
+          0.4878358917319245,
+          0.4972999221112833
+        ],
+        "log_loss": [
+          0.6808875933796025,
+          0.6904377895264964
+        ]
+      },
+      "games": 2451,
+      "interval_method": "percentile block bootstrap",
+      "mean": {
+        "accuracy": 0.5503875968992248,
+        "brier": 0.4926244003372577,
+        "log_loss": 0.6857248086045967
+      },
+      "minimum_blocks": 5,
+      "uncertainty_status": "available_descriptive"
+    }
+  },
+  "model_minus_fixed_elo": {
+    "blocks": 194,
+    "bootstrap_draws": 2000,
+    "ci95": {
+      "accuracy": [
+        -0.02080166934189406,
+        0.012937609266106325
+      ],
+      "brier": [
+        -0.002135206656146086,
+        0.0029411422578898144
+      ],
+      "log_loss": [
+        -0.002225832220200411,
+        0.00297584773382026
+      ]
+    },
+    "games": 2451,
+    "interval_method": "percentile block bootstrap",
+    "mean": {
+      "accuracy": -0.0036719706242350062,
+      "brier": 0.00030066798813540023,
+      "log_loss": 0.00026979185868700975
+    },
+    "minimum_blocks": 5,
+    "uncertainty_status": "available_descriptive"
+  },
+  "result_delay_hours": 12,
+  "score_rows_sha256": "2ee8bd6a49ec9cd255f0dbf2427a95c4a1b5ebf63978b5bd39d94d513522180f",
+  "scored": 2451,
+  "source_provenance": {
+    "filter": "season 2026 completed finals with assumed kickoff + 12h eligibility strictly before model freeze; no prospective-period games",
+    "observed_history_sha256": "63310bba00d48b234e491d3a58438c4f64e0960262603b34659a1caf4b772970",
+    "path": "benchmarks/two_way_prospective/mlb/observed_history.json",
+    "repository_commit": "cc15d2e867f39906303722f70d2022d09cd555c0",
+    "source_url": "https://github.com/tylerstong66/Tyler-ai/blob/cc15d2e867f39906303722f70d2022d09cd555c0/benchmarks/two_way_prospective/mlb/observed_history.json"
+  },
+  "sport": "MLB",
+  "training_season": 2025
+}

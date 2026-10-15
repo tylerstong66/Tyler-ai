@@ -1,0 +1,24 @@
+name: NHL and MLB retrospective replay
+on:
+  push:
+    paths: ['sports_two_way_replay.py', 'test_sports_two_way_replay.py', 'sports_two_way_test.py', 'sports_historical_benchmark.py', 'sports_benchmark_review.py', 'benchmarks/two_way_retrospective_v1/**', '.github/workflows/two_way_replay_checks.yml']
+  pull_request:
+    paths: ['sports_two_way_replay.py', 'test_sports_two_way_replay.py', 'sports_two_way_test.py', 'sports_historical_benchmark.py', 'sports_benchmark_review.py', 'benchmarks/two_way_retrospective_v1/**', '.github/workflows/two_way_replay_checks.yml']
+permissions:
+  contents: read
+jobs:
+  offline-replay:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test chronology, frozen inputs and exact report reproduction
+        run: python -m unittest -v test_sports_two_way_replay
+      - name: Reproduce reports without network or app credentials
+        run: |
+          python sports_two_way_replay.py --output /tmp/two-way-replay
+          cmp benchmarks/two_way_retrospective_v1/nhl_report.json /tmp/two-way-replay/nhl_report.json
+          cmp benchmarks/two_way_retrospective_v1/mlb_report.json /tmp/two-way-replay/mlb_report.json
+          cmp benchmarks/two_way_retrospective_v1/README.md /tmp/two-way-replay/README.md
