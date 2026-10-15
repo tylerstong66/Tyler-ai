@@ -15,7 +15,7 @@ Seven MLB 1+ hit/HR conditional shadow predictions were previously committed for
 
 ### Important evidence caveat
 
-**Git commit author/committer timestamps are not independent receipt timestamps.** A Git author can set these timestamps, and the SHA-256 hash only commits to content, not when GitHub received the push. The report therefore explicitly states \`prospective_proof_established=false\` and \`independently_attested_publish_times=0\`, even when all commit metadata is chronologically consistent and historical edits are absent. Independent GitHub Actions run creation times and server-side publication receipts are useful additional corroboration where available, but they are not manufactured here.
+**Git commit author/committer timestamps are not independent receipt timestamps.** Git stores them only to whole seconds; records captured a fraction of a second into the commit's reported second are explicitly marked as *subsecond ordering uncertain*, not as changed or later-published forecasts. A Git author can set these timestamps, and the SHA-256 hash only commits to content, not when GitHub received the push. The report therefore explicitly states \`prospective_proof_established=false\` and \`independently_attested_publish_times=0\`, even when all commit metadata is chronologically consistent and historical edits are absent. Independent GitHub Actions run creation times and server-side publication receipts are useful additional corroboration where available, but they are not manufactured here.
 
 The audit detects concrete publication-integrity problems and makes the evidence more transparent; it does not establish profitable sports betting, unconditional real prop probabilities, or statistical model skill.
 
