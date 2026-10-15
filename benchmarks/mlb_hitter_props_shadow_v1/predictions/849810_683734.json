@@ -1,0 +1,55 @@
+{
+  "actual_wager": 0,
+  "condition": "at_least_one_official_at_bat",
+  "conditional_at_bat_probabilities": {
+    "hit": 0.59,
+    "hr": 0.066
+  },
+  "event_start_utc": "2026-10-16T00:00:00+00:00",
+  "frozen_at_utc": "2026-10-15T19:22:21.214418+00:00",
+  "game_id": 849810,
+  "historical_input_sha256": "14d75173903ee1c20a32c8d0940379543bdcfe4ef4340ded25fa676765e46a51",
+  "hitter_id": 683734,
+  "hitter_name": "Andrew Vaughn",
+  "hitter_side": "away",
+  "hitter_team_id": 158,
+  "model": "mlb_hitter_game_frequency_shadow_v1",
+  "model_calibrated": false,
+  "official_historical_at_bat_eligible_games": 213,
+  "official_historical_games_observed": 216,
+  "opponent_team_id": 119,
+  "record_digest_sha256": "24515ce74628f4fc67a12aa9e64d850091736070803bf661950f406fef749c89",
+  "schema": "mlb_hit_prop_shadow_ledger_v1",
+  "source_capture_started_at_utc": "2026-10-15T19:22:20.675890+00:00",
+  "source_receipts": {
+    "active_roster": {
+      "data_through": "2026-10-15T19:22:20.873049+00:00",
+      "response_sha256": "d6944fc41926bd5959360f268c3749eed36b083427535028dedbe81a720506fe",
+      "retrieved_at": "2026-10-15T19:22:20.873049+00:00",
+      "source_url": "https://statsapi.mlb.com/api/v1/teams/158/roster?date=2026-10-15&rosterType=active"
+    },
+    "hitter_game_logs": [
+      {
+        "data_through": "2026-10-15T19:22:21.099533+00:00",
+        "response_sha256": "e08379eefbde959c8317b339644cb3dbd98552fe3e07cdaafe11bd83718c5fd1",
+        "retrieved_at": "2026-10-15T19:22:21.099533+00:00",
+        "source_url": "https://statsapi.mlb.com/api/v1/people/683734/stats?gameType=R&group=hitting&season=2025&stats=gameLog"
+      },
+      {
+        "data_through": "2026-10-15T19:22:21.210759+00:00",
+        "response_sha256": "d1e3ee94955a46d28224facb8fd4643767c071e55c701d660f0fe5465738e7bb",
+        "retrieved_at": "2026-10-15T19:22:21.210759+00:00",
+        "source_url": "https://statsapi.mlb.com/api/v1/people/683734/stats?gameType=R&group=hitting&season=2026&stats=gameLog"
+      }
+    ],
+    "pregame_game": {
+      "data_through": "2026-10-15T19:22:20.753188+00:00",
+      "response_sha256": "700a55db62b8ccb38202ab4758df60cd442f6a183a8fca3b055a7e24ca1e11ff",
+      "retrieved_at": "2026-10-15T19:22:20.753188+00:00",
+      "source_url": "https://statsapi.mlb.com/api/v1.1/game/849810/feed/live"
+    }
+  },
+  "sportsbook_wager_eligible": false,
+  "status": "IMMUTABLE_PREGAME_SHADOW_NO_BET",
+  "training_game_day_before": "2026-10-15"
+}
