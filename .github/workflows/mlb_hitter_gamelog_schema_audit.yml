@@ -1,0 +1,39 @@
+name: MLB individual hitting gamelog public schema audit
+on:
+  push:
+    branches: ['ops/tyler-render-smoke-20261015']
+    paths: ['.github/workflows/mlb_hitter_gamelog_schema_audit.yml']
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install requests==2.32.5
+      - name: Inspect official gameLog splits from multiple seasons
+        run: |
+          python - <<'PY'
+          import requests
+          base='https://statsapi.mlb.com/api/v1/people/683734/stats'
+          for season in (2025,2026):
+              response=requests.get(base,params={'stats':'gameLog','group':'hitting','season':season,'gameType':'R'},
+                                    timeout=15,allow_redirects=False)
+              print('HTTP',season,response.status_code,'bytes',len(response.content),flush=True)
+              response.raise_for_status()
+              groups=response.json().get('stats',[])
+              for g in groups:
+                  print('GROUP',season,g.get('type'),g.get('group'),'splits',len(g.get('splits',[])),flush=True)
+                  for split in g.get('splits',[])[:5]:
+                      print('SPLIT',season,{'date':split.get('date'),'season':split.get('season'),
+                         'gameType':split.get('gameType'),'game':split.get('game'),
+                         'team':split.get('team'),'player':split.get('player'),
+                         'stat':{k:split.get('stat',{}).get(k) for k in ('atBats','hits','homeRuns',
+                               'plateAppearances','gamesPlayed','baseOnBalls','gamesStarted')}},
+                         flush=True)
+          print('GAME_LOG_SCHEMA_AUDIT_COMPLETE')
+          PY
