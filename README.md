@@ -7,6 +7,7 @@ Tyler AI autonomous assistant
 
 - [NFL results](benchmarks/nfl_prospective_v2/RESULTS.md): the previously frozen efficiency candidate versus team Elo and market odds.
 - [NHL results](benchmarks/two_way_prospective/nhl/RESULTS.md) and [MLB results](benchmarks/two_way_prospective/mlb/RESULTS.md): separate frozen team-Elo logistic baselines versus fixed Elo and timestamped market odds. All verified regular-season and playoff games within 24 hours are eligible, including unpriced games. There is no NHL/MLB enrollment cap; the first review milestone is 100 settled games per league.
+- [NHL/MLB retrospective diagnostics](benchmarks/two_way_retrospective_v1/README.md): reproducible chronological scoring of the frozen models on retained 2026-season games before the prospective trials. This post-hoc reconstruction is separate from the live test and is not a blind holdout.
 
 The shared hourly GitHub workflow captures public sources, saves predictions before kickoff, and settles only when official league and ESPN identities, start times and final scores agree. Forecast files and frozen assets are hashed. Existing predictions are never replaced. Sleeping services, upstream failures, rescheduling and workflow delays can leave gaps; exact enrollment and settlement timing are not guaranteed.
 
