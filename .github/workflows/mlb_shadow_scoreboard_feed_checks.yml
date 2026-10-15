@@ -1,0 +1,33 @@
+name: Tyler MLB public scoreboard feed and authenticated chat checks
+on:
+  push:
+    branches: [feature/mlb-shadow-github-scoreboard-feed-v1]
+    paths:
+      - sports_mlb_prop_scoreboard_feed.py
+      - sports_mlb_prop_scoreboard_reader.py
+      - app_v2_19_3_39.py
+      - test_sports_mlb_prop_scoreboard_feed.py
+      - test_v2_19_3_39_mlb_scoreboard_http.py
+      - .github/workflows/mlb_shadow_scoreboard_feed_checks.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - sports_mlb_prop_scoreboard_feed.py
+      - sports_mlb_prop_scoreboard_reader.py
+      - app_v2_19_3_39.py
+      - test_sports_mlb_prop_scoreboard_feed.py
+      - test_v2_19_3_39_mlb_scoreboard_http.py
+      - .github/workflows/mlb_shadow_scoreboard_feed_checks.yml
+permissions:
+  contents: read
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: python -m unittest -v test_sports_mlb_prop_scoreboard_feed test_v2_19_3_39_mlb_scoreboard_http
