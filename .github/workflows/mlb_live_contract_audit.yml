@@ -1,0 +1,22 @@
+name: Public MLB StatsAPI contract audit
+on:
+  push:
+    branches:
+      - audit/mlb-live-statsapi-contract-20261015
+    paths:
+      - audit_mlb_live_contract.py
+      - .github/workflows/mlb_live_contract_audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: python audit_mlb_live_contract.py
