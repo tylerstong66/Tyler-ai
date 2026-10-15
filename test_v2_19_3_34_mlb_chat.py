@@ -80,8 +80,9 @@ class ChatTests(unittest.TestCase):
         prior.assert_called_once_with("show evidence paper trials")
 
     def test_status_reports_not_deployed_probability_model(self):
-        result = app34.status()
-        data = result.get_json()
+        with app34.app.app_context():
+            result = app34.status()
+            data = result.get_json()
         self.assertTrue(data["sports_mlb_research_command_supported"])
         self.assertFalse(data["sports_mlb_research_official_data_live_schema_verified"])
         self.assertFalse(data["sports_mlb_player_prop_probabilities_calibrated"])
