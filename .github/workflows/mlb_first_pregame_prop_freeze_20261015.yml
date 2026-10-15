@@ -1,0 +1,33 @@
+name: MLB first prospective conditional-hitter freeze (research-only)
+on:
+  push:
+    branches: ['ops/tyler-render-smoke-20261015']
+    paths: ['.github/workflows/mlb_first_pregame_prop_freeze_20261015.yml']
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git fetch origin main
+          git checkout --detach origin/main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Collect immutable official-source shadow record before first pitch
+        run: |
+          python - <<'PY'
+          import json
+          from sports_mlb_prop_prospective import freeze_pregame_hit_props, _verify
+          record=freeze_pregame_hit_props(849810,683734,'away')
+          _verify(record)
+          assert record['actual_wager']==0
+          assert record['status']=='IMMUTABLE_PREGAME_SHADOW_NO_BET'
+          assert record['frozen_at_utc'] < record['event_start_utc']
+          print('FROZEN_MLB_JSON='+json.dumps(record,sort_keys=True,separators=(',',':')))
+          print('PREGAME_SHADOW_CAPTURE_PASSED',record['record_digest_sha256'])
+          PY
