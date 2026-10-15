@@ -5,7 +5,10 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['.github/workflows/mlb_shadow_scoreboard_publisher.yml']
+    paths:
+      - '.github/workflows/mlb_shadow_scoreboard_publisher.yml'
+      - 'sports_mlb_shadow_uncertainty.py'
+      - 'sports_mlb_prop_shadow_scoreboard.py'
 permissions:
   contents: write
 concurrency:
