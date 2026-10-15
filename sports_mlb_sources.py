@@ -6,6 +6,7 @@ Uses an injected reader for offline tests; default reader is the public MLB Stat
 import hashlib
 import json
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 from urllib.parse import urlencode
 
 import requests
@@ -173,7 +174,7 @@ def pregame_research(game_id, hitter_id, hitter_side, reliever_ids=(), *, reader
     starter_id = positive_id(pp["id"], "probable pitcher")
     if starter_id in reliever_ids or hitter_id == starter_id or hitter_id in reliever_ids:
         raise ValueError("Role collision among MLB player IDs.")
-    date = start.date().isoformat()
+    date = start.astimezone(ZoneInfo("America/New_York")).date().isoformat()
     team_roster, _ = reader.load("teams/" + str(hitter_team_id) + "/roster", {
         "rosterType": "active", "date": date})
     opponent_roster, _ = reader.load("teams/" + str(pitcher_team_id) + "/roster", {
