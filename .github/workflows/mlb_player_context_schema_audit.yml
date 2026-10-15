@@ -1,0 +1,46 @@
+name: Official MLB season and handedness schema audit
+on:
+  push:
+    branches: ['ops/tyler-render-smoke-20261015']
+    paths:
+      - .github/workflows/mlb_player_context_schema_audit.yml
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install requests==2.32.5
+      - run: |
+          python - <<'PY'
+          import requests
+          B='https://statsapi.mlb.com/api/v1/'
+          for pid in (683734,607192):
+              r=requests.get(B+f'people/{pid}',timeout=15,allow_redirects=False)
+              print('PLAYER_HTTP',pid,r.status_code)
+              r.raise_for_status()
+              data=r.json()
+              for p in data.get('people',[]):
+                  print('PERSON',p.get('id'),p.get('fullName'),
+                        'batSide',p.get('batSide'),'pitchHand',p.get('pitchHand'))
+          for season in (2025,2026):
+              r=requests.get(B+'people/683734/stats',params={
+                  'stats':'season','group':'hitting','season':season,'gameType':'R'},
+                  timeout=15,allow_redirects=False)
+              print('STATS_HTTP',season,r.status_code)
+              r.raise_for_status()
+              for group in r.json().get('stats',[]):
+                  print('GROUP',season,group.get('type'),group.get('group'))
+                  for split in group.get('splits',[]):
+                      print('SPLIT',season,{'season':split.get('season'),
+                          'gameType':split.get('gameType'),
+                          'team':split.get('team'),
+                          'player':split.get('player'),
+                          'stat':{k:split.get('stat',{}).get(k) for k in (
+                              'gamesPlayed','plateAppearances','atBats','hits','homeRuns','baseOnBalls') }})
+          PY
