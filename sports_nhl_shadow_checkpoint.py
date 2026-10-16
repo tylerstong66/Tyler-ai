@@ -9,6 +9,35 @@ VERSION = 'nhl-shadow-first-100-enrolled-v1'
 RELATIVE_PATH = 'checkpoints/first_100_enrolled/REVIEW.json'
 
 
+def calibration_diagnostics(rows, names):
+    """Fixed-bin reliability and probability sharpness on a declared sample.
+
+    Descriptive only. Wilson intervals are not time-block uncertainty tests.
+    The caller must supply identical game rows for every compared source.
+    """
+    sources = {}
+    for name in names:
+        pairs = [(row['home_probabilities'][name], row['outcome'] == 'home')
+                 for row in rows]
+        values = [review.probability(p) for p, _ in pairs]
+        count = len(values)
+        sources[name] = {
+            'calibration': review.calibration(pairs),
+            'spread': {
+                'games': count,
+                'mean_distance_from_even': (
+                    sum(abs(p-.5) for p in values)/count if count else None),
+                'share_between_40_and_60_percent': (
+                    sum(.4 <= p <= .6 for p in values)/count if count else None),
+            },
+        }
+    return {
+        'sources': sources,
+        'limitation': ('Fixed-bin descriptive reliability; small bins are unstable. '
+                       'Wilson intervals assume independent games; no edge, promotion or wagering inference.'),
+    }
+
+
 def preserve(root, selection, scored_rows, protocol_digest, paired_differences):
     """Freeze a reproducible report only after the first 100 forecasts settle.
 
