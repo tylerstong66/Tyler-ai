@@ -1,0 +1,21 @@
+{
+  "version": "nhl-forward-challenger-shadow-v1",
+  "activation_utc": "2026-10-16T17:00:00+00:00",
+  "candidate": "ridge_recipe",
+  "weights": [
+    0.2561241691997487,
+    0.6107928174778942
+  ],
+  "source_report": "benchmarks/two_way_challenger_v1/nhl_report.json",
+  "source_protocol_sha256": "4ec1c2b8a4cea91f83b029f2c279c1742f8cf0b00b5c4d208f559aea786e071a",
+  "source_score_rows_sha256": "63b78c6b5a54710223c0d3c503e30fd6d9e9f510ba47de09b155975ae48078bb",
+  "review_checkpoint": 100,
+  "source_2024_training_games": 1312,
+  "source_2025_development_games": 1312,
+  "development_selection_not_blind": true,
+  "research_only": true,
+  "promotion_allowed": false,
+  "NO_BET": true,
+  "actual_wagers": 0,
+  "notes": "This 2024-fitted ridge challenger was selected on 2025 historical games. Enrollment never backfills a pre-activation primary forecast, never runs after kickoff, never alters the original primary forecast/model, and never places a wager. Future shadow results are a new dependent cohort with first 100 selected by enrollment time, not by outcome."
+}
