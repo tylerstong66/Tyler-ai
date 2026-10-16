@@ -222,7 +222,7 @@
       "uncertainty_status": "insufficient_blocks"
     }
   },
-  "as_of_utc": "2026-10-16T17:24:58.978549+00:00",
+  "as_of_utc": "2026-10-16T17:46:42.649958+00:00",
   "candidate": "ridge_recipe",
   "enrolled": 1,
   "first_100_enrolled": {
@@ -241,7 +241,7 @@
   },
   "input_digest": "160fe83b8c8ecd3dde5c14f3f148867ddb1904a001a60a922069172b6e950c1a",
   "limitation": "Research only; all results are descriptive. No candidate selection, model promotion, bets, odds backfills or claims of an edge.",
-  "newly_enrolled": 1,
+  "newly_enrolled": 0,
   "paired_challenger_minus_baseline": {
     "fixed_elo": {
       "blocks": 0,
@@ -606,5 +606,38 @@
   },
   "source_report": "benchmarks/two_way_challenger_v1/nhl_report.json",
   "source_report_protocol_sha256": "4ec1c2b8a4cea91f83b029f2c279c1742f8cf0b00b5c4d208f559aea786e071a",
+  "upcoming_pregame_comparisons": {
+    "NO_BET": true,
+    "actual_wagers": 0,
+    "games": [
+      {
+        "archived_forecast_recorded_at_utc": "2026-10-16T17:24:58.978549+00:00",
+        "away": "NJD",
+        "event_id": "401892519",
+        "game_id": "2026020121",
+        "home": "WSH",
+        "home_win_probabilities": {
+          "challenger": 0.5911197963785702,
+          "fixed_elo": 0.6224179445926905,
+          "original_model": 0.5410579328488289,
+          "saved_market": 0.5324675324675325
+        },
+        "live_market_quote": false,
+        "result_eligible_to_score_now": false,
+        "saved_market_observed_at_utc": "2026-10-16T17:24:56.309906+00:00",
+        "saved_market_provider": "DraftKings",
+        "scheduled_start_utc": "2026-10-17T17:00:00+00:00",
+        "shadow_forecast_sha256": "8538cf4b864bc5448a877bf7ab806f580babf7fa661b699aab26d51af39f396a",
+        "source_forecast_sha256": "2ac1b09bf7d217c039df2fac8e11b067fbd3156ad4d71e44a4411afb0f6fc8b9",
+        "source_generated_at_utc": "2026-10-16T17:24:56.371527+00:00"
+      }
+    ],
+    "probability_convention": "probability of home team winning including overtime or shootout",
+    "quote_warning": "Market probability is a saved pregame quote from the original forecast, NOT current odds or a verified closing line.",
+    "scope": "earliest_future_frozen_nhl_challenger_games",
+    "selection": "scheduled_start_utc ascending, then game_id; never based on result or model confidence",
+    "shown": 1,
+    "total_future_enrolled": 1
+  },
   "version": "nhl-forward-challenger-shadow-v1"
 }
