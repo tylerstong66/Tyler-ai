@@ -2,6 +2,15 @@
 
 **Research/paper only. No real wagers. No model promotion without genuinely sufficient independent prospective evidence.** This is a current operational entry; older historical notes remain below unchanged.
 
+### October 16 continuation: first-100 checkpoint and forward shadow coverage
+
+- PR #83 added candidate-minus-primary/Elo/market **paired same-game** Brier, log-loss, and accuracy deltas; separate market comparisons include only games with saved pregame prices. All 13 PR checks and its post-merge collector succeeded. A zero-game report correctly keeps missing metrics and date-block uncertainty null.
+- PR #84 protected NHL shadow artifact publication: Git stages challenger outputs only if the validation/enrollment step reports success, although original NFL/NHL/MLB source evidence is independently retained on error. All 14 checks passed; post-merge scheduled collector succeeded.
+- PR #85 added a deterministic and immutable `checkpoints/first_100_enrolled/REVIEW.json` artifact only when the **first 100 enrolled NHL challenger games themselves** all have verified results, never replacing slow-to-settle games with later results. Each future run recomputes all checkpoint data from saved SHA-linked forecasts and final score rows; mismatch fails closed. All 15 checks passed, and post-merge scheduled collection succeeded.
+- PR #86 separately exposes every eligible **saved original post-activation** NHL forecast, reports missed shadow enrollment after kickoff rather than fabricating a retrospective forecast, and refuses rehashed pre-activation or future-dated shadow records. This cannot establish upstream NHL schedule completeness. All 13 checks passed; post-merge scheduled primary, shadow, review and artifact collection succeeded.
+- The independently published NHL challenger scoreboard as of **2026-10-16T16:24:31Z** showed `0 eligible post-activation saved primary forecasts / 0 shadow-enrolled / 0 scored`, with `0` missed source records and the first-100 checkpoint in `collecting_forecasts` state. The activation cutoff remains **2026-10-16T17:00Z**. Do **not** interpret these as model performance or repair pre-activation games.
+- Next verified data dependency: the first truly new original NHL paper forecast generated and recorded after 17:00 UTC, still before kickoff. Let the hourly `Sports prospective paper tests` workflow create the separately frozen challenger record, independently validate its later official final and keep cumulative and first-100 summaries descriptive. No wagers, promotion or production Render deploy.
+
 ### NHL challenger cohort activated in code — awaiting independent post-cutoff games
 
 - PR #79 added same-game probability-spread diagnostics; NHL (35 priced decisive games) has model probabilities 100% within 40–60% versus 57% for Elo and 77% for the archived market. Its model Brier 0.477369 was worse than Elo 0.457007 and market 0.462939; better winner accuracy is not enough to establish probability quality.
