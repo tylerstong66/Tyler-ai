@@ -103,6 +103,25 @@ upcoming disappear from this preview but remain preserved in the cumulative
 trial and first-100 selected set. No past outcome, odds movement or highest
 predicted winning chance affects selection order. All records stay NO BET.
 
+### Result-linked per-game casebook
+
+The cumulative shadow scoreboard also publishes a `recent_verified_game_casebook`
+after confirmed NHL finals are linked by the existing independent result-integrity
+reader to their original frozen forecasts. It shows the **latest 25** verified
+games by retained final-verification timestamp and ID, along with the total
+number of all scored challenger games (all contribute to aggregate scores).
+For each game it gives the exact original/shadow prediction hashes, matchup,
+winner, original home-win probabilities, Brier/log-loss/accuracy for challenger,
+primary model, fixed Elo, and—only when priced originally—the saved market.
+Paired differences come from **that exact game's** original outcome, not
+separately aggregated populations. Unpriced market metrics remain null.
+
+The view is a convenience subset for audit, **not a model-selection cohort**;
+the immutable first-100 checkpoint and cumulative scoring include all eligible
+scored games irrespective of which appear in the latest-25 display. The saved
+market is an archival pregame quote, not an available bet, closing line or
+expected profitable opportunity. The NO BET and no-promotion rules remain.
+
 ### Prospective calibration and probability spread
 
 The cumulative scoreboard and the immutable first-100 review independently
