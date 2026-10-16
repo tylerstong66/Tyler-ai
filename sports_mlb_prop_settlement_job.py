@@ -17,25 +17,34 @@ DEFAULT_ROOT="benchmarks/mlb_hitter_props_shadow_v1"
 
 
 def settle_ready_records(root=DEFAULT_ROOT, *, reader=None, max_files=100):
+    """Validate all saved evidence; rotate up to max_files official final checks.
+
+    The inventory may grow beyond the per-run network budget. Selecting an
+    explicit 3-hour rotating window from as-yet-unsettled, past-scheduled-start
+    forecasts prevents permanently starving newer or older player-games.
+    Previously settled records are never changed.
+    """
     root=Path(root)
     if isinstance(max_files,bool) or not isinstance(max_files,int) or not 1<=max_files<=100:
-        raise ValueError("At most 100 frozen shadow predictions per settlement run.")
+        raise ValueError("At most 100 official MLB player-game checks per settlement run.")
     original_dir=root/"predictions"
     out_dir=root/"settlements"
     if not original_dir.exists():
         return {"discovered":0,"settled":0,"pending":0,"unresolved":0,
-                "already_settled":0,"files":[],"unresolved_files":[]}
-    pending=0
-    unresolved=0
-    unresolved_files=[]
-    done=0
-    existing=0
-    discovered=0
-    files=[]
+                "already_settled":0,"files":[],"unresolved_files":[],
+                "eligible_unsettled":0,"attempted_official_checks":0,
+                "deferred_due_to_batch_cap":0,"batch_window":None,
+                "batch_window_count":0}
     reader=reader or OfficialMlbReader()
+    now=utc(reader.clock())
     entries=sorted(original_dir.glob("*.json"))
-    if len(entries)>max_files:
-        raise ValueError("More pregame snapshots exist than allowed; refuse partial silent settlement.")
+    if len(entries)>30000:
+        raise ValueError("Unexpectedly many sealed MLB predictions; refuse unbounded inventory.")
+    candidates=[]
+    existing=0
+    pregame=0
+    # FIRST preflight all predictions, settlement hashes and identities before
+    # writing even one new immutable official result. No silent partial batch.
     for path in entries:
         record=json.loads(path.read_text(encoding="utf-8"))
         core=_verify(record)
@@ -43,19 +52,35 @@ def settle_ready_records(root=DEFAULT_ROOT, *, reader=None, max_files=100):
         hitter=core.get("hitter_id")
         if path.name!=str(game)+"_"+str(hitter)+".json":
             raise ValueError("Frozen forecast file naming does not match immutable game/player IDs.")
-        discovered+=1
         target=out_dir/path.name
         if target.exists():
             previous=json.loads(target.read_text(encoding="utf-8"))
-            _verify(previous)
-            if previous.get("prediction_digest_sha256")!=record["record_digest_sha256"]:
-                raise ValueError("Existing settlement points at the wrong frozen prediction.")
+            sealed=_verify(previous)
+            if (sealed.get("game_id")!=game or sealed.get("hitter_id")!=hitter
+                    or previous.get("prediction_digest_sha256")!=record["record_digest_sha256"]):
+                raise ValueError("Existing settlement identity or original forecast link is invalid.")
             existing+=1
             continue
-        now=utc(reader.clock())
-        if now<=utc(core["event_start_utc"]):
-            pending+=1
+        kickoff=utc(core["event_start_utc"])
+        if now<=kickoff:
+            pregame+=1
             continue
+        candidates.append((kickoff,game,hitter,path,record,target))
+    candidates.sort(key=lambda entry:(entry[0],entry[1],entry[2]))
+    window_count=(len(candidates)+max_files-1)//max_files
+    # Scheduled workflow runs at most every three hours; the bounded,
+    # deterministic slice cycles through ALL remaining eligible windows.
+    slot=int(now.timestamp())//(3*3600)
+    window=slot%window_count if window_count else None
+    selected=(candidates[window*max_files:(window+1)*max_files]
+              if window is not None else [])
+    deferred=len(candidates)-len(selected)
+    pending=pregame+deferred
+    unresolved=0
+    unresolved_files=[]
+    done=0
+    files=[]
+    for kickoff,game,hitter,path,record,target in selected:
         official,_=reader.load("game/"+str(game)+"/feed/live",api_version="v1.1")
         status=official.get("gameData",{}).get("status",{})
         if official.get("gamePk")!=game:
@@ -63,14 +88,11 @@ def settle_ready_records(root=DEFAULT_ROOT, *, reader=None, max_files=100):
         if status.get("abstractGameState")!="Final":
             pending+=1
             continue
-        # Re-read through settlement routine, independently verifying final
-        # official event time, team IDs, hitter ID and conditional outcome.
         try:
+            # Independently verifies MLB final source, team/player identity,
+            # counts and timestamp against the saved pregame forecast.
             result=settle_frozen_hit_props(record,reader=reader)
         except MissingOfficialBattingFieldError as error:
-            # An absent official count is not a verified zero. Never write an
-            # immutable grade that could be contradicted by a later feed.
-            # Actual wrong types, impossible counts and identity drift still fail.
             unresolved+=1
             reason=("OFFICIAL_FINAL_AT_BATS_UNAVAILABLE_RETRY"
                     if error.field=="atBats"
@@ -84,9 +106,13 @@ def settle_ready_records(root=DEFAULT_ROOT, *, reader=None, max_files=100):
                       "prediction_digest":record["record_digest_sha256"],
                       "settlement_digest":result["record_digest_sha256"]})
     return {
-        "discovered":discovered,"settled":done,"pending":pending,
+        "discovered":len(entries),"settled":done,"pending":pending,
         "unresolved":unresolved,"unresolved_files":unresolved_files,
         "already_settled":existing,"files":files,
+        "eligible_unsettled":len(candidates),
+        "attempted_official_checks":len(selected),
+        "deferred_due_to_batch_cap":deferred,
+        "batch_window":window,"batch_window_count":window_count,
         "only_separate_result_files_written":True,"wagers":0,
     }
 

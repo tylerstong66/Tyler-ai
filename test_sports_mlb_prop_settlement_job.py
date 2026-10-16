@@ -1,12 +1,13 @@
 """Scheduled no-wager settlement test: no updates to original frozen predictions."""
 import copy
 import json
+from datetime import timedelta
 import tempfile
 import unittest
 from pathlib import Path
 
 from sports_mlb_prop_settlement_job import settle_ready_records
-from sports_mlb_prop_prospective import freeze_pregame_hit_props, write_exclusive_json
+from sports_mlb_prop_prospective import freeze_pregame_hit_props, write_exclusive_json, _seal
 from test_sports_mlb_prop_prospective import OfficialReader, AFTER
 
 
@@ -127,6 +128,62 @@ class SettlementScheduleTests(unittest.TestCase):
             path.rename(path.with_name("malformed.json"))
             with self.assertRaisesRegex(ValueError,"naming"):
                 settle_ready_records(d,reader=reader)
+
+    def populate(self, root, total):
+        reader,record,first=self.prepare(root)
+        for i in range(1,total):
+            core=copy.deepcopy(record)
+            core.pop("record_digest_sha256")
+            core["hitter_id"]=700000+i
+            core["hitter_name"]="Synthetic backlog hitter"
+            write_exclusive_json(Path(root)/"predictions"/f"849810_{700000+i}.json",_seal(core))
+        return reader,record,first
+
+    def test_more_than_100_forecasts_no_longer_blocks_future_settlements(self):
+        with tempfile.TemporaryDirectory() as folder:
+            reader,record,first=self.populate(folder,103)
+            report=settle_ready_records(folder,reader=reader)
+            self.assertEqual(report["discovered"],103)
+            self.assertEqual(report["pending"],103)
+            self.assertEqual(report["attempted_official_checks"],0)
+            self.assertEqual(report["eligible_unsettled"],0)
+            self.assertEqual(report["deferred_due_to_batch_cap"],0)
+            self.assertEqual(report["batch_window_count"],0)
+            self.assertFalse((Path(folder)/"settlements").exists())
+
+    def test_bounded_rotating_windows_eventually_check_every_unsettled_window(self):
+        with tempfile.TemporaryDirectory() as folder:
+            reader,record,first=self.populate(folder,7)
+            reader.final=False
+            seen=set()
+            for k in range(7):
+                reader.now=AFTER+timedelta(hours=3*k)
+                report=settle_ready_records(folder,reader=reader,max_files=1)
+                self.assertEqual(report["discovered"],7)
+                self.assertEqual(report["eligible_unsettled"],7)
+                self.assertEqual(report["attempted_official_checks"],1)
+                self.assertEqual(report["deferred_due_to_batch_cap"],6)
+                self.assertEqual(report["pending"],7)
+                self.assertEqual(report["batch_window_count"],7)
+                self.assertEqual(report["settled"],0)
+                self.assertEqual(report["unresolved"],0)
+                seen.add(report["batch_window"])
+            self.assertEqual(seen,set(range(7)))
+            self.assertFalse((Path(folder)/"settlements").exists())
+
+    def test_full_inventory_preflight_blocks_partial_writes(self):
+        with tempfile.TemporaryDirectory() as folder:
+            reader,record,first=self.populate(folder,3)
+            reader.now=AFTER
+            reader.final=True
+            path=Path(folder)/"predictions"/"849810_700002.json"
+            tampered=json.loads(path.read_text())
+            tampered["conditional_at_bat_probabilities"]["hit"]=0.999
+            path.write_text(json.dumps(tampered))
+            with self.assertRaisesRegex(ValueError,"digest"):
+                settle_ready_records(folder,reader=reader,max_files=1)
+            self.assertFalse((Path(folder)/"settlements").exists())
+            self.assertEqual(json.loads(first.read_text()),record)
 
     def test_no_prediction_directory_has_no_side_effect(self):
         with tempfile.TemporaryDirectory() as d:
