@@ -68,6 +68,7 @@ class NhlForwardShadowTests(unittest.TestCase):
             first = shadow.evaluate(base, clock)
             self.assertEqual((first['enrolled'], first['newly_enrolled'],
                               first['scored'], first['pending']), (1, 1, 0, 1))
+            self.assertEqual(first['recent_verified_game_casebook']['shown'], 0)
             upcoming=first['upcoming_pregame_comparisons']
             self.assertEqual((upcoming['total_future_enrolled'],upcoming['shown']),(1,1))
             view=upcoming['games'][0]
@@ -99,6 +100,18 @@ class NhlForwardShadowTests(unittest.TestCase):
             later = shadow.evaluate(base, review.utc('2026-10-17T05:00:00Z'))
             self.assertEqual((later['scored'], later['pending'], later['same_game_priced_count']),
                              (1, 0, 1))
+            detailed=later['recent_verified_game_casebook']
+            self.assertEqual((detailed['total_settled_shadow_games'], detailed['shown']),(1,1))
+            case=detailed['games'][0]
+            self.assertEqual(case['verified_winner'], 'H')
+            self.assertEqual(case['verified_winner_side'], 'home')
+            self.assertEqual(case['original_forecast_sha256'],original['sha256'])
+            self.assertEqual(case['home_win_probabilities']['candidate'],
+                             pred['home_probability'])
+            self.assertAlmostEqual(case['challenger_minus_baseline']['model']['brier'],
+                                   case['proper_scores']['candidate']['brier'] -
+                                   case['proper_scores']['model']['brier'])
+            self.assertFalse(case['live_odds'])
             self.assertEqual(later['upcoming_pregame_comparisons']['shown'],0)
             self.assertEqual(later['all_scored_calibration']['sources']['candidate']['calibration']['games'],1)
             self.assertEqual(later['same_game_priced_calibration']['sources']['market']['spread']['games'],1)

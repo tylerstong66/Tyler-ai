@@ -14,6 +14,7 @@ from zoneinfo import ZoneInfo
 import sports_benchmark_review as review
 import sports_nhl_shadow_checkpoint as checkpoint
 import sports_nhl_shadow_preview as preview
+import sports_nhl_shadow_casebook as casebook
 import sports_historical_benchmark as b
 import sports_prospective_test as n
 
@@ -200,6 +201,7 @@ def evaluate(base=Path('.'), at=None):
             raise ValueError('NHL shadow settlement is not a two-outcome final')
         score = review.binary_scores(item['home_probability'], outcome)
         scores.append({'game_id': row['game_id'],
+                       'verified_at': row['verified_at'],
                        'block': review.utc(item['kickoff']).astimezone(
                            ZoneInfo('America/New_York')).date().isoformat(),
                        'candidate': score, 'model': row['binary']['model'],
@@ -242,6 +244,7 @@ def evaluate(base=Path('.'), at=None):
         'pending': len(shadow)-len(scores),
         'same_game_priced_count': len(paired),
         'upcoming_pregame_comparisons': preview.upcoming(shadow, originals, now),
+        'recent_verified_game_casebook': casebook.recent_verified(scores, shadow, originals),
         'all_scored_unpriced_and_priced': metrics(scores, names[:3]),
         'same_game_priced': metrics(paired, names),
         'paired_challenger_minus_baseline': paired_score_differences(scores),

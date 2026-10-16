@@ -2,7 +2,7 @@ name: Sports prospective paper tests
 on:
   push:
     branches: ['main']
-    paths: ['sports_prospective_test.py', 'sports_two_way_test.py', 'sports_benchmark_review.py', 'sports_market_evidence.py', 'sports_benchmark_coverage.py', 'sports_nhl_challenger_shadow.py', 'sports_nhl_shadow_checkpoint.py', 'sports_nhl_shadow_preview.py', 'benchmarks/nhl_challenger_shadow_v1/protocol.json', '.github/workflows/nfl_prospective_paper.yml']
+    paths: ['sports_prospective_test.py', 'sports_two_way_test.py', 'sports_benchmark_review.py', 'sports_market_evidence.py', 'sports_benchmark_coverage.py', 'sports_nhl_challenger_shadow.py', 'sports_nhl_shadow_checkpoint.py', 'sports_nhl_shadow_preview.py', 'sports_nhl_shadow_casebook.py', 'benchmarks/nhl_challenger_shadow_v1/protocol.json', '.github/workflows/nfl_prospective_paper.yml']
   schedule:
     - cron: '15 * * * *'
   workflow_dispatch:
