@@ -148,6 +148,8 @@ def evaluate(base=Path('.'), at=None):
         item = shadow.get(row['game_id'])
         if item is None:
             continue
+        if review.utc(row['verified_at']) > now:
+            continue  # A saved future timestamp cannot create an as-of result.
         outcome = row['outcome']
         if outcome not in ('home', 'away'):
             raise ValueError('NHL shadow settlement is not a two-outcome final')
