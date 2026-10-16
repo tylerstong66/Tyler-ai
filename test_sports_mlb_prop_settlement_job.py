@@ -53,6 +53,34 @@ class SettlementScheduleTests(unittest.TestCase):
             self.assertEqual((again["settled"],again["already_settled"]),(0,1))
             self.assertEqual(json.loads(target.read_text()),saved)
 
+    def test_missing_official_at_bats_remains_unsettled_and_retryable(self):
+        with tempfile.TemporaryDirectory() as d:
+            reader,original,path=self.prepare(d)
+            reader.now=AFTER
+            reader.final=True
+            reader.omit_at_bats=True
+            report=settle_ready_records(d,reader=reader)
+            self.assertEqual((report["discovered"],report["settled"],
+                              report["unresolved"]),(1,0,1))
+            self.assertEqual(report["unresolved_files"][0]["hitter_id"],683734)
+            self.assertFalse((Path(d)/"settlements"/path.name).exists())
+            self.assertEqual(json.loads(path.read_text()),original)
+            reader.omit_at_bats=False
+            second=settle_ready_records(d,reader=reader)
+            self.assertEqual((second["settled"],second["unresolved"]),(1,0))
+            self.assertTrue((Path(d)/"settlements"/path.name).exists())
+            self.assertEqual(json.loads(path.read_text()),original)
+
+    def test_malformed_official_at_bats_still_fails_closed(self):
+        with tempfile.TemporaryDirectory() as d:
+            reader,original,path=self.prepare(d)
+            reader.now=AFTER
+            reader.final=True
+            reader.at_bats="4"
+            with self.assertRaisesRegex(ValueError,"missing or invalid"):
+                settle_ready_records(d,reader=reader)
+            self.assertFalse((Path(d)/"settlements"/path.name).exists())
+
     def test_renamed_or_corrupted_frozen_file_rejected(self):
         with tempfile.TemporaryDirectory() as d:
             reader,original,path=self.prepare(d)

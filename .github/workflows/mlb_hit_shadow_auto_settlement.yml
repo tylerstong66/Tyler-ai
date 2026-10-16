@@ -2,7 +2,12 @@ name: MLB hitter shadow official final collection
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/mlb_hit_shadow_auto_settlement.yml']
+    paths:
+      - '.github/workflows/mlb_hit_shadow_auto_settlement.yml'
+      - 'sports_mlb_prop_prospective.py'
+      - 'sports_mlb_prop_settlement_job.py'
+      - 'test_sports_mlb_prop_prospective.py'
+      - 'test_sports_mlb_prop_settlement_job.py'
   schedule:
     - cron: '17 */3 * * *'
   workflow_dispatch:

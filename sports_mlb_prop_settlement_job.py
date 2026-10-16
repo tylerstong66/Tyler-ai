@@ -8,7 +8,8 @@ import json
 from pathlib import Path
 
 from sports_mlb_prop_prospective import (
-    _verify, settle_frozen_hit_props, write_exclusive_json
+    _verify, settle_frozen_hit_props, write_exclusive_json,
+    MissingOfficialAtBatsError,
 )
 from sports_mlb_sources import OfficialMlbReader, utc
 
@@ -22,8 +23,11 @@ def settle_ready_records(root=DEFAULT_ROOT, *, reader=None, max_files=100):
     original_dir=root/"predictions"
     out_dir=root/"settlements"
     if not original_dir.exists():
-        return {"discovered":0,"settled":0,"pending":0,"already_settled":0,"files":[]}
+        return {"discovered":0,"settled":0,"pending":0,"unresolved":0,
+                "already_settled":0,"files":[],"unresolved_files":[]}
     pending=0
+    unresolved=0
+    unresolved_files=[]
     done=0
     existing=0
     discovered=0
@@ -61,7 +65,16 @@ def settle_ready_records(root=DEFAULT_ROOT, *, reader=None, max_files=100):
             continue
         # Re-read through settlement routine, independently verifying final
         # official event time, team IDs, hitter ID and conditional outcome.
-        result=settle_frozen_hit_props(record,reader=reader)
+        try:
+            result=settle_frozen_hit_props(record,reader=reader)
+        except MissingOfficialAtBatsError:
+            # Do not call this a zero-AB outcome, and do not write an immutable
+            # settlement that may later be contradicted by a completed feed.
+            # The next scheduled run will independently retry the official box.
+            unresolved+=1
+            unresolved_files.append({"game_id":game,"hitter_id":hitter,
+                "reason":"OFFICIAL_FINAL_AT_BATS_UNAVAILABLE_RETRY"})
+            continue
         write_exclusive_json(target,result)
         done+=1
         files.append({"path":str(target),"status":result["status"],
@@ -69,6 +82,7 @@ def settle_ready_records(root=DEFAULT_ROOT, *, reader=None, max_files=100):
                       "settlement_digest":result["record_digest_sha256"]})
     return {
         "discovered":discovered,"settled":done,"pending":pending,
+        "unresolved":unresolved,"unresolved_files":unresolved_files,
         "already_settled":existing,"files":files,
         "only_separate_result_files_written":True,"wagers":0,
     }
@@ -80,6 +94,9 @@ def main():
     args=parser.parse_args()
     report=settle_ready_records(args.root)
     print("MLB_SHADOW_OFFICIAL_SETTLEMENT_REPORT="+json.dumps(report,sort_keys=True))
+    if report["unresolved"]:
+        print("::warning::Official final MLB at-bat count unresolved for "
+              +str(report["unresolved"])+" frozen player-games; no labels fabricated.")
 
 
 if __name__=="__main__":
