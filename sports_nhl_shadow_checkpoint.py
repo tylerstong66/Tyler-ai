@@ -88,6 +88,10 @@ def preserve(root, selection, scored_rows, protocol_digest, paired_differences):
             'priced_same_games': metrics(
                 priced, ('candidate', 'model', 'fixed_elo', 'market')),
             'paired_differences': paired_differences(chosen),
+            'all_games_calibration': calibration_diagnostics(
+                chosen, ('candidate', 'model', 'fixed_elo')),
+            'same_game_priced_calibration': calibration_diagnostics(
+                priced, ('candidate', 'model', 'fixed_elo', 'market')),
             'note': '2025 challenger selection was retrospective and not blind; scores descriptive only.',
             'promotion_allowed': False,
             'NO_BET': True,
