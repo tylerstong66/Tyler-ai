@@ -31,11 +31,27 @@ def pregame_readiness(schedule, predictions, events, followups, as_of):
             continue
         pred = predictions.get(identifier); issues = []
         if game.get('state') != 'pre': issues.append('official_game_not_pregame')
-        if pred is None: issues.append('forecast_not_enrolled')
-        elif (r.utc(pred['kickoff']) != kickoff or any(
+        frozen_start_discrepancy = None
+        if pred is None:
+            issues.append('forecast_not_enrolled')
+        else:
+            frozen_start = r.utc(pred['kickoff'])
+            start_changed = frozen_start != kickoff
+            team_changed = any(
                 pred.get(side+'_id', pred[side]) != game.get(side+'_id', game[side])
-                for side in ('home', 'away'))):
-            issues.append('official_identity_differs_from_forecast')
+                for side in ('home', 'away'))
+            if start_changed or team_changed:
+                issues.append('official_identity_differs_from_forecast')
+            if start_changed:
+                issues.append('saved_start_differs_from_latest_official_start')
+                frozen_start_discrepancy = {
+                    'saved_forecast_start_utc': frozen_start.isoformat(),
+                    'latest_official_start_utc': kickoff.isoformat(),
+                    'latest_minus_saved_minutes': (kickoff-frozen_start).total_seconds()/60,
+                    'action': 'no_regrade_or_rewrite_of_frozen_forecast',
+                }
+            if team_changed:
+                issues.append('saved_teams_differ_from_latest_official_teams')
         matches = [(at, event) for at, event in events if
                    (event['event_id'] == pred['event_id'] if pred else
                     r.utc(event['kickoff']) == kickoff and all(
@@ -62,7 +78,9 @@ def pregame_readiness(schedule, predictions, events, followups, as_of):
                      'away': game.get('away_name', game['away']), 'kickoff': game['kickoff'],
                      'enrolled': pred is not None, 'enrollment_priced': enrollment_priced,
                      'separate_followup_recorded': followup, 'latest_scoreboard_priced': priced_now,
-                     'latest_scoreboard_observed_at': quote_at, 'issues': issues, 'ready': not issues})
+                     'latest_scoreboard_observed_at': quote_at,
+                     'saved_vs_latest_official_start': frozen_start_discrepancy,
+                     'issues': issues, 'ready': not issues})
     return {'as_of_evidence_at': as_of.isoformat(), 'window_hours': 24,
             'observed_games': len(rows), 'ready_games': sum(row['ready'] for row in rows),
             'status': ('no_upcoming_games_observed' if not rows else
