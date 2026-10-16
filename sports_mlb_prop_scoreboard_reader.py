@@ -52,6 +52,15 @@ def load_published_shadow_scoreboard(*, get=None, clock=None):
     if count!=pending+scored+ineligible or distinct>count:
         raise ValueError("Published scoreboard counts are inconsistent.")
     published=utc(payload.get("published_at_utc"))
+    last_change=utc(payload.get("benchmark_last_changed_at_utc")
+                    or payload.get("published_at_utc"))
+    if last_change>published:
+        raise ValueError("Benchmark evidence change timestamp exceeds feed publication.")
+    refresh_kind=payload.get("source_refresh_kind","legacy_no_refresh_kind")
+    if refresh_kind not in (
+            "benchmark_changed","unchanged_saved_evidence_heartbeat",
+            "legacy_no_refresh_kind"):
+        raise ValueError("Unrecognized research snapshot refresh kind.")
     age=(utc(clock())-published).total_seconds()
     if age< -120:
         raise ValueError("Published scoreboard timestamp is unexpectedly in the future.")
@@ -61,6 +70,10 @@ def load_published_shadow_scoreboard(*, get=None, clock=None):
         "source":FEED_URL,"published_at_utc":published.isoformat(),
         "snapshot_age_hours":round(max(age,0)/3600,2),
         "may_be_stale":age>4*3600,
+        "benchmark_last_changed_at_utc":last_change.isoformat(),
+        "benchmark_age_hours":round(max((utc(clock())-last_change).total_seconds(),0)/3600,2),
+        "refresh_kind":refresh_kind,
+        "refresh_proves_new_official_MLB_data":False,
         "last_source_commit":payload.get("source_git_revision"),
         "frozen_player_game_forecasts":count,
         "distinct_official_games":distinct,
