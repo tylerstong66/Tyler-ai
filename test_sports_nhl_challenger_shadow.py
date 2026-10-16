@@ -68,6 +68,11 @@ class NhlForwardShadowTests(unittest.TestCase):
             first = shadow.evaluate(base, clock)
             self.assertEqual((first['enrolled'], first['newly_enrolled'],
                               first['scored'], first['pending']), (1, 1, 0, 1))
+            self.assertEqual(first['first_100_enrolled']['preserved_checkpoint']['status'],
+                             'collecting_forecasts')
+            self.assertIsNone(first['first_100_enrolled']['preserved_checkpoint']['path'])
+            self.assertFalse((base / shadow.ROOT /
+                              'checkpoints/first_100_enrolled/REVIEW.json').exists())
             pred = json.loads((base / shadow.ROOT / 'predictions/fixture.json').read_text())
             frozen = (base / shadow.ROOT / 'predictions/fixture.json').read_bytes()
             self.assertTrue(.5 < pred['home_probability'] < 1)

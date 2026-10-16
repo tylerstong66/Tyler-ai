@@ -52,6 +52,25 @@ outcomes. The first-100-enrolled checkpoint is reported separately. These are **
 The selected 2025 development candidate stays fixed; observing 2026 outcomes
 may inform later research but must not modify this shadow's frozen weights.
 
+### Immutable first-100-enrolled checkpoint
+
+Once the **first 100 shadow forecasts by original UTC recording time** are all
+verified as settled, the runner writes
+`checkpoints/first_100_enrolled/REVIEW.json` exclusively. It captures exactly
+those 100 frozen prediction hashes, the selected verified score rows, Brier/log
+loss/accuracy summaries for the challenger and both original comparators,
+and paired challenger-minus-baseline differences. It reports all 100 games
+even when some have no saved market prices; market comparisons include only
+their actually priced subset. A pending game within the first 100 must finish
+before the checkpoint can be saved. Later games can never replace it.
+
+Every subsequent run recomputes the checkpoint from its pinned inputs and
+requires byte-equivalent JSON data, failing rather than silently overwriting
+if any saved prediction, result, selection, or checkpoint content differs.
+The mutable scoreboard points to the preserved checkpoint once available.
+This checkpoint requests **human research review only**, with no promotion
+or real wagering authorization.
+
 The scheduled GitHub workflow `Sports prospective paper tests` runs the
 isolated NHL challenger step after the existing NHL/MLB primary enrollment,
 then always stages the independently collected original prospective evidence,

@@ -12,6 +12,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import sports_benchmark_review as review
+import sports_nhl_shadow_checkpoint as checkpoint
 import sports_historical_benchmark as b
 import sports_prospective_test as n
 
@@ -193,6 +194,7 @@ def evaluate(base=Path('.'), at=None):
     scored_games = [s['game_id'] for s in scores]
     selection = sorted(shadow.values(), key=lambda s:(review.utc(s['recorded_at']),s['game_id']))[:100]
     first_100_ids = {s['game_id'] for s in selection}
+    first_100 = checkpoint.preserve(root, selection, scores, review.digest(policy), paired_score_differences)
     status = {
         'version': 'nhl-forward-challenger-shadow-v1',
         'as_of_utc': now.isoformat(),
@@ -215,6 +217,7 @@ def evaluate(base=Path('.'), at=None):
             'status': 'ready_for_human_review' if (
                 len(selection) == 100 and first_100_ids.issubset(scored_games))
                 else 'collecting_or_awaiting_selected_finals',
+            'preserved_checkpoint': first_100,
         },
         'input_digest': review.digest({
             'shadow': {key: shadow[key]['sha256'] for key in sorted(shadow)},
