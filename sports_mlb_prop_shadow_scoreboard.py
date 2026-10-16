@@ -52,6 +52,8 @@ def official_shadow_scoreboard(root=DEFAULT_ROOT):
             "frozen_player_game_forecasts":0,
             "distinct_official_game_ids":0,
             "pending":0,"ineligible":0,"scored":0,
+            "pending_player_game_examples":[],
+            "pending_examples_truncated":False,
             "metrics":{k:_report_metric([]) for k in PRIORS},
             "no_wagers":True,
         }
@@ -98,6 +100,7 @@ def official_shadow_scoreboard(root=DEFAULT_ROOT):
             raise ValueError("Final settlement timestamp is not after scheduled game time.")
         settled[key]=record
     pending=0
+    pending_examples=[]
     eligible=0
     ineligible=0
     outcomes={"hit":[],"hr":[]}
@@ -107,6 +110,13 @@ def official_shadow_scoreboard(root=DEFAULT_ROOT):
         if result is None:
             pending+=1
             by_game[game]["pending"]+=1
+            pending_examples.append({
+                "game_id":str(game),
+                "hitter_id":str(key[1]),
+                "hitter_name":forecast.get("hitter_name"),
+                "scheduled_first_pitch_utc":forecast.get("event_start_utc"),
+                "status":"NO_SEALED_OFFICIAL_SETTLEMENT_YET",
+            })
             continue
         if result["status"] in ("INELIGIBLE_ZERO_AB","INELIGIBLE_NOT_IN_FINAL_BOXSCORE"):
             ineligible+=1
@@ -130,6 +140,11 @@ def official_shadow_scoreboard(root=DEFAULT_ROOT):
             if abs(scores[kind]["brier_error"]-(p-label)**2)>1e-7:
                 raise ValueError("Recorded Brier loss does not match frozen event forecast.")
             outcomes[kind].append({"event":kind,"game_id":game,"probability":p,"outcome":label})
+    # Audit coverage is the full pending count, not merely the 25 examples.
+    # Always sort by originally saved first pitch and stable identity; never
+    # pick high-confidence or outcome-positive hitter forecasts to display.
+    pending_examples.sort(key=lambda row: (
+        row["scheduled_first_pitch_utc"],row["game_id"],row["hitter_id"]))
     metrics={kind:_report_metric(outcomes[kind]) for kind in outcomes}
     for kind in metrics:
         item=metrics[kind]
@@ -144,6 +159,8 @@ def official_shadow_scoreboard(root=DEFAULT_ROOT):
         "distinct_official_game_ids":len(by_game),
         "distinct_official_game_ids_with_eligible_settlements":sum(g["scored"]>0 for g in by_game.values()),
         "pending":pending,"ineligible":ineligible,"scored":eligible,
+        "pending_player_game_examples":pending_examples[:25],
+        "pending_examples_truncated":len(pending_examples)>25,
         "per_game":{str(k):v for k,v in sorted(by_game.items())},
         "metrics":metrics,
         "model_is_calibrated":False,
