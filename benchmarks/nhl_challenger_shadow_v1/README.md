@@ -40,9 +40,14 @@ timestamp is in the future. Unpriced games count toward eligible prospective
 shadow scores but cannot enter same-market paired comparisons.
 
 The scoreboard reports settled/pending counts, unpriced/all-game probability
-scores, identical-market-paired game metrics, independent Eastern scheduled
-date block-bootstrap intervals where at least five blocks exist, and the
-first-100-enrolled checkpoint. These are **descriptive**; five dates and/or
+scores, identical-market-paired game metrics, and *paired challenger-minus-baseline*
+Brier, log-loss and accuracy differences versus the frozen primary model,
+fixed Elo, and only the same games with saved pregame market quotes. Negative
+Brier or log-loss deltas favor the challenger; positive accuracy differences
+favor it. Every paired analysis resamples Eastern scheduled-date blocks,
+withholding confidence intervals below five blocks. Unlike subtracting
+independently estimated errors, these deltas use exactly the same scored
+outcomes. The first-100-enrolled checkpoint is reported separately. These are **descriptive**; five dates and/or
 100 games cannot establish profitability or authorize wagering/model promotion.
 The selected 2025 development candidate stays fixed; observing 2026 outcomes
 may inform later research but must not modify this shadow's frozen weights.
