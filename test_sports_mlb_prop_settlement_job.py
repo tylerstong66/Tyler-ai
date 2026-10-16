@@ -81,6 +81,15 @@ class SettlementScheduleTests(unittest.TestCase):
                 settle_ready_records(d,reader=reader)
             self.assertFalse((Path(d)/"settlements"/path.name).exists())
 
+    def test_workflow_refreshes_only_readonly_scoreboard_after_final_commit(self):
+        yaml=(Path(__file__).parent/".github/workflows/mlb_hit_shadow_auto_settlement.yml").read_text()
+        first=yaml.index("Commit only newly created official final settlement files")
+        refresh=yaml.index("Refresh read-only scoreboard after final-settlement commit")
+        self.assertLess(first,refresh)
+        self.assertIn("python sports_mlb_prop_scoreboard_feed.py",yaml)
+        self.assertIn("PUBLIC_SCOREBOARD_ONLY_NO_WAGERS",yaml)
+        self.assertIn("benchmarks/mlb_hitter_props_shadow_v1/scoreboard.latest.json",yaml)
+
     def test_renamed_or_corrupted_frozen_file_rejected(self):
         with tempfile.TemporaryDirectory() as d:
             reader,original,path=self.prepare(d)
