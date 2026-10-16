@@ -248,6 +248,30 @@ def comparisons(rows, model, baselines):
     return output
 
 
+def paired_probability_concentration(rows, sources):
+    """Describe home-win probability spread on identical priced decisive games.
+
+    This is NOT a calibration, strategy-selection or betting-edge metric.
+    """
+    result = {}
+    for name in sources:
+        values = [probability(row['probabilities'][name]['conditional_home']) for row in rows]
+        size = len(values)
+        result[name] = {
+            'games': size,
+            'min_home_probability': min(values) if size else None,
+            'max_home_probability': max(values) if size else None,
+            'mean_distance_from_even': sum(abs(p - .5) for p in values) / size if size else None,
+            'fraction_home_probability_40_to_60': sum(.4 <= p <= .6 for p in values) / size if size else None,
+        }
+    return {
+        'scope': 'same_priced_decisive_games',
+        'no_model_selection_or_promotion': True,
+        'interpretation': 'Forecast sharpness is descriptive, not proof of calibration or a betting edge.',
+        'sources': result,
+    }
+
+
 def collection_evidence(root, sport):
     manifests = sorted((root / 'captures').glob('*/manifest.json'))
     if not manifests:
@@ -283,6 +307,7 @@ def summarize(root, sport, models, predictions, rows):
             'all_decisive': subset_metrics(decisive, models, 'binary'),
             'paired_market': subset_metrics(paired, (*models, 'market'), 'binary'),
             'paired_differences': comparisons(decisive, models[0], (models[1], 'market')),
+            'paired_probability_concentration': paired_probability_concentration(paired, (*models, 'market')),
             'conditional_home_calibration': model_calibration,
             'paired_market_calibration': calibration([(r['probabilities']['market']['conditional_home'], r['outcome'] == 'home') for r in paired]),
             'full_outcome_calibration': full_calibration, 'collection_evidence': collection_evidence(root, sport),
@@ -397,6 +422,16 @@ def render(data):
             display = lambda value: fmt(value, field == 'accuracy').replace('%', ' pp')
             cells += [display(m['mean'][field]), 'Unavailable' if ci is None else ' to '.join(display(v) for v in ci)]
         lines.append(f"| {baseline} | {m['games']} | {m['blocks']} | {' | '.join(cells)} |")
+    spread = data['paired_probability_concentration']
+    lines += ['', '## Forecast probability concentration — same priced decisive games', '',
+              'Home-win spread is descriptive only. Forecasts nearer 50% are not inherently better or worse; read alongside calibration and Brier.', '',
+              '| Source | Games | Minimum | Maximum | Mean distance from 50% | Share at 40–60% |',
+              '|---|---:|---:|---:|---:|---:|']
+    for name, values in spread['sources'].items():
+        lines.append(f"| {name} | {values['games']} | {fmt(values['min_home_probability'], True)} | "
+                     f"{fmt(values['max_home_probability'], True)} | "
+                     f"{fmt(values['mean_distance_from_even'], True)} | "
+                     f"{fmt(values['fraction_home_probability_40_to_60'], True)} |")
     calibrations = dict(data['conditional_home_calibration'])
     calibrations['market (paired only)'] = data['paired_market_calibration']
     if data['full_outcome_calibration']:
