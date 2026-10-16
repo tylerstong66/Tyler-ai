@@ -25,7 +25,11 @@ source creation but strictly **before** the original kickoff. Any prior forecast
 or started game is skipped, even when it would have been possible to calculate
 a probability retrospectively. The original pregame model weights, forecasts,
 market odds, game IDs and timestamps are never modified. Missing/faulty inputs
-fail closed rather than producing synthetic data.
+fail closed rather than producing synthetic data. Before writing **any** new
+shadow forecast in a run, the script validates all retained primary forecast and
+settlement links and all previously written shadow records. An unrelated bad
+source snapshot or tampered existing shadow must not generate a partial shadow
+batch that an always-run GitHub audit step could accidentally commit.
 
 The existing prospective integrity reader validates official final settlements
 and recomputes the original model, Elo and market scores from the original
