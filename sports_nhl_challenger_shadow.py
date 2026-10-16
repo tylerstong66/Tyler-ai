@@ -81,11 +81,44 @@ def evaluate(base=Path('.'), at=None):
     shadow_dir = root / 'predictions'
     original_dir = live / 'predictions'
     shadow_dir.mkdir(parents=True, exist_ok=True)
+    # Preflight ALL original provenance and settlements before writing even one
+    # immutable shadow. Otherwise a corrupt late source could allow a partial
+    # batch to be committed by the workflow's always-run audit preservation.
+    _, settled_rows = review.load_rows(live, 'NHL', ('model', 'fixed_elo'))
+    originals = {path.stem: verified_live_forecast(path)
+                 for path in sorted(original_dir.glob('*.json'))}
+    # Verify every existing shadow and independently recompute stored probability.
+    # Never silently update past shadow predictions when input history changes.
+    shadow = {}
+    for path in sorted(shadow_dir.glob('*.json')):
+        item = json.loads(path.read_text())
+        if item.get('sha256') != review.digest({k: v for k, v in item.items() if k != 'sha256'}):
+            raise ValueError('Shadow forecast digest mismatch')
+        identifier = path.stem
+        if identifier != item.get('game_id') or identifier in shadow:
+            raise ValueError('Shadow forecast filename or ID mismatch')
+        pred = originals[identifier]
+        p = b.sigmoid(b.dot(weights, pred['features']))
+        if (item['source_prediction_sha256'] != pred['sha256']
+                or item['source_model_sha256'] != pred['model_sha256']
+                or item['source_generated_at'] != pred['generated_at']
+                or item['source_recorded_at'] != pred['recorded_at']
+                or item['event_id'] != pred['event_id']
+                or item['kickoff'] != pred['kickoff']
+                or item['candidate'] != 'ridge_recipe_2024_fit_2025_development_selected'
+                or item['protocol_sha256'] != review.digest(policy)
+                or item['NO_BET'] is not True or item['actual_wagers'] != 0
+                or not math.isclose(item['home_probability'], p, abs_tol=1e-12)
+                or review.utc(item['recorded_at']) < activation
+                or not (review.utc(pred['generated_at']) <= review.utc(pred['recorded_at'])
+                        <= review.utc(item['recorded_at']) < review.utc(pred['kickoff']))):
+            raise ValueError('Shadow record differs from frozen source or enrollment policy')
+        shadow[identifier] = item
     enrolled = []
     # Every new forecast is written only while its game remains in the future.
     # A frozen source forecast from before activation never becomes a shadow.
     for path in sorted(original_dir.glob('*.json')):
-        pred = verified_live_forecast(path)
+        pred = originals[path.stem]
         shadow_path = shadow_dir / path.name
         if shadow_path.exists():
             continue
@@ -113,36 +146,8 @@ def evaluate(base=Path('.'), at=None):
         record['sha256'] = review.digest(record)
         n.write_json(shadow_path, record, exclusive=True)
         enrolled.append(pred['game_id'])
-    # Verify every existing shadow and independently recompute stored probability.
-    # Never silently update past shadow predictions when input history changes.
-    shadow = {}
-    for path in sorted(shadow_dir.glob('*.json')):
-        item = json.loads(path.read_text())
-        if item.get('sha256') != review.digest({k: v for k, v in item.items() if k != 'sha256'}):
-            raise ValueError('Shadow forecast digest mismatch')
-        identifier = path.stem
-        if identifier != item.get('game_id') or identifier in shadow:
-            raise ValueError('Shadow forecast filename or ID mismatch')
-        pred = verified_live_forecast(original_dir / path.name)
-        p = b.sigmoid(b.dot(weights, pred['features']))
-        if (item['source_prediction_sha256'] != pred['sha256']
-                or item['source_model_sha256'] != pred['model_sha256']
-                or item['source_generated_at'] != pred['generated_at']
-                or item['source_recorded_at'] != pred['recorded_at']
-                or item['event_id'] != pred['event_id']
-                or item['kickoff'] != pred['kickoff']
-                or item['candidate'] != 'ridge_recipe_2024_fit_2025_development_selected'
-                or item['protocol_sha256'] != review.digest(policy)
-                or item['NO_BET'] is not True or item['actual_wagers'] != 0
-                or not math.isclose(item['home_probability'], p, abs_tol=1e-12)
-                or review.utc(item['recorded_at']) < activation
-                or not (review.utc(pred['generated_at']) <= review.utc(pred['recorded_at'])
-                        <= review.utc(item['recorded_at']) < review.utc(pred['kickoff']))):
-            raise ValueError('Shadow record differs from frozen source or enrollment policy')
-        shadow[identifier] = item
-    # Existing prospective validator independently checks source/result hashes,
-    # score arithmetic, betting flags, timings and event-to-result linkage.
-    _, settled_rows = review.load_rows(live, 'NHL', ('model', 'fixed_elo'))
+        shadow[pred['game_id']] = record
+    # Scores use only preflighted immutable official prospective finals.
     scores = []
     for row in settled_rows:
         item = shadow.get(row['game_id'])
