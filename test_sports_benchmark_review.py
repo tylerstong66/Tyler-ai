@@ -78,6 +78,35 @@ class ReviewTests(unittest.TestCase):
             self.assertIn(' pp', r.render(data))
             self.assertIn('actual wagers $0', r.render(data))
 
+    def test_paired_probability_concentration_uses_identical_games(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            self.add_game(root,identifier='one',model_probability=.7,market=.6)
+            self.add_game(root,identifier='two',model_probability=.3,market=None)
+            data=self.review(root)
+            spread=data['paired_probability_concentration']
+            self.assertTrue(spread['no_model_selection_or_promotion'])
+            self.assertEqual(spread['scope'],'same_priced_decisive_games')
+            model=spread['sources']['model']
+            reference=spread['sources']['fixed_elo']
+            market=spread['sources']['market']
+            self.assertEqual(model['games'],1)
+            self.assertAlmostEqual(model['mean_distance_from_even'],.2)
+            self.assertEqual(model['fraction_home_probability_40_to_60'],0)
+            self.assertEqual(reference['fraction_home_probability_40_to_60'],1)
+            self.assertEqual(market['fraction_home_probability_40_to_60'],1)
+            self.assertIn('Forecast probability concentration',r.render(data))
+
+    def test_paired_probability_concentration_handles_no_priced_games(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            self.add_game(root,identifier='only',market=None)
+            report=self.review(root)['paired_probability_concentration']
+            for metrics in report['sources'].values():
+                self.assertEqual(metrics['games'],0)
+                self.assertIsNone(metrics['min_home_probability'])
+                self.assertIsNone(metrics['fraction_home_probability_40_to_60'])
+
     def test_nfl_ties_in_full_scores_and_calibration_only(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
