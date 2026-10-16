@@ -58,7 +58,7 @@
       "uncertainty_status": "insufficient_blocks"
     }
   },
-  "as_of_utc": "2026-10-16T14:22:42.058215+00:00",
+  "as_of_utc": "2026-10-16T14:44:59.552974+00:00",
   "candidate": "ridge_recipe",
   "enrolled": 0,
   "first_100_enrolled": {
@@ -70,6 +70,65 @@
   "input_digest": "61b40d1894380ada9c3b2ee75175f99ff34cd0cf07e6b502abf84ee7c25b9239",
   "limitation": "Research only; all results are descriptive. No candidate selection, model promotion, bets, odds backfills or claims of an edge.",
   "newly_enrolled": 0,
+  "paired_challenger_minus_baseline": {
+    "fixed_elo": {
+      "blocks": 0,
+      "bootstrap_draws": 2000,
+      "ci95": {
+        "accuracy": null,
+        "brier": null,
+        "log_loss": null
+      },
+      "direction": "challenger minus baseline: lower Brier/log loss and higher accuracy favor challenger",
+      "games": 0,
+      "interval_method": "percentile block bootstrap",
+      "mean": {
+        "accuracy": null,
+        "brier": null,
+        "log_loss": null
+      },
+      "minimum_blocks": 5,
+      "uncertainty_status": "insufficient_blocks"
+    },
+    "market": {
+      "blocks": 0,
+      "bootstrap_draws": 2000,
+      "ci95": {
+        "accuracy": null,
+        "brier": null,
+        "log_loss": null
+      },
+      "direction": "challenger minus baseline: lower Brier/log loss and higher accuracy favor challenger",
+      "games": 0,
+      "interval_method": "percentile block bootstrap",
+      "mean": {
+        "accuracy": null,
+        "brier": null,
+        "log_loss": null
+      },
+      "minimum_blocks": 5,
+      "uncertainty_status": "insufficient_blocks"
+    },
+    "model": {
+      "blocks": 0,
+      "bootstrap_draws": 2000,
+      "ci95": {
+        "accuracy": null,
+        "brier": null,
+        "log_loss": null
+      },
+      "direction": "challenger minus baseline: lower Brier/log loss and higher accuracy favor challenger",
+      "games": 0,
+      "interval_method": "percentile block bootstrap",
+      "mean": {
+        "accuracy": null,
+        "brier": null,
+        "log_loss": null
+      },
+      "minimum_blocks": 5,
+      "uncertainty_status": "insufficient_blocks"
+    }
+  },
   "pending": 0,
   "promotion_allowed": false,
   "same_game_priced": {
