@@ -27,6 +27,12 @@ class ScoreboardTests(unittest.TestCase):
             self.assertEqual(result["status"],"PROSPECTIVE_FREEZE_SCORING_DIAGNOSTIC_NO_BET")
             self.assertEqual(result["pending"],1)
             self.assertEqual(result["scored"],0)
+            self.assertEqual(len(result["pending_player_game_examples"]),1)
+            waiting=result["pending_player_game_examples"][0]
+            self.assertEqual(waiting["game_id"],"849810")
+            self.assertEqual(waiting["hitter_id"],"683734")
+            self.assertEqual(waiting["status"],"NO_SEALED_OFFICIAL_SETTLEMENT_YET")
+            self.assertFalse(result["pending_examples_truncated"])
             self.assertEqual(result["distinct_official_game_ids"],1)
             self.assertIsNone(result["metrics"]["hit"]["brier"])
             self.assertFalse(result["proven_betting_edge"])
@@ -42,6 +48,8 @@ class ScoreboardTests(unittest.TestCase):
             report=official_shadow_scoreboard(d)
             self.assertEqual(report["scored"],1)
             self.assertEqual(report["pending"],0)
+            self.assertEqual(report["pending_player_game_examples"],[])
+            self.assertFalse(report["pending_examples_truncated"])
             self.assertEqual(report["distinct_official_game_ids_with_eligible_settlements"],1)
             self.assertEqual(report["metrics"]["hit"]["eligible_player_games"],1)
             self.assertIsNotNone(report["metrics"]["hit"]["brier"])
@@ -94,6 +102,9 @@ class ScoreboardTests(unittest.TestCase):
             self.assertEqual(report["frozen_player_game_forecasts"],2)
             self.assertEqual(report["distinct_official_game_ids"],1)
             self.assertEqual(report["pending"],2)
+            self.assertEqual(len(report["pending_player_game_examples"]),2)
+            self.assertEqual({p["hitter_id"] for p in report["pending_player_game_examples"]},
+                             {"683734","123456"})
 
     def test_empty_directory_reports_no_enrolled_games(self):
         with tempfile.TemporaryDirectory() as d:
