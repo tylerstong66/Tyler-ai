@@ -1,0 +1,55 @@
+{
+  "actual_wager": 0,
+  "condition": "at_least_one_official_at_bat",
+  "conditional_at_bat_probabilities": {
+    "hit": 0.58,
+    "hr": 0.076
+  },
+  "event_start_utc": "2026-10-17T00:00:00+00:00",
+  "frozen_at_utc": "2026-10-16T18:10:38.834646+00:00",
+  "game_id": 849817,
+  "historical_input_sha256": "deaa5cead456cf5e1e6bced2085611c3decf405792c77a794ba309d7bb844d09",
+  "hitter_id": 595978,
+  "hitter_name": "Austin Hedges",
+  "hitter_side": "home",
+  "hitter_team_id": 114,
+  "model": "mlb_hitter_game_frequency_shadow_v1",
+  "model_calibrated": false,
+  "official_historical_at_bat_eligible_games": 132,
+  "official_historical_games_observed": 146,
+  "opponent_team_id": 139,
+  "record_digest_sha256": "3f196e0f91055b1d269685f581ff029d5b5e28f48b396d9404edd0d45268744a",
+  "schema": "mlb_hit_prop_shadow_ledger_v1",
+  "source_capture_started_at_utc": "2026-10-16T18:10:38.295109+00:00",
+  "source_receipts": {
+    "active_roster": {
+      "data_through": "2026-10-16T18:10:38.514504+00:00",
+      "response_sha256": "76474c2d14441498bceba967530b39de7a786c1887a857f51c62a3e7a677f05d",
+      "retrieved_at": "2026-10-16T18:10:38.514504+00:00",
+      "source_url": "https://statsapi.mlb.com/api/v1/teams/114/roster?date=2026-10-16&rosterType=active"
+    },
+    "hitter_game_logs": [
+      {
+        "data_through": "2026-10-16T18:10:38.711211+00:00",
+        "response_sha256": "ea8c64faee37611987ff13a5c71485c0fd683ea03e8cd20d7cc8bdd929d887d7",
+        "retrieved_at": "2026-10-16T18:10:38.711211+00:00",
+        "source_url": "https://statsapi.mlb.com/api/v1/people/595978/stats?gameType=R&group=hitting&season=2025&stats=gameLog"
+      },
+      {
+        "data_through": "2026-10-16T18:10:38.831465+00:00",
+        "response_sha256": "5e5927f64429afe14b9d8dcf0de2ec1b0205efdf765d4fd3bf9ca2f041b289bd",
+        "retrieved_at": "2026-10-16T18:10:38.831465+00:00",
+        "source_url": "https://statsapi.mlb.com/api/v1/people/595978/stats?gameType=R&group=hitting&season=2026&stats=gameLog"
+      }
+    ],
+    "pregame_game": {
+      "data_through": "2026-10-16T18:10:38.399385+00:00",
+      "response_sha256": "58df0b2933cb983fd7bfee500fbe1d2f221050e96c801f3caeb3812d7800215a",
+      "retrieved_at": "2026-10-16T18:10:38.399385+00:00",
+      "source_url": "https://statsapi.mlb.com/api/v1.1/game/849817/feed/live"
+    }
+  },
+  "sportsbook_wager_eligible": false,
+  "status": "IMMUTABLE_PREGAME_SHADOW_NO_BET",
+  "training_game_day_before": "2026-10-16"
+}
