@@ -2,6 +2,15 @@
 
 **Research/paper only. No real wagers. No model promotion without genuinely sufficient independent prospective evidence.** This is a current operational entry; older historical notes remain below unchanged.
 
+### NHL challenger cohort activated in code — awaiting independent post-cutoff games
+
+- PR #79 added same-game probability-spread diagnostics; NHL (35 priced decisive games) has model probabilities 100% within 40–60% versus 57% for Elo and 77% for the archived market. Its model Brier 0.477369 was worse than Elo 0.457007 and market 0.462939; better winner accuracy is not enough to establish probability quality.
+- PR #80 merged a **distinct forward-only 2024-trained ridge NHL challenger**, selected in already-reviewed 2025 development games (1312 training, 1312 development validation). Pinned weights and hash-linked original features; separate immutable shadow forecasts, same-game evaluation, first-100 check, no bets or promotion. **Activation is 2026-10-16 17:00 UTC** (1 PM Eastern), not a retrospective backfill. All 15 PR checks passed, and its post-merge hourly collector run succeeded.
+- PR #81 additionally validates **all** existing original prospective records, official results and previous shadows *before* writing any new shadow forecast, preventing partial commits when a later input fails. All 13 PR checks passed; post-merge scheduled NHL shadow step, sports enrollment and audit all completed successfully.
+- At the latest verified shadow scoreboard update 2026-10-16T14:22:42Z, the activation was still in the future: **0 enrolled / 0 scored**. Existing NHL cohort stayed **37 recorded / 35 settled**. NHL upcoming games 2026020119 and 2026020120 were ready within their own original paper cohort at that audit time, but **do not belong to the newly activated shadow unless their original forecasts were actually created after activation** (they were already enrolled at that time). Do not change either cohort's frozen predictions.
+- New challenger details: [Protocol](benchmarks/nhl_challenger_shadow_v1/protocol.json), [Run instructions](benchmarks/nhl_challenger_shadow_v1/README.md), [Live read-only shadow scoreboard](benchmarks/nhl_challenger_shadow_v1/scoreboard.latest.json). GitHub workflow `Sports prospective paper tests` runs the offline shadow step hourly on a best-effort schedule and publishes files under the separate shadow directory. GitHub is not Render deployment; runtime auto-deploy remains disabled.
+- Next valid test milestone is the **first qualifying post-activation future NHL forecast**, followed by independently verified final scores for those exact frozen player-independent game predictions. Compare the challenger against the contemporaneous primary model, fixed Elo and same-game saved market odds; no tuning on its test outcomes.
+
 ### Latest verified collector and benchmark evidence
 
 - As of 2026-10-16T13:47:35Z in the retained prospective coverage audit: NFL 14 recorded / 14 settled; NHL 37 / 35; MLB team-winner 9 / 7. The three cohorts are separate, with a first-100-enrolled review checkpoint per sport. Pending NHL 2; MLB 2. No demonstrated sportsbook betting edge.
