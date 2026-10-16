@@ -81,6 +81,23 @@
     "model_is_calibrated": false,
     "no_wagers": true,
     "pending": 2,
+    "pending_examples_truncated": false,
+    "pending_player_game_examples": [
+      {
+        "game_id": "849810",
+        "hitter_id": "596142",
+        "hitter_name": "Gary S\u00e1nchez",
+        "scheduled_first_pitch_utc": "2026-10-16T00:00:00+00:00",
+        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
+      },
+      {
+        "game_id": "849810",
+        "hitter_id": "683734",
+        "hitter_name": "Andrew Vaughn",
+        "scheduled_first_pitch_utc": "2026-10-16T00:00:00+00:00",
+        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
+      }
+    ],
     "per_game": {
       "849810": {
         "ineligible": 1,
@@ -93,8 +110,8 @@
     "scored": 4,
     "status": "PROSPECTIVE_FREEZE_SCORING_DIAGNOSTIC_NO_BET"
   },
-  "benchmark_last_changed_at_utc": "2026-10-16T13:15:07.279230+00:00",
-  "benchmark_sha256": "1381bee89fd4d7a6270fe1b585b02c10232ccd68b167b151a173eedd45956a10",
+  "benchmark_last_changed_at_utc": "2026-10-16T18:04:26.613847+00:00",
+  "benchmark_sha256": "92645deb394cdeb374b303b97beead57ce3afed69c9bc0392a2a2cf76fcd25d8",
   "limitations": [
     "The feed reports only the GitHub repository snapshot as of its publication time.",
     "GitHub scheduled jobs may run late, so actual final results may appear later.",
@@ -104,10 +121,10 @@
     "Git commit metadata is not independent proof of publication timestamp."
   ],
   "no_wagers": true,
-  "published_at_utc": "2026-10-16T18:00:05.519573+00:00",
+  "published_at_utc": "2026-10-16T18:04:26.613847+00:00",
   "schema": "tyler_mlb_shadow_public_scoreboard_v1",
   "source": "public_github_main_scheduled_snapshot",
-  "source_git_revision": "cc912fd3c26a53c77739f0c48a28d7891bd082e6",
+  "source_git_revision": "d38fac6f82c603c86f91bb38fe96a832e9765eb9",
   "source_is_not_live_official_MLB_api": true,
-  "source_refresh_kind": "unchanged_saved_evidence_heartbeat"
+  "source_refresh_kind": "benchmark_changed"
 }
