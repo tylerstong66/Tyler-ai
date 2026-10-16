@@ -216,6 +216,63 @@ class ReaderTests(unittest.TestCase):
             reader.load_published_shadow_scoreboard(
                 get=lambda *a,**kw:FakeResponse(snap),clock=lambda:CLOCK)
 
+    def test_pending_saved_first_pitch_audit_separates_future_from_elapsed(self):
+        snap=make_snapshot()
+        snap["published_at_utc"]="2026-10-16T21:55:00Z"
+        snap["benchmark"]["pending_player_game_examples"]=[
+            {"game_id":"849810","hitter_id":"683734",
+             "hitter_name":"Andrew Vaughn",
+             "scheduled_first_pitch_utc":"2026-10-16T00:00:00Z",
+             "status":"NO_SEALED_OFFICIAL_SETTLEMENT_YET"},
+            {"game_id":"849817","hitter_id":"608070",
+             "hitter_name":"José Ramírez",
+             "scheduled_first_pitch_utc":"2026-10-17T00:00:00Z",
+             "status":"NO_SEALED_OFFICIAL_SETTLEMENT_YET"},
+        ]
+        snap["benchmark"]["pending_examples_truncated"]=True
+        snap["benchmark_sha256"]=hashlib.sha256(
+            feed._canonical(snap["benchmark"]).encode()).hexdigest()
+        out=reader.load_published_shadow_scoreboard(
+            get=lambda *a,**kw:FakeResponse(snap),
+            clock=lambda:"2026-10-16T21:56:00Z")
+        timing=out["pending_saved_schedule_audit"]
+        self.assertEqual((timing["shown"],timing["unshown_pending"]),(2,5))
+        self.assertEqual((timing["scheduled_first_pitch_future"],
+                          timing["scheduled_first_pitch_reached"]),(1,1))
+        self.assertEqual(timing["events"][0]["time_state"],
+                         "SAVED_FIRST_PITCH_REACHED_UNSETTLED")
+        self.assertEqual(timing["events"][1]["time_state"],"SAVED_FIRST_PITCH_FUTURE")
+        self.assertFalse(timing["official_game_state_verified"])
+        self.assertTrue(all(v["no_verified_player_outcome"] for v in timing["events"]))
+        next_clock=reader.load_published_shadow_scoreboard(
+            get=lambda *a,**kw:FakeResponse(snap),
+            clock=lambda:"2026-10-17T01:00:00Z")["pending_saved_schedule_audit"]
+        self.assertEqual(next_clock["scheduled_first_pitch_future"],0)
+        self.assertEqual(next_clock["scheduled_first_pitch_reached"],2)
+
+    def test_pending_scheduled_first_pitch_malformed_fails_closed(self):
+        snap=make_snapshot()
+        snap["benchmark"]["pending_player_game_examples"]=[
+            {"game_id":"849817","hitter_id":"608070",
+             "scheduled_first_pitch_utc":"not-a-date",
+             "status":"NO_SEALED_OFFICIAL_SETTLEMENT_YET"}]
+        snap["benchmark"]["pending_examples_truncated"]=True
+        snap["benchmark_sha256"]=hashlib.sha256(
+            feed._canonical(snap["benchmark"]).encode()).hexdigest()
+        with self.assertRaisesRegex(ValueError,"Invalid saved first pitch"):
+            reader.load_published_shadow_scoreboard(
+                get=lambda *a,**kw:FakeResponse(snap),clock=lambda:CLOCK)
+
+    def test_legacy_pending_feed_does_not_claim_timing_coverage(self):
+        snap=make_snapshot()
+        out=reader.load_published_shadow_scoreboard(
+            get=lambda *a,**kw:FakeResponse(snap),clock=lambda:CLOCK)
+        audit=out["pending_saved_schedule_audit"]
+        self.assertFalse(audit["available"])
+        self.assertEqual(audit["unshown_pending"],7)
+        self.assertIsNone(audit["scheduled_first_pitch_future"])
+        self.assertIsNone(audit["scheduled_first_pitch_reached"])
+
     def test_old_snapshot_warns_and_missing_feed_fails_closed(self):
         valid=make_snapshot()
         out=reader.load_published_shadow_scoreboard(
