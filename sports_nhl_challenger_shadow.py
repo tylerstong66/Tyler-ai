@@ -131,6 +131,9 @@ def evaluate(base=Path('.'), at=None):
                 or item['NO_BET'] is not True or item['actual_wagers'] != 0
                 or not math.isclose(item['home_probability'], p, abs_tol=1e-12)
                 or review.utc(item['recorded_at']) < activation
+                or review.utc(item['recorded_at']) > now
+                or review.utc(pred['generated_at']) < activation
+                or review.utc(pred['recorded_at']) < activation
                 or not (review.utc(pred['generated_at']) <= review.utc(pred['recorded_at'])
                         <= review.utc(item['recorded_at']) < review.utc(pred['kickoff']))):
             raise ValueError('Shadow record differs from frozen source or enrollment policy')
@@ -168,6 +171,21 @@ def evaluate(base=Path('.'), at=None):
         n.write_json(shadow_path, record, exclusive=True)
         enrolled.append(pred['game_id'])
         shadow[pred['game_id']] = record
+    # Auditable source denominator: a missed post-activation pregame source
+    # must stay missing after kickoff; never reconstruct its shadow retrospectively.
+    eligible = [pred for pred in originals.values()
+                if review.utc(pred['generated_at']) >= activation
+                and review.utc(pred['recorded_at']) >= activation
+                and review.utc(pred['recorded_at']) <= now]
+    missed = []
+    for pred in sorted(eligible, key=lambda row:(row['kickoff'], row['game_id'])):
+        if pred['game_id'] not in shadow:
+            if review.utc(pred['kickoff']) > now:
+                raise ValueError('Eligible future NHL source was not shadow enrolled')
+            missed.append({'game_id': pred['game_id'],
+                           'source_recorded_at': pred['recorded_at'],
+                           'saved_kickoff': pred['kickoff'],
+                           'reason': 'MISSED_SOURCE_FORECAST_NOT_BACKFILLED'})
     # Scores use only preflighted immutable official prospective finals.
     scores = []
     for row in settled_rows:
@@ -204,6 +222,13 @@ def evaluate(base=Path('.'), at=None):
         'candidate': 'ridge_recipe',
         'enrolled': len(shadow),
         'newly_enrolled': len(enrolled),
+        'source_enrollment_coverage': {
+            'eligible_saved_primary_forecasts_since_activation': len(eligible),
+            'shadow_enrolled': len(shadow),
+            'missed_started_source_forecasts': missed,
+            'unseen_official_schedule_not_measured': True,
+            'note': 'Only hash-verified saved primary forecasts; no upstream schedule completeness claim or retrospective repair.'
+        },
         'scored': len(scores),
         'pending': len(shadow)-len(scores),
         'same_game_priced_count': len(paired),

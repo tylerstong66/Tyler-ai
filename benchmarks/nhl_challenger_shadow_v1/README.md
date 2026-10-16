@@ -52,6 +52,21 @@ outcomes. The first-100-enrolled checkpoint is reported separately. These are **
 The selected 2025 development candidate stays fixed; observing 2026 outcomes
 may inform later research but must not modify this shadow's frozen weights.
 
+### Post-activation primary-forecast coverage
+
+The scoreboard separately audits every **saved** primary NHL forecast whose
+original generation and recording both occurred after the challenger activation.
+It counts the forecasts enrolled in the independent shadow, and lists any source
+forecasts first encountered after their saved scheduled kickoff as
+`MISSED_SOURCE_FORECAST_NOT_BACKFILLED`. These misses are retained rather than
+silently manufacturing a late candidate prediction. Existing shadow records
+are rejected if their timestamp is ahead of the audit clock or their original
+generation predates activation, even if an attacker recomputes their self-hash.
+
+This is a **saved-primary-forecast denominator only**. It cannot prove the
+official NHL source returned all scheduled games; the source-coverage audit
+remains separate. It never loosens the no-wager rule.
+
 ### Immutable first-100-enrolled checkpoint
 
 Once the **first 100 shadow forecasts by original UTC recording time** are all
