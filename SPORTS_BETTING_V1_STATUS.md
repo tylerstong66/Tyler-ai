@@ -2,6 +2,12 @@
 
 **Research/paper only. No real wagers. No model promotion without genuinely sufficient independent prospective evidence.** This is a current operational entry; older historical notes remain below unchanged.
 
+### Latest NHL challenger reliability diagnostics (as of 2026-10-16T16:30:48Z)
+
+- PR #88 (all 13 pull-request checks passed; independent post-merge NHL shadow/collector steps passed) added fixed-bin **prospective calibration** and probability-spread diagnostics. The scoreboard now compares the frozen 2024-trained challenger, original NHL model and Elo on exactly the same settled post-activation games. An additional same-game subset includes only **originally priced** saved market evidence. This is a read-only retrospective result review of prospectively enrolled games, not training or automatic promotion.
+- Future completed first-100 NHL challenger checkpoint also retains these calibration and same-priced comparative summaries. Wilson bin intervals can be unstable or dependent, and five date blocks do not prove an edge. This trial remains research-only and no wagers can be placed.
+- At verified publication **2026-10-16T16:30:48Z**, the 17:00 UTC activation cutoff was still in the future: the challenger remained **0 enrolled / 0 scored**, with no fabricated probabilities or Brier superiority. Both the baseline and independent challenger histories are preserved. Continue the existing hourly collector after activation; the first genuinely new post-activation primary NHL forecast is the next real evidence hinge.
+
 ### October 16 continuation: first-100 checkpoint and forward shadow coverage
 
 - PR #83 added candidate-minus-primary/Elo/market **paired same-game** Brier, log-loss, and accuracy deltas; separate market comparisons include only games with saved pregame prices. All 13 PR checks and its post-merge collector succeeded. A zero-game report correctly keeps missing metrics and date-block uncertainty null.
