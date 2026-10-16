@@ -149,6 +149,30 @@ class CoverageAuditTests(unittest.TestCase):
                 elif fault=='abnormal':schedule['1']['game']['state']='in'
                 self.assertEqual(c.pregame_readiness(schedule,predictions,events,set(),at)['ready_games'],0)
 
+    def test_readiness_names_and_quantifies_frozen_start_mismatch(self):
+        at,schedule,predictions,events=self.preflight_fixture()
+        schedule["1"]["game"]["kickoff"]="2026-10-15T22:00:00Z"
+        result=c.pregame_readiness(schedule,predictions,events,set(),at)
+        row=result["games"][0]
+        self.assertFalse(row["ready"])
+        self.assertIn("saved_start_differs_from_latest_official_start",row["issues"])
+        self.assertIn("official_identity_differs_from_forecast",row["issues"])
+        drift=row["saved_vs_latest_official_start"]
+        self.assertEqual(drift["latest_minus_saved_minutes"],120)
+        self.assertEqual(drift["saved_forecast_start_utc"],"2026-10-15T20:00:00+00:00")
+        self.assertEqual(drift["latest_official_start_utc"],"2026-10-15T22:00:00+00:00")
+        self.assertEqual(drift["action"],"no_regrade_or_rewrite_of_frozen_forecast")
+        self.assertEqual(predictions["1"]["kickoff"],"2026-10-15T20:00:00Z")
+
+    def test_readiness_separates_official_team_drift_from_start_drift(self):
+        at,schedule,predictions,events=self.preflight_fixture()
+        schedule["1"]["game"]["home"]="OTHER"
+        row=c.pregame_readiness(schedule,predictions,events,set(),at)["games"][0]
+        self.assertFalse(row["ready"])
+        self.assertIsNone(row["saved_vs_latest_official_start"])
+        self.assertIn("saved_teams_differ_from_latest_official_teams",row["issues"])
+        self.assertNotIn("saved_start_differs_from_latest_official_start",row["issues"])
+
     def test_readiness_window_is_future_24h_and_empty_is_explicit(self):
         at,schedule,predictions,events=self.preflight_fixture()
         for hours,expected in [(0,0),(24,1),(24.01,0),(-1,0)]:
