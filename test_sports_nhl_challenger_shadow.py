@@ -126,6 +126,37 @@ class NhlForwardShadowTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'digest mismatch'):
                 shadow.evaluate(base, clock)
 
+    def test_future_source_snapshot_cannot_create_shadow(self):
+        with tempfile.TemporaryDirectory() as folder:
+            base = Path(folder)
+            _, source, original = self.prepare(base)
+            original['source_snapshots'] = [
+                {'retrieved_at': '2026-10-16T19:00:00+00:00'}]
+            original.pop('sha256')
+            original['sha256'] = review.digest(original)
+            source.write_text(json.dumps(original))
+            with self.assertRaisesRegex(ValueError, 'Source snapshot was retrieved after'):
+                shadow.evaluate(base, review.utc('2026-10-16T19:30:00Z'))
+            self.assertFalse(list((base / shadow.ROOT / 'predictions').glob('*.json')))
+
+    def test_bad_existing_shadow_blocks_new_forecast_batch(self):
+        with tempfile.TemporaryDirectory() as folder:
+            base = Path(folder)
+            root, original_path, original = self.prepare(base)
+            clock = review.utc('2026-10-16T19:00:00Z')
+            shadow.evaluate(base, clock)
+            another = {**original, 'game_id': 'fixture2', 'event_id': 'espnfixture2'}
+            another.pop('sha256')
+            another['sha256'] = review.digest(another)
+            (root / 'predictions/fixture2.json').write_text(json.dumps(another))
+            first_path = base / shadow.ROOT / 'predictions/fixture.json'
+            first = json.loads(first_path.read_text())
+            first['home_probability'] = 0.9
+            first_path.write_text(json.dumps(first))
+            with self.assertRaisesRegex(ValueError, 'Shadow forecast digest mismatch'):
+                shadow.evaluate(base, clock)
+            self.assertFalse((base / shadow.ROOT / 'predictions/fixture2.json').exists())
+
     def test_frozen_development_weights_and_provenance_are_locked(self):
         with tempfile.TemporaryDirectory() as folder:
             base = Path(folder)
