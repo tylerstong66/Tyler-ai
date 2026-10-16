@@ -186,6 +186,36 @@ class ReaderTests(unittest.TestCase):
                 reader.load_published_shadow_scoreboard(
                     get=lambda *a,**kw:FakeResponse(snap),clock=lambda:CLOCK)
 
+    def test_pending_hitter_identity_examples_and_truncation_validation(self):
+        snap=make_snapshot()
+        snap["benchmark"]["pending_player_game_examples"]=[
+            {"game_id":"849810","hitter_id":"683734",
+             "hitter_name":"Andrew Vaughn",
+             "scheduled_first_pitch_utc":CLOCK,
+             "status":"NO_SEALED_OFFICIAL_SETTLEMENT_YET"}
+        ]
+        snap["benchmark"]["pending_examples_truncated"]=True
+        def refresh():
+            snap["benchmark_sha256"]=hashlib.sha256(
+                feed._canonical(snap["benchmark"]).encode()).hexdigest()
+        refresh()
+        out=reader.load_published_shadow_scoreboard(
+            get=lambda *a,**kw:FakeResponse(snap),clock=lambda:CLOCK)
+        self.assertTrue(out["pending_player_ids_available"])
+        self.assertEqual(out["pending_player_game_examples"][0]["hitter_id"],"683734")
+        self.assertTrue(out["pending_examples_truncated"])
+        snap["benchmark"]["pending_examples_truncated"]=False
+        refresh()
+        with self.assertRaisesRegex(ValueError,"count is inconsistent"):
+            reader.load_published_shadow_scoreboard(
+                get=lambda *a,**kw:FakeResponse(snap),clock=lambda:CLOCK)
+        snap["benchmark"]["pending_examples_truncated"]=True
+        snap["benchmark"]["pending_player_game_examples"][0]["hitter_id"]="fake"
+        refresh()
+        with self.assertRaisesRegex(ValueError,"Invalid pending hitter identity"):
+            reader.load_published_shadow_scoreboard(
+                get=lambda *a,**kw:FakeResponse(snap),clock=lambda:CLOCK)
+
     def test_old_snapshot_warns_and_missing_feed_fails_closed(self):
         valid=make_snapshot()
         out=reader.load_published_shadow_scoreboard(
