@@ -204,6 +204,19 @@ class NhlForwardShadowTests(unittest.TestCase):
                 shadow.evaluate(base, clock)
             self.assertFalse((base / shadow.ROOT / 'predictions/fixture2.json').exists())
 
+    def test_workflow_never_publishes_partial_shadow_if_shadow_step_fails(self):
+        workflow = Path('.github/workflows/nfl_prospective_paper.yml').read_text()
+        self.assertIn('id: nhl_shadow', workflow)
+        self.assertIn('if: always()\\n        run: python sports_nhl_challenger_shadow.py'.replace('\\n','\n'), workflow)
+        publication = workflow.split('      - name: Preserve audit data even when upstream sources fail', 1)[1]
+        self.assertIn('git add benchmarks/nfl_prospective_v2 benchmarks/two_way_prospective', publication)
+        guard = 'if [ "${{ steps.nhl_shadow.outcome }}" = "success" ]; then'
+        self.assertIn(guard, publication)
+        self.assertIn('git add benchmarks/nhl_challenger_shadow_v1', publication.split(guard, 1)[1])
+        self.assertNotIn(
+            'git add benchmarks/nfl_prospective_v2 benchmarks/two_way_prospective benchmarks/nhl_challenger_shadow_v1',
+            publication)
+
     def test_frozen_development_weights_and_provenance_are_locked(self):
         with tempfile.TemporaryDirectory() as folder:
             base = Path(folder)
