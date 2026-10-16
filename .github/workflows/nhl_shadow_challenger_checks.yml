@@ -1,9 +1,9 @@
 name: NHL challenger shadow checks
 on:
   push:
-    paths: ['sports_nhl_challenger_shadow.py', 'sports_nhl_shadow_checkpoint.py', 'sports_nhl_shadow_preview.py', 'test_sports_nhl_challenger_shadow.py', 'test_sports_nhl_shadow_preview.py', 'test_sports_nhl_shadow_checkpoint.py', 'benchmarks/nhl_challenger_shadow_v1/**', '.github/workflows/nhl_shadow_challenger_checks.yml', '.github/workflows/nfl_prospective_paper.yml']
+    paths: ['sports_nhl_challenger_shadow.py', 'sports_nhl_shadow_checkpoint.py', 'sports_nhl_shadow_preview.py', 'sports_nhl_shadow_casebook.py', 'test_sports_nhl_challenger_shadow.py', 'test_sports_nhl_shadow_casebook.py', 'test_sports_nhl_shadow_preview.py', 'test_sports_nhl_shadow_checkpoint.py', 'benchmarks/nhl_challenger_shadow_v1/**', '.github/workflows/nhl_shadow_challenger_checks.yml', '.github/workflows/nfl_prospective_paper.yml']
   pull_request:
-    paths: ['sports_nhl_challenger_shadow.py', 'sports_nhl_shadow_checkpoint.py', 'sports_nhl_shadow_preview.py', 'test_sports_nhl_challenger_shadow.py', 'test_sports_nhl_shadow_preview.py', 'test_sports_nhl_shadow_checkpoint.py', 'benchmarks/nhl_challenger_shadow_v1/**', '.github/workflows/nhl_shadow_challenger_checks.yml', '.github/workflows/nfl_prospective_paper.yml']
+    paths: ['sports_nhl_challenger_shadow.py', 'sports_nhl_shadow_checkpoint.py', 'sports_nhl_shadow_preview.py', 'sports_nhl_shadow_casebook.py', 'test_sports_nhl_challenger_shadow.py', 'test_sports_nhl_shadow_casebook.py', 'test_sports_nhl_shadow_preview.py', 'test_sports_nhl_shadow_checkpoint.py', 'benchmarks/nhl_challenger_shadow_v1/**', '.github/workflows/nhl_shadow_challenger_checks.yml', '.github/workflows/nfl_prospective_paper.yml']
 permissions:
   contents: read
 jobs:
@@ -16,7 +16,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Test source hashes, forward-only enrollment and final scoring
-        run: python -m unittest -v test_sports_nhl_challenger_shadow test_sports_nhl_shadow_checkpoint test_sports_nhl_shadow_preview
+        run: python -m unittest -v test_sports_nhl_challenger_shadow test_sports_nhl_shadow_checkpoint test_sports_nhl_shadow_preview test_sports_nhl_shadow_casebook
       - name: Recheck pinned 2024/2025 development against original inputs
         run: python -m unittest -v test_sports_two_way_challenger
       - name: Offline dry-run of shadow cohort
