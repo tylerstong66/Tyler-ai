@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-15T22:19:23.181558+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
+Evidence through **2026-10-16T01:21:27.055470+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 8 / 6 / 2 |
-| Started games in retained official schedules / enrolled | 6 / 6 |
+| Recorded / settled / pending | 9 / 6 / 3 |
+| Started games in retained official schedules / enrolled | 7 / 7 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 6 / 8 |
+| Enrollment-time priced forecasts | 6 / 9 |
 | Settled with enrollment prices / decisive market-paired | 4 / 4 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -17,6 +17,7 @@ Evidence through **2026-10-15T22:19:23.181558+00:00**; cohort began 2026-10-11T1
 
 | Game | Matchup | Settled | Enrollment evidence | First later archived pregame pair (UTC) |
 |---|---|---|---|---|
+| 849808 | MIL at LAD | False | no provider odds | Unavailable |
 | 849812 | LAD at MIL | True | no usable pair in reduced snapshot raw schema unavailable | 2026-10-12T07:21:49.547508+00:00 |
 | 849813 | CLE at TB | True | no usable pair in reduced snapshot raw schema unavailable | 2026-10-13T07:43:09.630071+00:00 |
 
@@ -24,11 +25,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-15T22:19:23.181558+00:00. Ready: 2 / 2 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-16T01:21:27.055470+00:00. Ready: 1 / 2 observed games. Status: attention.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 849810 | Milwaukee Brewers at Los Angeles Dodgers | True | False | True | None |
+| 849808 | Milwaukee Brewers at Los Angeles Dodgers | False | False | False | latest_scoreboard_market_pair_missing, pregame_market_evidence_not_recorded |
 | 849817 | Tampa Bay Rays at Cleveland Guardians | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
@@ -37,6 +38,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 | Game | Matchup | Start (UTC) | Decision | Exclusion evidence |
 |---|---|---|---|---|
+| 849808 | Milwaukee Brewers at Los Angeles Dodgers | 2026-10-17T01:00:00+00:00 | enrolled | — |
 | 849809 | Los Angeles Dodgers at Milwaukee Brewers | 2026-10-12T00:00:00+00:00 | enrolled | — |
 | 849810 | Milwaukee Brewers at Los Angeles Dodgers | 2026-10-16T00:00:00+00:00 | enrolled | — |
 | 849811 | Milwaukee Brewers at Los Angeles Dodgers | 2026-10-15T00:00:00+00:00 | enrolled | — |
@@ -48,7 +50,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 27. Latest: `20261015T221920847439Z`.
+Audited capture manifests: 28. Latest: `20261016T012124620663Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

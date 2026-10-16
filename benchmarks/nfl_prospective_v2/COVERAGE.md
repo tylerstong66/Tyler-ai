@@ -2,12 +2,12 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-15T22:19:19.714073+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-10-16T01:21:22.375665+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
 | Recorded / settled / pending | 14 / 13 / 1 |
-| Started games in retained official schedules / enrolled | 13 / 13 |
+| Started games in retained official schedules / enrolled | 14 / 14 |
 | Observed missing started games | 0 |
 | Enrollment-time priced forecasts | 14 / 14 |
 | Settled with enrollment prices / decisive market-paired | 13 / 12 |
@@ -25,11 +25,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-15T22:19:19.714073+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-16T01:21:22.375665+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026_06_SEA_DEN | SEA at DEN | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -54,7 +53,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 29. Latest: `20261015T221916093005Z`.
+Audited capture manifests: 30. Latest: `20261016T012118951651Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
