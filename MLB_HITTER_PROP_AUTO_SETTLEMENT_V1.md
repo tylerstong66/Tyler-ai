@@ -12,7 +12,7 @@ The scheduled GitHub workflow checks **once every three hours** (schedule can be
 
 For each final it validates the original SHA256 content digest, official game ID and scheduled start time, team identities and player ID, then reads official final batting counts. If the batter has 0 AB or is absent from the final boxscore, settlement is *ineligible for the conditional hit/HR event scoring*, not a loss. Otherwise it records separate 1+ hit and 1+ HR binary labels and squared Brier errors for the precise frozen probabilities.
 
-The workflow stages and commits **only new files beneath the settlement directory**, using GitHub's standard workflow token. No prediction files, application modules, wagers, sportsbook accounts, or production Render deployment variables are touched.
+The settlement step stages and commits **only new files beneath the settlement directory**, using GitHub's standard workflow token. A subsequent independently guarded step can refresh and commit **only** the mutable read-only `scoreboard.latest.json` if its benchmark changed, so settled outcomes become visible without relying on the next hourly schedule. No prediction files, application modules, wagers, sportsbook accounts, or production Render deployment variables are touched. The hourly publisher remains an independent fallback.
 
 If a final's verified identity or start time differs from the freeze (e.g. reschedule), the job deliberately fails; do not guess or rewrite the original. If GitHub's organization or repository policy blocks workflow-token writes, the collector will report a permission failure, requiring an explicit repo-level decision. Pending runs should **not** be represented as successful final grading.
 
