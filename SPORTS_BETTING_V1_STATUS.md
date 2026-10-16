@@ -1,5 +1,23 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-16)
 
+## Verified after NHL activation: source comparison, postgame audit and MLB freshness (18:04 UTC)
+
+Research/paper only; **NO BET / zero actual wagers / zero model promotions**. The following changes are GitHub research workflows, **not** new Render production deployments.
+
+- **NHL shadow:** first real post-activation forecast is `2026020121`, **New Jersey at Washington**, starting **2026-10-17 17:00 UTC**. Its frozen Washington home-win probability is **0.5911197964** from the independent 2024-fitted challenger, versus original model **0.5410579328**, fixed Elo **0.6224179446** and saved market **0.5324675325** (archived DraftKings quote at 2026-10-16 17:24:56 UTC, **not current odds**). This is a forecast, not an event result. As of the post-merge 2026-10-16 17:51 UTC audit, **1 shadow enrolled / 0 scored**, **0 missed enrollments** and first-100 checkpoint collecting. Original NHL cohort **38 enrolled / 35 scored / 3 pending** at the matching research audit.
+- PR **#90** adds a source-hash-linked read-only pregame probability comparison for the earliest 25 future shadow NHL games by scheduled start/ID, never cherry-picked by expected win. **15/15** checks passed; post-merge automated collector published exactly the first frozen matchup.
+- PR **#91** adds a verifiable postgame casebook for up to 25 latest verified outcomes; it uses immutable original and shadow digests, authenticated result linkage, proper scoring and same-game candidate-minus-baseline differences. **15/15** checks passed; as expected the casebook initially remains empty until the first official final result is verified.
+- PR **#92** preserved the first real NHL challenger forecast and immutable publication state in this handoff. **10/10** checks passed.
+- **MLB hitter feed freshness:** PR **#93** now recomputes unchanged saved research and refreshes a feed heartbeat at most every 2 hours while keeping the date of the **last actual benchmark content change** separate. Successful refresh must not be mistaken for fresh official at-bats, a model improvement or independently attested publication. The GitHub PR passed **12/12** checks. Verified public feed heartbeat **2026-10-16 18:00 UTC** reported unchanged 13:15 UTC benchmark content. The new optional reader metadata is backward-compatible; Render auto-deploy is **OFF** and should not be represented as updated app code.
+- **MLB unresolved hitters:** PR **#94** added source-sealed player-game identities for up to 25 pending forecasts, with count/truncation checks and explicit non-grading. **14/14** checks passed; the publisher's post-merge workflow updated `scoreboard.latest.json` at **2026-10-16T18:04:26Z**. The benchmark still has **7 frozen hitter forecasts / 4 scored / 1 verified zero-AB ineligible / 2 pending**, all from MLB game **849810**. The two still-pending players are **Gary Sánchez (596142)** and **Andrew Vaughn (683734)**. Status is `NO_SEALED_OFFICIAL_SETTLEMENT_YET`, **not proof of zero official at-bats, a loss, or failure to play**.
+- MLB team-winner readiness remains unresolved for game **849808** (current ESPN event/recorded pregame odds missing) and **849817** (saved first pitch 22:00 UTC, latest official 00:00 UTC next day, +120min). Do not backfill prices, rewrite freeze/start, or grade conflicting events. NFL retained prospect cohort **14/14** settled with insufficient independent week blocks for confidence claims.
+
+**Next developer priority:** Let scheduled pregame enrollment and source-final verification run without interruption. On the first NHL challenger game final, validate the hash-linked shadow casebook and same-game scores against the original official result before interpreting aggregates. Continue the existing retry-only settlement logic for the two unresolved MLB hitters; grade only complete verified official lines. Do not change frozen NHL model weights, retrospective samples or no-wager gates. GitHub collector operations occur on their scheduled cadence; additional code work starts only in an active ChatGPT/Work session or a separately configured automation.
+
+---
+
+
+
 **Research/paper only. No real wagers. No model promotion without genuinely sufficient independent prospective evidence.** This is a current operational entry; older historical notes remain below unchanged.
 
 ### First independently enrolled NHL challenger forecast — verified 2026-10-16T17:51:45Z
