@@ -45,6 +45,16 @@ Model minus baseline on the same games. Negative Brier/log loss favors the model
 | fixed_elo | 7 | 5 | 0.0074 | -0.0122 to 0.0426 | 0.0073 | -0.0126 to 0.0432 | -14.3 pp | -50.0 pp to 0.0 pp |
 | market | 5 | 4 | -0.0967 | Unavailable | -0.0987 | Unavailable | 0.0 pp | Unavailable |
 
+## Forecast probability concentration — same priced decisive games
+
+Home-win spread is descriptive only. Forecasts nearer 50% are not inherently better or worse; read alongside calibration and Brier.
+
+| Source | Games | Minimum | Maximum | Mean distance from 50% | Share at 40–60% |
+|---|---:|---:|---:|---:|---:|
+| model | 5 | 50.5% | 58.3% | 3.5% | 100.0% |
+| fixed_elo | 5 | 46.8% | 60.7% | 4.8% | 80.0% |
+| market | 5 | 50.6% | 62.1% | 7.3% | 60.0% |
+
 ## Calibration
 
 Conditional sections compare home-win probabilities on decisive games. NFL full-outcome sections include every settled game and ties.
@@ -70,7 +80,7 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/two_way_prospective/mlb/captures/20261016T134732123008Z/manifest.json.
+Latest saved manifest: benchmarks/two_way_prospective/mlb/captures/20261016T135444008688Z/manifest.json.
 Manifest completion field: True. Errors: [{"error": "Unique saved event required for follow-up quote", "game_id": "849808", "stage": "market_followup"}]. Exclusions: [].
 Optional availability errors: [].
 Newer saved collection failure: null.

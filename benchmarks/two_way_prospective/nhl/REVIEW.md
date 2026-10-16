@@ -45,6 +45,16 @@ Model minus baseline on the same games. Negative Brier/log loss favors the model
 | fixed_elo | 35 | 5 | 0.0204 | -0.0136 to 0.0631 | 0.0221 | -0.0139 to 0.0674 | 5.7 pp | 0.0 pp to 15.4 pp |
 | market | 35 | 5 | 0.0144 | -0.0191 to 0.0485 | 0.0162 | -0.0184 to 0.0528 | 8.6 pp | 0.0 pp to 30.8 pp |
 
+## Forecast probability concentration — same priced decisive games
+
+Home-win spread is descriptive only. Forecasts nearer 50% are not inherently better or worse; read alongside calibration and Brier.
+
+| Source | Games | Minimum | Maximum | Mean distance from 50% | Share at 40–60% |
+|---|---:|---:|---:|---:|---:|
+| model | 35 | 44.1% | 58.9% | 3.5% | 100.0% |
+| fixed_elo | 35 | 34.7% | 74.1% | 10.0% | 57.1% |
+| market | 35 | 34.3% | 72.2% | 7.7% | 77.1% |
+
 ## Calibration
 
 Conditional sections compare home-win probabilities on decisive games. NFL full-outcome sections include every settled game and ties.
@@ -70,7 +80,7 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/two_way_prospective/nhl/captures/20261016T134730166281Z/manifest.json.
+Latest saved manifest: benchmarks/two_way_prospective/nhl/captures/20261016T135442548717Z/manifest.json.
 Manifest completion field: True. Errors: []. Exclusions: [].
 Optional availability errors: [].
 Newer saved collection failure: null.

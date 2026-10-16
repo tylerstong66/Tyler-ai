@@ -71,7 +71,7 @@
       }
     ],
     "excluded": [],
-    "latest_manifest": "benchmarks/two_way_prospective/mlb/captures/20261016T134732123008Z/manifest.json",
+    "latest_manifest": "benchmarks/two_way_prospective/mlb/captures/20261016T135444008688Z/manifest.json",
     "newer_saved_collection_failure": null,
     "optional_availability_errors": []
   },
@@ -350,6 +350,34 @@
     ],
     "games": 5,
     "limitation": "Fixed five bins. Wilson bin intervals assume independent observations; descriptive only."
+  },
+  "paired_probability_concentration": {
+    "interpretation": "Forecast sharpness is descriptive, not proof of calibration or a betting edge.",
+    "no_model_selection_or_promotion": true,
+    "scope": "same_priced_decisive_games",
+    "sources": {
+      "fixed_elo": {
+        "fraction_home_probability_40_to_60": 0.8,
+        "games": 5,
+        "max_home_probability": 0.6070088181527998,
+        "mean_distance_from_even": 0.04801963213180375,
+        "min_home_probability": 0.4679299171116112
+      },
+      "market": {
+        "fraction_home_probability_40_to_60": 0.6,
+        "games": 5,
+        "max_home_probability": 0.6206070287539937,
+        "mean_distance_from_even": 0.07305658299197715,
+        "min_home_probability": 0.5064960374171755
+      },
+      "model": {
+        "fraction_home_probability_40_to_60": 1.0,
+        "games": 5,
+        "max_home_probability": 0.5827207455916936,
+        "mean_distance_from_even": 0.03540967839835074,
+        "min_home_probability": 0.5052999237237734
+      }
+    }
   },
   "pending": 2,
   "probability_policy": "Saved pregame probabilities only; NFL binary metrics condition on no tie.",
