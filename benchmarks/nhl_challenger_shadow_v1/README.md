@@ -54,9 +54,12 @@ may inform later research but must not modify this shadow's frozen weights.
 
 The scheduled GitHub workflow `Sports prospective paper tests` runs the
 isolated NHL challenger step after the existing NHL/MLB primary enrollment,
-then stages only the existing prospective directories and the independent
-shadow directory. This creates zero new sportsbook bets and requires no Render
-deployment or user API keys.
+then always stages the independently collected original prospective evidence,
+but stages the separate challenger directory **only if the shadow verification
+step completes successfully**. Failed shadow runs cannot accidentally publish
+half-written immutable challenger predictions merely because GitHub's general
+audit-preservation step still executes. This creates zero new sportsbook bets
+and requires no Render deployment or user API keys.
 
 ## Reproduce
 
