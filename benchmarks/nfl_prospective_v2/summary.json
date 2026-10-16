@@ -4,37 +4,47 @@
   "availability_records": 158,
   "full_three_outcome_metrics": {
     "v1": {
-      "full_brier": 0.4937860423174619,
-      "full_log_loss": 0.9895796682853758
+      "full_brier": 0.5041830530362391,
+      "full_log_loss": 0.9787169623215973
     },
     "v2": {
-      "full_brier": 0.48322962285772775,
-      "full_log_loss": 0.9776553935177573
+      "full_brier": 0.4920309664871772,
+      "full_log_loss": 0.9652525681360465
     }
   },
   "injury_effect_enabled": false,
   "paired_metrics": {
     "market": {
-      "binary_brier": 0.41321232081846665,
-      "conditional_log_loss": 0.6006014619641038,
-      "correct": 0.6666666666666666
+      "binary_brier": 0.4302764970045144,
+      "conditional_log_loss": 0.6181666357914041,
+      "correct": 0.6153846153846154
     },
     "v1": {
-      "binary_brier": 0.41063511688228904,
-      "conditional_log_loss": 0.6005446187303732,
-      "correct": 0.75
+      "binary_brier": 0.42826822092530475,
+      "conditional_log_loss": 0.6184911318442601,
+      "correct": 0.6923076923076923
     },
     "v2": {
-      "binary_brier": 0.3990908000511875,
-      "conditional_log_loss": 0.5876266543987865,
-      "correct": 0.75
+      "binary_brier": 0.415071259929663,
+      "conditional_log_loss": 0.6039910150290517,
+      "correct": 0.6923076923076923
     }
   },
-  "paired_priced_decisive_games": 12,
-  "pending": 1,
+  "paired_priced_decisive_games": 13,
+  "pending": 0,
   "recorded": 14,
-  "settled": 13,
+  "settled": 14,
   "state": "collecting",
   "target": 100,
-  "week_block_brier_difference": null
+  "week_block_brier_difference": {
+    "approximate_95_percent_interval": [
+      -0.02820983276571809,
+      -0.014121520767279185
+    ],
+    "blocks": 2,
+    "draws": 2000,
+    "limitation": "Approximate season/week-block uncertainty for the prospective sample; not proof of future profitability.",
+    "mean_model_minus_market": -0.01520523707485141,
+    "seed": 1729
+  }
 }

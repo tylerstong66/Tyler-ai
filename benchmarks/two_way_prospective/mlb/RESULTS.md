@@ -1,6 +1,6 @@
 # Tyler MLB prospective paper test
 
-Recorded: **9** · Settled: **6** · Pending: **3**
+Recorded: **9** · Settled: **7** · Pending: **2**
 
 **NO BET — actual wagers $0.**
 
@@ -8,9 +8,9 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 
 | Model | Paired games | Brier | Log loss | Accuracy |
 |---|---:|---:|---:|---:|
-| model | 4 | 0.5206 | 0.7141 | 50.0% |
-| fixed_elo | 4 | 0.5359 | 0.7299 | 50.0% |
-| market | 4 | 0.5998 | 0.7951 | 50.0% |
+| model | 5 | 0.5222 | 0.7156 | 40.0% |
+| fixed_elo | 5 | 0.5223 | 0.7161 | 60.0% |
+| market | 5 | 0.6189 | 0.8143 | 40.0% |
 
 | Game | Start (Eastern) | Model pick | Win probability |
 |---|---|---|---:|

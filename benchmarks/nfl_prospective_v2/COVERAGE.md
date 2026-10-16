@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-16T01:21:22.375665+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-10-16T07:10:33.600326+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 14 / 13 / 1 |
+| Recorded / settled / pending | 14 / 14 / 0 |
 | Started games in retained official schedules / enrolled | 14 / 14 |
 | Observed missing started games | 0 |
 | Enrollment-time priced forecasts | 14 / 14 |
-| Settled with enrollment prices / decisive market-paired | 13 / 12 |
+| Settled with enrollment prices / decisive market-paired | 14 / 13 |
 | Separate later quotes recorded prospectively | 0 |
 
 A priced NFL tie is excluded only from binary decisive market comparisons.
@@ -25,7 +25,7 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-16T01:21:22.375665+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
+As of retained evidence: 2026-10-16T07:10:33.600326+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
@@ -53,7 +53,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 30. Latest: `20261016T012118951651Z`.
+Audited capture manifests: 31. Latest: `20261016T071031679808Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

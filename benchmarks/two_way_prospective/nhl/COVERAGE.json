@@ -1,12 +1,12 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-10-16T01:21:24.541523+00:00",
-  "capture_count": 28,
+  "as_of_evidence_at": "2026-10-16T07:10:34.884288+00:00",
+  "capture_count": 29,
   "cohort_started_at": "2026-10-11T15:58:51.144676+00:00",
   "completion_note": "Only manifests without an explicit incomplete state are audited; legacy manifests are retained.",
-  "decisive_market_paired": 24,
-  "enrollment_priced": 36,
+  "decisive_market_paired": 35,
+  "enrollment_priced": 37,
   "followup_quotes_separate_from_original_metrics": [],
   "games": [
     {
@@ -535,7 +535,7 @@
       "lead_hours": 21.3325062825,
       "pregame_schedule_observations_in_window": 28,
       "recorded_at": "2026-10-15T04:40:02.977383+00:00",
-      "started_by_as_of": false,
+      "started_by_as_of": true,
       "status": "enrolled"
     },
     {
@@ -546,19 +546,36 @@
       "home": "COL",
       "kickoff": "2026-10-17T01:00:00+00:00",
       "latest_saved_decision": {
-        "checked_at": "2026-10-16T01:21:24.543734+00:00",
-        "decision": "enrolled",
-        "game_id": "2026020119",
-        "priced": true
+        "decision": "already_enrolled",
+        "game_id": "2026020119"
       },
       "lead_hours": 23.643177238333333,
-      "pregame_schedule_observations_in_window": 4,
+      "pregame_schedule_observations_in_window": 8,
       "recorded_at": "2026-10-16T01:21:24.561942+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
+      "away": "BOS",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-10-16T07:10:33.949418+00:00",
+      "game_id": "2026020120",
+      "home": "ANA",
+      "kickoff": "2026-10-17T02:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-10-16T07:10:34.886265+00:00",
+        "decision": "enrolled",
+        "game_id": "2026020120",
+        "priced": true
+      },
+      "lead_hours": 18.823637784444443,
+      "pregame_schedule_observations_in_window": 4,
+      "recorded_at": "2026-10-16T07:10:34.903976+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
     }
   ],
-  "input_digest": "1fe0775794ed0d49ae71a0c9d5b89c5d7b11ae23281f2d7816a5bcc8bb0ef72a",
+  "input_digest": "ba51744b5e492dbb205421ef876ac6347b6c46cd25294c0aaff1241f8e981a4d",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -587,8 +604,8 @@
       "to": "2026-10-13T00:40:34.119783+00:00"
     }
   ],
-  "latest_attempted_capture": "20261016T012122541696Z",
-  "latest_capture": "20261016T012122541696Z",
+  "latest_attempted_capture": "20261016T071033764285Z",
+  "latest_capture": "20261016T071033764285Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
@@ -635,264 +652,260 @@
       "game_id": "2026020118"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.543734+00:00",
+      "decision": "already_enrolled",
+      "game_id": "2026020119"
+    },
+    {
+      "checked_at": "2026-10-16T07:10:34.886265+00:00",
       "decision": "enrolled",
-      "game_id": "2026020119",
+      "game_id": "2026020120",
       "priced": true
     },
     {
-      "checked_at": "2026-10-16T01:21:24.562832+00:00",
-      "decision": "outside_24h_window",
-      "game_id": "2026020120"
-    },
-    {
-      "checked_at": "2026-10-16T01:21:24.562881+00:00",
+      "checked_at": "2026-10-16T07:10:34.904821+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020121"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.562915+00:00",
+      "checked_at": "2026-10-16T07:10:34.904857+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020122"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.562943+00:00",
+      "checked_at": "2026-10-16T07:10:34.904883+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020123"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.562971+00:00",
+      "checked_at": "2026-10-16T07:10:34.904923+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020124"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563000+00:00",
+      "checked_at": "2026-10-16T07:10:34.904948+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020125"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563027+00:00",
+      "checked_at": "2026-10-16T07:10:34.904970+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020126"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563055+00:00",
+      "checked_at": "2026-10-16T07:10:34.904991+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020127"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563082+00:00",
+      "checked_at": "2026-10-16T07:10:34.905012+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020128"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563108+00:00",
+      "checked_at": "2026-10-16T07:10:34.905033+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020129"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563133+00:00",
+      "checked_at": "2026-10-16T07:10:34.905053+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020130"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563158+00:00",
+      "checked_at": "2026-10-16T07:10:34.905073+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020131"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563184+00:00",
+      "checked_at": "2026-10-16T07:10:34.905094+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020132"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563210+00:00",
+      "checked_at": "2026-10-16T07:10:34.905116+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020133"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563236+00:00",
+      "checked_at": "2026-10-16T07:10:34.905137+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020134"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563262+00:00",
+      "checked_at": "2026-10-16T07:10:34.905158+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020135"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563287+00:00",
+      "checked_at": "2026-10-16T07:10:34.905179+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020136"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563312+00:00",
+      "checked_at": "2026-10-16T07:10:34.905200+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020137"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563342+00:00",
+      "checked_at": "2026-10-16T07:10:34.905220+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020138"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563369+00:00",
+      "checked_at": "2026-10-16T07:10:34.905244+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020139"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563396+00:00",
+      "checked_at": "2026-10-16T07:10:34.905265+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020140"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563423+00:00",
+      "checked_at": "2026-10-16T07:10:34.905288+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020141"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563448+00:00",
+      "checked_at": "2026-10-16T07:10:34.905310+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020142"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563473+00:00",
+      "checked_at": "2026-10-16T07:10:34.905330+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020143"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563499+00:00",
+      "checked_at": "2026-10-16T07:10:34.905350+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020144"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563525+00:00",
+      "checked_at": "2026-10-16T07:10:34.905371+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020145"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563550+00:00",
+      "checked_at": "2026-10-16T07:10:34.905391+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020146"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563576+00:00",
+      "checked_at": "2026-10-16T07:10:34.905411+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020147"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563601+00:00",
+      "checked_at": "2026-10-16T07:10:34.905431+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020148"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563626+00:00",
+      "checked_at": "2026-10-16T07:10:34.905452+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020149"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563651+00:00",
+      "checked_at": "2026-10-16T07:10:34.905472+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020150"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563675+00:00",
+      "checked_at": "2026-10-16T07:10:34.905492+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020151"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563701+00:00",
+      "checked_at": "2026-10-16T07:10:34.905512+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020152"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563726+00:00",
+      "checked_at": "2026-10-16T07:10:34.905532+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020153"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563773+00:00",
+      "checked_at": "2026-10-16T07:10:34.905551+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020154"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563810+00:00",
+      "checked_at": "2026-10-16T07:10:34.905572+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020155"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563839+00:00",
+      "checked_at": "2026-10-16T07:10:34.905592+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020156"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563865+00:00",
+      "checked_at": "2026-10-16T07:10:34.905612+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020157"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563890+00:00",
+      "checked_at": "2026-10-16T07:10:34.905632+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020158"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563919+00:00",
+      "checked_at": "2026-10-16T07:10:34.905652+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020159"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563945+00:00",
+      "checked_at": "2026-10-16T07:10:34.905674+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020160"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563970+00:00",
+      "checked_at": "2026-10-16T07:10:34.905695+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020161"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.563995+00:00",
+      "checked_at": "2026-10-16T07:10:34.905715+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020162"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.564019+00:00",
+      "checked_at": "2026-10-16T07:10:34.905735+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020163"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.564044+00:00",
+      "checked_at": "2026-10-16T07:10:34.905755+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020164"
     },
     {
-      "checked_at": "2026-10-16T01:21:24.564069+00:00",
+      "checked_at": "2026-10-16T07:10:34.905776+00:00",
       "decision": "outside_24h_window",
       "game_id": "2026020165"
+    },
+    {
+      "checked_at": "2026-10-16T07:10:34.905796+00:00",
+      "decision": "outside_24h_window",
+      "game_id": "2026020166"
+    },
+    {
+      "checked_at": "2026-10-16T07:10:34.905816+00:00",
+      "decision": "outside_24h_window",
+      "game_id": "2026020167"
     }
   ],
-  "latest_official_schedule_observed_at": "2026-10-16T01:21:24.157276+00:00",
+  "latest_official_schedule_observed_at": "2026-10-16T07:10:34.798799+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [],
   "minimum_forecast_lead_hours": 4.973583106388889,
   "observed_missing_started_games": [],
-  "pending": 12,
+  "pending": 2,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-10-16T01:21:24.541523+00:00",
+    "as_of_evidence_at": "2026-10-16T07:10:34.884288+00:00",
     "games": [
-      {
-        "away": "CGY",
-        "enrolled": true,
-        "enrollment_priced": true,
-        "game_id": "2026020118",
-        "home": "VGK",
-        "issues": [],
-        "kickoff": "2026-10-16T02:00:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-16T01:21:24.078801+00:00",
-        "latest_scoreboard_priced": true,
-        "ready": true,
-        "separate_followup_recorded": false
-      },
       {
         "away": "PIT",
         "enrolled": true,
@@ -901,7 +914,20 @@
         "home": "COL",
         "issues": [],
         "kickoff": "2026-10-17T01:00:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-16T01:21:24.420625+00:00",
+        "latest_scoreboard_observed_at": "2026-10-16T07:10:34.737440+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "BOS",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026020120",
+        "home": "ANA",
+        "issues": [],
+        "kickoff": "2026-10-17T02:00:00+00:00",
+        "latest_scoreboard_observed_at": "2026-10-16T07:10:34.737440+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "separate_followup_recorded": false
@@ -914,7 +940,7 @@
     "window_hours": 24
   },
   "report_version": "prospective-coverage-v1",
-  "saved": 36,
+  "saved": 37,
   "saved_collector_errors": [
     {
       "capture": "20261014T061239505192Z",
@@ -939,10 +965,10 @@
   ],
   "saved_exclusions": [],
   "saved_failed_attempts": [],
-  "settled": 24,
-  "settled_enrollment_priced": 24,
+  "settled": 35,
+  "settled_enrollment_priced": 35,
   "settled_ties_with_prices": 0,
   "sport": "NHL",
-  "started_schedule_games_enrolled": 34,
-  "started_schedule_games_in_scope": 34
+  "started_schedule_games_enrolled": 35,
+  "started_schedule_games_in_scope": 35
 }

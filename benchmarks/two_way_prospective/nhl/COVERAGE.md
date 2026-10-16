@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-16T01:21:24.541523+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-16T07:10:34.884288+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 36 / 24 / 12 |
-| Started games in retained official schedules / enrolled | 34 / 34 |
+| Recorded / settled / pending | 37 / 35 / 2 |
+| Started games in retained official schedules / enrolled | 35 / 35 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 36 / 36 |
-| Settled with enrollment prices / decisive market-paired | 24 / 24 |
+| Enrollment-time priced forecasts | 37 / 37 |
+| Settled with enrollment prices / decisive market-paired | 35 / 35 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,12 +23,12 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-16T01:21:24.541523+00:00. Ready: 2 / 2 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-16T07:10:34.884288+00:00. Ready: 2 / 2 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020118 | CGY at VGK | True | False | True | None |
 | 2026020119 | PIT at COL | True | False | True | None |
+| 2026020120 | BOS at ANA | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -72,10 +72,11 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020117 | UTA at EDM | 2026-10-16T01:00:00+00:00 | enrolled | — |
 | 2026020118 | CGY at VGK | 2026-10-16T02:00:00+00:00 | enrolled | — |
 | 2026020119 | PIT at COL | 2026-10-17T01:00:00+00:00 | enrolled | — |
+| 2026020120 | BOS at ANA | 2026-10-17T02:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 28. Latest: `20261016T012122541696Z`.
+Audited capture manifests: 29. Latest: `20261016T071033764285Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

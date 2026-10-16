@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-16T01:21:27.055470+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
+Evidence through **2026-10-16T07:10:37.743316+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 9 / 6 / 3 |
+| Recorded / settled / pending | 9 / 7 / 2 |
 | Started games in retained official schedules / enrolled | 7 / 7 |
 | Observed missing started games | 0 |
 | Enrollment-time priced forecasts | 6 / 9 |
-| Settled with enrollment prices / decisive market-paired | 4 / 4 |
+| Settled with enrollment prices / decisive market-paired | 5 / 5 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -25,12 +25,12 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-16T01:21:27.055470+00:00. Ready: 1 / 2 observed games. Status: attention.
+As of retained evidence: 2026-10-16T07:10:37.743316+00:00. Ready: 0 / 2 observed games. Status: attention.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 849808 | Milwaukee Brewers at Los Angeles Dodgers | False | False | False | latest_scoreboard_market_pair_missing, pregame_market_evidence_not_recorded |
-| 849817 | Tampa Bay Rays at Cleveland Guardians | True | False | True | None |
+| 849808 | Milwaukee Brewers at Los Angeles Dodgers | False | False | False | latest_scoreboard_event_missing_or_ambiguous, pregame_market_evidence_not_recorded |
+| 849817 | Tampa Bay Rays at Cleveland Guardians | True | False | True | official_identity_differs_from_forecast |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -44,13 +44,13 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 849811 | Milwaukee Brewers at Los Angeles Dodgers | 2026-10-15T00:00:00+00:00 | enrolled | — |
 | 849812 | Los Angeles Dodgers at Milwaukee Brewers | 2026-10-12T21:00:00+00:00 | enrolled | — |
 | 849813 | Cleveland Guardians at Tampa Bay Rays | 2026-10-14T00:00:00+00:00 | enrolled | — |
-| 849817 | Tampa Bay Rays at Cleveland Guardians | 2026-10-16T22:00:00+00:00 | enrolled | — |
+| 849817 | Tampa Bay Rays at Cleveland Guardians | 2026-10-17T00:00:00+00:00 | enrolled | — |
 | 849818 | Tampa Bay Rays at Cleveland Guardians | 2026-10-15T17:00:00+00:00 | enrolled | — |
 | 849820 | Cleveland Guardians at Tampa Bay Rays | 2026-10-13T00:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 28. Latest: `20261016T012124620663Z`.
+Audited capture manifests: 29. Latest: `20261016T071034966948Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
