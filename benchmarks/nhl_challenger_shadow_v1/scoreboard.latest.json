@@ -222,7 +222,7 @@
       "uncertainty_status": "insufficient_blocks"
     }
   },
-  "as_of_utc": "2026-10-16T17:46:42.649958+00:00",
+  "as_of_utc": "2026-10-16T17:51:45.339846+00:00",
   "candidate": "ridge_recipe",
   "enrolled": 1,
   "first_100_enrolled": {
@@ -303,6 +303,17 @@
   },
   "pending": 1,
   "promotion_allowed": false,
+  "recent_verified_game_casebook": {
+    "NO_BET": true,
+    "actual_wagers": 0,
+    "caveat": "Descriptive game-level audit, not independent evidence of profitability or a wagering signal.",
+    "games": [],
+    "proper_score_interpretation": "challenger minus baseline: lower Brier/log loss favors challenger; positive accuracy difference favors challenger",
+    "scope": "all_already_verified_nhl_challenger_finals",
+    "selection": "latest final verified_at UTC first, then game_id; not chosen by performance",
+    "shown": 0,
+    "total_settled_shadow_games": 0
+  },
   "same_game_priced": {
     "candidate": {
       "blocks": 0,
