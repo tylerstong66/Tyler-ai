@@ -58,7 +58,7 @@
       "uncertainty_status": "insufficient_blocks"
     }
   },
-  "as_of_utc": "2026-10-16T16:21:15.775623+00:00",
+  "as_of_utc": "2026-10-16T16:24:31.192056+00:00",
   "candidate": "ridge_recipe",
   "enrolled": 0,
   "first_100_enrolled": {
@@ -216,6 +216,13 @@
   "same_game_priced_count": 0,
   "scored": 0,
   "selection_warning": "2025 retrospective model selection was not blind; only post-activation NHL shadow games are prospective.",
+  "source_enrollment_coverage": {
+    "eligible_saved_primary_forecasts_since_activation": 0,
+    "missed_started_source_forecasts": [],
+    "note": "Only hash-verified saved primary forecasts; no upstream schedule completeness claim or retrospective repair.",
+    "shadow_enrolled": 0,
+    "unseen_official_schedule_not_measured": true
+  },
   "source_report": "benchmarks/two_way_challenger_v1/nhl_report.json",
   "source_report_protocol_sha256": "4ec1c2b8a4cea91f83b029f2c279c1742f8cf0b00b5c4d208f559aea786e071a",
   "version": "nhl-forward-challenger-shadow-v1"
