@@ -68,6 +68,16 @@ class NhlForwardShadowTests(unittest.TestCase):
             first = shadow.evaluate(base, clock)
             self.assertEqual((first['enrolled'], first['newly_enrolled'],
                               first['scored'], first['pending']), (1, 1, 0, 1))
+            upcoming=first['upcoming_pregame_comparisons']
+            self.assertEqual((upcoming['total_future_enrolled'],upcoming['shown']),(1,1))
+            view=upcoming['games'][0]
+            self.assertEqual((view['home'],view['away']),('H','A'))
+            self.assertEqual(view['scheduled_start_utc'], original['kickoff'])
+            self.assertEqual(view['source_forecast_sha256'],original['sha256'])
+            self.assertEqual(view['home_win_probabilities']['saved_market'],
+                             original['market']['conditional_home_probability'])
+            self.assertFalse(view['live_market_quote'])
+            self.assertFalse(view['result_eligible_to_score_now'])
             self.assertEqual(first['source_enrollment_coverage']['eligible_saved_primary_forecasts_since_activation'], 1)
             self.assertEqual(first['source_enrollment_coverage']['shadow_enrolled'], 1)
             self.assertEqual(first['source_enrollment_coverage']['missed_started_source_forecasts'], [])
@@ -89,6 +99,7 @@ class NhlForwardShadowTests(unittest.TestCase):
             later = shadow.evaluate(base, review.utc('2026-10-17T05:00:00Z'))
             self.assertEqual((later['scored'], later['pending'], later['same_game_priced_count']),
                              (1, 0, 1))
+            self.assertEqual(later['upcoming_pregame_comparisons']['shown'],0)
             self.assertEqual(later['all_scored_calibration']['sources']['candidate']['calibration']['games'],1)
             self.assertEqual(later['same_game_priced_calibration']['sources']['market']['spread']['games'],1)
             self.assertAlmostEqual(
