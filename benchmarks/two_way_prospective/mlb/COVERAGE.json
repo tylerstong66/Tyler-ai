@@ -1,8 +1,8 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-10-16T21:09:32.543594+00:00",
-  "capture_count": 44,
+  "as_of_evidence_at": "2026-10-16T23:36:18.443855+00:00",
+  "capture_count": 45,
   "cohort_started_at": "2026-10-11T15:59:30.281973+00:00",
   "completion_note": "Only manifests without an explicit incomplete state are audited; legacy manifests are retained.",
   "decisive_market_paired": 5,
@@ -153,7 +153,7 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "4ef0e94a9438efb740cd4079f5d6293114bdbc07981a5a9b86876d4d131bd68d",
+  "input_digest": "2f6a7a26b106b10760cf6039509dde0f0048d9e8086d68f0ecc9b25ac9de494a",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -182,20 +182,20 @@
       "to": "2026-10-13T00:41:35.771663+00:00"
     }
   ],
-  "latest_attempted_capture": "20261016T210929631226Z",
-  "latest_capture": "20261016T210929631226Z",
+  "latest_attempted_capture": "20261016T233615539073Z",
+  "latest_capture": "20261016T233615539073Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
       "game_id": "849817"
     },
     {
-      "checked_at": "2026-10-16T21:09:32.544908+00:00",
+      "checked_at": "2026-10-16T23:36:18.445063+00:00",
       "decision": "outside_24h_window",
       "game_id": "849816"
     }
   ],
-  "latest_official_schedule_observed_at": "2026-10-16T21:09:32.477317+00:00",
+  "latest_official_schedule_observed_at": "2026-10-16T23:36:18.348508+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [
     {
@@ -274,7 +274,7 @@
   "observed_missing_started_games": [],
   "pending": 2,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-10-16T21:09:32.543594+00:00",
+    "as_of_evidence_at": "2026-10-16T23:36:18.443855+00:00",
     "games": [
       {
         "away": "Milwaukee Brewers",
@@ -300,12 +300,15 @@
         "game_id": "849817",
         "home": "Cleveland Guardians",
         "issues": [
+          "official_game_not_pregame",
           "official_identity_differs_from_forecast",
-          "saved_start_differs_from_latest_official_start"
+          "saved_start_differs_from_latest_official_start",
+          "latest_scoreboard_not_pregame",
+          "latest_scoreboard_market_pair_missing"
         ],
         "kickoff": "2026-10-17T00:00:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-16T21:09:32.379599+00:00",
-        "latest_scoreboard_priced": true,
+        "latest_scoreboard_observed_at": "2026-10-16T23:36:18.174764+00:00",
+        "latest_scoreboard_priced": false,
         "ready": false,
         "saved_vs_latest_official_start": {
           "action": "no_regrade_or_rewrite_of_frozen_forecast",
@@ -417,6 +420,12 @@
     },
     {
       "capture": "20261016T210929631226Z",
+      "error": "Unique saved event required for follow-up quote",
+      "game_id": "849808",
+      "stage": "market_followup"
+    },
+    {
+      "capture": "20261016T233615539073Z",
       "error": "Unique saved event required for follow-up quote",
       "game_id": "849808",
       "stage": "market_followup"

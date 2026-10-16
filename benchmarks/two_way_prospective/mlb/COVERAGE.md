@@ -2,7 +2,7 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-16T21:09:32.543594+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
+Evidence through **2026-10-16T23:36:18.443855+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
 
 | Coverage | Games |
 |---|---:|
@@ -25,12 +25,12 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-16T21:09:32.543594+00:00. Ready: 0 / 2 observed games. Status: attention.
+As of retained evidence: 2026-10-16T23:36:18.443855+00:00. Ready: 0 / 2 observed games. Status: attention.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
 | 849808 | Milwaukee Brewers at Los Angeles Dodgers | False | False | False | latest_scoreboard_event_missing_or_ambiguous, pregame_market_evidence_not_recorded |
-| 849817 | Tampa Bay Rays at Cleveland Guardians | True | False | True | official_identity_differs_from_forecast, saved_start_differs_from_latest_official_start |
+| 849817 | Tampa Bay Rays at Cleveland Guardians | True | False | False | official_game_not_pregame, official_identity_differs_from_forecast, saved_start_differs_from_latest_official_start, latest_scoreboard_not_pregame, latest_scoreboard_market_pair_missing |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -50,7 +50,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 44. Latest: `20261016T210929631226Z`.
+Audited capture manifests: 45. Latest: `20261016T233615539073Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

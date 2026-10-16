@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-16T21:09:29.537670+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-16T23:36:15.433438+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 40 / 35 / 5 |
+| Recorded / settled / pending | 47 / 35 / 12 |
 | Started games in retained official schedules / enrolled | 35 / 35 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 40 / 40 |
+| Enrollment-time priced forecasts | 47 / 47 |
 | Settled with enrollment prices / decisive market-paired | 35 / 35 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -23,7 +23,7 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-16T21:09:29.537670+00:00. Ready: 5 / 5 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-16T23:36:15.433438+00:00. Ready: 12 / 12 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
@@ -32,6 +32,13 @@ As of retained evidence: 2026-10-16T21:09:29.537670+00:00. Ready: 5 / 5 observed
 | 2026020121 | NJD at WSH | True | False | True | None |
 | 2026020122 | CAR at WPG | True | False | True | None |
 | 2026020123 | VAN at TBL | True | False | True | None |
+| 2026020124 | SEA at FLA | True | False | True | None |
+| 2026020125 | NYI at TOR | True | False | True | None |
+| 2026020126 | BUF at MTL | True | False | True | None |
+| 2026020127 | SJS at DET | True | False | True | None |
+| 2026020128 | OTT at PHI | True | False | True | None |
+| 2026020129 | NYR at CBJ | True | False | True | None |
+| 2026020130 | DAL at CHI | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -79,10 +86,17 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020121 | NJD at WSH | 2026-10-17T17:00:00+00:00 | enrolled | — |
 | 2026020122 | CAR at WPG | 2026-10-17T19:30:00+00:00 | enrolled | — |
 | 2026020123 | VAN at TBL | 2026-10-17T20:00:00+00:00 | enrolled | — |
+| 2026020124 | SEA at FLA | 2026-10-17T22:00:00+00:00 | enrolled | — |
+| 2026020125 | NYI at TOR | 2026-10-17T23:00:00+00:00 | enrolled | — |
+| 2026020126 | BUF at MTL | 2026-10-17T23:00:00+00:00 | enrolled | — |
+| 2026020127 | SJS at DET | 2026-10-17T23:00:00+00:00 | enrolled | — |
+| 2026020128 | OTT at PHI | 2026-10-17T23:00:00+00:00 | enrolled | — |
+| 2026020129 | NYR at CBJ | 2026-10-17T23:00:00+00:00 | enrolled | — |
+| 2026020130 | DAL at CHI | 2026-10-17T23:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 44. Latest: `20261016T210928431825Z`.
+Audited capture manifests: 45. Latest: `20261016T233613549695Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
