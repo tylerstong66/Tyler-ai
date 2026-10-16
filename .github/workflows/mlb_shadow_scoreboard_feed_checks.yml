@@ -1,7 +1,7 @@
 name: Tyler MLB public scoreboard feed and authenticated chat checks
 on:
   push:
-    branches: [feature/mlb-shadow-github-scoreboard-feed-v1]
+    branches: [main]
     paths:
       - sports_mlb_prop_scoreboard_feed.py
       - sports_mlb_prop_scoreboard_reader.py

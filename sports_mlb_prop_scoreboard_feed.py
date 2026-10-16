@@ -8,7 +8,7 @@ import argparse
 import hashlib
 import json
 import subprocess
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from sports_mlb_prop_shadow_scoreboard import official_shadow_scoreboard
@@ -16,6 +16,9 @@ from sports_mlb_sources import utc
 
 FEED_SCHEMA="tyler_mlb_shadow_public_scoreboard_v1"
 FEED_RELATIVE="benchmarks/mlb_hitter_props_shadow_v1/scoreboard.latest.json"
+# Avoid a misleading >4h stale warning when healthy jobs find unchanged data.
+# Two hours limits no-op Git commit churn while retaining a visible heartbeat.
+HEARTBEAT_INTERVAL=timedelta(hours=2)
 
 
 def _canonical(value):
@@ -31,24 +34,34 @@ def publish_readonly_shadow_feed(root="benchmarks/mlb_hitter_props_shadow_v1",
     stable={k:v for k,v in report.items() if k!="report_created_utc"}
     digest=hashlib.sha256(_canonical(stable).encode("utf-8")).hexdigest()
     target=Path(repository)/FEED_RELATIVE
+    prior=None
+    same_evidence=False
     if target.exists():
         prior=json.loads(target.read_text(encoding="utf-8"))
         if prior.get("schema")!=FEED_SCHEMA:
             raise ValueError("Existing public scoreboard feed has unknown schema.")
-        if prior.get("benchmark_sha256")==digest and prior.get("benchmark")==stable:
+        published=utc(prior.get("published_at_utc"))
+        if published>current:
+            raise ValueError("Existing published scoreboard timestamp is in the future.")
+        same_evidence=(prior.get("benchmark_sha256")==digest
+                       and prior.get("benchmark")==stable)
+        if same_evidence and current-published<HEARTBEAT_INTERVAL:
             return {
                 "status":"UNCHANGED","destination":FEED_RELATIVE,
                 "forecast_count":stable.get("frozen_player_game_forecasts"),
                 "benchmark_sha256":digest,"wagers":0
             }
-        if utc(prior.get("published_at_utc"))>current:
-            raise ValueError("Existing published scoreboard timestamp is in the future.")
     git_head=subprocess.check_output(["git","rev-parse","HEAD"],cwd=repository,
                                      stderr=subprocess.PIPE).decode().strip()
     if len(git_head)!=40 or any(ch not in "0123456789abcdef" for ch in git_head):
         raise ValueError("Cannot verify publication input Git commit.")
     snapshot={
         "schema":FEED_SCHEMA,"published_at_utc":current.isoformat(),
+        "benchmark_last_changed_at_utc": (
+            prior.get("benchmark_last_changed_at_utc",prior["published_at_utc"])
+            if same_evidence else current.isoformat()),
+        "source_refresh_kind": (
+            "unchanged_saved_evidence_heartbeat" if same_evidence else "benchmark_changed"),
         "source_git_revision":git_head,
         "source":"public_github_main_scheduled_snapshot",
         "source_is_not_live_official_MLB_api":True,
@@ -58,6 +71,7 @@ def publish_readonly_shadow_feed(root="benchmarks/mlb_hitter_props_shadow_v1",
         "limitations":[
             "The feed reports only the GitHub repository snapshot as of its publication time.",
             "GitHub scheduled jobs may run late, so actual final results may appear later.",
+            "An unchanged-data heartbeat only proves the saved local research ledger was recomputed; it is not a fresh official MLB API check.",
             "It is NOT a live sportsbook feed or a validated profitable betting model.",
             "Probability scoring is conditional on at least one official at-bat.",
             "Git commit metadata is not independent proof of publication timestamp."
@@ -67,7 +81,8 @@ def publish_readonly_shadow_feed(root="benchmarks/mlb_hitter_props_shadow_v1",
     target.write_text(json.dumps(snapshot,sort_keys=True,indent=2,allow_nan=False)+"\n",
                       encoding="utf-8")
     return {
-        "status":"CREATED_OR_UPDATED","destination":FEED_RELATIVE,
+        "status":"HEARTBEAT_REFRESHED" if same_evidence else "CREATED_OR_UPDATED",
+        "destination":FEED_RELATIVE,
         "forecast_count":stable.get("frozen_player_game_forecasts"),
         "benchmark_sha256":digest,"wagers":0
     }

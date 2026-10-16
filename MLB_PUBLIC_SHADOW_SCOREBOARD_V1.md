@@ -4,9 +4,24 @@ The existing frozen MLB 1+ hit/HR model predictions and official settlements liv
 
 ## Published read-only feed
 
-The GitHub Actions workflow \`.github/workflows/mlb_shadow_scoreboard_publisher.yml\` runs once per hour (best effort; GitHub Actions cron can be delayed), reads the original sealed prediction and settlement files through \`official_shadow_scoreboard\`, and publishes a compact \`scoreboard.latest.json\` under the benchmark directory **only when the observed results or counts have changed**. It never modifies the frozen predictions, original published commitments or official settlement files.
+The GitHub Actions workflow \`.github/workflows/mlb_shadow_scoreboard_publisher.yml\` runs once per hour (best effort; GitHub Actions cron can be delayed), reads the original sealed prediction and settlement files through \`official_shadow_scoreboard\`, and publishes a compact \`scoreboard.latest.json\` under the benchmark directory **when saved benchmark evidence changes, or after at least two hours of unchanged evidence to refresh the read-only feed heartbeat**. It never modifies the frozen predictions, original published commitments or official settlement files.
 
 The file has a canonical report SHA-256, a GitHub input source commit hash, publication time, counts for pending/scored/ineligible records, distinct games, metrics against the fixed reference, and explicit limitations.
+
+**Freshness is not new evidence.** `published_at_utc` is when the research
+feed was last written or heartbeat-refreshed. The new
+`benchmark_last_changed_at_utc` preserves the time that the actual saved
+benchmark contents most recently changed. The separate `source_refresh_kind`
+explicitly distinguishes `benchmark_changed` from
+`unchanged_saved_evidence_heartbeat`; the reader exposes separate
+`snapshot_age_hours` and `benchmark_age_hours` and accepts older feeds
+that do not have those optional metadata fields.
+
+A no-change heartbeat is **not** a new official MLB final, a live API fetch,
+a verified market quote or independent proof of pregame publication. It means
+the saved repository's official settlement and prediction ledger was
+recomputed and was still unchanged. Pending hitters remain pending, and
+GitHub cron delay may still make the feed appear stale.
 
 The public snapshot URL used by Tyler is fixed:
 

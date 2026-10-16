@@ -9,6 +9,8 @@ on:
       - '.github/workflows/mlb_shadow_scoreboard_publisher.yml'
       - 'sports_mlb_shadow_uncertainty.py'
       - 'sports_mlb_prop_shadow_scoreboard.py'
+      - 'sports_mlb_prop_scoreboard_feed.py'
+      - 'sports_mlb_prop_scoreboard_reader.py'
 permissions:
   contents: write
 concurrency:
@@ -26,14 +28,14 @@ jobs:
       - run: pip install -r requirements.txt
       - name: Test feed authenticity, aggregation and no-wager safeguards
         run: python -m unittest -v test_sports_mlb_prop_scoreboard_feed test_sports_mlb_prop_shadow_scoreboard
-      - name: Produce current immutable-research snapshot if benchmark changed
+      - name: Publish changed benchmark or bounded unchanged-ledger heartbeat
         run: python sports_mlb_prop_scoreboard_feed.py
       - name: Commit the one permitted public benchmark snapshot
         shell: bash
         run: |
           git add -- benchmarks/mlb_hitter_props_shadow_v1/scoreboard.latest.json
           if git diff --cached --quiet; then
-            echo "Published scoreboard matches current benchmark; no write."
+            echo "Published scoreboard heartbeat is still fresh; no write."
             exit 0
           fi
           python - <<'PY'
@@ -48,5 +50,5 @@ jobs:
           PY
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Publish read-only MLB conditional hitter shadow benchmark snapshot [no bets]"
+          git commit -m "Refresh read-only MLB hitter research scoreboard [no bets]"
           git push origin HEAD:main

@@ -56,6 +56,38 @@ class PublisherTests(unittest.TestCase):
         self.assertEqual(second["status"],"UNCHANGED")
         self.assertEqual(target.read_bytes(),content)
 
+    def test_unchanged_saved_data_refreshes_only_feed_heartbeat_after_two_hours(self):
+        with patch.object(feed,"official_shadow_scoreboard",return_value=benchmark()):
+            original=feed.publish_readonly_shadow_feed(repository=self.root,now=CLOCK)
+        target=self.root/feed.FEED_RELATIVE
+        before=json.loads(target.read_text())
+        with patch.object(feed,"official_shadow_scoreboard",return_value=benchmark()):
+            refreshed=feed.publish_readonly_shadow_feed(
+                repository=self.root,now="2026-10-15T23:00:00Z")
+        after=json.loads(target.read_text())
+        self.assertEqual(refreshed["status"],"HEARTBEAT_REFRESHED")
+        self.assertEqual(after["benchmark_sha256"],before["benchmark_sha256"])
+        self.assertEqual(after["benchmark"],before["benchmark"])
+        self.assertEqual(after["benchmark_last_changed_at_utc"],CLOCK)
+        self.assertEqual(after["published_at_utc"],"2026-10-15T23:00:00+00:00")
+        self.assertEqual(after["source_refresh_kind"],"unchanged_saved_evidence_heartbeat")
+        self.assertTrue(any("not a fresh official MLB API check" in line
+                            for line in after["limitations"]))
+        heartbeat_bytes=target.read_bytes()
+        with patch.object(feed,"official_shadow_scoreboard",return_value=benchmark()):
+            again=feed.publish_readonly_shadow_feed(
+                repository=self.root,now="2026-10-15T23:10:00Z")
+        self.assertEqual(again["status"],"UNCHANGED")
+        self.assertEqual(target.read_bytes(),heartbeat_bytes)
+
+    def test_rejects_backwards_clock_even_with_identical_report(self):
+        with patch.object(feed,"official_shadow_scoreboard",return_value=benchmark()):
+            feed.publish_readonly_shadow_feed(repository=self.root,now=CLOCK)
+        with patch.object(feed,"official_shadow_scoreboard",return_value=benchmark()):
+            with self.assertRaisesRegex(ValueError,"in the future"):
+                feed.publish_readonly_shadow_feed(
+                    repository=self.root,now="2026-10-15T19:00:00Z")
+
     def test_update_after_settlement_makes_new_snapshot_not_forecast_change(self):
         report=benchmark()
         with patch.object(feed,"official_shadow_scoreboard",return_value=report):
@@ -117,6 +149,25 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(result["source"],reader.FEED_URL)
         self.assertFalse(seen[0][1]["allow_redirects"])
         self.assertEqual(seen[0][1]["timeout"],12)
+
+    def test_heartbeat_makes_feed_recent_without_claiming_new_benchmark_evidence(self):
+        snap=make_snapshot()
+        snap["published_at_utc"]="2026-10-16T03:00:00Z"
+        snap["benchmark_last_changed_at_utc"]=CLOCK
+        snap["source_refresh_kind"]="unchanged_saved_evidence_heartbeat"
+        result=reader.load_published_shadow_scoreboard(
+            get=lambda *args,**kwargs:FakeResponse(snap),
+            clock=lambda:"2026-10-16T04:00:00Z")
+        self.assertEqual(result["snapshot_age_hours"],1)
+        self.assertEqual(result["benchmark_age_hours"],8)
+        self.assertFalse(result["may_be_stale"])
+        self.assertFalse(result["refresh_proves_new_official_MLB_data"])
+        self.assertEqual(result["refresh_kind"],"unchanged_saved_evidence_heartbeat")
+        snap["benchmark_last_changed_at_utc"]="2026-10-16T06:00:00Z"
+        with self.assertRaisesRegex(ValueError,"change timestamp exceeds"):
+            reader.load_published_shadow_scoreboard(
+                get=lambda *args,**kwargs:FakeResponse(snap),
+                clock=lambda:"2026-10-16T07:00:00Z")
 
     def test_wrong_hash_ignored_source_and_inconsistent_counts_refused(self):
         for change in ("hash","source","count","wagers"):
