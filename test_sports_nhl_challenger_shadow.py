@@ -89,6 +89,11 @@ class NhlForwardShadowTests(unittest.TestCase):
             later = shadow.evaluate(base, review.utc('2026-10-17T05:00:00Z'))
             self.assertEqual((later['scored'], later['pending'], later['same_game_priced_count']),
                              (1, 0, 1))
+            self.assertEqual(later['all_scored_calibration']['sources']['candidate']['calibration']['games'],1)
+            self.assertEqual(later['same_game_priced_calibration']['sources']['market']['spread']['games'],1)
+            self.assertAlmostEqual(
+                later['all_scored_calibration']['sources']['candidate']['spread']['mean_distance_from_even'],
+                abs(pred['home_probability']-.5))
             for model in ('candidate', 'model', 'fixed_elo', 'market'):
                 self.assertEqual(later['same_game_priced'][model]['games'], 1)
             challenger = review.binary_scores(pred['home_probability'], 'home')
