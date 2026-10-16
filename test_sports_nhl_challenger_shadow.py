@@ -31,7 +31,7 @@ class NhlForwardShadowTests(unittest.TestCase):
             'model': {'home': .53, 'away': .47},
             'fixed_elo': {'home': .58, 'away': .42},
             'market': {'conditional_home_probability': .56},
-            'market_observed_at': '2026-10-16T17:59:00+00:00',
+            'market_observed_at': '2026-10-16T16:50:00+00:00',
             'NO_BET': True, 'actual_wagers': 0,
         }
         original['sha256'] = review.digest(original)
