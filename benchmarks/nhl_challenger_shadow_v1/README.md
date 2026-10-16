@@ -86,6 +86,23 @@ The mutable scoreboard points to the preserved checkpoint once available.
 This checkpoint requests **human research review only**, with no promotion
 or real wagering authorization.
 
+### Read-only upcoming matchup comparisons
+
+The mutable shadow scoreboard includes `upcoming_pregame_comparisons`
+with the **earliest 25 future enrolled NHL challenger games**, ordered
+only by saved kickoff then game ID. For each it shows the original frozen
+home/away matchup, exact recorded source/forecast digests, the challenger
+home-win probability, original Tyler model and fixed-Elo probabilities,
+and any saved pregame market probability with its original observation time
+and provider. The archive also reports total eligible future shadow games
+so limiting the display cannot hide the number omitted.
+
+These are **not updated sportsbook odds or betting signals**. Only forecasts
+actually saved strictly before the original start can appear. Games no longer
+upcoming disappear from this preview but remain preserved in the cumulative
+trial and first-100 selected set. No past outcome, odds movement or highest
+predicted winning chance affects selection order. All records stay NO BET.
+
 ### Prospective calibration and probability spread
 
 The cumulative scoreboard and the immutable first-100 review independently
