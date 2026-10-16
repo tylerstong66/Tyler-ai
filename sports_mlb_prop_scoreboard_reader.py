@@ -51,6 +51,26 @@ def load_published_shadow_scoreboard(*, get=None, clock=None):
             raise ValueError("Published scoreboard has invalid outcome counts.")
     if count!=pending+scored+ineligible or distinct>count:
         raise ValueError("Published scoreboard counts are inconsistent.")
+    examples=report.get("pending_player_game_examples")
+    truncated=report.get("pending_examples_truncated")
+    if examples is not None:
+        if (not isinstance(examples,list) or len(examples)>25
+                or len(examples)>pending or type(truncated) is not bool
+                or truncated!=(pending>len(examples))):
+            raise ValueError("Published pending hitter audit count is inconsistent.")
+        seen=set()
+        for item in examples:
+            if (not isinstance(item,dict)
+                    or item.get("status")!="NO_SEALED_OFFICIAL_SETTLEMENT_YET"
+                    or not str(item.get("game_id") or "").isdigit()
+                    or not str(item.get("hitter_id") or "").isdigit()):
+                raise ValueError("Invalid pending hitter identity in published benchmark.")
+            key=(str(item["game_id"]),str(item["hitter_id"]))
+            if key in seen:
+                raise ValueError("Repeated pending player-game identity in benchmark.")
+            seen.add(key)
+    elif truncated is not None:
+        raise ValueError("Pending hitter truncation metadata without examples.")
     published=utc(payload.get("published_at_utc"))
     last_change=utc(payload.get("benchmark_last_changed_at_utc")
                     or payload.get("published_at_utc"))
@@ -78,6 +98,9 @@ def load_published_shadow_scoreboard(*, get=None, clock=None):
         "frozen_player_game_forecasts":count,
         "distinct_official_games":distinct,
         "pending":pending,"scored":scored,"ineligible":ineligible,
+        "pending_player_game_examples":examples if examples is not None else [],
+        "pending_examples_truncated":truncated if examples is not None else None,
+        "pending_player_ids_available":examples is not None,
         "metrics":report.get("metrics"),
         "per_game":report.get("per_game"),
         "no_wagers":True,
