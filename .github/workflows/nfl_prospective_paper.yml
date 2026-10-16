@@ -29,6 +29,7 @@ jobs:
         if: always()
         run: python sports_two_way_test.py
       - name: Record only future NHL challenger shadow forecasts and score verified existing finals
+        id: nhl_shadow
         if: always()
         run: python sports_nhl_challenger_shadow.py
       - name: Review saved NFL, NHL and MLB benchmark results
@@ -40,7 +41,14 @@ jobs:
       - name: Preserve audit data even when upstream sources fail
         if: always()
         run: |
-          git add benchmarks/nfl_prospective_v2 benchmarks/two_way_prospective benchmarks/nhl_challenger_shadow_v1
+          git add benchmarks/nfl_prospective_v2 benchmarks/two_way_prospective
+          # Do not publish a partially created shadow cohort if its validation
+          # failed; retain independently collected original sports evidence.
+          if [ "${{ steps.nhl_shadow.outcome }}" = "success" ]; then
+            git add benchmarks/nhl_challenger_shadow_v1
+          else
+            echo '::warning::NHL shadow step did not succeed; exclude shadow artifacts from publication'
+          fi
           if ! git diff --cached --quiet; then
             git config user.name github-actions\[bot\]
             git config user.email 41898282+github-actions\[bot\]@users.noreply.github.com
