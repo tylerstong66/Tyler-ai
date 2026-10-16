@@ -68,6 +68,9 @@ class NhlForwardShadowTests(unittest.TestCase):
             first = shadow.evaluate(base, clock)
             self.assertEqual((first['enrolled'], first['newly_enrolled'],
                               first['scored'], first['pending']), (1, 1, 0, 1))
+            self.assertEqual(first['source_enrollment_coverage']['eligible_saved_primary_forecasts_since_activation'], 1)
+            self.assertEqual(first['source_enrollment_coverage']['shadow_enrolled'], 1)
+            self.assertEqual(first['source_enrollment_coverage']['missed_started_source_forecasts'], [])
             self.assertEqual(first['first_100_enrolled']['preserved_checkpoint']['status'],
                              'collecting_forecasts')
             self.assertIsNone(first['first_100_enrolled']['preserved_checkpoint']['path'])
@@ -158,6 +161,63 @@ class NhlForwardShadowTests(unittest.TestCase):
                 result = shadow.evaluate(base, review.utc(when))
                 self.assertEqual(result['enrolled'], 0)
                 self.assertFalse(list((base / shadow.ROOT / 'predictions').glob('*.json')))
+
+    def test_no_late_backfill_reports_saved_missed_primary_forecast(self):
+        with tempfile.TemporaryDirectory() as folder:
+            base=Path(folder)
+            self.prepare(base)
+            late=review.utc('2026-10-17T01:00:00Z')
+            result=shadow.evaluate(base, late)
+            coverage=result['source_enrollment_coverage']
+            self.assertEqual((result['enrolled'],coverage['eligible_saved_primary_forecasts_since_activation']),
+                             (0, 1))
+            self.assertEqual(len(coverage['missed_started_source_forecasts']), 1)
+            self.assertEqual(coverage['missed_started_source_forecasts'][0]['game_id'], 'fixture')
+            self.assertTrue(coverage['unseen_official_schedule_not_measured'])
+            self.assertFalse((base/shadow.ROOT/'predictions/fixture.json').exists())
+
+    def test_rejects_future_shadow_timestamps_relative_to_audit(self):
+        with tempfile.TemporaryDirectory() as folder:
+            base=Path(folder)
+            self.prepare(base)
+            shadow.evaluate(base, review.utc('2026-10-16T19:00:00Z'))
+            with self.assertRaisesRegex(ValueError, 'Shadow record differs'):
+                shadow.evaluate(base, review.utc('2026-10-16T18:30:00Z'))
+
+    def test_pre_activation_original_cannot_be_laundered_into_existing_shadow(self):
+        with tempfile.TemporaryDirectory() as folder:
+            base=Path(folder)
+            _,source,record=self.prepare(base)
+            shadow.evaluate(base, review.utc('2026-10-16T19:00:00Z'))
+            record['generated_at']='2026-10-16T16:59:00+00:00'
+            record['recorded_at']='2026-10-16T16:59:01+00:00'
+            record.pop('sha256')
+            record['sha256']=review.digest(record)
+            source.write_text(json.dumps(record))
+            path=base/shadow.ROOT/'predictions/fixture.json'
+            saved=json.loads(path.read_text())
+            saved['source_prediction_sha256']=record['sha256']
+            saved['source_generated_at']=record['generated_at']
+            saved['source_recorded_at']=record['recorded_at']
+            saved.pop('sha256')
+            saved['sha256']=review.digest(saved)
+            path.write_text(json.dumps(saved))
+            with self.assertRaisesRegex(ValueError, 'Shadow record differs'):
+                shadow.evaluate(base, review.utc('2026-10-16T19:00:00Z'))
+
+    def test_old_primary_forecast_excluded_from_coverage_denominator(self):
+        with tempfile.TemporaryDirectory() as folder:
+            base=Path(folder)
+            _,source,record=self.prepare(base)
+            record['generated_at']='2026-10-16T16:59:00+00:00'
+            record['recorded_at']='2026-10-16T16:59:01+00:00'
+            record.pop('sha256')
+            record['sha256']=review.digest(record)
+            source.write_text(json.dumps(record))
+            result=shadow.evaluate(base, review.utc('2026-10-16T19:00:00Z'))
+            coverage=result['source_enrollment_coverage']
+            self.assertEqual(coverage['eligible_saved_primary_forecasts_since_activation'], 0)
+            self.assertEqual(coverage['missed_started_source_forecasts'], [])
 
     def test_tampered_existing_prediction_or_source_fails_closed(self):
         with tempfile.TemporaryDirectory() as folder:
