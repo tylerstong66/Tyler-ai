@@ -63,6 +63,7 @@ class SettlementScheduleTests(unittest.TestCase):
             self.assertEqual((report["discovered"],report["settled"],
                               report["unresolved"]),(1,0,1))
             self.assertEqual(report["unresolved_files"][0]["hitter_id"],683734)
+            self.assertEqual(report["unresolved_files"][0]["field"],"atBats")
             self.assertFalse((Path(d)/"settlements"/path.name).exists())
             self.assertEqual(json.loads(path.read_text()),original)
             reader.omit_at_bats=False
@@ -70,6 +71,29 @@ class SettlementScheduleTests(unittest.TestCase):
             self.assertEqual((second["settled"],second["unresolved"]),(1,0))
             self.assertTrue((Path(d)/"settlements"/path.name).exists())
             self.assertEqual(json.loads(path.read_text()),original)
+
+    def test_other_missing_counts_and_null_batting_retry_without_grading(self):
+        for absent in ("hits","homeRuns","batting"):
+            with self.subTest(absent=absent),tempfile.TemporaryDirectory() as d:
+                reader,original,path=self.prepare(d)
+                reader.now=AFTER
+                reader.final=True
+                if absent=="batting":
+                    reader.null_batting=True
+                else:
+                    reader.omit_batting_fields=(absent,)
+                report=settle_ready_records(d,reader=reader)
+                self.assertEqual((report["unresolved"],report["settled"]),(1,0))
+                self.assertEqual(report["unresolved_files"][0]["field"],absent)
+                self.assertEqual(report["unresolved_files"][0]["reason"],
+                                 "OFFICIAL_FINAL_BATTING_FIELD_UNAVAILABLE_RETRY")
+                self.assertFalse((Path(d)/"settlements"/path.name).exists())
+                self.assertEqual(json.loads(path.read_text()),original)
+                reader.omit_batting_fields=()
+                reader.null_batting=False
+                second=settle_ready_records(d,reader=reader)
+                self.assertEqual((second["settled"],second["unresolved"]),(1,0))
+                self.assertEqual(json.loads(path.read_text()),original)
 
     def test_malformed_official_at_bats_still_fails_closed(self):
         with tempfile.TemporaryDirectory() as d:
