@@ -41,6 +41,25 @@ reader validates source hash, optional count/truncation consistency, IDs and
 no-wager flags. Older public feed files lacking these optional examples
 remain supported.
 
+### Saved schedule versus missing official settlement
+
+The authenticated read-only reader now separately classifies **displayed** still-pending
+player-games by comparing each originally saved first-pitch time against
+the reader's timezone-aware UTC clock. Results are
+`SAVED_FIRST_PITCH_FUTURE` or `SAVED_FIRST_PITCH_REACHED_UNSETTLED`
+and a `pending_saved_schedule_audit` count distinguishes how many displayed
+players are in each category. Up to 25 source-sealed player-game identities
+are visible; the exact number of *undisplayed* pending records is also
+reported, and no timing classification is claimed for the truncated remainder.
+
+**A scheduled first pitch passing does not prove that a game started or
+finished.** Weather, postponement, game identity changes or incomplete
+official hitter box scores require independent verified source evidence.
+No player outcome or wager is inferred. Older feeds without the optional
+pending-identity entries explicitly report timing unavailable rather than
+guessing. This reader code change in GitHub does not deploy a new Render
+application build; the existing Render checkout remains unchanged.
+
 The public snapshot URL used by Tyler is fixed:
 
 \`\`\`text
