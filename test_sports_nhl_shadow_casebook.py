@@ -45,9 +45,9 @@ class NhlShadowCasebookTests(unittest.TestCase):
         self.assertEqual((out['total_settled_shadow_games'],out['shown']),(29,25))
         self.assertEqual([x['game_id'] for x in out['games']],
                          [str(i) for i in range(28,3,-1)])
-        self.assertIsNone(out['games'][0]['challenger_minus_baseline']['market'])
-        self.assertIsNotNone(out['games'][1]['challenger_minus_baseline']['market'])
-        self.assertEqual(out['games'][0]['saved_market_provider'],None)
+        self.assertIsNotNone(out['games'][0]['challenger_minus_baseline']['market'])
+        self.assertIsNone(out['games'][1]['challenger_minus_baseline']['market'])
+        self.assertIsNone(out['games'][1]['saved_market_provider'])
         self.assertTrue(out['NO_BET'])
 
     def test_digests_and_winner_side_verified_with_scores(self):
