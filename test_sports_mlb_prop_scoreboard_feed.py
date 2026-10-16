@@ -73,11 +73,12 @@ class PublisherTests(unittest.TestCase):
         self.assertEqual(after["source_refresh_kind"],"unchanged_saved_evidence_heartbeat")
         self.assertTrue(any("not a fresh official MLB API check" in line
                             for line in after["limitations"]))
+        heartbeat_bytes=target.read_bytes()
         with patch.object(feed,"official_shadow_scoreboard",return_value=benchmark()):
             again=feed.publish_readonly_shadow_feed(
                 repository=self.root,now="2026-10-15T23:10:00Z")
         self.assertEqual(again["status"],"UNCHANGED")
-        self.assertEqual(target.read_text(),json.dumps(after,sort_keys=True,indent=2,allow_nan=False)+"\\n")
+        self.assertEqual(target.read_bytes(),heartbeat_bytes)
 
     def test_rejects_backwards_clock_even_with_identical_report(self):
         with patch.object(feed,"official_shadow_scoreboard",return_value=benchmark()):
