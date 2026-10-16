@@ -23,6 +23,24 @@ the saved repository's official settlement and prediction ledger was
 recomputed and was still unchanged. Pending hitters remain pending, and
 GitHub cron delay may still make the feed appear stale.
 
+### Exact unresolved hitter identities
+
+When a frozen hitter prediction has no immutable official settlement yet, the
+scoreboard now includes a **read-only, source-sealed**
+`pending_player_game_examples` subset containing its MLB game ID, official
+hitter ID, frozen player name, saved scheduled start and
+`NO_SEALED_OFFICIAL_SETTLEMENT_YET` status. Examples are ordered by original
+scheduled start and stable player-game identifiers, with a fixed 25-entry cap,
+the complete existing `pending` count and an explicit truncation flag.
+This display order cannot favor positive model outcomes.
+
+**Missing settlement does not mean that a hitter recorded zero at-bats,
+lost a hit/HR prop, or failed to play.** The collector may still be waiting
+for a complete official final batting line; no outcome is inferred. The
+reader validates source hash, optional count/truncation consistency, IDs and
+no-wager flags. Older public feed files lacking these optional examples
+remain supported.
+
 The public snapshot URL used by Tyler is fixed:
 
 \`\`\`text
