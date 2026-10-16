@@ -23,6 +23,7 @@ class OfficialReader:
         self.at_bats=4
         self.exists=True
         self.bad_identity=False
+        self.omit_at_bats=False
         self.days=40
 
     def clock(self):
@@ -41,6 +42,8 @@ class OfficialReader:
                 player={"person":{"id":683734 if not self.bad_identity else 987},
                         "stats":{"batting":{"atBats":self.at_bats,
                                             "hits":1 if self.at_bats else 0,"homeRuns":0}}}
+                if self.omit_at_bats:
+                    player["stats"]["batting"].pop("atBats")
                 data["liveData"]={"boxscore":{"teams":{"away":{"players":{
                     "ID683734":player} if self.exists else {}}}}}
         elif path=="teams/158/roster":
