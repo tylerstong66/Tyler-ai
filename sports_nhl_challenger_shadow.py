@@ -69,6 +69,26 @@ def verified_live_forecast(path):
     return pred
 
 
+def paired_score_differences(rows):
+    """Compare challenger and frozen baselines only on identical settled games.
+
+    The market pair is restricted to games with saved pregame prices. Resample
+    Eastern scheduled-date blocks; the existing review helper suppresses CIs
+    until at least five blocks. This is diagnostic only, not model promotion.
+    """
+    result = {}
+    for baseline in ('model', 'fixed_elo', 'market'):
+        eligible = [row for row in rows if row[baseline] is not None]
+        diffs = [{'block': row['block'],
+                  **{key: row['candidate'][key] - row[baseline][key]
+                     for key in ('brier', 'log_loss', 'accuracy')}}
+                 for row in eligible]
+        result[baseline] = review.estimates(diffs)
+        result[baseline]['direction'] = (
+            'challenger minus baseline: lower Brier/log loss and higher accuracy favor challenger')
+    return result
+
+
 def evaluate(base=Path('.'), at=None):
     base = Path(base)
     now = at if at is not None else datetime.now(timezone.utc)
@@ -187,6 +207,7 @@ def evaluate(base=Path('.'), at=None):
         'same_game_priced_count': len(paired),
         'all_scored_unpriced_and_priced': metrics(scores, names[:3]),
         'same_game_priced': metrics(paired, names),
+        'paired_challenger_minus_baseline': paired_score_differences(scores),
         'first_100_enrolled': {
             'selected': len(selection),
             'settled_selected': len(first_100_ids.intersection(scored_games)),

@@ -83,11 +83,58 @@ class NhlForwardShadowTests(unittest.TestCase):
                              (1, 0, 1))
             for model in ('candidate', 'model', 'fixed_elo', 'market'):
                 self.assertEqual(later['same_game_priced'][model]['games'], 1)
+            challenger = review.binary_scores(pred['home_probability'], 'home')
+            for baseline in ('model', 'fixed_elo', 'market'):
+                diff = later['paired_challenger_minus_baseline'][baseline]
+                old_p = (original[baseline]['home'] if baseline != 'market'
+                         else original['market']['conditional_home_probability'])
+                expected = review.binary_scores(old_p, 'home')
+                self.assertEqual((diff['games'], diff['blocks']), (1, 1))
+                self.assertAlmostEqual(diff['mean']['brier'],
+                                       challenger['brier'] - expected['brier'])
+                self.assertAlmostEqual(diff['mean']['log_loss'],
+                                       challenger['log_loss'] - expected['log_loss'])
+                self.assertEqual(diff['uncertainty_status'], 'insufficient_blocks')
+                self.assertIsNone(diff['ci95']['brier'])
             self.assertEqual(later['first_100_enrolled']['status'],
                              'collecting_or_awaiting_selected_finals')
             self.assertFalse(later['promotion_allowed'])
             self.assertTrue(later['NO_BET'])
             self.assertEqual(source.read_bytes(), before)
+
+    def test_delta_pairs_unpriced_games_without_backfilling_market(self):
+        def game(block, candidate_p, primary_p, elo_p, market_p):
+            return {
+                'block': block,
+                'candidate': review.binary_scores(candidate_p, 'home'),
+                'model': review.binary_scores(primary_p, 'home'),
+                'fixed_elo': review.binary_scores(elo_p, 'home'),
+                'market': (review.binary_scores(market_p, 'home')
+                           if market_p is not None else None),
+            }
+        entries = [
+            game('2026-10-19', .65, .55, .62, None),
+            game('2026-10-19', .70, .58, .60, .66),
+            game('2026-10-20', .57, .61, .63, None),
+        ]
+        result = shadow.paired_score_differences(entries)
+        self.assertEqual(result['model']['games'], 3)
+        self.assertEqual(result['fixed_elo']['games'], 3)
+        self.assertEqual(result['market']['games'], 1)
+        self.assertEqual(result['model']['blocks'], 2)
+        self.assertEqual(result['market']['blocks'], 1)
+        self.assertEqual(result['market']['uncertainty_status'], 'insufficient_blocks')
+        self.assertAlmostEqual(result['market']['mean']['brier'],
+                               entries[1]['candidate']['brier'] -
+                               entries[1]['market']['brier'])
+        self.assertIsNone(result['model']['ci95']['brier'])
+
+    def test_empty_shadow_delta_reports_unavailable_not_zero(self):
+        result = shadow.paired_score_differences([])
+        for baseline in ('model', 'fixed_elo', 'market'):
+            self.assertEqual(result[baseline]['games'], 0)
+            self.assertIsNone(result[baseline]['mean']['brier'])
+            self.assertIsNone(result[baseline]['ci95']['brier'])
 
     def test_never_backfills_old_pregame_or_after_kickoff(self):
         for mutation, when in (
