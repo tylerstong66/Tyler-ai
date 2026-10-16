@@ -24,6 +24,8 @@ class OfficialReader:
         self.exists=True
         self.bad_identity=False
         self.omit_at_bats=False
+        self.omit_batting_fields=()
+        self.null_batting=False
         self.days=40
 
     def clock(self):
@@ -44,6 +46,10 @@ class OfficialReader:
                                             "hits":1 if self.at_bats else 0,"homeRuns":0}}}
                 if self.omit_at_bats:
                     player["stats"]["batting"].pop("atBats")
+                for missing in self.omit_batting_fields:
+                    player["stats"]["batting"].pop(missing)
+                if self.null_batting:
+                    player["stats"]["batting"]=None
                 data["liveData"]={"boxscore":{"teams":{"away":{"players":{
                     "ID683734":player} if self.exists else {}}}}}
         elif path=="teams/158/roster":
