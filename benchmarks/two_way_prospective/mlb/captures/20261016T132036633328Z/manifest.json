@@ -1,0 +1,53 @@
+{
+  "collection_completed": true,
+  "errors": [
+    {
+      "error": "Unique saved event required for follow-up quote",
+      "game_id": "849808",
+      "stage": "market_followup"
+    }
+  ],
+  "excluded": [],
+  "history_games": 7399,
+  "new_market_followups": [],
+  "new_predictions": [],
+  "new_results": [],
+  "optional_availability_errors": [],
+  "sources": [
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/8514ddb119eee0f1cd0a5ec9b15ad32d371a692bdbc0c4a5ba542682b5231d0e.json",
+      "response_sha256": "32a875305d1da436212ca9bc0d8b01c295f1152775de37fbf3c0c5af23818213",
+      "retrieved_at": "2026-10-16T13:20:38.302380+00:00",
+      "sha256": "8514ddb119eee0f1cd0a5ec9b15ad32d371a692bdbc0c4a5ba542682b5231d0e",
+      "source_url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&startDate=2026-03-01&endDate=2026-10-16&hydrate=linescore"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/c90482b5ff230f2fd11c073c746dee4efe39ed35d5ab021edd34db8ca7ea04f6.json",
+      "response_sha256": "83f7bb53b172aab3db2381ec183906d2cf8085f105f112234671f2f69526b6dd",
+      "retrieved_at": "2026-10-16T13:20:38.709419+00:00",
+      "sha256": "c90482b5ff230f2fd11c073c746dee4efe39ed35d5ab021edd34db8ca7ea04f6",
+      "source_url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-10-16&hydrate=probablePitcher,linescore,team"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/3021aa7a41df2981cdfcb731ce6179bfb477becea545fdce860692b69767cb39.json",
+      "response_sha256": "fc5933ab72cffa1b87b96d3853cc038766779addbc608faa323cdc25cea08c98",
+      "retrieved_at": "2026-10-16T13:20:38.761752+00:00",
+      "sha256": "3021aa7a41df2981cdfcb731ce6179bfb477becea545fdce860692b69767cb39",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20261016"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/b37ad1bddc25f69a8af29809c48feda9d9da8c39dac4bdbec812d1b891807cc6.json",
+      "response_sha256": "39871844499dec36da16ff19bf4b0daa510e9533846422253d31ed44d382024d",
+      "retrieved_at": "2026-10-16T13:20:38.914505+00:00",
+      "sha256": "b37ad1bddc25f69a8af29809c48feda9d9da8c39dac4bdbec812d1b891807cc6",
+      "source_url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-10-17&hydrate=probablePitcher,linescore,team"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/d27d8da293aad5fa346a1fb7754fdbaac24f293682167782729fe509c6fa7cc0.json",
+      "response_sha256": "eb0212965e1b0c6d5fc1363c7fac771e0f2214cde7a806237989216eec33f021",
+      "retrieved_at": "2026-10-16T13:20:38.969679+00:00",
+      "sha256": "d27d8da293aad5fa346a1fb7754fdbaac24f293682167782729fe509c6fa7cc0",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20261017"
+    }
+  ]
+}

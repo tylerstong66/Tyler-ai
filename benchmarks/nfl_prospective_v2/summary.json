@@ -37,14 +37,13 @@
   "state": "collecting",
   "target": 100,
   "week_block_brier_difference": {
-    "approximate_95_percent_interval": [
-      -0.02820983276571809,
-      -0.014121520767279185
-    ],
+    "approximate_95_percent_interval": null,
     "blocks": 2,
-    "draws": 2000,
-    "limitation": "Approximate season/week-block uncertainty for the prospective sample; not proof of future profitability.",
+    "draws": 0,
+    "limitation": "No confidence interval below five season/week blocks; point estimate is descriptive, not a demonstrated edge.",
     "mean_model_minus_market": -0.01520523707485141,
-    "seed": 1729
+    "minimum_blocks": 5,
+    "seed": 1729,
+    "uncertainty_status": "insufficient_blocks"
   }
 }
