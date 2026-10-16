@@ -25,6 +25,44 @@ def now():
     return datetime.now(timezone.utc)
 
 
+PROSPECTIVE_MIN_WEEK_BLOCKS = 5
+
+
+def prospective_week_block_uncertainty(paired):
+    """Withhold prospective intervals until independent week coverage is adequate.
+
+    Shared historical bootstrap retains its own retrospective behavior; this
+    forward-test reporting guard matches the independent audit policy.
+    """
+    if not paired:
+        return None
+    blocks = len({row["week"] for row in paired})
+    if blocks < PROSPECTIVE_MIN_WEEK_BLOCKS:
+        return {
+            "mean_model_minus_market": sum(
+                row["model_brier"] - row["market_brier"] for row in paired
+            ) / len(paired),
+            "approximate_95_percent_interval": None,
+            "blocks": blocks,
+            "draws": 0,
+            "seed": 1729,
+            "minimum_blocks": PROSPECTIVE_MIN_WEEK_BLOCKS,
+            "uncertainty_status": "insufficient_blocks",
+            "limitation": "No confidence interval below five season/week blocks; "
+                          "point estimate is descriptive, not a demonstrated edge.",
+        }
+    result = b.week_bootstrap(paired)
+    if result is None or result["blocks"] != blocks:
+        raise ValueError("Prospective bootstrap week identities inconsistent.")
+    result["minimum_blocks"] = PROSPECTIVE_MIN_WEEK_BLOCKS
+    result["uncertainty_status"] = "available_descriptive"
+    result["limitation"] = (
+        "Descriptive season/week-cluster bootstrap only; five blocks are not "
+        "proof of significance, calibration or profitable sports betting."
+    )
+    return result
+
+
 def write_json(path, data, exclusive=False):
     path = Path(path); path.parent.mkdir(parents=True, exist_ok=True)
     with path.open('x' if exclusive else 'w') as stream:
@@ -251,9 +289,11 @@ def report(root):
     value={'recorded':len(predictions),'settled':len(results),'pending':len(predictions)-len(results),'target':100,'paired_priced_decisive_games':len(paired),'paired_metrics':metrics,'availability_records':sum(len(p['availability']['observations']) for p in predictions),'injury_effect_enabled':False,'NO_BET':True,'actual_wagers':0}
     value['state']='completed_100_game_test' if len(results)>=100 else 'collecting'
     value['full_three_outcome_metrics']={name:{metric:mean([r['scores'][name][metric] for r in results]) for metric in ['full_brier','full_log_loss']} for name in ['v2','v1']}
-    value['week_block_brier_difference']=b.week_bootstrap([{'week':str(r['season'])+'/'+str(r['week']),'model_brier':r['scores']['v2']['binary_brier'],'market_brier':r['scores']['market']['binary_brier']} for r in paired]) if paired else None
-    if value['week_block_brier_difference']:
-        value['week_block_brier_difference']['limitation']='Approximate season/week-block uncertainty for the prospective sample; not proof of future profitability.'
+    value['week_block_brier_difference']=prospective_week_block_uncertainty([
+        {'week':str(r['season'])+'/'+str(r['week']),
+         'model_brier':r['scores']['v2']['binary_brier'],
+         'market_brier':r['scores']['market']['binary_brier']}
+        for r in paired])
     write_json(root/'summary.json',value)
     lines=['# Tyler NFL prospective paper test','',f"Recorded: **{len(predictions)}/100** · Settled: **{len(results)}** · Pending: **{len(predictions)-len(results)}**",'', '**NO BET — actual wagers $0.**', '', 'Frozen experimental v2 compared with frozen v1 and market odds observed before kickoff. QB/injury reports are evidence only; model effects remain disabled. Confirmed starters and final inactive lists are unknown unless explicitly captured.','', '| Model | Paired games | Brier (lower is better) | Log loss (lower is better) | Accuracy |','|---|---:|---:|---:|---:|']
     for name in ['v2','v1','market']:

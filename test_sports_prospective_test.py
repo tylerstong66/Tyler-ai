@@ -11,6 +11,43 @@ import sports_historical_benchmark as b
 import sports_efficiency_candidate as c
 
 
+class ProspectiveWeekUncertaintyTests(unittest.TestCase):
+    def rows(self, blocks):
+        return [
+            {"week": f"2026/{i}", "model_brier": 0.3 + 0.03 * i,
+             "market_brier": 0.6 - 0.01 * i}
+            for i in range(blocks)
+        ]
+
+    def test_empty_is_unavailable(self):
+        self.assertIsNone(p.prospective_week_block_uncertainty([]))
+
+    def test_one_two_and_four_week_blocks_withhold_confidence_interval(self):
+        for blocks in (1, 2, 4):
+            with self.subTest(blocks=blocks):
+                records=self.rows(blocks)
+                result=p.prospective_week_block_uncertainty(records)
+                self.assertEqual(result["blocks"],blocks)
+                self.assertEqual(result["minimum_blocks"],5)
+                self.assertIsNone(result["approximate_95_percent_interval"])
+                self.assertEqual(result["draws"],0)
+                self.assertEqual(result["uncertainty_status"],"insufficient_blocks")
+                expected=sum(v["model_brier"]-v["market_brier"]
+                             for v in records)/len(records)
+                self.assertAlmostEqual(result["mean_model_minus_market"],expected)
+
+    def test_five_week_blocks_unlock_only_descriptive_interval(self):
+        records=self.rows(5)
+        result=p.prospective_week_block_uncertainty(records)
+        expected=b.week_bootstrap(records)
+        self.assertEqual(result["approximate_95_percent_interval"],
+                         expected["approximate_95_percent_interval"])
+        self.assertEqual(result["blocks"],5)
+        self.assertEqual(result["minimum_blocks"],5)
+        self.assertEqual(result["uncertainty_status"],"available_descriptive")
+        self.assertIn("not",result["limitation"])
+
+
 class ProspectiveTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
