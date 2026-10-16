@@ -48,6 +48,20 @@ and are not sequential tests or automatic model-promotion decisions. These
 review calculations were added after initial results were observed; they are
 not represented as a preregistered confirmatory analysis.
 
+## Paired probability concentration
+
+The cumulative review additionally displays, for each source on the **identical**
+settled decisive games with saved pregame two-sided market quotes, its minimum
+and maximum home-win probability, mean absolute distance from an even 50%,
+and fraction of forecasts between 40% and 60% (inclusive). The sample is the
+same for model, frozen baseline and market; later quotes are not backfilled.
+This is a **sharpness diagnostic only**. Concentrated forecasts are not
+necessarily worse, and broader forecasts are not necessarily better: only
+proper scoring, calibration and sufficient independent out-of-sample evidence
+can establish forecast quality. Empty paired cohorts report unavailable
+statistics, never invented zeros. No candidate selection, fitted parameters,
+odds changes or betting action is triggered by this read-only section.
+
 ## Integrity, completion, and milestone
 
 The reader verifies forecast hashes, pregame and market/source timestamps,
