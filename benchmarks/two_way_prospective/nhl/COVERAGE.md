@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-16T17:51:42.303209+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-16T21:09:29.537670+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 38 / 35 / 3 |
+| Recorded / settled / pending | 40 / 35 / 5 |
 | Started games in retained official schedules / enrolled | 35 / 35 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 38 / 38 |
+| Enrollment-time priced forecasts | 40 / 40 |
 | Settled with enrollment prices / decisive market-paired | 35 / 35 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -23,13 +23,15 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-16T17:51:42.303209+00:00. Ready: 3 / 3 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-16T21:09:29.537670+00:00. Ready: 5 / 5 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
 | 2026020119 | PIT at COL | True | False | True | None |
 | 2026020120 | BOS at ANA | True | False | True | None |
 | 2026020121 | NJD at WSH | True | False | True | None |
+| 2026020122 | CAR at WPG | True | False | True | None |
+| 2026020123 | VAN at TBL | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -75,10 +77,12 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020119 | PIT at COL | 2026-10-17T01:00:00+00:00 | enrolled | — |
 | 2026020120 | BOS at ANA | 2026-10-17T02:00:00+00:00 | enrolled | — |
 | 2026020121 | NJD at WSH | 2026-10-17T17:00:00+00:00 | enrolled | — |
+| 2026020122 | CAR at WPG | 2026-10-17T19:30:00+00:00 | enrolled | — |
+| 2026020123 | VAN at TBL | 2026-10-17T20:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 43. Latest: `20261016T175141325383Z`.
+Audited capture manifests: 44. Latest: `20261016T210928431825Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

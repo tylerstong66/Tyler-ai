@@ -1,6 +1,6 @@
 # Tyler NHL prospective paper test
 
-Recorded: **38** · Settled: **35** · Pending: **3**
+Recorded: **40** · Settled: **35** · Pending: **5**
 
 **NO BET — actual wagers $0.**
 
@@ -52,6 +52,8 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | PIT at COL | Oct 16 09:00 PM | COL | 55.5% |
 | BOS at ANA | Oct 16 10:00 PM | ANA | 50.6% |
 | NJD at WSH | Oct 17 01:00 PM | WSH | 54.1% |
+| CAR at WPG | Oct 17 03:30 PM | CAR | 55.8% |
+| VAN at TBL | Oct 17 04:00 PM | TBL | 61.4% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
 
