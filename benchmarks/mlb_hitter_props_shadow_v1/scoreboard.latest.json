@@ -93,18 +93,21 @@
     "scored": 4,
     "status": "PROSPECTIVE_FREEZE_SCORING_DIAGNOSTIC_NO_BET"
   },
+  "benchmark_last_changed_at_utc": "2026-10-16T13:15:07.279230+00:00",
   "benchmark_sha256": "1381bee89fd4d7a6270fe1b585b02c10232ccd68b167b151a173eedd45956a10",
   "limitations": [
     "The feed reports only the GitHub repository snapshot as of its publication time.",
     "GitHub scheduled jobs may run late, so actual final results may appear later.",
+    "An unchanged-data heartbeat only proves the saved local research ledger was recomputed; it is not a fresh official MLB API check.",
     "It is NOT a live sportsbook feed or a validated profitable betting model.",
     "Probability scoring is conditional on at least one official at-bat.",
     "Git commit metadata is not independent proof of publication timestamp."
   ],
   "no_wagers": true,
-  "published_at_utc": "2026-10-16T13:15:07.279230+00:00",
+  "published_at_utc": "2026-10-16T18:00:05.519573+00:00",
   "schema": "tyler_mlb_shadow_public_scoreboard_v1",
   "source": "public_github_main_scheduled_snapshot",
-  "source_git_revision": "a90a46b4850118a07ac024e08403c052023b1976",
-  "source_is_not_live_official_MLB_api": true
+  "source_git_revision": "cc912fd3c26a53c77739f0c48a28d7891bd082e6",
+  "source_is_not_live_official_MLB_api": true,
+  "source_refresh_kind": "unchanged_saved_evidence_heartbeat"
 }
