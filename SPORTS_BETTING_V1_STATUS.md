@@ -1,3 +1,36 @@
+# Sports Betting Analyst v1 — verified handoff (2026-10-16)
+
+**Research/paper only. No real wagers. No model promotion without genuinely sufficient independent prospective evidence.** This is a current operational entry; older historical notes remain below unchanged.
+
+### Latest verified collector and benchmark evidence
+
+- As of 2026-10-16T13:47:35Z in the retained prospective coverage audit: NFL 14 recorded / 14 settled; NHL 37 / 35; MLB team-winner 9 / 7. The three cohorts are separate, with a first-100-enrolled review checkpoint per sport. Pending NHL 2; MLB 2. No demonstrated sportsbook betting edge.
+- As of the read-only MLB hitter snapshot published 2026-10-16T13:15:07Z: 7 frozen player-game forecasts from **one MLB game**; 4 scored conditional forecasts, 1 verified zero-AB ineligible, and 2 awaiting complete official batting evidence. The two unresolved MLB players are Gary Sánchez (ID 596142) and Andrew Vaughn (ID 683734); an absent `atBats` is not evidence of zero. First-game hit Brier 0.27665 versus fixed reference 0.31, HR Brier 0.010266 versus reference 0.0064; neither comparison establishes calibration or an edge.
+- The prospective NFL summary reports 14 settled games but only 2 season/week uncertainty blocks. Its model-minus-market Brier point estimate is -0.0152052371, with the 95% interval correctly **unavailable** until at least 5 distinct weekly blocks.
+- Official MLB game 849817 has a saved pregame start of 2026-10-16T22:00Z but the latest retained official scheduled start was 2026-10-17T00:00Z (**+120 minutes**). The forecast remains immutable, readiness false, and no replacement result or retroactive forecast is invented. Game 849808 was still missing a unique current ESPN scoreboard match and enrollment-time market evidence; those gaps also remain explicit.
+- Existing hourly prospective NFL/NHL/MLB collectors and separate MLB hitter pregame/settlement/scoreboard GitHub workflows continue. GitHub schedule timing is best effort. Render service auto-deploy is off; these research-only workflow changes do **not** imply a new Render runtime deployment.
+
+### Completed and verified changes on October 16
+
+- PR #73: missing official final `atBats` remains unresolved/retryable instead of crashing the collector or being scored as zero; all checks passed and scheduled settlement recovered. Five separate immutable settlement files were committed without altering the seven original forecasts.
+- PR #74: scheduled MLB settlement refreshes the read-only public scoreboard immediately after writing settlement records; the independent hourly publisher remains a fallback.
+- PR #75: remove premature NFL two-week bootstrap confidence intervals; point estimates remain descriptive.
+- PR #76: missing official `hits`, `homeRuns` and entire null batting lines are also unresolved and retryable; malformed typed values, impossible counts and altered identity still fail closed. All 13 PR checks and the post-merge settlement run succeeded.
+- PR #77: read-only future game readiness now distinguishes and quantifies saved-versus-latest official kickoff drift from team-identity differences. All 14 checks passed; live audit captured the 120-minute game 849817 discrepancy.
+
+### Next implementation priorities / research boundaries
+
+1. Continue acquiring real pregame forecasts with immutable source/digest and cutoff verification; no retroactive addition to prior cohorts and no expanding claims based on one favorable game.
+2. Recheck the two unresolved official MLB player lines on scheduled final sweeps; preserve them as unresolved unless official counts are complete. Investigate future final-source completeness only with independent verified identities, not guesses.
+3. Preserve strict no-bet and no-promotion gates on games with source/start-time changes or missing ESPN matches; if formal exclusion policies are needed for the first-100 checkpoint, preregister them before using outcomes to assess a model.
+4. Maintain separate MLB hitter uncertainty thresholds of **30 distinct scored games AND 150 eligible hitter player-games** per event; NHL/MLB game-winner review remains at 100 prospective enrolled games. Compare each model with its same-game fixed and/or market baselines with correct correlated-block uncertainty.
+
+### Operating instructions for future Tyler AI project sessions
+
+After a user-authorized continuation, treat brief project progress questions as status checks, not stop commands. Verify current GitHub/Render state, then autonomously progress through safe code review, isolated branches, deterministic tests, checks, PR merge and read-only verification. Ask for input only when an actual authorization, credential or interactive blocker exists. Prefer connected chat tools; use Work mode only if a necessary graphical/browser workflow cannot be performed through these tools. Never claim asynchronous progress outside an actual scheduled workflow, and never treat GitHub merge as proof of a Render deployment.
+
+---
+
 # Sports Betting Analyst v1
 
 ## Sourced cohorts, MLB and automated final collection (October 10)
