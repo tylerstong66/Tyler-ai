@@ -86,6 +86,23 @@ The mutable scoreboard points to the preserved checkpoint once available.
 This checkpoint requests **human research review only**, with no promotion
 or real wagering authorization.
 
+### Prospective calibration and probability spread
+
+The cumulative scoreboard and the immutable first-100 review independently
+report fixed five-bin **home-win calibration** and the mean distance of predicted
+home probability from 50%. They compare the 2024-trained challenger with the
+already-frozen primary NHL model and fixed Elo on all eligible settled games.
+They also compare all three with the saved pregame market on the **identical
+originally priced games**. No postgame odds, historical challenger selection
+results or omitted unpriced games enter the same-market cohort.
+
+These diagnostics describe reliability and confidence concentration, not
+predicted betting profits. Bin-wise Wilson observed-rate intervals assume
+independent games and can be misleading for small or dependent samples;
+the date-block Brier/log-loss uncertainty elsewhere in the report remains
+separate. Empty samples report unavailable values, not artificial success.
+No feature fitting or production model selection is triggered.
+
 The scheduled GitHub workflow `Sports prospective paper tests` runs the
 isolated NHL challenger step after the existing NHL/MLB primary enrollment,
 then always stages the independently collected original prospective evidence,

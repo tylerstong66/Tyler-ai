@@ -203,7 +203,15 @@ def evaluate(base=Path('.'), at=None):
                            ZoneInfo('America/New_York')).date().isoformat(),
                        'candidate': score, 'model': row['binary']['model'],
                        'fixed_elo': row['binary']['fixed_elo'],
-                       'market': row['binary'].get('market')})
+                       'market': row['binary'].get('market'),
+                       'outcome': outcome,
+                       'home_probabilities': {
+                           'candidate': item['home_probability'],
+                           'model': row['probabilities']['model']['conditional_home'],
+                           'fixed_elo': row['probabilities']['fixed_elo']['conditional_home'],
+                           'market': (row['probabilities']['market']['conditional_home']
+                                      if 'market' in row['probabilities'] else None),
+                       }})
     paired = [row for row in scores if row['market'] is not None]
     def metrics(rows, names):
         return {name: review.estimates([
@@ -235,6 +243,10 @@ def evaluate(base=Path('.'), at=None):
         'all_scored_unpriced_and_priced': metrics(scores, names[:3]),
         'same_game_priced': metrics(paired, names),
         'paired_challenger_minus_baseline': paired_score_differences(scores),
+        'all_scored_calibration': checkpoint.calibration_diagnostics(
+            scores, names[:3]),
+        'same_game_priced_calibration': checkpoint.calibration_diagnostics(
+            paired, names),
         'first_100_enrolled': {
             'selected': len(selection),
             'settled_selected': len(first_100_ids.intersection(scored_games)),

@@ -15,6 +15,11 @@ def fixtures(size=100):
     for i in range(size):
         rows.append({
             'game_id': str(i), 'block': f'2026-10-{17+i//10:02d}',
+            'outcome': 'home' if i%3 else 'away',
+            'home_probabilities': {
+                'candidate': .61, 'model': .54, 'fixed_elo': .67,
+                'market': .57 if i%2 else None,
+            },
             'candidate': {'brier': 0.2+i/1000, 'log_loss': .4, 'accuracy': 1.0},
             'model': {'brier': .3, 'log_loss': .5, 'accuracy': 1.0},
             'fixed_elo': {'brier': .4, 'log_loss': .6, 'accuracy': 0.0},
@@ -52,6 +57,10 @@ class ShadowCheckpointTests(unittest.TestCase):
             saved = json.loads((root/checkpoint.RELATIVE_PATH).read_text())
             self.assertEqual(saved['game_ids'], [str(i) for i in range(100)])
             self.assertEqual(saved['priced_same_games']['market']['games'], 50)
+            self.assertEqual(
+                saved['same_game_priced_calibration']['sources']['market']['spread']['games'], 50)
+            self.assertEqual(
+                saved['all_games_calibration']['sources']['candidate']['calibration']['games'], 100)
             self.assertIs(saved['NO_BET'], True)
             self.assertFalse(saved['promotion_allowed'])
 
@@ -86,6 +95,18 @@ class ShadowCheckpointTests(unittest.TestCase):
                     path.write_text(json.dumps(payload))
                 with self.assertRaisesRegex(ValueError, 'checkpoint or selected inputs changed'):
                     self.exercise(root, selected, rows)
+
+    def test_calibration_diagnostics_concentrated_and_empty(self):
+        selection, rows=fixtures(3)
+        report=checkpoint.calibration_diagnostics(rows, ('candidate', 'model', 'fixed_elo'))
+        self.assertEqual(report['sources']['candidate']['calibration']['games'], 3)
+        self.assertAlmostEqual(
+            report['sources']['candidate']['spread']['mean_distance_from_even'], .11)
+        self.assertEqual(report['sources']['candidate']['spread']['share_between_40_and_60_percent'], 0)
+        self.assertEqual(report['sources']['model']['spread']['share_between_40_and_60_percent'], 1)
+        empty=checkpoint.calibration_diagnostics([], ('candidate',))
+        self.assertEqual(empty['sources']['candidate']['calibration']['games'], 0)
+        self.assertIsNone(empty['sources']['candidate']['spread']['mean_distance_from_even'])
 
     def test_duplicate_source_identifiers_are_rejected_without_writing(self):
         with tempfile.TemporaryDirectory() as tmp:
