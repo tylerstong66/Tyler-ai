@@ -123,7 +123,7 @@ class NhlForwardShadowTests(unittest.TestCase):
             original = json.loads(source.read_text())
             original['features'] = [1, 1]
             source.write_text(json.dumps(original))
-            with self.assertRaisesRegex(ValueError, 'digest mismatch'):
+            with self.assertRaisesRegex(ValueError, 'hash mismatch'):
                 shadow.evaluate(base, clock)
 
     def test_future_source_snapshot_cannot_create_shadow(self):
