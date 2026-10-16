@@ -9,7 +9,7 @@ from pathlib import Path
 
 from sports_mlb_prop_prospective import (
     _verify, settle_frozen_hit_props, write_exclusive_json,
-    MissingOfficialAtBatsError,
+    MissingOfficialBattingFieldError,
 )
 from sports_mlb_sources import OfficialMlbReader, utc
 
@@ -67,13 +67,16 @@ def settle_ready_records(root=DEFAULT_ROOT, *, reader=None, max_files=100):
         # official event time, team IDs, hitter ID and conditional outcome.
         try:
             result=settle_frozen_hit_props(record,reader=reader)
-        except MissingOfficialAtBatsError:
-            # Do not call this a zero-AB outcome, and do not write an immutable
-            # settlement that may later be contradicted by a completed feed.
-            # The next scheduled run will independently retry the official box.
+        except MissingOfficialBattingFieldError as error:
+            # An absent official count is not a verified zero. Never write an
+            # immutable grade that could be contradicted by a later feed.
+            # Actual wrong types, impossible counts and identity drift still fail.
             unresolved+=1
+            reason=("OFFICIAL_FINAL_AT_BATS_UNAVAILABLE_RETRY"
+                    if error.field=="atBats"
+                    else "OFFICIAL_FINAL_BATTING_FIELD_UNAVAILABLE_RETRY")
             unresolved_files.append({"game_id":game,"hitter_id":hitter,
-                "reason":"OFFICIAL_FINAL_AT_BATS_UNAVAILABLE_RETRY"})
+                                     "field":error.field,"reason":reason})
             continue
         write_exclusive_json(target,result)
         done+=1
@@ -95,7 +98,7 @@ def main():
     report=settle_ready_records(args.root)
     print("MLB_SHADOW_OFFICIAL_SETTLEMENT_REPORT="+json.dumps(report,sort_keys=True))
     if report["unresolved"]:
-        print("::warning::Official final MLB at-bat count unresolved for "
+        print("::warning::Official final MLB batting count unresolved for "
               +str(report["unresolved"])+" frozen player-games; no labels fabricated.")
 
 

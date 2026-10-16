@@ -21,12 +21,18 @@ EASTERN=ZoneInfo("America/New_York")
 SPORTS_VERSION="mlb_hit_prop_shadow_ledger_v1"
 
 
-class MissingOfficialAtBatsError(ValueError):
-    """Final boxscore does not yet establish the player's at-bat count.
+class MissingOfficialBattingFieldError(ValueError):
+    """An absent official final batting count cannot be inferred as zero.
 
-    Never infer that the player had zero at-bats or score a conditional bet
-    when the official field is absent. A future source pull may resolve it.
+    The final feed may omit atBats, hits or homeRuns for a player who has no
+    batting line. A missing field is neither a scored prop loss nor proof of
+    zero at-bats. Keep the immutable player-game open for a future retry.
     """
+
+    def __init__(self, field):
+        self.field=field
+        super().__init__("Official MLB final hitter "+field+
+                         " unavailable; do not infer zero.")
 
 
 
@@ -58,11 +64,10 @@ def _verify(record):
 
 
 def _positive_stats(row):
-    if "atBats" not in row or row["atBats"] is None:
-        raise MissingOfficialAtBatsError(
-            "Official MLB final hitter atBats unavailable; do not infer zero.")
     def valid(key):
-        value=row.get(key)
+        if key not in row or row[key] is None:
+            raise MissingOfficialBattingFieldError(key)
+        value=row[key]
         if isinstance(value,bool) or not isinstance(value,int) or value<0:
             raise ValueError("Official MLB final hitter "+key+" is missing or invalid.")
         return value
@@ -190,8 +195,10 @@ def settle_frozen_hit_props(record, *, reader=None):
         if not isinstance(raw,dict) or raw.get("person",{}).get("id")!=pid:
             raise ValueError("Official final batter identity changed.")
         stats=raw.get("stats",{}).get("batting")
+        if stats is None:
+            raise MissingOfficialBattingFieldError("batting")
         if not isinstance(stats,dict):
-            raise ValueError("Official final batter statistical entry missing.")
+            raise ValueError("Official final batter statistical entry invalid.")
         ab,hits,hr=_positive_stats(stats)
         batting={"at_bats":ab,"hits":hits,"home_runs":hr}
         result="SETTLED_CONDITIONAL" if ab>=1 else "INELIGIBLE_ZERO_AB"
