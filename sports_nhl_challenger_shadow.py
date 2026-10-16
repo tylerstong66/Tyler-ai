@@ -13,6 +13,7 @@ from zoneinfo import ZoneInfo
 
 import sports_benchmark_review as review
 import sports_nhl_shadow_checkpoint as checkpoint
+import sports_nhl_shadow_preview as preview
 import sports_historical_benchmark as b
 import sports_prospective_test as n
 
@@ -240,6 +241,7 @@ def evaluate(base=Path('.'), at=None):
         'scored': len(scores),
         'pending': len(shadow)-len(scores),
         'same_game_priced_count': len(paired),
+        'upcoming_pregame_comparisons': preview.upcoming(shadow, originals, now),
         'all_scored_unpriced_and_priced': metrics(scores, names[:3]),
         'same_game_priced': metrics(paired, names),
         'paired_challenger_minus_baseline': paired_score_differences(scores),
