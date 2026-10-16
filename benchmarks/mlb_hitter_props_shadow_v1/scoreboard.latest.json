@@ -1,8 +1,8 @@
 {
   "benchmark": {
-    "distinct_official_game_ids": 1,
+    "distinct_official_game_ids": 2,
     "distinct_official_game_ids_with_eligible_settlements": 1,
-    "frozen_player_game_forecasts": 7,
+    "frozen_player_game_forecasts": 13,
     "independent_github_commit_time_attestation_included": false,
     "ineligible": 1,
     "limitations": [
@@ -80,7 +80,7 @@
     },
     "model_is_calibrated": false,
     "no_wagers": true,
-    "pending": 2,
+    "pending": 8,
     "pending_examples_truncated": false,
     "pending_player_game_examples": [
       {
@@ -96,6 +96,48 @@
         "hitter_name": "Andrew Vaughn",
         "scheduled_first_pitch_utc": "2026-10-16T00:00:00+00:00",
         "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
+      },
+      {
+        "game_id": "849817",
+        "hitter_id": "595978",
+        "hitter_name": "Austin Hedges",
+        "scheduled_first_pitch_utc": "2026-10-17T00:00:00+00:00",
+        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
+      },
+      {
+        "game_id": "849817",
+        "hitter_id": "608070",
+        "hitter_name": "Jos\u00e9 Ram\u00edrez",
+        "scheduled_first_pitch_utc": "2026-10-17T00:00:00+00:00",
+        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
+      },
+      {
+        "game_id": "849817",
+        "hitter_id": "622761",
+        "hitter_name": "Jorge Mateo",
+        "scheduled_first_pitch_utc": "2026-10-17T00:00:00+00:00",
+        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
+      },
+      {
+        "game_id": "849817",
+        "hitter_id": "650490",
+        "hitter_name": "Yandy D\u00edaz",
+        "scheduled_first_pitch_utc": "2026-10-17T00:00:00+00:00",
+        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
+      },
+      {
+        "game_id": "849817",
+        "hitter_id": "656775",
+        "hitter_name": "Cedric Mullins",
+        "scheduled_first_pitch_utc": "2026-10-17T00:00:00+00:00",
+        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
+      },
+      {
+        "game_id": "849817",
+        "hitter_id": "663993",
+        "hitter_name": "Nathaniel Lowe",
+        "scheduled_first_pitch_utc": "2026-10-17T00:00:00+00:00",
+        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
       }
     ],
     "per_game": {
@@ -104,14 +146,20 @@
         "pending": 2,
         "predictions": 7,
         "scored": 4
+      },
+      "849817": {
+        "ineligible": 0,
+        "pending": 6,
+        "predictions": 6,
+        "scored": 0
       }
     },
     "proven_betting_edge": false,
     "scored": 4,
     "status": "PROSPECTIVE_FREEZE_SCORING_DIAGNOSTIC_NO_BET"
   },
-  "benchmark_last_changed_at_utc": "2026-10-16T18:04:26.613847+00:00",
-  "benchmark_sha256": "92645deb394cdeb374b303b97beead57ce3afed69c9bc0392a2a2cf76fcd25d8",
+  "benchmark_last_changed_at_utc": "2026-10-16T20:10:26.140996+00:00",
+  "benchmark_sha256": "37d5ae520d9ec1df0027053fc7e2ec9b35b754b963bb8fa889aeff0ad2108d17",
   "limitations": [
     "The feed reports only the GitHub repository snapshot as of its publication time.",
     "GitHub scheduled jobs may run late, so actual final results may appear later.",
@@ -121,10 +169,10 @@
     "Git commit metadata is not independent proof of publication timestamp."
   ],
   "no_wagers": true,
-  "published_at_utc": "2026-10-16T18:04:26.613847+00:00",
+  "published_at_utc": "2026-10-16T20:10:26.140996+00:00",
   "schema": "tyler_mlb_shadow_public_scoreboard_v1",
   "source": "public_github_main_scheduled_snapshot",
-  "source_git_revision": "d38fac6f82c603c86f91bb38fe96a832e9765eb9",
+  "source_git_revision": "956631461effce9df395fbdde74777378341ced5",
   "source_is_not_live_official_MLB_api": true,
   "source_refresh_kind": "benchmark_changed"
 }
