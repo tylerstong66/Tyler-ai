@@ -16,6 +16,48 @@ FEED_URL=("https://raw.githubusercontent.com/tylerstong66/Tyler-ai/main/"
           "benchmarks/mlb_hitter_props_shadow_v1/scoreboard.latest.json")
 
 
+def _pending_time_audit(examples, total_pending, as_of):
+    """Clock-relative timing of DISPLAYED saved player-games, not live MLB status.
+
+    No network lookups, no presumed final outcomes and no retroactive grading.
+    When a public feed is capped at 25, don't infer timings for hidden records.
+    """
+    if examples is None:
+        return {
+            "available":False,"as_of_utc":as_of.isoformat(),
+            "shown":0,"unshown_pending":total_pending,
+            "scheduled_first_pitch_future":None,
+            "scheduled_first_pitch_reached":None,
+            "events":[],"official_game_state_verified":False,
+        }
+    timed=[]
+    future=reached=0
+    for entry in examples:
+        first_pitch=utc(entry["scheduled_first_pitch_utc"])
+        status=("SAVED_FIRST_PITCH_FUTURE" if first_pitch>as_of
+                else "SAVED_FIRST_PITCH_REACHED_UNSETTLED")
+        future+=int(first_pitch>as_of)
+        reached+=int(first_pitch<=as_of)
+        timed.append({
+            "game_id":str(entry["game_id"]),
+            "hitter_id":str(entry["hitter_id"]),
+            "hitter_name":entry.get("hitter_name"),
+            "saved_first_pitch_utc":first_pitch.isoformat(),
+            "time_state":status,
+            "no_verified_player_outcome":True,
+        })
+    return {
+        "available":True,"as_of_utc":as_of.isoformat(),
+        "shown":len(timed),"unshown_pending":total_pending-len(timed),
+        "scheduled_first_pitch_future":future,
+        "scheduled_first_pitch_reached":reached,
+        "events":timed,
+        "official_game_state_verified":False,
+        "limitation":("This compares the original saved first-pitch time with the reader clock. "
+                      "It neither verifies actual start/final status nor assigns a player outcome."),
+    }
+
+
 def load_published_shadow_scoreboard(*, get=None, clock=None):
     get=get or requests.get
     clock=clock or (lambda:datetime.now(timezone.utc))
@@ -65,6 +107,10 @@ def load_published_shadow_scoreboard(*, get=None, clock=None):
                     or not str(item.get("game_id") or "").isdigit()
                     or not str(item.get("hitter_id") or "").isdigit()):
                 raise ValueError("Invalid pending hitter identity in published benchmark.")
+            try:
+                utc(item["scheduled_first_pitch_utc"])
+            except (TypeError, ValueError, KeyError, OverflowError) as exc:
+                raise ValueError("Invalid saved first pitch in pending hitter audit.") from exc
             key=(str(item["game_id"]),str(item["hitter_id"]))
             if key in seen:
                 raise ValueError("Repeated pending player-game identity in benchmark.")
@@ -81,7 +127,8 @@ def load_published_shadow_scoreboard(*, get=None, clock=None):
             "benchmark_changed","unchanged_saved_evidence_heartbeat",
             "legacy_no_refresh_kind"):
         raise ValueError("Unrecognized research snapshot refresh kind.")
-    age=(utc(clock())-published).total_seconds()
+    now=utc(clock())
+    age=(now-published).total_seconds()
     if age< -120:
         raise ValueError("Published scoreboard timestamp is unexpectedly in the future.")
     if payload.get("source")!="public_github_main_scheduled_snapshot":
@@ -91,7 +138,7 @@ def load_published_shadow_scoreboard(*, get=None, clock=None):
         "snapshot_age_hours":round(max(age,0)/3600,2),
         "may_be_stale":age>4*3600,
         "benchmark_last_changed_at_utc":last_change.isoformat(),
-        "benchmark_age_hours":round(max((utc(clock())-last_change).total_seconds(),0)/3600,2),
+        "benchmark_age_hours":round(max((now-last_change).total_seconds(),0)/3600,2),
         "refresh_kind":refresh_kind,
         "refresh_proves_new_official_MLB_data":False,
         "last_source_commit":payload.get("source_git_revision"),
@@ -101,6 +148,7 @@ def load_published_shadow_scoreboard(*, get=None, clock=None):
         "pending_player_game_examples":examples if examples is not None else [],
         "pending_examples_truncated":truncated if examples is not None else None,
         "pending_player_ids_available":examples is not None,
+        "pending_saved_schedule_audit":_pending_time_audit(examples,pending,now),
         "metrics":report.get("metrics"),
         "per_game":report.get("per_game"),
         "no_wagers":True,
