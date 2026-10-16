@@ -21,6 +21,15 @@ EASTERN=ZoneInfo("America/New_York")
 SPORTS_VERSION="mlb_hit_prop_shadow_ledger_v1"
 
 
+class MissingOfficialAtBatsError(ValueError):
+    """Final boxscore does not yet establish the player's at-bat count.
+
+    Never infer that the player had zero at-bats or score a conditional bet
+    when the official field is absent. A future source pull may resolve it.
+    """
+
+
+
 def _bytes(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"),
                       allow_nan=False, ensure_ascii=False).encode("utf-8")
@@ -49,6 +58,9 @@ def _verify(record):
 
 
 def _positive_stats(row):
+    if "atBats" not in row or row["atBats"] is None:
+        raise MissingOfficialAtBatsError(
+            "Official MLB final hitter atBats unavailable; do not infer zero.")
     def valid(key):
         value=row.get(key)
         if isinstance(value,bool) or not isinstance(value,int) or value<0:
