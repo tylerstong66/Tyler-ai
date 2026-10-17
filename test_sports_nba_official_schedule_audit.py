@@ -16,7 +16,7 @@ def official_games(times=("2026-10-20T19:00:00Z",)):
     result=[]
     for i,time in enumerate(times):
         result.append({
-            "gameId":f"00226000{i:03d}",
+            "gameId":f"0022600{i:03d}",
             "gameDateTimeUTC":time,"gameStatus":1,
             "homeTeam":{"teamTricode":"NYK","score":None},
             "awayTeam":{"teamTricode":"BOS","score":None},
@@ -24,7 +24,7 @@ def official_games(times=("2026-10-20T19:00:00Z",)):
     # Whole-season shape is required. Dummy other games must be unique IDs.
     for i in range(125):
         result.append({
-            "gameId":f"0022700{i:04d}",
+            "gameId":f"002270{i:04d}",
             "gameDateTimeUTC":"2026-11-02T19:00:00Z",
             "gameStatus":1,
             "homeTeam":{"teamTricode":"LAL","score":None},
