@@ -49,7 +49,7 @@ def dates_by_league():
         for sport in ORDER}
 
 
-def verify_existing(base, sport, split, day):
+def verify_existing(base, sport, split, day, *, as_of=None):
     prefix=Path(base)/ROOT/"sources"/sport/split
     artifact=prefix/(day+".json.gz")
     receipt=prefix/(day+".receipt.json")
@@ -58,6 +58,8 @@ def verify_existing(base, sport, split, day):
     if not artifact.exists() or not receipt.exists():
         raise ValueError("Historical source missing one sealed archive component")
     r=json.loads(receipt.read_text())
+    if as_of is not None and (observer.utc(r["recorded_at_utc"]) > as_of.astimezone(timezone.utc)):
+        raise ValueError("Saved historical receipt has future observation timestamp")
     if (r.get("schema")!="college-nba-history-provider-day-v1"
             or r.get("league")!=sport or r.get("split")!=split
             or r.get("source_date")!=day
@@ -74,7 +76,7 @@ def verify_existing(base, sport, split, day):
     return True
 
 
-def capture(fetch,*,base=Path("."),now=None,per_league=10,date_plan=None):
+def capture(fetch,*,base=Path("."),now=None,per_league=20,date_plan=None):
     if type(per_league) is not int or not 1<=per_league<=30:
         raise ValueError("Historical per-league fetch budget must be 1..30")
     now=now or datetime.now(timezone.utc)
@@ -86,6 +88,37 @@ def capture(fetch,*,base=Path("."),now=None,per_league=10,date_plan=None):
         raise ValueError("Historical source plan cannot change sport cohort")
     new=[]
     counts={}
+    # Unknown, orphaned, or cross-season source files fail the WHOLE run.
+    # Auditing the complete existing archive precedes all network requests.
+    known=set()
+    for league in ORDER:
+        if set(plan[league])!={"train","validation"}:
+            raise ValueError("Historical split labels must remain separate")
+        per_split=[]
+        for split in ("train","validation"):
+            selected=plan[league][split]
+            if (not isinstance(selected,list) or
+                    len(set(selected))!=len(selected) or
+                    selected!=sorted(selected)):
+                raise ValueError("Historical dates must be sorted and unique per split")
+            per_split+=selected
+            for day in selected:
+                if not isinstance(day,str) or date.fromisoformat(day).isoformat()!=day:
+                    raise ValueError("Historical plan requires canonical ISO dates")
+                for extension in (".json.gz",".receipt.json"):
+                    known.add((league,split,day+extension))
+        if (not plan[league]["train"] or not plan[league]["validation"]
+                or len(set(per_split))!=len(per_split)
+                or max(plan[league]["train"])>=min(plan[league]["validation"])):
+            raise ValueError("Training and validation historical days overlap or misorder")
+    files_root=base/ROOT/"sources"
+    if files_root.exists():
+        for item in files_root.rglob("*"):
+            if not item.is_file():
+                continue
+            relative=item.relative_to(files_root).parts
+            if len(relative)!=3 or tuple(relative) not in known:
+                raise ValueError("Unknown or misplaced historical source archive file")
     # Full receipt verification before any outbound fetch or append-only writes
     for sport in ORDER:
         if set(plan[sport])!={"train","validation"}:
@@ -97,7 +130,7 @@ def capture(fetch,*,base=Path("."),now=None,per_league=10,date_plan=None):
                 if date.fromisoformat(day)>now.date():
                     raise ValueError("Historical source request is future-dated")
                 total+=1
-                if verify_existing(base,sport,split,day):
+                if verify_existing(base,sport,split,day,as_of=now):
                     existing_count+=1
                 elif len(chosen)<per_league:
                     chosen.append((sport,split,day))
