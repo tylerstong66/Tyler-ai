@@ -18,18 +18,21 @@ LIMITATION = ('Coverage is limited to retained official schedule snapshots since
               'remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.')
 
 
-def pregame_readiness(schedule, predictions, events, followups, as_of):
+def pregame_readiness(schedule, predictions, events, followups, as_of, quarantined_ids=()):
     """Check the next 24h against only the latest audited capture's scoreboard.
 
     Historical quotes cannot make a missing latest event look ready. This is
     read-only snapshot evidence, not live availability or forecast enrollment.
     """
     rows = []
+    quarantined_ids=set(quarantined_ids)
     for identifier, item in sorted(schedule.items()):
         game = item['game']; kickoff = r.utc(game['kickoff'])
         if not as_of < kickoff <= as_of+timedelta(hours=24):
             continue
         pred = predictions.get(identifier); issues = []
+        if identifier in quarantined_ids:
+            issues.append('official_daily_snapshot_conflict_quarantined')
         if game.get('state') != 'pre': issues.append('official_game_not_pregame')
         frozen_start_discrepancy = None
         if pred is None:
@@ -102,6 +105,9 @@ def audit(root, sport, models, base=Path('.')):
     captures, exclusions, errors, input_files = [], [], [], []
     latest_decisions = []; saved_decisions = {}; latest_events = []; audited_paths = []
     observed, schedule_times = [], []
+    latest_official_schedule_complete = None
+    latest_official_daily_conflicts = []
+    official_daily_conflicted_capture_count = 0
 
     def read_source(source):
         path = base/source['path']
@@ -124,6 +130,17 @@ def audit(root, sport, models, base=Path('.')):
             continue
         capture_time = stamp(path.parent)
         audited_paths.append(path); latest_events = []
+        if sport == 'MLB':
+            completeness=manifest.get('official_schedule_complete')
+            current_conflicts=manifest.get('official_daily_conflicts', [])
+            if (completeness is not None and type(completeness) is not bool
+                    or not isinstance(current_conflicts,list)
+                    or (current_conflicts and completeness is not False)):
+                raise ValueError('Inconsistent official daily conflict audit metadata')
+            latest_official_schedule_complete=completeness
+            latest_official_daily_conflicts=[{**item,'capture':path.parent.name}
+                                             for item in current_conflicts]
+            official_daily_conflicted_capture_count+=bool(current_conflicts)
         captures.append(capture_time)
         input_files.append({'path': str(path.relative_to(root)), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
         enrollment = path.parent/'enrollment.json'
@@ -243,7 +260,8 @@ def audit(root, sport, models, base=Path('.')):
     decisive_paired = sum(row['game_id'] in predictions and row['outcome'] != 'tie' and predictions[row['game_id']].get('market') is not None for row in results)
     leads = [g['lead_hours'] for g in games if g['lead_hours'] is not None]
     readiness = pregame_readiness(schedule, predictions, latest_events,
-                                  {row['game_id'] for row in followups}, as_of)
+                                  {row['game_id'] for row in followups}, as_of,
+                                  {str(item['game_id']) for item in latest_official_daily_conflicts})
     return {'sport': sport, 'input_integrity': 'verified', 'report_version': VERSION,
             'cohort_started_at': start.isoformat(), 'as_of_evidence_at': as_of.isoformat(),
             'latest_official_schedule_observed_at': max(schedule_times).isoformat(),
@@ -256,6 +274,9 @@ def audit(root, sport, models, base=Path('.')):
             'started_schedule_games_enrolled': sum(g['status'] == 'enrolled' for g in due),
             'observed_missing_started_games': missing, 'games': games, 'market_gaps': market_gaps,
             'pregame_readiness': readiness,
+            'latest_official_schedule_complete':latest_official_schedule_complete,
+            'latest_official_daily_conflicts':latest_official_daily_conflicts,
+            'official_daily_conflicted_capture_count':official_daily_conflicted_capture_count,
             'capture_count': len(captures), 'largest_capture_intervals': capture_gaps[:5],
             'minimum_forecast_lead_hours': min(leads) if leads else None,
             'latest_capture': audited_paths[-1].parent.name, 'latest_attempted_capture': manifests[-1].parent.name,
@@ -288,6 +309,27 @@ def render(data):
         lines.append(f"| {row['game_id']} | {row['away']} at {row['home']} | {row['settled']} | {row['enrollment_diagnosis']['status'].replace('_', ' ')} | {later['observed_at'] if later else 'Unavailable'} |")
     if not data['market_gaps']:
         lines += ['| None | — | — | — | — |']
+    if data['sport'] == 'MLB':
+        completeness=data.get('latest_official_schedule_complete')
+        conflicts=data.get('latest_official_daily_conflicts', [])
+        state=('partial_conflicting_daily_sources' if completeness is False else
+               'consistent_daily_sources' if completeness is True else
+               'not_explicitly_reported_by_legacy_capture')
+        lines += ['', '## Official daily-source coverage', '',
+                  f"Latest capture status: **{state}**. Quarantined games: "
+                  f"**{len(conflicts)}**. Completed capture attempts with "
+                  f"official daily-source conflicts: "
+                  f"**{data.get('official_daily_conflicted_capture_count', 0)}**.", '']
+        for item in conflicts:
+            timestamps=', '.join(
+                f"{obs['queried_day']} -> {obs['scheduled_start_utc']}"
+                for obs in item['observations'])
+            lines.append(
+                f"- Game {item['game_id']}: conflicting official day rows "
+                f"({timestamps}); no new forecasts, grading or market quote "
+                f"backfills for that game.")
+        if conflicts:
+            lines += ['', 'Partial source coverage: collector execution succeeded for unaffected games only; quarantined games are not confirmed ready or graded.', '']
     lines += ['', 'Later archived pairs explain timing gaps; they are not retrospectively inserted into forecasts or scored market comparisons.', '',
               '## Next 24-hour pregame readiness', '',
               f"As of retained evidence: {data['pregame_readiness']['as_of_evidence_at']}. "
