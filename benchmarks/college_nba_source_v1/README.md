@@ -30,6 +30,33 @@ rather than an unsupported statement of coverage completeness. Unknown
 season type is excluded, **not** assumed regular season. NBA preseason and
 college nonregular competitions are excluded.
 
+## Independent NBA league-owned schedule checks
+
+NBA now has an **additional, independent observation source**:
+`https://cdn.nba.com/static/json/staticData/scheduleLeagueV2.json`, which
+comes from the NBA-controlled CDN rather than ESPN. The optional
+`sports_nba_official_schedule_audit.py` step pins its raw gzip response,
+SHA-256 hash, retrieval timestamp, source ESPN capture hash, and a conservative
+team-tricode/scheduled-tipoff cross-check. It only selects uniquely matching
+regular-season or playoff NBA game IDs (`002` or `004`) with unchanged
+home/away identities and a scheduled start difference of no more than 30
+minutes. Changed scheduled times, uncertain identities and duplicate
+candidates remain explicitly **uncorrelated**; neither original source is
+rewritten.
+
+This initial comparison verifies independent league-owned **schedule
+identity**, not final game scores. It deliberately keeps
+`official_final_scoring_enabled=false` and
+`forecasting_enabled=false`, including when both schedules match.
+Only a successful optional source check can publish its additional
+`nba_official/captures/` evidence. NBA CDN downtime or incompatible
+schema does not block the existing separate ESPN source ledger, but no
+independent NBA agreement may be claimed when that happens.
+
+Additional independently verified official result, reschedule,
+time-split historical model and forward-only pregame freeze gates remain
+necessary before scoring or modeling this new cohort.
+
 ## Saved-source integrity audit
 
 Before any new observation batch is committed, an independent saved-data
