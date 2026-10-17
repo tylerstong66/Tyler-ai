@@ -2,7 +2,7 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-17T12:07:32.060307+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
+Evidence through **2026-10-17T12:12:02.451961+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
 
 | Coverage | Games |
 |---|---:|
@@ -21,15 +21,24 @@ Evidence through **2026-10-17T12:07:32.060307+00:00**; cohort began 2026-10-11T1
 | 849812 | LAD at MIL | True | no usable pair in reduced snapshot raw schema unavailable | 2026-10-12T07:21:49.547508+00:00 |
 | 849813 | CLE at TB | True | no usable pair in reduced snapshot raw schema unavailable | 2026-10-13T07:43:09.630071+00:00 |
 
+## Official daily-source coverage
+
+Latest capture status: **partial_conflicting_daily_sources**. Quarantined games: **1**. Completed capture attempts with official daily-source conflicts: **2**.
+
+- Game 849817: conflicting official day rows (2026-10-16 -> 2026-10-17T00:00:00+00:00, 2026-10-18 -> 2026-10-18T21:08:00+00:00); no new forecasts, grading or market quote backfills for that game.
+
+Partial source coverage: collector execution succeeded for unaffected games only; quarantined games are not confirmed ready or graded.
+
+
 Later archived pairs explain timing gaps; they are not retrospectively inserted into forecasts or scored market comparisons.
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-17T12:07:32.060307+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-17T12:12:02.451961+00:00. Ready: 0 / 1 observed games. Status: attention.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 849816 | Tampa Bay Rays at Cleveland Guardians | True | False | True | None |
+| 849816 | Tampa Bay Rays at Cleveland Guardians | True | False | True | official_identity_differs_from_forecast, saved_start_differs_from_latest_official_start, latest_scoreboard_identity_conflict |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -43,13 +52,13 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 849811 | Milwaukee Brewers at Los Angeles Dodgers | 2026-10-15T00:00:00+00:00 | enrolled | — |
 | 849812 | Los Angeles Dodgers at Milwaukee Brewers | 2026-10-12T21:00:00+00:00 | enrolled | — |
 | 849813 | Cleveland Guardians at Tampa Bay Rays | 2026-10-14T00:00:00+00:00 | enrolled | — |
-| 849816 | Tampa Bay Rays at Cleveland Guardians | 2026-10-18T00:00:00+00:00 | enrolled | — |
+| 849816 | Tampa Bay Rays at Cleveland Guardians | 2026-10-18T00:08:00+00:00 | enrolled | — |
 | 849818 | Tampa Bay Rays at Cleveland Guardians | 2026-10-15T17:00:00+00:00 | enrolled | — |
 | 849820 | Cleveland Guardians at Tampa Bay Rays | 2026-10-13T00:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 46. Latest: `20261017T120728150537Z`.
+Audited capture manifests: 47. Latest: `20261017T121159075702Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
