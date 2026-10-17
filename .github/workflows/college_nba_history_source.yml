@@ -35,7 +35,7 @@ jobs:
           if ! git diff --cached --quiet; then
             git config user.name github-actions\[bot\]
             git config user.email 41898282+github-actions\[bot\]@users.noreply.github.com
-            git commit -m 'Archive NBA FBS D1 men's historical source receipts [research only]'
+            git commit -m "Archive NBA FBS D1 source receipts [research only]"
             git pull --rebase origin main
             git push origin HEAD:main
           fi
