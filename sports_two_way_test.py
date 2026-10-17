@@ -355,7 +355,17 @@ def run_sport(sport,source_cache=None):
                 availability[g['game_id']]={'coverage':'unknown','effect_enabled':False,'error':str(error)}
                 optional_errors.append({'stage':'availability','game_id':g['game_id'],'error':str(error)})
     new,excluded=record_forecasts(root,capture,combined,games,events,model,config,availability)
-    followups,quote_errors=m.collect_followups(root,capture,events,n.now)
+    # When official MLB day feeds disagree, ESPN odds cannot be confidently
+    # attached to every still-pending event. Defer the optional *new* market
+    # follow-up for this run; preserve every already-saved quote unchanged.
+    if sport=='MLB' and daily_conflicts:
+        followups=[]
+        quote_errors=[{'stage':'market_followup',
+                       'game_id':item['game_id'],
+                       'error':'OFFICIAL_DAILY_SNAPSHOT_CONFLICT_NO_NEW_QUOTE'}
+                      for item in daily_conflicts]
+    else:
+        followups,quote_errors=m.collect_followups(root,capture,events,n.now)
     settled,errors=settle(root,capture,games,events,sport)
     errors.extend(quote_errors)
     n.write_json(capture.folder/'manifest.json',{'sources':capture.evidence,'history_games':len(combined),'new_predictions':new,'new_results':settled,'new_market_followups':followups,'excluded':excluded,'errors':errors,'optional_availability_errors':optional_errors,
