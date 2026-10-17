@@ -73,6 +73,59 @@ class TwoWayTests(unittest.TestCase):
         for rows in [[g,{**g,'home_score':99}],[{**g,'home_score':3}],[{**g,'home_score':True}],[{**g,'home_id':g['away_id']}]]:
             with self.subTest(rows=rows),self.assertRaises(ValueError):p.unique_finals(rows,self.clock)
 
+    def test_conflicting_mlb_daily_schedules_quarantine_only_the_disputed_game(self):
+        base=self.game(game_id='849817',home_id='114',away_id='139',
+                       home='CLE',away='TB',completed=False,state='pre',
+                       home_score=None,away_score=None,
+                       kickoff='2026-10-16T22:00:00+00:00')
+        original={**base,'_queried_day':'2026-10-16'}
+        later={**base,'kickoff':'2026-10-17T00:00:00+00:00',
+               '_queried_day':'2026-10-17'}
+        unaffected=self.game(game_id='other',_queried_day='2026-10-17')
+        accepted,conflicts=p.reconcile_mlb_daily_snapshots(
+            [original,unaffected,later])
+        self.assertEqual([x['game_id'] for x in accepted],['other'])
+        self.assertEqual(len(conflicts),1)
+        entry=conflicts[0]
+        self.assertEqual(entry['game_id'],'849817')
+        self.assertEqual(entry['reason'],
+                         'CONFLICTING_OFFICIAL_DAILY_SNAPSHOTS_QUARANTINED')
+        self.assertEqual({r['scheduled_start_utc'] for r in entry['observations']},
+                         {'2026-10-16T22:00:00+00:00','2026-10-17T00:00:00+00:00'})
+        self.assertEqual({r['queried_day'] for r in entry['observations']},
+                         {'2026-10-16','2026-10-17'})
+        self.assertEqual(entry['decision'],'no_forecast_no_settlement_no_start_rewrite')
+        self.assertEqual(original['kickoff'],'2026-10-16T22:00:00+00:00')
+        self.assertEqual(later['kickoff'],'2026-10-17T00:00:00+00:00')
+
+    def test_duplicate_identical_mlb_daily_rows_collapse_without_false_conflict(self):
+        base=self.game(game_id='849817',home_id='114',away_id='139')
+        rows=[{**base,'_queried_day':'2026-10-16'},
+              {**base,'_queried_day':'2026-10-17'}]
+        accepted,conflicts=p.reconcile_mlb_daily_snapshots(rows)
+        self.assertEqual(len(accepted),1)
+        self.assertEqual(conflicts,[])
+        self.assertEqual(accepted[0]['game_id'],'849817')
+
+    def test_mlb_day_disagreements_in_identity_score_state_fail_closed_per_game(self):
+        base=self.game(game_id='849817')
+        for altered in ({'home_id':'wrong'},{'away_id':'wrong'},
+                        {'home_score':7},{'away_score':0},
+                        {'state':'post'},{'kickoff':'2026-10-12T22:00:00Z'}):
+            with self.subTest(altered=altered):
+                newer={**base,**altered}
+                accepted,conflicts=p.reconcile_mlb_daily_snapshots([base,newer])
+                self.assertEqual(accepted,[])
+                self.assertEqual(len(conflicts),1)
+
+    def test_collector_marks_partial_mlb_coverage_and_never_attaches_quotes_to_conflict(self):
+        source=Path(p.__file__).read_text()
+        self.assertIn("'official_daily_conflicts':daily_conflicts",source)
+        self.assertIn("'official_schedule_complete':not bool(daily_conflicts)",source)
+        self.assertIn("if sport=='MLB' and daily_conflicts:",source)
+        self.assertIn("OFFICIAL_DAILY_SNAPSHOT_CONFLICT_NO_NEW_QUOTE",source)
+        self.assertIn("'collection_completed':True",source)
+
     def test_current_and_future_scores_cannot_leak(self):
         target=self.game()
         before=p.pregame([],target,self.clock,self.config)

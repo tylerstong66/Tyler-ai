@@ -34,4 +34,34 @@ The first review milestone remains 100 settled games per sport, with enrollment
 continuing thereafter. Settlements and paired market comparisons have separate
 sample counts. No betting edge is established by reaching a count.
 
+## MLB conflicting daily source snapshots (October 17)
+
+The Oct 17 scheduled collector encountered the same official MLB game ID
+in overlapping requested-day feeds with materially different originally
+observed official rows. Previously this aborted the entire MLB collection
+with `Daily official snapshots conflict`, even though unrelated games and
+NHL evidence remained valid.
+
+The collector now groups official MLB rows by game ID across requested dates.
+Identical duplicated rows are safely deduplicated. If kickoff, team IDs,
+score fields, or state disagree, **the full conflicting game is quarantined
+from all new team-winner forecasts and final grades for that run**. Every
+original daily observation, request date and conflict reason is preserved
+under `captures/<run>/official_daily_conflicts.json` and recorded again
+in `manifest.json` with `official_schedule_complete=false`,
+`quarantined_game_ids`, and `official_daily_conflicts`. Other unique,
+internally consistent MLB games can still be collected independently. A
+quarantine also withholds new optional MLB market follow-up quotes during
+that run rather than risk associating a quote with a disputed event; already
+saved historical quote evidence is never modified. This is **partial source
+coverage**, not a blanket successful verification of all scheduled games.
+
+No source row is selected merely because its timestamp is later or more
+favorable, and no frozen game/winner forecast, model input, team identity,
+price, or official settlement is rewritten. In particular the already
+identified two-hour frozen-start discrepancy for game 849817 remains
+separate from its independently frozen hitter forecasts. Resolve that
+discrepancy through an auditable future provider-identity investigation,
+never retrospective re-enrollment or backfilled market odds.
+
 **NO BET — actual wagers $0.**

@@ -252,6 +252,45 @@ def availability_snapshot(capture,g,sport):
     capture.retain('availability_'+g['game_id']+'.json',value,e);return value
 
 
+def reconcile_mlb_daily_snapshots(games):
+    """Quarantine contradictory daily representations; never pick by intuition.
+
+    A rescheduled game can appear in two daily schedule queries at different
+    official timestamps. Preserving one arbitrary row could issue a false
+    pregame freeze or grade a final under the wrong identity. Quarantine only
+    that game; unrelated verified games remain eligible for the collector.
+    """
+    grouped=defaultdict(list)
+    for game in games:
+        grouped[game['game_id']].append(game)
+    accepted, conflicts=[],[]
+    identity=('kickoff','home_id','away_id','home_score','away_score','state')
+    for identifier,rows in sorted(grouped.items()):
+        first=rows[0]
+        if all(all(row[key]==first[key] for key in identity) for row in rows[1:]):
+            accepted.append(first)
+            continue
+        evidence=[]
+        for row in rows:
+            evidence.append({
+                'queried_day':row.get('_queried_day'),
+                'scheduled_start_utc':row['kickoff'],
+                'home_id':row['home_id'],
+                'away_id':row['away_id'],
+                'home_score':row['home_score'],
+                'away_score':row['away_score'],
+                'state':row['state'],
+                'completed':row['completed'],
+            })
+        conflicts.append({
+            'game_id':identifier,
+            'reason':'CONFLICTING_OFFICIAL_DAILY_SNAPSHOTS_QUARANTINED',
+            'observations':evidence,
+            'decision':'no_forecast_no_settlement_no_start_rewrite',
+        })
+    return accepted,conflicts
+
+
 def run_sport(sport,source_cache=None):
     root=ROOT/sport.lower();protocol=json.loads((ROOT/'protocol.json').read_text());config=protocol[sport]
     history=json.loads((root/'history.json').read_text());model=json.loads((root/'model.json').read_text())
@@ -281,17 +320,34 @@ def run_sport(sport,source_cache=None):
     for day in sorted(dates):
         if sport=='NHL':url='https://api-web.nhle.com/v1/schedule/'+day;parser=nhl_games
         else:url='https://statsapi.mlb.com/api/v1/schedule?sportId=1&date='+day+'&hydrate=probablePitcher,linescore,team';parser=mlb_games
-        games+=read_capture(capture,url,parser,'official_'+day+'.json')
+        rows=read_capture(capture,url,parser,'official_'+day+'.json')
+        games += [{**g,'_queried_day':day} for g in rows]
         url='https://site.api.espn.com/apis/site/v2/sports/'+ESPN_PATH[sport]+'/scoreboard?dates='+day.replace('-','')
         day_events=read_capture(capture,url,lambda d:espn_events(d,sport),'espn_'+day+'.json')
         for event in day_events:event['market_observed_at']=capture.evidence[-1]['retrieved_at']
         events+=day_events
-    # NHL daily endpoints return overlapping weeks; preserve one exact event.
-    deduplicated={}
-    for g in games:
-        if g['game_id'] in deduplicated and any(g[k]!=deduplicated[g['game_id']][k] for k in ['kickoff','home_id','away_id','home_score','away_score','state']):raise ValueError('Daily official snapshots conflict')
-        deduplicated[g['game_id']]=g
-    games=list(deduplicated.values());availability={};optional_errors=[]
+    # NHL weekly overlap remains strictly validated. MLB cross-day schedule
+    # disagreements are retained as evidence, but isolated from forecasts and
+    # final settlement instead of stopping every unrelated MLB game.
+    daily_conflicts=[]
+    if sport=='MLB':
+        games,daily_conflicts=reconcile_mlb_daily_snapshots(games)
+        n.write_json(capture.folder/'official_daily_conflicts.json',{
+            'records':daily_conflicts,
+            'quarantined_game_ids':[row['game_id'] for row in daily_conflicts],
+            'official_schedule_complete':not bool(daily_conflicts),
+            'NO_BET':True,'actual_wagers':0,
+        })
+    else:
+        deduplicated={}
+        for g in games:
+            if g['game_id'] in deduplicated and any(
+                    g[k]!=deduplicated[g['game_id']][k]
+                    for k in ['kickoff','home_id','away_id','home_score','away_score','state']):
+                raise ValueError('Daily official snapshots conflict')
+            deduplicated[g['game_id']]=g
+        games=list(deduplicated.values())
+    availability={};optional_errors=[]
     for g in games:
         if g['state']=='pre' and clock<b.utc(g['kickoff'])<=clock+timedelta(hours=24) and not (root/'predictions'/(g['game_id']+'.json')).exists():
             try:availability[g['game_id']]=availability_snapshot(capture,g,sport)
@@ -299,10 +355,24 @@ def run_sport(sport,source_cache=None):
                 availability[g['game_id']]={'coverage':'unknown','effect_enabled':False,'error':str(error)}
                 optional_errors.append({'stage':'availability','game_id':g['game_id'],'error':str(error)})
     new,excluded=record_forecasts(root,capture,combined,games,events,model,config,availability)
-    followups,quote_errors=m.collect_followups(root,capture,events,n.now)
+    # When official MLB day feeds disagree, ESPN odds cannot be confidently
+    # attached to every still-pending event. Defer the optional *new* market
+    # follow-up for this run; preserve every already-saved quote unchanged.
+    if sport=='MLB' and daily_conflicts:
+        followups=[]
+        quote_errors=[{'stage':'market_followup',
+                       'game_id':item['game_id'],
+                       'error':'OFFICIAL_DAILY_SNAPSHOT_CONFLICT_NO_NEW_QUOTE'}
+                      for item in daily_conflicts]
+    else:
+        followups,quote_errors=m.collect_followups(root,capture,events,n.now)
     settled,errors=settle(root,capture,games,events,sport)
     errors.extend(quote_errors)
-    n.write_json(capture.folder/'manifest.json',{'sources':capture.evidence,'history_games':len(combined),'new_predictions':new,'new_results':settled,'new_market_followups':followups,'excluded':excluded,'errors':errors,'optional_availability_errors':optional_errors,'collection_completed':True})
+    n.write_json(capture.folder/'manifest.json',{'sources':capture.evidence,'history_games':len(combined),'new_predictions':new,'new_results':settled,'new_market_followups':followups,'excluded':excluded,'errors':errors,'optional_availability_errors':optional_errors,
+          'official_daily_conflicts':daily_conflicts,
+          'official_schedule_complete':not bool(daily_conflicts),
+          'quarantined_game_ids':[row['game_id'] for row in daily_conflicts],
+          'collection_completed':True})
     return report(root,sport)
 
 
