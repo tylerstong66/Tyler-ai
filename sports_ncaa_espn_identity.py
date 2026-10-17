@@ -29,6 +29,52 @@ def name(value):
     ascii_value="".join(c for c in ascii_value if not unicodedata.combining(c))
     return re.sub(r"[^a-z0-9]+","",ascii_value.lower())
 
+# Human-reviewed exact NCAA `nameShort` spellings observed in the 2026-10-17
+# frozen FBS source, with the corresponding ESPN `team.location` university
+# names. No edit-distance matching, mascots, scores or result-based lookup.
+# Every matched game still needs both sides and a unique kickoff within 30m.
+FBS_NCAA_TO_ESPN_SCHOOL={
+    "mississippist":"mississippistate",
+    "arizonast":"arizonastate",
+    "kansasst":"kansasstate",
+    "oklahomast":"oklahomastate",
+    "charlestonso":"charlestonsouthern",
+    "floridast":"floridastate",
+    "ohiost":"ohiostate",
+    "pennst":"pennstate",
+    "michiganst":"michiganstate",
+    "oregonst":"oregonstate",
+    "washingtonst":"washingtonstate",
+    "sandiegost":"sandiegostate",
+    "fresnost":"fresnostate",
+    "armywestpoint":"army",
+    "flaatlantic":"floridaatlantic",
+    "southfla":"southflorida",
+    "kentst":"kentstate",
+    "northdakotast":"northdakotastate",
+    "niu":"northernillinois",
+    "sanjosest":"sanjosestate",
+    "ballst":"ballstate",
+    "centralmich":"centralmichigan",
+    "westernmich":"westernmichigan",
+    "easternmich":"easternmichigan",
+    "sacramentost":"sacramentostate",
+    "southernmiss":"southernmiss",
+    "arkansasst":"arkansasstate",
+    "georgiast":"georgiastate",
+    "fiu":"floridainternational",
+    "middletenn":"middletennessee",
+    "missourist":"missouristate",
+    "ulm":"ulmonroe",
+}
+
+
+def official_school_name(sport,school):
+    """An exact, curated 2026 FBS spelling; no NCAA D1 hoops assumptions."""
+    original=name(school)
+    return FBS_NCAA_TO_ESPN_SCHOOL.get(original,original) if sport=="NCAAF_FBS" else original
+
+
 
 def verify_ncaa(folder, manifest):
     if (manifest.get("schema")!="ncaa-owned-2026-source-observations-v1"
@@ -123,7 +169,8 @@ def verify_espn(folder,manifest):
 def reconcile(source_rows,espn_rows):
     ncaa_keys=defaultdict(list)
     for row in source_rows:
-        ncaa_keys[(row["league"],name(row["home_name"]),name(row["away_name"]))].append(row)
+        ncaa_keys[(row["league"],official_school_name(row["league"],row["home_name"]),
+                   official_school_name(row["league"],row["away_name"]))].append(row)
     matched=[];unverified=[]
     for item in sorted(espn_rows,key=lambda x:(x["league"],x["espn_game_id"])):
         names=item["school_names"]
@@ -161,6 +208,12 @@ def reconcile(source_rows,espn_rows):
         at=datetime.fromtimestamp(int(nc["source_start_time_epoch"]),tz=timezone.utc)
         matched.append({**base,
                         "ncaa_game_id":nc["ncaa_game_id"],
+                        "ncaa_home_school_as_recorded":nc["home_name"],
+                        "ncaa_away_school_as_recorded":nc["away_name"],
+                        "curated_fbs_home_alias":(name(nc["home_name"])!=
+                                                  official_school_name(item["league"],nc["home_name"])),
+                        "curated_fbs_away_alias":(name(nc["away_name"])!=
+                                                  official_school_name(item["league"],nc["away_name"])),
                         "ncaa_source_start_utc":at.isoformat(),
                         "start_difference_minutes":(at-start).total_seconds()/60,
                         "espn_provider_completed":item["provider_completed"],
