@@ -30,6 +30,25 @@ rather than an unsupported statement of coverage completeness. Unknown
 season type is excluded, **not** assumed regular season. NBA preseason and
 college nonregular competitions are excluded.
 
+## Saved-source integrity audit
+
+Before any new observation batch is committed, an independent saved-data
+reader (`sports_expansion_audit.py`) re-opens **every** archived ESPN
+`.json.gz` response in the repository, verifies its original response
+SHA-256, fully re-parses every game, recomputes the date-conflict quarantine
+and checks the no-forecast/no-scoring/no-wager guards. It rejects tampered
+receipts, missing/untracked files, mismatched dates, changed identifiers,
+overwritten result labels and malformed capture names. It then publishes
+`COVERAGE.latest.json` with verified capture counts, provider game
+observations and **provider-reported but not independently official** finals.
+The scheduled workflow commits only if both the new capture and this
+entire archive replay pass.
+
+This audit independently reproduces *archived ESPN evidence*, but is **not**
+an independent NCAA/NBA governing-body verification. Training and grading
+remain disabled until a separate original-source validator and a season-aware
+time-split benchmark pass.
+
 ESPN is a **media data provider, not the independent official NCAA/NBA final
 authority**. A provider-reported final is source evidence only. Prior to
 launching any scores, separate official-result cross-checks and saved source
