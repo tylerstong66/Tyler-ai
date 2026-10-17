@@ -80,7 +80,7 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/two_way_prospective/mlb/captures/20261017T171043094809Z/manifest.json.
+Latest saved manifest: benchmarks/two_way_prospective/mlb/captures/20261017T192538133991Z/manifest.json.
 Manifest completion field: True. Errors: [{"error": "OFFICIAL_DAILY_SNAPSHOT_CONFLICT_NO_NEW_QUOTE", "game_id": "849817", "stage": "market_followup"}]. Exclusions: [].
 Optional availability errors: [].
 Newer saved collection failure: null.
