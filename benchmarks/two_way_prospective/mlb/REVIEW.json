@@ -65,18 +65,14 @@
     "completion_note": "Manifest completion alone does not imply absence of per-game errors.",
     "errors": [
       {
-        "error": "Unique saved event required for follow-up quote",
-        "game_id": "849808",
+        "error": "OFFICIAL_DAILY_SNAPSHOT_CONFLICT_NO_NEW_QUOTE",
+        "game_id": "849817",
         "stage": "market_followup"
       }
     ],
     "excluded": [],
-    "latest_manifest": "benchmarks/two_way_prospective/mlb/captures/20261016T233615539073Z/manifest.json",
-    "newer_saved_collection_failure": {
-      "collection_completed": false,
-      "error": "Daily official snapshots conflict",
-      "observed_at": "2026-10-17T09:22:18.157861+00:00"
-    },
+    "latest_manifest": "benchmarks/two_way_prospective/mlb/captures/20261017T120728150537Z/manifest.json",
+    "newer_saved_collection_failure": null,
     "optional_availability_errors": []
   },
   "conditional_home_calibration": {
@@ -183,10 +179,10 @@
     }
   },
   "first_100_checkpoint": {
-    "additional_forecasts_needed": 91,
-    "pending_selected": 2,
+    "additional_forecasts_needed": 90,
+    "pending_selected": 3,
     "promotion_allowed": false,
-    "selected_forecasts": 9,
+    "selected_forecasts": 10,
     "selection_rule": "First 100 by recorded_at in UTC, then game_id; never by outcome, price or settlement order.",
     "settled_selected": 7,
     "status": "collecting_forecasts",
@@ -195,7 +191,7 @@
   },
   "full_outcome_calibration": null,
   "input_integrity": "verified",
-  "input_sha256": "302d854fce495f7b1525ce8b96346c2473fab7621aafd3edc1b66d872e1ba325",
+  "input_sha256": "d3825d2704595403527ddb7c9a15dc6ba08d37efb686764d3f01685893c4ce77",
   "latest_result_verified_at": "2026-10-16T07:10:37.746412+00:00",
   "limitation": "Experimental descriptive results. NFL uncertainty uses season/week blocks; NHL/MLB use Eastern game-date blocks. Blocks can still be dependent. Intervals require at least five blocks and are unavailable below that; five blocks or 100 settled games does not establish a betting edge. Repeated monitoring intervals are not sequential significance tests. No model promotion, forecast changes, wagers, or profits are inferred.",
   "paired_differences": {
@@ -383,9 +379,9 @@
       }
     }
   },
-  "pending": 2,
+  "pending": 3,
   "probability_policy": "Saved pregame probabilities only; NFL binary metrics condition on no tie.",
-  "recorded": 9,
+  "recorded": 10,
   "report_version": "prospective-review-v2",
   "review_due": false,
   "review_milestone": 100,

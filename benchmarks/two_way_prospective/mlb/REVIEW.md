@@ -2,7 +2,7 @@
 
 **NO BET — actual wagers $0.**
 
-Recorded: **9** · Settled: **7** · Pending: **2**
+Recorded: **10** · Settled: **7** · Pending: **3**
 
 100-settlement milestone: **collecting**. This flag requests human review; it does not authorize model promotion or wagering.
 
@@ -16,7 +16,7 @@ Uncertainty unit: Eastern scheduled game date. CIs require at least 5 blocks.
 ## First-100-enrolled checkpoint
 
 Status: **collecting_forecasts**. This is separate from the cumulative 100-settlement flag.
-Selected: 9 / 100; settled among selected: 7; pending among selected: 2.
+Selected: 10 / 100; settled among selected: 7; pending among selected: 3.
 First 100 by recorded_at in UTC, then game_id; never by outcome, price or settlement order.
 
 ## All decisive games — conditional two-way scores
@@ -80,10 +80,10 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/two_way_prospective/mlb/captures/20261016T233615539073Z/manifest.json.
-Manifest completion field: True. Errors: [{"error": "Unique saved event required for follow-up quote", "game_id": "849808", "stage": "market_followup"}]. Exclusions: [].
+Latest saved manifest: benchmarks/two_way_prospective/mlb/captures/20261017T120728150537Z/manifest.json.
+Manifest completion field: True. Errors: [{"error": "OFFICIAL_DAILY_SNAPSHOT_CONFLICT_NO_NEW_QUOTE", "game_id": "849817", "stage": "market_followup"}]. Exclusions: [].
 Optional availability errors: [].
-Newer saved collection failure: {"collection_completed": false, "error": "Daily official snapshots conflict", "observed_at": "2026-10-17T09:22:18.157861+00:00"}.
+Newer saved collection failure: null.
 Manifest completion alone does not imply absence of per-game errors.
 
 Experimental descriptive results. NFL uncertainty uses season/week blocks; NHL/MLB use Eastern game-date blocks. Blocks can still be dependent. Intervals require at least five blocks and are unavailable below that; five blocks or 100 settled games does not establish a betting edge. Repeated monitoring intervals are not sequential significance tests. No model promotion, forecast changes, wagers, or profits are inferred.

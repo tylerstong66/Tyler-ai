@@ -1,9 +1,7 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "errors": [
-    "MLB: Daily official snapshots conflict"
-  ],
+  "errors": [],
   "leagues": [
     {
       "NO_BET": true,
@@ -33,6 +31,35 @@
       "recorded": 51,
       "settled": 37,
       "sport": "NHL"
+    },
+    {
+      "NO_BET": true,
+      "actual_wagers": 0,
+      "availability_effect_enabled": false,
+      "enrollment_cap": null,
+      "first_review_milestone": 100,
+      "paired_games": 5,
+      "paired_metrics": {
+        "fixed_elo": {
+          "brier": 0.5222938445673336,
+          "correct": 0.6,
+          "log_loss": 0.7160812975523976
+        },
+        "market": {
+          "brier": 0.6189037574652679,
+          "correct": 0.4,
+          "log_loss": 0.8142930123891841
+        },
+        "model": {
+          "brier": 0.5221970150865647,
+          "correct": 0.4,
+          "log_loss": 0.7155814278462906
+        }
+      },
+      "pending": 3,
+      "recorded": 10,
+      "settled": 7,
+      "sport": "MLB"
     }
   ]
 }
