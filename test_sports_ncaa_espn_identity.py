@@ -106,7 +106,7 @@ class CollegeIdentityTests(unittest.TestCase):
 
     def test_missing_school_location_and_alias_never_fuzzy_match(self):
         college={"league":"NCAAM_D1","ncaa_game_id":"77",
-                 "home_name":"Penn St.","away_name":"Michigan",
+                 "home_name":"Penn Stzx","away_name":"Michigan",
                  "source_start_time_epoch":str(KICKOFF_EPOCH),
                  "provider_reported_final":False}
         espn_game={"league":"NCAAM_D1","game_id":"123","espn_game_id":"123",
@@ -121,6 +121,46 @@ class CollegeIdentityTests(unittest.TestCase):
         out=identity.reconcile([college],[espn_game])
         self.assertEqual(out["unverified"][0]["reason"],
                          "ESPN_SCHOOL_LOCATION_UNAVAILABLE")
+
+    def test_curated_FBS_name_variants_cannot_bypass_unique_time_and_team_checks(self):
+        self.assertEqual(identity.official_school_name("NCAAF_FBS","Penn St."),"pennstate")
+        self.assertEqual(identity.official_school_name("NCAAF_FBS","Mississippi St."),
+                         "mississippistate")
+        self.assertEqual(identity.official_school_name("NCAAF_FBS","Army West Point"),"army")
+        self.assertEqual(identity.official_school_name("NCAAF_FBS","FIU"),"floridainternational")
+        self.assertEqual(identity.official_school_name("NCAAF_FBS","Penn Stzx"),"pennstzx")
+        self.assertEqual(identity.official_school_name("NCAAM_D1","Penn St."),"pennst")
+        self.assertEqual(len(set(identity.FBS_NCAA_TO_ESPN_SCHOOL.values())),
+                         len(identity.FBS_NCAA_TO_ESPN_SCHOOL))
+        ncaa_source={
+            "league":"NCAAF_FBS","ncaa_game_id":"654321",
+            "home_name":"Mississippi St.","away_name":"Army West Point",
+            "source_start_time_epoch":str(KICKOFF_EPOCH),
+            "provider_reported_final":False,
+        }
+        espn_source={
+            "league":"NCAAF_FBS","espn_game_id":"401100001",
+            "scheduled_start_utc":KICKOFF,
+            "home_name":"Mississippi State Bulldogs","away_name":"Army Black Knights",
+            "school_names":{"home":"mississippistate","away":"army"},
+            "provider_completed":False,
+        }
+        found=identity.reconcile([ncaa_source],[espn_source])
+        self.assertEqual(found["unique_source_game_identity_matches"],1)
+        self.assertTrue(found["matched"][0]["curated_fbs_home_alias"])
+        self.assertTrue(found["matched"][0]["curated_fbs_away_alias"])
+        self.assertEqual(found["matched"][0]["ncaa_home_school_as_recorded"],
+                         "Mississippi St.")
+        self.assertFalse(found["matched"][0]["independent_result_grading_enabled"])
+        # A canonical spelling cannot override an actual kickoff change.
+        shifted={**ncaa_source,"source_start_time_epoch":str(KICKOFF_EPOCH+7200)}
+        declined=identity.reconcile([shifted],[espn_source])
+        self.assertEqual(declined["unique_source_game_identity_matches"],0)
+        self.assertEqual(declined["unverified"][0]["reason"],"NCAA_START_CHANGED")
+        # Nor may one school alias turn a different opponent into a match.
+        changed={**ncaa_source,"away_name":"Other Academy"}
+        declined=identity.reconcile([changed],[espn_source])
+        self.assertEqual(declined["unique_source_game_identity_matches"],0)
 
     def test_source_tampering_and_stale_sources_fail_before_any_new_crosswalk(self):
         with tempfile.TemporaryDirectory() as td:
