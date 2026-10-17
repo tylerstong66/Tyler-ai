@@ -35,3 +35,26 @@ Later **archived pregame** pairs can explain why a first-capture price was missi
 For future collections, `sports_market_evidence.collect_followups` saves the first usable later quote for an originally unpriced forecast under `market_followups/<game_id>.json`, exclusively and separately. It requires the immutable prediction hash; unique saved ESPN ID; exact home/away/start; a retained hashed matching scoreboard; pregame/uncompleted state; and both observation and local recording before the saved start. Cached observations before the prediction was recorded are not accepted as later quotes. The price remains an observed current quote, never a verified closing line. These quote records link to their prediction and source with hashes and cannot replace an existing follow-up or any prediction/result. Their count is reported separately; the current scoring reviews do not use them. Any future scoring of this different quote-selection policy must be explicitly labeled as a separate analysis.
 
 No schedule frequency, model weights, frozen assets, forecast selection window, wagers, or existing score definitions change.
+
+## Latest MLB daily-source quarantine status
+
+When overlapping official MLB day feeds represent the same game ID with
+contradictory scheduled starts, team IDs, final scores or state, the main
+collector now quarantines that game instead of guessing a correct row or
+stopping unrelated research. The audit reads each **completed** capture's
+immutable manifest and explicitly reports `latest_official_schedule_complete`
+(`false` for a partial latest official source),
+`latest_official_daily_conflicts` including saved request dates and source
+start times, and `official_daily_conflicted_capture_count`. Legacy
+manifests without the newer completeness flag return `null`, never a
+retroactive claim that all historical schedule feeds were complete.
+
+In the upcoming-game readiness view, a game still under latest official
+daily-source quarantine receives
+`official_daily_snapshot_conflict_quarantined` and can **never** be marked
+ready merely because the archived ESPN listing or earlier frozen forecast
+seems consistent. Completed/succeeded GitHub collection may therefore be
+**partially complete by official MLB game coverage**. The audit does not
+rewrite, settle, combine or backfill any original forecast, time, team,
+price or official result. Quarantine is evidence requiring later independent
+provider verification, not a betting signal.
