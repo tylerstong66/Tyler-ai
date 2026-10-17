@@ -14,13 +14,18 @@ under `college_nba_source_v1`.
 
 The `sports_expansion_historical_capture.py` retriever issues bounded
 calendar-day ESPN requests with league-specific groups and a 500-event
-cap. It captures **up to 10 new calendar days per league per scheduled
-run**, at most 30 total requests; previous receipts are reverified
+cap. It captures **up to 20 new calendar days per league per scheduled
+run**, at most 60 total requests; previous receipts are reverified
 against original gzip SHA256 source bytes and normalized scoreboard
 before any further writes. All requests in the selected batch are
 parsed and validated before writing any new files. Repeated jobs skip
 already sealed days; no original snapshot can be changed or silently
-overwritten. Provider errors or truncated slates fail the batch.
+overwritten. Provider errors or truncated slates fail the batch. Before any network
+requests, the collector also rejects unplanned files, missing halves of a
+sealed source receipt, unexpected calendar dates, overlapping or unordered
+training/validation partitions, modified SHA digests, and saved observation
+timestamps later than the current audit clock. The increased collection
+budget does not loosen those immutability or timing checks.
 
 A three-times-daily GitHub Actions job
 (`college_nba_history_source.yml`) incrementally retains these dated
