@@ -1,0 +1,46 @@
+# Separate 2024 training / 2025 validation source seasons
+
+**Strict research evidence acquisition only. No forecasts, wagers, performance claims, live deployment, or model promotions.**
+
+This cohort is wholly separate from prospective original NFL/NHL/MLB
+forecasts, and from the 2026 FBS/men's college hoops/NBA source snapshots
+under `college_nba_source_v1`.
+
+| League | Retrospective training request window | Unseen validation request window |
+|---|---|---|
+| NBA | 2024-10-22 through 2025-06-22 | 2025-10-21 through 2026-06-23 |
+| NCAA FBS football | 2024-08-24 through 2025-01-21 | 2025-08-23 through 2026-01-20 |
+| NCAA Division I men's basketball | 2024-11-04 through 2025-04-08 | 2025-11-03 through 2026-04-07 |
+
+The `sports_expansion_historical_capture.py` retriever issues bounded
+calendar-day ESPN requests with league-specific groups and a 500-event
+cap. It captures **up to 10 new calendar days per league per scheduled
+run**, at most 30 total requests; previous receipts are reverified
+against original gzip SHA256 source bytes and normalized scoreboard
+before any further writes. All requests in the selected batch are
+parsed and validated before writing any new files. Repeated jobs skip
+already sealed days; no original snapshot can be changed or silently
+overwritten. Provider errors or truncated slates fail the batch.
+
+A three-times-daily GitHub Actions job
+(`college_nba_history_source.yml`) incrementally retains these dated
+source receipts. `COVERAGE.latest.json` exposes requested/retained
+calendar days by league and is not a claim that every actual NCAA or
+NBA event was present in the provider response. Zero-event days are
+still source-observed dates, not proof of no games; postponements,
+provider schedule changes and unknown dates require separate analysis.
+
+**Future research gate:** Full closed-season source coverage, explicit
+game-ID and timing integrity, independent official-result corroboration,
+and deterministic per-sport chronological leakage checks must all pass
+before any training/validation results become accepted. The 2025
+validation season may not be used to tune a 2024-fitted candidate
+after examining its results. Same-season retrospective guesses may not
+be recorded as historical pregame paper forecasts. The 2026-27
+prospective experiments may enroll only new future games with original
+immutable pregame freeze timestamps.
+
+This collector sets `training_allowed=false`,
+`live_forecasts_allowed=false`, `historical_backfilled_forecasts=0`,
+`NO_BET=true`, `actual_wagers=0` and
+`promotion_allowed=false` until a separate evidence-reviewed phase.
