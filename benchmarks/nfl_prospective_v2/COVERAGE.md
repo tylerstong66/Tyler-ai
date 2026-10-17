@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-17T12:11:57.557982+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-10-17T13:43:40.957429+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 14 / 14 / 0 |
+| Recorded / settled / pending | 15 / 14 / 1 |
 | Started games in retained official schedules / enrolled | 14 / 14 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 14 / 14 |
+| Enrollment-time priced forecasts | 15 / 15 |
 | Settled with enrollment prices / decisive market-paired | 14 / 13 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -25,10 +25,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-17T12:11:57.557982+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
+As of retained evidence: 2026-10-17T13:43:40.957429+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
+| 2026_06_HOU_JAX | HOU at JAX | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -49,11 +50,12 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026_05_MIN_NO | MIN at NO | 2026-10-11T17:00:00+00:00 | enrolled | — |
 | 2026_05_NYG_WAS | NYG at WAS | 2026-10-11T17:00:00+00:00 | enrolled | — |
 | 2026_05_SF_SEA | SF at SEA | 2026-10-11T20:25:00+00:00 | enrolled | — |
+| 2026_06_HOU_JAX | HOU at JAX | 2026-10-18T13:30:00+00:00 | enrolled | — |
 | 2026_06_SEA_DEN | SEA at DEN | 2026-10-16T00:15:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 51. Latest: `20261017T121154953721Z`.
+Audited capture manifests: 52. Latest: `20261017T134337892583Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
