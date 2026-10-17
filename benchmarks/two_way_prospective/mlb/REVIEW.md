@@ -83,7 +83,7 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 Latest saved manifest: benchmarks/two_way_prospective/mlb/captures/20261016T233615539073Z/manifest.json.
 Manifest completion field: True. Errors: [{"error": "Unique saved event required for follow-up quote", "game_id": "849808", "stage": "market_followup"}]. Exclusions: [].
 Optional availability errors: [].
-Newer saved collection failure: null.
+Newer saved collection failure: {"collection_completed": false, "error": "Daily official snapshots conflict", "observed_at": "2026-10-17T04:27:25.492247+00:00"}.
 Manifest completion alone does not imply absence of per-game errors.
 
 Experimental descriptive results. NFL uncertainty uses season/week blocks; NHL/MLB use Eastern game-date blocks. Blocks can still be dependent. Intervals require at least five blocks and are unavailable below that; five blocks or 100 settled games does not establish a betting edge. Repeated monitoring intervals are not sequential significance tests. No model promotion, forecast changes, wagers, or profits are inferred.
