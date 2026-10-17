@@ -1,6 +1,6 @@
 # Tyler NHL prospective paper test
 
-Recorded: **51** · Settled: **37** · Pending: **14**
+Recorded: **52** · Settled: **38** · Pending: **14**
 
 **NO BET — actual wagers $0.**
 
@@ -8,9 +8,9 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 
 | Model | Paired games | Brier | Log loss | Accuracy |
 |---|---:|---:|---:|---:|
-| model | 37 | 0.4761 | 0.6691 | 59.5% |
-| fixed_elo | 37 | 0.4535 | 0.6446 | 54.1% |
-| market | 37 | 0.4572 | 0.6483 | 54.1% |
+| model | 38 | 0.4747 | 0.6677 | 60.5% |
+| fixed_elo | 38 | 0.4491 | 0.6402 | 55.3% |
+| market | 38 | 0.4567 | 0.6478 | 55.3% |
 
 | Game | Start (Eastern) | Model pick | Win probability |
 |---|---|---|---:|
@@ -65,6 +65,7 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | BOS at LAK | Oct 17 09:00 PM | BOS | 54.0% |
 | EDM at UTA | Oct 17 10:00 PM | UTA | 53.3% |
 | PIT at VGK | Oct 17 10:00 PM | VGK | 56.5% |
+| CBJ at MIN | Oct 18 06:00 PM | MIN | 55.6% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
 

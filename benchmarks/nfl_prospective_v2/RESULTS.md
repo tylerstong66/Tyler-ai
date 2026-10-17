@@ -1,6 +1,6 @@
 # Tyler NFL prospective paper test
 
-Recorded: **22/100** · Settled: **14** · Pending: **8**
+Recorded: **25/100** · Settled: **14** · Pending: **11**
 
 **NO BET — actual wagers $0.**
 
@@ -36,6 +36,9 @@ Frozen experimental v2 compared with frozen v1 and market odds observed before k
 | NYJ at NE | Oct 18 01:00 PM | NE | 81.3% | Oct 17 01:10 PM |
 | PIT at TB | Oct 18 01:00 PM | PIT | 50.8% | Oct 17 01:10 PM |
 | TEN at IND | Oct 18 01:00 PM | IND | 71.7% | Oct 17 01:10 PM |
+| ARI at LA | Oct 18 04:05 PM | LA | 80.3% | Oct 17 06:19 PM |
+| BUF at LV | Oct 18 04:25 PM | BUF | 74.5% | Oct 17 06:19 PM |
+| LAC at KC | Oct 18 04:25 PM | KC | 76.9% | Oct 17 06:19 PM |
 
 Probabilities include a small tie allowance. These picks are experimental model outputs, not wagering recommendations. Source timing and scheduling delays can leave coverage gaps; missed games are logged rather than backfilled after kickoff.
 
