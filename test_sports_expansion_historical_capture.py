@@ -103,6 +103,79 @@ class HistoricalCaptureTests(unittest.TestCase):
                           per_league=2,date_plan=PLAN)
             self.assertFalse((root/h.ROOT/"sources"/"NBA"/"validation").exists())
 
+    def test_default_budget_is_20_new_source_days_per_league(self):
+        # Synthetic plan keeps the network call count deterministic.
+        dates=[f"2024-10-{day:02d}" for day in range(1,22)]
+        synthetic={sport:{"train":dates,"validation":["2025-10-21"]}
+                   for sport in h.ORDER}
+        called=[]
+        def source(url):
+            called.append(url)
+            return payload()
+        with tempfile.TemporaryDirectory() as td:
+            result=h.capture(source,base=td,now=CLOCK,date_plan=synthetic)
+            self.assertEqual(len(called),60)
+            for sport in h.ORDER:
+                self.assertEqual(result["sport_day_status"][sport]["archived_source_dates"],20)
+                self.assertEqual(result["sport_day_status"][sport]["remaining_source_dates"],2)
+            self.assertFalse(result["training_allowed"])
+            self.assertEqual(result["historical_backfilled_forecasts"],0)
+
+    def test_rejects_unplanned_source_file_before_contacting_provider(self):
+        for rogue in ("extra_source", "orphan", "misplaced", "unlisted_date"):
+            with self.subTest(rogue=rogue),tempfile.TemporaryDirectory() as td:
+                root=Path(td)
+                h.capture(lambda _:payload(),base=root,now=CLOCK,
+                          per_league=1,date_plan=PLAN)
+                parent=root/h.ROOT/"sources"/"NBA"/"train"
+                if rogue=="extra_source":
+                    (parent/"unexpected.log").write_text("not sealed evidence")
+                elif rogue=="orphan":
+                    (parent/"2024-10-23.json.gz").write_bytes(b"orphan")
+                elif rogue=="misplaced":
+                    bogus=root/h.ROOT/"sources"/"NBA"/"unknown"
+                    bogus.mkdir()
+                    (bogus/"2024-10-22.json.gz").write_bytes(b"not planned")
+                elif rogue=="unlisted_date":
+                    (parent/"2024-10-25.receipt.json").write_text("{}")
+                calls=[]
+                with self.assertRaisesRegex(ValueError,"Unknown or misplaced"):
+                    h.capture(lambda url:(calls.append(url),payload())[1],
+                              base=root,now=CLOCK,date_plan=PLAN)
+                self.assertEqual(calls,[])
+
+    def test_existing_future_dated_source_receipt_blocks_append(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            h.capture(lambda _:payload(),base=root,now=CLOCK,
+                      per_league=1,date_plan=PLAN)
+            r=root/h.ROOT/"sources"/"NBA"/"train"/"2024-10-22.receipt.json"
+            receipt=json.loads(r.read_text())
+            receipt["recorded_at_utc"]="2026-10-18T14:00:00+00:00"
+            r.write_text(json.dumps(receipt))
+            attempts=[]
+            with self.assertRaisesRegex(ValueError,"future observation timestamp"):
+                h.capture(lambda url:(attempts.append(url),payload())[1],
+                          base=root,now=CLOCK,date_plan=PLAN)
+            self.assertEqual(attempts,[])
+
+    def test_rejects_overlapping_or_unsorted_source_season_dates(self):
+        for kind in ("duplicate", "overlap", "reverse", "empty"):
+            with self.subTest(kind=kind),tempfile.TemporaryDirectory() as td:
+                plan={league:{split:list(dates) for split,dates in PLAN[league].items()}
+                      for league in h.ORDER}
+                if kind=="duplicate":
+                    plan["NBA"]["train"]*=2
+                elif kind=="overlap":
+                    plan["NBA"]["validation"]=["2024-10-22"]
+                elif kind=="reverse":
+                    plan["NBA"]["train"]=["2024-10-23","2024-10-22"]
+                else:
+                    plan["NBA"]["train"]=[]
+                with self.assertRaises(ValueError):
+                    h.capture(lambda _:payload(),base=td,now=CLOCK,date_plan=plan)
+                self.assertFalse((Path(td)/h.ROOT).exists())
+
     def test_budget_future_and_wrong_splits_are_refused(self):
         with tempfile.TemporaryDirectory() as td:
             for budget in (0,31,True):
