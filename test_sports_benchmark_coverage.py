@@ -149,6 +149,56 @@ class CoverageAuditTests(unittest.TestCase):
                 elif fault=='abnormal':schedule['1']['game']['state']='in'
                 self.assertEqual(c.pregame_readiness(schedule,predictions,events,set(),at)['ready_games'],0)
 
+    def test_readiness_never_calls_conflicting_official_game_ready(self):
+        at,schedule,predictions,events=self.preflight_fixture()
+        ready=c.pregame_readiness(schedule,predictions,events,set(),at)
+        self.assertEqual(ready['ready_games'],1)
+        quarantined=c.pregame_readiness(
+            schedule,predictions,events,set(),at,quarantined_ids={'1'})
+        self.assertEqual(quarantined['ready_games'],0)
+        self.assertFalse(quarantined['games'][0]['ready'])
+        self.assertIn('official_daily_snapshot_conflict_quarantined',
+                      quarantined['games'][0]['issues'])
+        self.assertEqual(predictions['1']['kickoff'],'2026-10-15T20:00:00Z')
+
+    def test_mlb_coverage_manifest_preserves_latest_quarantine_and_partial_state(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            self.fixture(root)
+            manifests=sorted((root/'captures').glob('*/manifest.json'))
+            mlb_url=('https://statsapi.mlb.com/api/v1/schedule?'
+                     'sportId=1&date=2026-10-12&hydrate=probablePitcher,linescore,team')
+            for path in manifests:
+                payload=json.loads(path.read_text())
+                for receipt in payload['sources']:
+                    receipt['source_url']=mlb_url
+                if path==manifests[-1]:
+                    payload['official_schedule_complete']=False
+                    payload['official_daily_conflicts']=[{
+                        'game_id':'1',
+                        'reason':'CONFLICTING_OFFICIAL_DAILY_SNAPSHOTS_QUARANTINED',
+                        'observations':[
+                            {'queried_day':'2026-10-12',
+                             'scheduled_start_utc':'2026-10-12T21:00:00Z'},
+                            {'queried_day':'2026-10-13',
+                             'scheduled_start_utc':'2026-10-13T22:00:00Z'}],
+                        'decision':'no_forecast_no_settlement_no_start_rewrite',
+                    }]
+                n.write_json(path,payload)
+            report=c.audit(root,'MLB',('model','fixed_elo'))
+            self.assertIs(report['latest_official_schedule_complete'],False)
+            self.assertEqual(report['official_daily_conflicted_capture_count'],1)
+            self.assertEqual(len(report['latest_official_daily_conflicts']),1)
+            self.assertEqual(report['latest_official_daily_conflicts'][0]['game_id'],'1')
+            self.assertEqual(report['latest_official_daily_conflicts'][0]['capture'],
+                             manifests[-1].parent.name)
+            human=c.render(report)
+            self.assertIn('partial_conflicting_daily_sources',human)
+            self.assertIn('Game 1: conflicting official day rows',human)
+            self.assertIn('Partial source coverage',human)
+            self.assertEqual(report['settled'],0)
+            self.assertEqual(report['saved'],0)
+
     def test_readiness_names_and_quantifies_frozen_start_mismatch(self):
         at,schedule,predictions,events=self.preflight_fixture()
         schedule["1"]["game"]["kickoff"]="2026-10-15T22:00:00Z"
