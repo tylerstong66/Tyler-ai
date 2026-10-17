@@ -1,0 +1,43 @@
+name: College football, college hoops and NBA research evidence
+on:
+  push:
+    branches: ['main']
+    paths:
+      - sports_expansion_observer.py
+      - test_sports_expansion_observer.py
+      - .github/workflows/college_nba_source_observation.yml
+  workflow_dispatch:
+  schedule:
+    - cron: '10 5,13,21 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: college-nba-paper-observer-v1
+  cancel-in-progress: false
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned transport
+        run: python -m pip install requests==2.32.5
+      - name: Check game-source parser and forecast isolation
+        run: python -m unittest -v test_sports_expansion_observer
+      - name: Retain timestamped source-only college and NBA snapshots
+        id: observation
+        run: python sports_expansion_observer.py --days-ahead 3
+      - name: Publish only fully validated research capture
+        if: ${{ steps.observation.outcome == 'success' }}
+        run: |
+          git add benchmarks/college_nba_source_v1
+          if ! git diff --cached --quiet; then
+            git config user.name github-actions\[bot\]
+            git config user.email 41898282+github-actions\[bot\]@users.noreply.github.com
+            git commit -m 'Record provider-only NCAA and NBA schedule evidence [no bets]'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
