@@ -8,7 +8,6 @@ enable training before coverage and leakage tests are independently approved.
 import gzip
 import hashlib
 import json
-import re
 from datetime import date,datetime,timedelta,timezone
 from pathlib import Path
 
@@ -108,8 +107,9 @@ def capture(fetch,*,base=Path("."),now=None,per_league=20,date_plan=None):
                     raise ValueError("Historical plan requires canonical ISO dates")
                 for extension in (".json.gz",".receipt.json"):
                     known.add((league,split,day+extension))
-        if len(set(per_split))!=len(per_split) or (per_split and
-               max(plan[league]["train"])>=min(plan[league]["validation"])):
+        if (not plan[league]["train"] or not plan[league]["validation"]
+                or len(set(per_split))!=len(per_split)
+                or max(plan[league]["train"])>=min(plan[league]["validation"])):
             raise ValueError("Training and validation historical days overlap or misorder")
     files_root=base/ROOT/"sources"
     if files_root.exists():
