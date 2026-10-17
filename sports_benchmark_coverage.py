@@ -309,6 +309,27 @@ def render(data):
         lines.append(f"| {row['game_id']} | {row['away']} at {row['home']} | {row['settled']} | {row['enrollment_diagnosis']['status'].replace('_', ' ')} | {later['observed_at'] if later else 'Unavailable'} |")
     if not data['market_gaps']:
         lines += ['| None | — | — | — | — |']
+    if data['sport'] == 'MLB':
+        completeness=data.get('latest_official_schedule_complete')
+        conflicts=data.get('latest_official_daily_conflicts', [])
+        state=('partial_conflicting_daily_sources' if completeness is False else
+               'consistent_daily_sources' if completeness is True else
+               'not_explicitly_reported_by_legacy_capture')
+        lines += ['', '## Official daily-source coverage', '',
+                  f"Latest capture status: **{state}**. Quarantined games: "
+                  f"**{len(conflicts)}**. Completed capture attempts with "
+                  f"official daily-source conflicts: "
+                  f"**{data.get('official_daily_conflicted_capture_count', 0)}**.", '']
+        for item in conflicts:
+            timestamps=', '.join(
+                f"{obs['queried_day']} -> {obs['scheduled_start_utc']}"
+                for obs in item['observations'])
+            lines.append(
+                f"- Game {item['game_id']}: conflicting official day rows "
+                f"({timestamps}); no new forecasts, grading or market quote "
+                f"backfills for that game.")
+        if conflicts:
+            lines += ['', 'Partial source coverage: collector execution succeeded for unaffected games only; quarantined games are not confirmed ready or graded.', '']
     lines += ['', 'Later archived pairs explain timing gaps; they are not retrospectively inserted into forecasts or scored market comparisons.', '',
               '## Next 24-hour pregame readiness', '',
               f"As of retained evidence: {data['pregame_readiness']['as_of_evidence_at']}. "
