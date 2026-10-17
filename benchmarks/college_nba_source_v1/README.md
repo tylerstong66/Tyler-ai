@@ -30,6 +30,33 @@ rather than an unsupported statement of coverage completeness. Unknown
 season type is excluded, **not** assumed regular season. NBA preseason and
 college nonregular competitions are excluded.
 
+## NCAA-owned 2026 football and men's basketball scoreboard evidence
+
+The source collector now optionally queries **NCAA-controlled**
+`https://sdataprod.ncaa.com/` using the documented 2026 persisted GraphQL
+scoreboard query and its separately scoped `MFB/division 11` (FBS) and
+`MBB/division 1` (men's D1) variables. This is not the defunct
+`data.ncaa.com/casablanca` endpoint nor an unaudited third-party score
+republication. Source responses are stored separately, compressed,
+SHA-256-linked and grouped by NCAA league, date/week and immutable retrieval
+timestamp.
+
+Football retrieval tests a bounded **estimated** current five-week window
+rather than claiming that a calendar week formula is an authoritative FBS
+schedule index. Men's basketball starts data retrieval within the declared
+November opening window using exact `contestDate` request variables. Every
+NCAA contest must have exactly two independent home/away teams, a unique
+NCAA game ID and a known source state. Contradictory representations in
+overlapping NCAA windows are quarantined, not selected by outcome. The
+official provider's `F` status is archived as a provider-observed final
+only; **results remain ungraded** until there is an independently verified
+cross-platform team/game mapping to Tyler's existing ESPN paper data.
+
+The step remains optional: unreachable endpoints or a changed GraphQL
+query are reported as unverified and may not rewrite or block the validated
+ESPN archive. No inferred football week completeness, player-team mapping,
+betting outcome, training or actual wagers can result from this step.
+
 ## Independent NBA league-owned schedule checks
 
 NBA now has an **additional, independent observation source**:
