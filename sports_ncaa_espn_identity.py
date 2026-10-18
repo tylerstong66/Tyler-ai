@@ -15,6 +15,7 @@ from datetime import datetime,timezone,timedelta
 from pathlib import Path
 
 import sports_expansion_observer as espn
+from sports_expansion_audit import bounded_gzip_read
 import sports_ncaa_official_source as ncaa
 
 ROOT=espn.ROOT/"college_identity"
@@ -90,7 +91,7 @@ def verify_ncaa(folder, manifest):
         compressed=folder/snap["source_file"]
         if not compressed.is_file() or compressed.stat().st_size>ncaa.MAX_BYTES+1_000_000:
             raise ValueError("Missing NCAA archived source")
-        raw=gzip.decompress(compressed.read_bytes())
+        raw=bounded_gzip_read(compressed.read_bytes(),limit=ncaa.MAX_BYTES)
         if hashlib.sha256(raw).hexdigest()!=snap["source_sha256"]:
             raise ValueError("NCAA original archived source SHA mismatch")
         rows=ncaa.official_scoreboard(raw,league)
@@ -128,7 +129,7 @@ def verify_espn(folder,manifest):
         path=folder/snap["compressed_file"]
         if not path.is_file():
             raise ValueError("Missing saved ESPN college source file")
-        raw=gzip.decompress(path.read_bytes())
+        raw=bounded_gzip_read(path.read_bytes())
         if hashlib.sha256(raw).hexdigest()!=snap["original_response_sha256"]:
             raise ValueError("ESPN college source raw digest mismatch")
         payload=json.loads(raw)
