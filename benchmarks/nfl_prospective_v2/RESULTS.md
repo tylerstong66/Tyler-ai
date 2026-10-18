@@ -1,6 +1,6 @@
 # Tyler NFL prospective paper test
 
-Recorded: **25/100** · Settled: **14** · Pending: **11**
+Recorded: **26/100** · Settled: **14** · Pending: **12**
 
 **NO BET — actual wagers $0.**
 
@@ -39,6 +39,7 @@ Frozen experimental v2 compared with frozen v1 and market odds observed before k
 | ARI at LA | Oct 18 04:05 PM | LA | 80.3% | Oct 17 06:19 PM |
 | BUF at LV | Oct 18 04:25 PM | BUF | 74.5% | Oct 17 06:19 PM |
 | LAC at KC | Oct 18 04:25 PM | KC | 76.9% | Oct 17 06:19 PM |
+| DAL at GB | Oct 18 08:20 PM | GB | 56.4% | Oct 17 09:03 PM |
 
 Probabilities include a small tie allowance. These picks are experimental model outputs, not wagering recommendations. Source timing and scheduling delays can leave coverage gaps; missed games are logged rather than backfilled after kickoff.
 

@@ -2,12 +2,12 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-17T22:19:33.306966+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
+Evidence through **2026-10-18T01:03:06.827689+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
 
 | Coverage | Games |
 |---|---:|
 | Recorded / settled / pending | 10 / 7 / 3 |
-| Started games in retained official schedules / enrolled | 8 / 8 |
+| Started games in retained official schedules / enrolled | 9 / 9 |
 | Observed missing started games | 0 |
 | Enrollment-time priced forecasts | 7 / 10 |
 | Settled with enrollment prices / decisive market-paired | 5 / 5 |
@@ -23,7 +23,7 @@ Evidence through **2026-10-17T22:19:33.306966+00:00**; cohort began 2026-10-11T1
 
 ## Official daily-source coverage
 
-Latest capture status: **partial_conflicting_daily_sources**. Quarantined games: **1**. Completed capture attempts with official daily-source conflicts: **6**.
+Latest capture status: **partial_conflicting_daily_sources**. Quarantined games: **1**. Completed capture attempts with official daily-source conflicts: **7**.
 
 - Game 849817: conflicting official day rows (2026-10-16 -> 2026-10-17T00:00:00+00:00, 2026-10-18 -> 2026-10-18T21:08:00+00:00); no new forecasts, grading or market quote backfills for that game.
 
@@ -34,12 +34,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-17T22:19:33.306966+00:00. Ready: 0 / 2 observed games. Status: attention.
+As of retained evidence: 2026-10-18T01:03:06.827689+00:00. Ready: 0 / 1 observed games. Status: attention.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 849816 | Tampa Bay Rays at Cleveland Guardians | True | False | True | official_identity_differs_from_forecast, saved_start_differs_from_latest_official_start, latest_scoreboard_identity_conflict |
-| 849817 | Tampa Bay Rays at Cleveland Guardians | True | False | False | official_daily_snapshot_conflict_quarantined, official_game_not_pregame, official_identity_differs_from_forecast, saved_start_differs_from_latest_official_start, latest_scoreboard_not_pregame, latest_scoreboard_identity_conflict, latest_scoreboard_market_pair_missing |
+| 849817 | Tampa Bay Rays at Cleveland Guardians | True | False | False | official_daily_snapshot_conflict_quarantined, official_identity_differs_from_forecast, saved_start_differs_from_latest_official_start, latest_scoreboard_not_pregame, latest_scoreboard_identity_conflict, latest_scoreboard_market_pair_missing |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -60,7 +59,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 51. Latest: `20261017T221930546195Z`.
+Audited capture manifests: 52. Latest: `20261018T010302996981Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

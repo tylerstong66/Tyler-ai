@@ -1,8 +1,8 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-10-17T22:19:33.306966+00:00",
-  "capture_count": 51,
+  "as_of_evidence_at": "2026-10-18T01:03:06.827689+00:00",
+  "capture_count": 52,
   "cohort_started_at": "2026-10-11T15:59:30.281973+00:00",
   "completion_note": "Only manifests without an explicit incomplete state are audited; legacy manifests are retained.",
   "decisive_market_paired": 5,
@@ -118,7 +118,7 @@
       "lead_hours": 12.007747020555556,
       "pregame_schedule_observations_in_window": 12,
       "recorded_at": "2026-10-17T12:07:32.110726+00:00",
-      "started_by_as_of": false,
+      "started_by_as_of": true,
       "status": "enrolled"
     },
     {
@@ -133,7 +133,7 @@
         "game_id": "849817"
       },
       "lead_hours": 70.81021366027778,
-      "pregame_schedule_observations_in_window": 34,
+      "pregame_schedule_observations_in_window": 35,
       "recorded_at": "2026-10-15T22:19:23.230823+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -170,7 +170,7 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "b72fea3916e655852cc9478029693b75f2add07b0eab6543e619fb9e91496721",
+  "input_digest": "eb16a1e59faa8946fa61febfa11fce197a1b5b6b0cad7cb5806bff210de2e179",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -199,8 +199,8 @@
       "to": "2026-10-12T07:21:47.631288+00:00"
     }
   ],
-  "latest_attempted_capture": "20261017T221930546195Z",
-  "latest_capture": "20261017T221930546195Z",
+  "latest_attempted_capture": "20261018T010302996981Z",
+  "latest_capture": "20261018T010302996981Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
@@ -209,7 +209,7 @@
   ],
   "latest_official_daily_conflicts": [
     {
-      "capture": "20261017T221930546195Z",
+      "capture": "20261018T010302996981Z",
       "decision": "no_forecast_no_settlement_no_start_rewrite",
       "game_id": "849817",
       "observations": [
@@ -225,20 +225,20 @@
         },
         {
           "away_id": "139",
-          "away_score": 0,
+          "away_score": null,
           "completed": false,
           "home_id": "114",
-          "home_score": 0,
+          "home_score": null,
           "queried_day": "2026-10-18",
           "scheduled_start_utc": "2026-10-18T21:08:00+00:00",
-          "state": "in"
+          "state": "pre"
         }
       ],
       "reason": "CONFLICTING_OFFICIAL_DAILY_SNAPSHOTS_QUARANTINED"
     }
   ],
   "latest_official_schedule_complete": false,
-  "latest_official_schedule_observed_at": "2026-10-17T22:19:33.268145+00:00",
+  "latest_official_schedule_observed_at": "2026-10-18T01:03:06.683335+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [
     {
@@ -315,34 +315,11 @@
   ],
   "minimum_forecast_lead_hours": 7.97023246888889,
   "observed_missing_started_games": [],
-  "official_daily_conflicted_capture_count": 6,
+  "official_daily_conflicted_capture_count": 7,
   "pending": 3,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-10-17T22:19:33.306966+00:00",
+    "as_of_evidence_at": "2026-10-18T01:03:06.827689+00:00",
     "games": [
-      {
-        "away": "Tampa Bay Rays",
-        "enrolled": true,
-        "enrollment_priced": true,
-        "game_id": "849816",
-        "home": "Cleveland Guardians",
-        "issues": [
-          "official_identity_differs_from_forecast",
-          "saved_start_differs_from_latest_official_start",
-          "latest_scoreboard_identity_conflict"
-        ],
-        "kickoff": "2026-10-18T00:08:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-17T22:19:33.129448+00:00",
-        "latest_scoreboard_priced": true,
-        "ready": false,
-        "saved_vs_latest_official_start": {
-          "action": "no_regrade_or_rewrite_of_frozen_forecast",
-          "latest_minus_saved_minutes": 8.0,
-          "latest_official_start_utc": "2026-10-18T00:08:00+00:00",
-          "saved_forecast_start_utc": "2026-10-18T00:00:00+00:00"
-        },
-        "separate_followup_recorded": false
-      },
       {
         "away": "Tampa Bay Rays",
         "enrolled": true,
@@ -351,7 +328,6 @@
         "home": "Cleveland Guardians",
         "issues": [
           "official_daily_snapshot_conflict_quarantined",
-          "official_game_not_pregame",
           "official_identity_differs_from_forecast",
           "saved_start_differs_from_latest_official_start",
           "latest_scoreboard_not_pregame",
@@ -359,7 +335,7 @@
           "latest_scoreboard_market_pair_missing"
         ],
         "kickoff": "2026-10-18T21:08:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-17T22:19:32.952530+00:00",
+        "latest_scoreboard_observed_at": "2026-10-18T01:03:06.182162+00:00",
         "latest_scoreboard_priced": false,
         "ready": false,
         "saved_vs_latest_official_start": {
@@ -372,7 +348,7 @@
       }
     ],
     "limitation": "Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.",
-    "observed_games": 2,
+    "observed_games": 1,
     "ready_games": 0,
     "status": "attention",
     "window_hours": 24
@@ -517,6 +493,12 @@
       "error": "OFFICIAL_DAILY_SNAPSHOT_CONFLICT_NO_NEW_QUOTE",
       "game_id": "849817",
       "stage": "market_followup"
+    },
+    {
+      "capture": "20261018T010302996981Z",
+      "error": "OFFICIAL_DAILY_SNAPSHOT_CONFLICT_NO_NEW_QUOTE",
+      "game_id": "849817",
+      "stage": "market_followup"
     }
   ],
   "saved_exclusions": [],
@@ -536,6 +518,6 @@
   "settled_enrollment_priced": 5,
   "settled_ties_with_prices": 0,
   "sport": "MLB",
-  "started_schedule_games_enrolled": 8,
-  "started_schedule_games_in_scope": 8
+  "started_schedule_games_enrolled": 9,
+  "started_schedule_games_in_scope": 9
 }

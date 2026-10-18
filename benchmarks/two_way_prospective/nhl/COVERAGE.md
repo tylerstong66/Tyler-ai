@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-17T22:19:30.462484+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-18T01:03:02.919382+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 52 / 38 / 14 |
-| Started games in retained official schedules / enrolled | 41 / 41 |
+| Recorded / settled / pending | 53 / 41 / 12 |
+| Started games in retained official schedules / enrolled | 49 / 49 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 52 / 52 |
-| Settled with enrollment prices / decisive market-paired | 38 / 38 |
+| Enrollment-time priced forecasts | 53 / 53 |
+| Settled with enrollment prices / decisive market-paired | 41 / 41 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,21 +23,14 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-17T22:19:30.462484+00:00. Ready: 11 / 11 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-18T01:03:02.919382+00:00. Ready: 4 / 4 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020125 | NYI at TOR | True | False | True | None |
-| 2026020126 | BUF at MTL | True | False | True | None |
-| 2026020127 | SJS at DET | True | False | True | None |
-| 2026020128 | OTT at PHI | True | False | True | None |
-| 2026020129 | NYR at CBJ | True | False | True | None |
-| 2026020130 | DAL at CHI | True | False | True | None |
-| 2026020131 | STL at NSH | True | False | True | None |
-| 2026020132 | BOS at LAK | True | False | True | None |
 | 2026020133 | EDM at UTA | True | False | True | None |
 | 2026020134 | PIT at VGK | True | False | True | None |
 | 2026020135 | CBJ at MIN | True | False | True | None |
+| 2026020136 | CAR at CGY | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -97,10 +90,11 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020133 | EDM at UTA | 2026-10-18T02:00:00+00:00 | enrolled | — |
 | 2026020134 | PIT at VGK | 2026-10-18T02:00:00+00:00 | enrolled | — |
 | 2026020135 | CBJ at MIN | 2026-10-18T22:00:00+00:00 | enrolled | — |
+| 2026020136 | CAR at CGY | 2026-10-19T00:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 53. Latest: `20261017T221928724821Z`.
+Audited capture manifests: 54. Latest: `20261018T010301204444Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
