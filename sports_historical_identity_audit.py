@@ -1,0 +1,86 @@
+"""Audit provider-history game identity and split leakage without model access."""
+from collections import defaultdict, Counter
+from datetime import datetime, timezone, date, timedelta
+from pathlib import Path
+import hashlib
+import json
+
+import sports_expansion_historical_capture as history
+import sports_expansion_observer as source
+
+FIELDS = ('scheduled_start_utc', 'home_team_id', 'away_team_id',
+          'season_stage', 'state', 'neutral_site', 'provider_completed', 'home_score', 'away_score')
+
+
+def audit(base=Path('.'), *, now=None):
+    base = Path(base); now = now or datetime.now(timezone.utc)
+    if now.tzinfo is None:
+        raise ValueError('Aware historical audit clock required')
+    plan = history.dates_by_league()
+    root = base / history.ROOT / 'sources'
+    known = {(league, split, day + extension)
+             for league, splits in plan.items() for split, days in splits.items()
+             for day in days for extension in ('.json.gz', '.receipt.json')}
+    for path in root.rglob('*'):
+        if path.is_file() and path.relative_to(root).parts not in known:
+            raise ValueError('Unplanned historical source file')
+    games = defaultdict(list); counts = Counter(); receipts = []
+    for league in history.ORDER:
+        for split, days in plan[league].items():
+            for day in days:
+                if not history.verify_existing(base, league, split, day, as_of=now):
+                    continue
+                path = root / league / split / (day + '.receipt.json')
+                raw = path.read_bytes(); receipt = json.loads(raw)
+                ref = {'league': league, 'split': split, 'source_date': day,
+                       'receipt_sha256': hashlib.sha256(raw).hexdigest(),
+                       'response_sha256': receipt['original_response_sha256']}
+                receipts.append(ref); counts[(league, split)] += 1
+                for row in receipt['parsed_provider_scoreboard']['games']:
+                    games[(league, row['game_id'])].append((row, ref, receipt['recorded_at_utc']))
+    quarantine = []; clean = Counter(); duplicate_observations = 0
+    for (league, game_id), found in sorted(games.items()):
+        reasons = set(); first = found[0][0]
+        duplicate_observations += len(found) - 1
+        if len({ref['split'] for _, ref, _ in found}) != 1:
+            reasons.add('GAME_ID_PRESENT_IN_TRAIN_AND_VALIDATION')
+        if any(any(row[key] != first[key] for key in FIELDS) for row, _, _ in found[1:]):
+            reasons.add('CONFLICTING_ARCHIVED_GAME_OBSERVATIONS')
+        for row, ref, observed in found:
+            kickoff = source.utc(row['scheduled_start_utc'])
+            requested = date.fromisoformat(ref['source_date'])
+            if not requested <= kickoff.date() <= requested + timedelta(days=1):
+                reasons.add('EVENT_DATE_OUTSIDE_REQUESTED_DAY')
+            allowed = plan[league][ref['split']]
+            if not (date.fromisoformat(allowed[0]) <= kickoff.date()
+                    <= date.fromisoformat(allowed[-1]) + timedelta(days=1)):
+                reasons.add('EVENT_OUTSIDE_DECLARED_SPLIT')
+            if row['provider_completed'] and source.utc(observed) <= kickoff:
+                reasons.add('FINAL_OBSERVED_AT_OR_BEFORE_SAVED_START')
+        if reasons:
+            quarantine.append({'league': league, 'game_id': game_id,
+                               'reasons': sorted(reasons),
+                               'source_receipts': [ref for _, ref, _ in found]})
+        else:
+            clean[(league, found[0][1]['split'])] += 1
+    return {'schema': 'tyler-historical-provider-identity-audit-v1',
+            'verified_source_days': len(receipts), 'receipt_provenance': receipts,
+            'unique_provider_game_ids': len(games),
+            'repeated_same_game_observations': duplicate_observations,
+            'quarantined_game_ids': len(quarantine), 'quarantined': quarantine,
+            'cohorts': {league: {split: {
+                'source_dates_verified': counts[(league, split)],
+                'nonconflicting_provider_game_ids': clean[(league, split)]}
+                for split in ('train', 'validation')} for league in history.ORDER},
+            'independently_verified_official_results': False,
+            'source_scope_complete': False, 'training_allowed': False,
+            'historical_evaluation_enabled': False, 'forecasting_enabled': False,
+            'promotion_allowed': False, 'NO_BET': True, 'actual_wagers': 0}
+
+
+def main():
+    print(json.dumps(audit(), sort_keys=True, indent=2))
+
+
+if __name__ == '__main__':
+    main()
