@@ -23,6 +23,10 @@ def classify(record):
         reasons.append("PREGAME_CHRONOLOGY_NOT_VERIFIED")
     if record.get("source_scope_complete") is not True:
         reasons.append("SCHEDULE_COVERAGE_NOT_CERTIFIED")
+    # These flags are caller assertions, not independently replayed receipts.
+    # Do not grant historical evaluation eligibility until a trusted reader
+    # derives these fields from immutable, hash-verified source manifests.
+    reasons.append("TRUSTED_SOURCE_RECEIPT_READER_NOT_IMPLEMENTED")
     return {
         "schema": "tyler-college-nba-research-eligibility-v1",
         "league": record["league"],

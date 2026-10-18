@@ -14,9 +14,10 @@ def record():
     )
 
 class EligibilityTests(unittest.TestCase):
-    def test_fully_correlated_record_is_evaluation_only(self):
+    def test_caller_asserted_provenance_never_grants_eligibility(self):
         result=classify(record())
-        self.assertTrue(result["eligible_for_historical_evaluation"])
+        self.assertFalse(result["eligible_for_historical_evaluation"])
+        self.assertIn("TRUSTED_SOURCE_RECEIPT_READER_NOT_IMPLEMENTED", result["exclusion_reasons"])
         self.assertFalse(result["eligible_for_model_training"])
         self.assertFalse(result["forecasting_enabled"])
         self.assertFalse(result["promotion_allowed"])
@@ -51,7 +52,7 @@ class EligibilityTests(unittest.TestCase):
     def test_batch_counts_do_not_enable_training(self):
         incomplete=record();incomplete["source_scope_complete"]=False
         out=classify_batch([record(),incomplete])
-        self.assertEqual((out["examined"],out["eligible_for_historical_evaluation"],out["excluded"]),(2,1,1))
+        self.assertEqual((out["examined"],out["eligible_for_historical_evaluation"],out["excluded"]),(2,0,2))
         self.assertFalse(out["model_training_enabled"])
 
 if __name__=="__main__":
