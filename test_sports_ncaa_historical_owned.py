@@ -12,7 +12,9 @@ START = int(datetime(2024, 8, 24, 17, tzinfo=timezone.utc).timestamp())
 
 
 def payload():
-    return json.dumps({'data': {'contests': [official_game(when=START, final=True)]}}).encode()
+    game = official_game(when=START, final=True)
+    game['startDate'] = '08/24/2024'
+    return json.dumps({'data': {'contests': [game]}}).encode()
 
 
 class NcaaHistoricalOwnedTests(unittest.TestCase):
@@ -76,6 +78,7 @@ class NcaaHistoricalOwnedTests(unittest.TestCase):
             def validation_source(url):
                 calls.append(url)
                 game = official_game(when=int(datetime(2025,8,23,17,tzinfo=timezone.utc).timestamp()), final=True)
+                game['startDate'] = '08/23/2025'
                 return json.dumps({'data': {'contests': [game]}}).encode()
             out = owned.capture(validation_source, base=root, now=NOW, split='auto')
             self.assertEqual((out['split'], out['new_source_weeks']), ('validation', 3))
@@ -89,6 +92,14 @@ class NcaaHistoricalOwnedTests(unittest.TestCase):
             done = owned.capture(lambda _: self.fail('No request after both indices complete'),
                                  base=root, now=NOW, split='auto')
             self.assertEqual((done['new_source_weeks'], done['retained_source_weeks']), (0, 21))
+
+    def test_published_game_date_cannot_contradict_historical_epoch(self):
+        obj = json.loads(payload())
+        obj['data']['contests'][0]['startDate'] = '08/24/2026'
+        with tempfile.TemporaryDirectory() as td:
+            with self.assertRaisesRegex(ValueError, 'contradicts kickoff'):
+                owned.capture(lambda _: json.dumps(obj).encode(), base=td, now=NOW)
+            self.assertFalse((Path(td)/owned.ROOT).exists())
 
     def test_scope_and_fetch_budget_are_bounded(self):
         for kwargs in ({'split': '../bad'}, {'per_run': 4}, {'per_run': False}):

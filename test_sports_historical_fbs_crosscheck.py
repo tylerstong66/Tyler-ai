@@ -18,6 +18,7 @@ class HistoricalFbsCrosscheckTests(unittest.TestCase):
     def seed(self, root, *, home='Tulsa', espn_home='Tulsa', conflict=False,
              duplicate=False, location=True):
         game = official_game(when=int(START.timestamp()), home=home, final=True)
+        game['startDate'] = '08/24/2024'
         raw = json.dumps({'data': {'contests': [game]}}).encode()
         owned.capture(lambda _: raw, base=root, now=NOW, per_run=1)
         plan = {sport: {split: [bounds[0]] for split, bounds in splits.items()}
