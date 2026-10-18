@@ -7,8 +7,9 @@ independent official final or eligibility for model evaluation.
 from collections import Counter
 import sports_ncaa_espn_identity as identity
 
-def classify(ncaa_rows,espn_rows):
-    crosswalk=identity.reconcile(ncaa_rows,espn_rows)
+def classify(ncaa_rows,espn_rows,*,use_curated_fbs_aliases=True):
+    crosswalk=identity.reconcile(ncaa_rows,espn_rows,
+                                 use_curated_fbs_aliases=use_curated_fbs_aliases)
     official_by_id={(r["league"],r["ncaa_game_id"]):r for r in ncaa_rows}
     provider_by_id={(r["league"],r["espn_game_id"]):r for r in espn_rows}
     if len(official_by_id)!=len(ncaa_rows) or len(provider_by_id)!=len(espn_rows):

@@ -5,6 +5,10 @@ on:
     paths:
       - sports_expansion_historical_capture.py
       - sports_historical_identity_audit.py
+      - sports_historical_fbs_crosscheck.py
+      - test_sports_historical_fbs_crosscheck.py
+      - sports_ncaa_espn_identity.py
+      - sports_college_dual_source_finals.py
       - sports_ncaa_historical_owned.py
       - test_sports_ncaa_historical_owned.py
       - test_sports_historical_identity_audit.py
@@ -32,7 +36,7 @@ jobs:
       - name: Install pinned network transport
         run: python -m pip install requests==2.32.5
       - name: Test prospective isolation, chronology and sealed history
-        run: python -m unittest -v test_sports_expansion_historical_capture test_sports_historical_identity_audit test_sports_ncaa_historical_owned
+        run: python -m unittest -v test_sports_expansion_historical_capture test_sports_historical_identity_audit test_sports_ncaa_historical_owned test_sports_historical_fbs_crosscheck
       - name: Fetch bounded 2024 training / 2025 validation season history
         run: python sports_expansion_historical_capture.py
       - name: Retain bounded NCAA-owned historical FBS source weeks
@@ -45,6 +49,13 @@ jobs:
         with:
           name: historical-provider-identity-audit
           path: historical-identity-audit.json
+          retention-days: 30
+      - name: Crosscheck historical independent NCAA and ESPN finals
+        run: python sports_historical_fbs_crosscheck.py > historical-fbs-crosscheck.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: historical-fbs-source-crosscheck
+          path: historical-fbs-crosscheck.json
           retention-days: 30
       - name: Publish historical SOURCE receipts only after entire batch succeeds
         run: |
