@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-18T18:06:20.573172+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-10-18T20:44:05.216007+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 26 / 15 / 11 |
-| Started games in retained official schedules / enrolled | 22 / 22 |
+| Recorded / settled / pending | 26 / 21 / 5 |
+| Started games in retained official schedules / enrolled | 25 / 25 |
 | Observed missing started games | 0 |
 | Enrollment-time priced forecasts | 26 / 26 |
-| Settled with enrollment prices / decisive market-paired | 15 / 14 |
+| Settled with enrollment prices / decisive market-paired | 21 / 20 |
 | Separate later quotes recorded prospectively | 0 |
 
 A priced NFL tie is excluded only from binary decisive market comparisons.
@@ -25,14 +25,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-18T18:06:20.573172+00:00. Ready: 4 / 4 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-18T20:44:05.216007+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026_06_ARI_LA | ARI at LA | True | False | True | None |
-| 2026_06_BUF_LV | BUF at LV | True | False | True | None |
 | 2026_06_DAL_GB | DAL at GB | True | False | True | None |
-| 2026_06_LAC_KC | LAC at KC | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -69,7 +66,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 60. Latest: `20261018T180618186767Z`.
+Audited capture manifests: 61. Latest: `20261018T204402139309Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
