@@ -10,9 +10,18 @@ import sports_nba_official_schedule_audit as nba
 import sports_nba_schedule_receipts as receipts
 
 
-def classify(official, provider, *, nba_observed_at, espn_observed_at):
+def classify(official, provider, *, nba_observed_at, espn_observed_at=None,
+             espn_observed_by_game=None):
     """No scores or winner affect which independently identified game is joined."""
-    nt, et = espn.utc(nba_observed_at), espn.utc(espn_observed_at)
+    nt = espn.utc(nba_observed_at)
+    if espn_observed_by_game is not None:
+        if (espn_observed_at is not None or not isinstance(espn_observed_by_game, dict)
+                or set(espn_observed_by_game) != set(provider)):
+            raise ValueError('Exact per-game ESPN observation provenance required')
+        observed = {key:espn.utc(value) for key,value in espn_observed_by_game.items()}
+    else:
+        at = espn.utc(espn_observed_at)
+        observed = {key:at for key in provider}
     report = nba.compare(official, provider)
     by_id = {row['nba_game_id']: row for row in official}
     if len(by_id) != len(official):
@@ -22,6 +31,7 @@ def classify(official, provider, *, nba_observed_at, espn_observed_at):
     for matched in report['matched']:
         n = by_id[matched['nba_official_game_id']]
         e = provider[matched['espn_game_id']]
+        et = observed[matched['espn_game_id']]
         base = {'league': 'NBA', 'nba_game_id': n['nba_game_id'],
                 'espn_game_id': e['espn_game_id'],
                 'nba_scheduled_start_utc': n['tipoff_utc'],
@@ -33,7 +43,7 @@ def classify(official, provider, *, nba_observed_at, espn_observed_at):
             reason = 'NON_BIJECTIVE_GAME_IDENTITY'
         elif int(n['nba_game_id'][3:5]) != season_year % 100:
             reason = 'NBA_GAME_ID_SEASON_MISMATCH'
-        elif n['nba_postponed_status'] not in (None, ''):
+        elif n['nba_postponed_status'] not in (None, '', 'N'):
             reason = 'POSTPONED_OR_UNKNOWN_NBA_STATUS'
         elif e['season_stage'] != (2 if n['kind'] == 'regular' else 3):
             reason = 'NBA_ESPN_SEASON_STAGE_MISMATCH'

@@ -17,6 +17,12 @@ on:
       - 'test_sports_historical_content_seal.py'
       - 'test_sports_historical_identity_audit.py'
       - 'benchmarks/college_nba_history_v1/**'
+      - sports_nba_historical_owned.py
+      - sports_historical_nba_crosscheck.py
+      - test_sports_nba_historical_owned.py
+      - test_sports_historical_nba_crosscheck.py
+      - sports_nba_final_receipts.py
+      - sports_nba_official_schedule_audit.py
       - 'sports_expansion_historical_capture.py'
       - 'test_sports_expansion_historical_capture.py'
       - 'sports_expansion_audit.py'
@@ -41,7 +47,7 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install requests==2.32.5
       - name: Test final receipt replay and research isolation
-        run: python -m unittest -v test_sports_college_final_receipts test_sports_college_dual_source_finals test_sports_ncaa_espn_crosswalk_receipts test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_result_dataset test_sports_nba_final_receipts test_sports_nba_schedule_receipts test_sports_nba_official_schedule_audit test_sports_college_d1_receipts test_sports_expansion_audit test_sports_expansion_historical_capture test_sports_historical_identity_audit test_sports_ncaa_historical_owned test_sports_historical_fbs_crosscheck test_sports_ncaa_d1_historical_owned test_sports_historical_d1_crosscheck test_sports_historical_content_seal
+        run: python -m unittest -v test_sports_college_final_receipts test_sports_college_dual_source_finals test_sports_ncaa_espn_crosswalk_receipts test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_result_dataset test_sports_nba_final_receipts test_sports_nba_schedule_receipts test_sports_nba_official_schedule_audit test_sports_college_d1_receipts test_sports_expansion_audit test_sports_expansion_historical_capture test_sports_historical_identity_audit test_sports_ncaa_historical_owned test_sports_historical_fbs_crosscheck test_sports_ncaa_d1_historical_owned test_sports_historical_d1_crosscheck test_sports_historical_content_seal test_sports_nba_historical_owned test_sports_historical_nba_crosscheck
       - name: Replay retained final evidence without collecting network data
         run: |
           python - <<'PYCODE'
@@ -99,6 +105,15 @@ jobs:
         with:
           name: historical-d1-source-crosscheck
           path: historical-d1-crosscheck.json
+          retention-days: 30
+      - name: Replay original NBA historical finals for both season splits
+        run: |
+          python sports_historical_nba_crosscheck.py --split train > historical-nba-train-crosscheck.json
+          python sports_historical_nba_crosscheck.py --split validation > historical-nba-validation-crosscheck.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: historical-nba-source-crosscheck
+          path: historical-nba-*-crosscheck.json
           retention-days: 30
       - name: Verify frozen original input bytes without certifying model eligibility
         run: python sports_historical_content_seal.py

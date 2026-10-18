@@ -49,3 +49,15 @@ final agreement 468 training / 450 validation. See
 `HISTORICAL_SOURCE_COMPLETION_2026_10_18.md` and the sealed completion JSON.
 Do not confuse complete request-date retention with certified event coverage,
 accepted pregame features, model evaluation or an established betting edge.
+
+## NBA-owned historical source access and replay
+
+Closed-season NBA Stats public access succeeded using the published nba_api
+1.11.4 request profile, while the old CDN endpoint remained unavailable.
+Original 2024-25 and 2025-26 responses are retained separately with pinned
+league/season identity, exact raw digests and observation chronology. Full
+original-source crosschecks yield 1,185 and 1,203 strict agreeing NBA/ESPN
+research finals respectively. Pending identities remain excluded, including
+four 2026 All-Star team-code games. Existing ambiguity safeguards and all
+model/wagering restrictions remain in effect. See
+`NBA_HISTORICAL_OWNED_SOURCE_PROTOCOL.md` for scope, counts and replay commands.
