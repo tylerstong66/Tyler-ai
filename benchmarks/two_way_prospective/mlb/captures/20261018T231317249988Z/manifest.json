@@ -1,0 +1,118 @@
+{
+  "collection_completed": true,
+  "errors": [
+    {
+      "game_id": "849816",
+      "reason": "Final identity differs from saved forecast"
+    },
+    {
+      "error": "OFFICIAL_DAILY_SNAPSHOT_CONFLICT_NO_NEW_QUOTE",
+      "game_id": "849817",
+      "stage": "market_followup"
+    }
+  ],
+  "excluded": [],
+  "history_games": 7400,
+  "new_market_followups": [],
+  "new_predictions": [],
+  "new_results": [],
+  "official_daily_conflicts": [
+    {
+      "decision": "no_forecast_no_settlement_no_start_rewrite",
+      "game_id": "849817",
+      "observations": [
+        {
+          "away_id": "139",
+          "away_score": null,
+          "completed": false,
+          "home_id": "114",
+          "home_score": null,
+          "queried_day": "2026-10-16",
+          "scheduled_start_utc": "2026-10-17T00:00:00+00:00",
+          "state": "in"
+        },
+        {
+          "away_id": "139",
+          "away_score": 3,
+          "completed": false,
+          "home_id": "114",
+          "home_score": 1,
+          "queried_day": "2026-10-18",
+          "scheduled_start_utc": "2026-10-18T21:08:00+00:00",
+          "state": "in"
+        }
+      ],
+      "reason": "CONFLICTING_OFFICIAL_DAILY_SNAPSHOTS_QUARANTINED"
+    }
+  ],
+  "official_schedule_complete": false,
+  "optional_availability_errors": [],
+  "quarantined_game_ids": [
+    "849817"
+  ],
+  "sources": [
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/9495f1802f081ff9406602d50fd4ffaaa4b6e240fe0317ffb834e873823f9f87.json",
+      "response_sha256": "7630ac0f048e89dca6919987ade0a48804ffa76b39c62edf2c3b6fa88987932f",
+      "retrieved_at": "2026-10-18T23:13:19.601824+00:00",
+      "sha256": "9495f1802f081ff9406602d50fd4ffaaa4b6e240fe0317ffb834e873823f9f87",
+      "source_url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&startDate=2026-03-01&endDate=2026-10-18&hydrate=linescore"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/82c6901592c9804217875410175d9ebb528aa2c5cc411a49e781f3509e8591e1.json",
+      "response_sha256": "186ba287fb2d403de72a5aae765b594ab1b17ac4a4559c9b5431a076dcaf6a84",
+      "retrieved_at": "2026-10-18T23:13:20.024854+00:00",
+      "sha256": "82c6901592c9804217875410175d9ebb528aa2c5cc411a49e781f3509e8591e1",
+      "source_url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-10-16&hydrate=probablePitcher,linescore,team"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/8050bae3ab25b3170e04962cd8a66780c16a45cb832a0d5dcf888e1e92ce1a6a.json",
+      "response_sha256": "dcd8c34bbdc4818ee3bddfa7a5f94762aeffb1dedbf76b1d6ee6802e1202e2ae",
+      "retrieved_at": "2026-10-18T23:13:20.112946+00:00",
+      "sha256": "8050bae3ab25b3170e04962cd8a66780c16a45cb832a0d5dcf888e1e92ce1a6a",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20261016"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/fabf1412a9ab9219d835b8f44cb9e7ce6fec592fe5352ad1c287e94b3de44034.json",
+      "response_sha256": "557185a412422b77db920c4079429b8058f35c6cac97d37ab44486d46d16a7cc",
+      "retrieved_at": "2026-10-18T23:13:20.220662+00:00",
+      "sha256": "fabf1412a9ab9219d835b8f44cb9e7ce6fec592fe5352ad1c287e94b3de44034",
+      "source_url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-10-17&hydrate=probablePitcher,linescore,team"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/923b493e1dbff54bc73d1b09ec69860752247b9fe0c72e66626974b34a05a0ae.json",
+      "response_sha256": "3aa7d91a225647872b5acead95c8b8e6525e2ccb4b112c5785316557a8143d94",
+      "retrieved_at": "2026-10-18T23:13:20.311065+00:00",
+      "sha256": "923b493e1dbff54bc73d1b09ec69860752247b9fe0c72e66626974b34a05a0ae",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20261017"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/ef643e4a8750d386590eeaecdb5e0b28b29f489aa69dc25673a33cac13295287.json",
+      "response_sha256": "b25a544e391db7fcf7ab1a5e00edd750564e6f4bab38d905cfb6cab3a2641a56",
+      "retrieved_at": "2026-10-18T23:13:20.366372+00:00",
+      "sha256": "ef643e4a8750d386590eeaecdb5e0b28b29f489aa69dc25673a33cac13295287",
+      "source_url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-10-18&hydrate=probablePitcher,linescore,team"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/b93615ce133027b3d4fd42210dca017961148f33a1a6dcb1f5b0dce597b3b012.json",
+      "response_sha256": "786692bfe5ec5cf20bb61c6cd38450ff5685c913b00f96bb6024ba26c7c81bf0",
+      "retrieved_at": "2026-10-18T23:13:20.421203+00:00",
+      "sha256": "b93615ce133027b3d4fd42210dca017961148f33a1a6dcb1f5b0dce597b3b012",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20261018"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/b3bc50d43355627e1f90bee36b23ce16d40b66b4370dabf9b23163941e59002e.json",
+      "response_sha256": "fd20d5884287f9a5a250058cdf2e854c061e195b361e0e57a5139d2ed56d49b8",
+      "retrieved_at": "2026-10-18T23:13:20.519096+00:00",
+      "sha256": "b3bc50d43355627e1f90bee36b23ce16d40b66b4370dabf9b23163941e59002e",
+      "source_url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=2026-10-19&hydrate=probablePitcher,linescore,team"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/mlb/snapshots/61277198e8eabfae3342a6cf3f144056a8d712f478c95e57ba579468f11d884a.json",
+      "response_sha256": "12b45701d5f5135eda337205dc40127992f28afa41fd918f7bd33ae6300e6596",
+      "retrieved_at": "2026-10-18T23:13:20.592838+00:00",
+      "sha256": "61277198e8eabfae3342a6cf3f144056a8d712f478c95e57ba579468f11d884a",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20261019"
+    }
+  ]
+}
