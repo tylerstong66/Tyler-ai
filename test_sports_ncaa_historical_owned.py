@@ -64,6 +64,32 @@ class NcaaHistoricalOwnedTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     owned.capture(lambda _: self.fail('No fetch on invalid receipt'), base=root, now=NOW)
 
+    def test_auto_phase_advances_only_after_all_training_week_receipts(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            first = owned.capture(lambda _: payload(), base=root, now=NOW, split='auto')
+            self.assertEqual(first['split'], 'train')
+            for _ in range(6):
+                owned.capture(lambda _: payload(), base=root, now=NOW)
+            before = (root/owned.ROOT/'train'/'week-01.receipt.json').read_bytes()
+            calls = []
+            def validation_source(url):
+                calls.append(url)
+                game = official_game(when=int(datetime(2025,8,23,17,tzinfo=timezone.utc).timestamp()), final=True)
+                return json.dumps({'data': {'contests': [game]}}).encode()
+            out = owned.capture(validation_source, base=root, now=NOW, split='auto')
+            self.assertEqual((out['split'], out['new_source_weeks']), ('validation', 3))
+            self.assertEqual(len(calls), 3)
+            self.assertTrue(all('2025' in url for url in calls))
+            self.assertEqual((root/owned.ROOT/'train'/'week-01.receipt.json').read_bytes(), before)
+            self.assertFalse(out['model_training_enabled'])
+            self.assertFalse(out['forecasting_enabled'])
+            for _ in range(6):
+                owned.capture(validation_source, base=root, now=NOW, split='auto')
+            done = owned.capture(lambda _: self.fail('No request after both indices complete'),
+                                 base=root, now=NOW, split='auto')
+            self.assertEqual((done['new_source_weeks'], done['retained_source_weeks']), (0, 21))
+
     def test_scope_and_fetch_budget_are_bounded(self):
         for kwargs in ({'split': '../bad'}, {'per_run': 4}, {'per_run': False}):
             with self.assertRaises(ValueError):

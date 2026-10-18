@@ -3,7 +3,11 @@
 `sports_ncaa_historical_owned.py` retains at most three previously missing
 NCAA-owned FBS source weeks per execution, with a fixed 1..21 week request
 index. Source queries explicitly pin 2024 training or 2025 validation season;
-currently the scheduled collector acquires training only. The index is not a
+the scheduled collector defaults to an automatic phase: acquire missing training
+weeks first, then validation weeks only after all 21 training request receipts
+have been verified. Explicit train/validation CLI selection remains available.
+Both phases retain the same maximum three-new-week request budget and no model
+activation. Completing a request index does not certify full event coverage. The index is not a
 certified complete NCAA week calendar or official event census.
 
 Every response is retained as original SHA-linked compressed bytes plus a
