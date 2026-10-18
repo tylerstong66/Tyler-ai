@@ -2,12 +2,12 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-18T11:06:05.319242+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-10-18T14:35:15.001179+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
 | Recorded / settled / pending | 26 / 14 / 12 |
-| Started games in retained official schedules / enrolled | 14 / 14 |
+| Started games in retained official schedules / enrolled | 15 / 15 |
 | Observed missing started games | 0 |
 | Enrollment-time priced forecasts | 26 / 26 |
 | Settled with enrollment prices / decisive market-paired | 14 / 13 |
@@ -25,7 +25,7 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-18T11:06:05.319242+00:00. Ready: 12 / 12 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-18T14:35:15.001179+00:00. Ready: 11 / 11 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
@@ -35,7 +35,6 @@ As of retained evidence: 2026-10-18T11:06:05.319242+00:00. Ready: 12 / 12 observ
 | 2026_06_CAR_PHI | CAR at PHI | True | False | True | None |
 | 2026_06_CHI_ATL | CHI at ATL | True | False | True | None |
 | 2026_06_DAL_GB | DAL at GB | True | False | True | None |
-| 2026_06_HOU_JAX | HOU at JAX | True | False | True | None |
 | 2026_06_LAC_KC | LAC at KC | True | False | True | None |
 | 2026_06_NO_NYG | NO at NYG | True | False | True | None |
 | 2026_06_NYJ_NE | NYJ at NE | True | False | True | None |
@@ -77,7 +76,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 58. Latest: `20261018T110602956606Z`.
+Audited capture manifests: 59. Latest: `20261018T143512014528Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
