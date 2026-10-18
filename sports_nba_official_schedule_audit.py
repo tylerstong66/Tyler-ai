@@ -15,6 +15,7 @@ from pathlib import Path
 
 import requests
 import sports_expansion_observer as obs
+from sports_expansion_audit import bounded_gzip_read
 
 NBA_URL="https://cdn.nba.com/static/json/staticData/scheduleLeagueV2.json"
 ROOT=obs.ROOT/"nba_official"
@@ -97,7 +98,7 @@ def espn_games(manifest, capture_folder):
     for snap in manifest["snapshots"]:
         if snap["league"]!="NBA":
             continue
-        raw=gzip.decompress((capture_folder/snap["compressed_file"]).read_bytes())
+        raw=bounded_gzip_read((capture_folder/snap["compressed_file"]).read_bytes())
         if hashlib.sha256(raw).hexdigest()!=snap["original_response_sha256"]:
             raise ValueError("Archived ESPN NBA response hash disagrees")
         payload=json.loads(raw)
