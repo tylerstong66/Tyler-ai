@@ -4,6 +4,8 @@ on:
     branches: ['main']
     paths:
       - sports_expansion_historical_capture.py
+      - sports_expansion_audit.py
+      - test_sports_expansion_audit.py
       - test_sports_expansion_historical_capture.py
       - .github/workflows/college_nba_history_source.yml
   schedule:

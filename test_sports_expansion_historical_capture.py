@@ -103,6 +103,38 @@ class HistoricalCaptureTests(unittest.TestCase):
                           per_league=2,date_plan=PLAN)
             self.assertFalse((root/h.ROOT/"sources"/"NBA"/"validation").exists())
 
+    def test_compressed_expansion_and_truncation_fail_before_fetch_or_writes(self):
+        for mode in ('bomb', 'truncated'):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as td:
+                root = Path(td)
+                h.capture(lambda _: payload(), base=root, now=CLOCK,
+                          per_league=1, date_plan=PLAN)
+                path = root/h.ROOT/'sources'/'NBA'/'train'/'2024-10-22.json.gz'
+                blob = (gzip.compress(b'x' * 8_000_001, mtime=0) if mode == 'bomb'
+                        else path.read_bytes()[:-6])
+                path.write_bytes(blob)
+                def no_fetch(url):
+                    self.fail('Invalid original archive must block outbound fetch')
+                with self.assertRaisesRegex(ValueError, 'exceeds maximum|Corrupt or incomplete'):
+                    h.capture(no_fetch, base=root, now=CLOCK, date_plan=PLAN)
+                self.assertEqual(path.read_bytes(), blob)
+                self.assertFalse((root/h.ROOT/'sources'/'NBA'/'validation').exists())
+
+    def test_modified_historical_research_guards_fail_closed(self):
+        for key, value in (('actual_wagers', 1), ('actual_wagers', False),
+                           ('promotion_allowed', True),
+                           ('independently_verified_official_scores', True)):
+            with self.subTest(key=key, value=value), tempfile.TemporaryDirectory() as td:
+                root = Path(td)
+                h.capture(lambda _: payload(), base=root, now=CLOCK,
+                          per_league=1, date_plan=PLAN)
+                path = root/h.ROOT/'sources'/'NBA'/'train'/'2024-10-22.receipt.json'
+                obj = json.loads(path.read_bytes()); obj[key] = value
+                path.write_text(json.dumps(obj))
+                with self.assertRaisesRegex(ValueError, 'safety metadata'):
+                    h.capture(lambda _: self.fail('No network allowed'),
+                              base=root, now=CLOCK, date_plan=PLAN)
+
     def test_default_budget_is_20_new_source_days_per_league(self):
         # Synthetic plan keeps the network call count deterministic.
         dates=[f"2024-10-{day:02d}" for day in range(1,22)]
