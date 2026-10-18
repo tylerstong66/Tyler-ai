@@ -9,7 +9,7 @@ All work remains NO_BET / actual_wagers 0 / no model promotion or runtime deploy
 | NFL | Prospective v2: 26 recorded, 14 settled, 12 pending; 13 paired priced decisive games | Only two season/week uncertainty blocks; retain null confidence intervals and await independent weeks |
 | NHL | Original: 53 recorded / 51 settled; frozen challenger: 16 enrolled / 14 scored / 2 pending | Continue unchanged prospective challenger; evaluate the preregistered first 100 rather than tune on early outcomes |
 | MLB | Team winner: 10 recorded / 7 settled / 3 pending; hitter: 19 player-games / 8 scored / 1 ineligible / 10 pending | Pending official batting completeness and cross-cohort start-time drift; only two scored hitter-game clusters |
-| NBA | Independent NBA schedule/ESPN identity receipts, historical provider collection 110/490 declared dates | Archived independent final-score replay and closed-season source coverage before model evaluation |
+| NBA | NBA schedule/ESPN receipt code is tested; 0 real NBA-owned archived captures; historical provider collection 110/490 declared dates | NBA CDN returned HTTP 403 in run 39148942458; independent source acquisition and final replay remain blocked before model evaluation |
 | NCAA FBS | New all-capture reader: 23 unique raw-replayed NCAA/ESPN agreeing postgame results across 17 compatible captures | One older crosswalk excluded under current identity policy; source scope and historical pregame evidence remain uncertified |
 | NCAA D1 men | Separate source/identity parsers; historical provider collection 110/312 declared dates | No qualifying college-final dataset rows yet; require independent matched final sources and chronology |
 
