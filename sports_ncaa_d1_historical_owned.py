@@ -32,6 +32,50 @@ def _rows(raw, split, day, observed):
     return rows
 
 
+
+def _parse_with_quarantine(raw, split, day, observed):
+    """Retain a malformed tied final as evidence, never an eligible result.
+
+    All other source/schema failures still fail the complete batch. A tied
+    final must independently pass the existing non-result identity/date
+    checks before it can enter this narrowly defined quarantine.
+    """
+    try:
+        return _rows(raw, split, day, observed), []
+    except ncaa.TiedNcaaFinalError:
+        pass
+    payload = json.loads(raw)
+    rows = []; quarantined = []; seen = set()
+    for contest in payload['data']['contests']:
+        game_id = ncaa._positive_id(contest.get('contestId'), 'contest ID')
+        if game_id in seen:
+            raise ValueError('Repeated NCAA contest identity')
+        seen.add(game_id)
+        single = source.canonical({'data': {'contests': [contest]}})
+        try:
+            rows.extend(_rows(single, split, day, observed))
+        except ncaa.TiedNcaaFinalError:
+            # This copy validates identity and date only. Its synthetic P
+            # state is never retained as a source observation or result.
+            pending = {**contest, 'gameState': 'P'}
+            structural = _rows(source.canonical({'data': {'contests': [pending]}}),
+                               split, day, observed)[0]
+            at = datetime.fromtimestamp(int(structural['source_start_time_epoch']), timezone.utc)
+            if observed <= at:
+                raise ValueError('Malformed NCAA final observed before scheduled start')
+            quarantined.append({'ncaa_game_id': game_id,
+                'home_name': structural['home_name'], 'away_name': structural['away_name'],
+                'source_start_date': structural['source_start_date'],
+                'source_start_time_epoch': structural['source_start_time_epoch'],
+                'original_source_state': contest['gameState'],
+                'original_home_score': next(t['score'] for t in contest['teams'] if t['isHome']),
+                'original_away_score': next(t['score'] for t in contest['teams'] if not t['isHome']),
+                'reason': 'INVALID_TIED_NCAA_REPORTED_FINAL',
+                'original_contest_sha256': hashlib.sha256(source.canonical(contest)).hexdigest(),
+                'eligible_for_result_agreement': False})
+    return rows, quarantined
+
+
 def verify(base, split, day, *, now=None):
     day = _scope(split, day); now = now or datetime.now(timezone.utc)
     if now.tzinfo is None:
@@ -43,7 +87,8 @@ def verify(base, split, day, *, now=None):
     if not blob.exists() or not path.exists():
         raise ValueError('Missing NCAA D1 sealed source component')
     saved = json.loads(path.read_bytes())
-    if (saved.get('schema') != 'tyler-ncaa-owned-d1-history-day-v1'
+    if (saved.get('schema') not in ('tyler-ncaa-owned-d1-history-day-v1',
+                                         'tyler-ncaa-owned-d1-history-day-v2')
             or saved.get('league') != 'NCAAM_D1' or saved.get('split') != split
             or saved.get('source_date') != day or saved.get('season_year') != YEARS[split]
             or saved.get('source_url') != ncaa.graph_url('NCAAM_D1', year=YEARS[split], day=day)
@@ -61,7 +106,15 @@ def verify(base, split, day, *, now=None):
     raw = bounded_gzip_read(blob.read_bytes(), limit=ncaa.MAX_BYTES)
     if hashlib.sha256(raw).hexdigest() != saved['original_response_sha256']:
         raise ValueError('NCAA D1 original response digest mismatch')
-    if _rows(raw, split, day, observed) != saved['parsed_ncaa_games']:
+    if saved['schema']=='tyler-ncaa-owned-d1-history-day-v2':
+        rows, quarantined = _parse_with_quarantine(raw, split, day, observed)
+        if not quarantined or quarantined != saved.get('quarantined_ncaa_contests'):
+            raise ValueError('NCAA D1 source quarantine differs from original')
+    else:
+        rows = _rows(raw, split, day, observed)
+        if saved.get('quarantined_ncaa_contests'):
+            raise ValueError('Legacy NCAA D1 source cannot contain unverified quarantine')
+    if rows != saved['parsed_ncaa_games']:
         raise ValueError('NCAA D1 original normalization changed')
     return saved
 
@@ -92,7 +145,7 @@ def capture(fetch, *, base=Path('.'), split='auto', per_run=20, now=None):
         raw = fetch(url)
         if not isinstance(raw, bytes) or not raw or len(raw) > ncaa.MAX_BYTES:
             raise ValueError('Missing or oversized NCAA D1 original response')
-        rows = _rows(raw, split, day, now)
+        rows, quarantined = _parse_with_quarantine(raw, split, day, now)
         saved = {'schema': 'tyler-ncaa-owned-d1-history-day-v1', 'league': 'NCAAM_D1',
                  'split': split, 'source_date': day, 'season_year': YEARS[split], 'source_url': url,
                  'recorded_at_utc': now.astimezone(timezone.utc).isoformat(),
@@ -100,6 +153,9 @@ def capture(fetch, *, base=Path('.'), split='auto', per_run=20, now=None):
                  'parsed_ncaa_games': rows, 'official_result_grading_enabled': False,
                  'model_training_enabled': False, 'forecasting_enabled': False,
                  'promotion_allowed': False, 'NO_BET': True, 'actual_wagers': 0}
+        if quarantined:
+            saved.update(schema='tyler-ncaa-owned-d1-history-day-v2',
+                         quarantined_ncaa_contests=quarantined)
         prepared.append((day, raw, saved))
     folder = root / split
     for day, raw, saved in prepared:
@@ -111,6 +167,10 @@ def capture(fetch, *, base=Path('.'), split='auto', per_run=20, now=None):
     return {'schema':'tyler-ncaa-owned-d1-history-capture-status-v1', 'split':split,
             'new_source_days':len(prepared), 'retained_source_days':
                 sum(existing[(split, day)] is not None for day in DATES[split])+len(prepared),
+            'quarantined_source_game_ids': sorted({q['ncaa_game_id']
+                for saved in [s for (part, _), s in existing.items() if part==split and s is not None]
+                             + [saved for _, _, saved in prepared]
+                for q in saved.get('quarantined_ncaa_contests', [])}),
             'official_source_completeness_certified':False,
             'independent_result_crosscheck_complete':False, 'model_training_enabled':False,
             'forecasting_enabled':False, 'promotion_allowed':False, 'NO_BET':True, 'actual_wagers':0}

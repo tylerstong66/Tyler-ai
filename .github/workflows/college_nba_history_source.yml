@@ -21,6 +21,8 @@ on:
       - sports_ncaa_espn_identity.py
       - sports_college_dual_source_finals.py
       - sports_ncaa_historical_owned.py
+      - test_sports_ncaa_d1_source_quarantine.py
+      - sports_ncaa_official_source.py
       - sports_ncaa_d1_historical_owned.py
       - test_sports_ncaa_d1_historical_owned.py
       - test_sports_historical_d1_crosscheck.py
@@ -50,7 +52,7 @@ jobs:
       - name: Install pinned network transport
         run: python -m pip install requests==2.32.5
       - name: Test prospective isolation, chronology and sealed history
-        run: python -m unittest -v test_sports_expansion_historical_capture test_sports_historical_identity_audit test_sports_ncaa_historical_owned test_sports_historical_fbs_crosscheck test_sports_ncaa_d1_historical_owned test_sports_historical_d1_crosscheck test_sports_historical_content_seal test_sports_nba_historical_owned test_sports_historical_nba_crosscheck test_sports_historical_school_identities
+        run: python -m unittest -v test_sports_expansion_historical_capture test_sports_historical_identity_audit test_sports_ncaa_historical_owned test_sports_historical_fbs_crosscheck test_sports_ncaa_d1_historical_owned test_sports_ncaa_d1_source_quarantine test_sports_historical_d1_crosscheck test_sports_historical_content_seal test_sports_nba_historical_owned test_sports_historical_nba_crosscheck test_sports_historical_school_identities
       - name: Verify the frozen original source-content index before acquisition
         run: python sports_historical_content_seal.py
       - name: Fetch bounded 2024 training / 2025 validation season history
@@ -82,11 +84,13 @@ jobs:
           path: historical-fbs-crosscheck.json
           retention-days: 30
       - name: Crosscheck retained D1 historical original source finals
-        run: python sports_historical_fbs_crosscheck.py --league NCAAM_D1 > historical-d1-crosscheck.json
+        run: |
+          python sports_historical_fbs_crosscheck.py --league NCAAM_D1 --split train > historical-d1-train-crosscheck.json
+          python sports_historical_fbs_crosscheck.py --league NCAAM_D1 --split validation > historical-d1-validation-crosscheck.json
       - uses: actions/upload-artifact@v4
         with:
           name: historical-d1-source-crosscheck
-          path: historical-d1-crosscheck.json
+          path: historical-d1-*-crosscheck.json
           retention-days: 30
       - name: Replay original NBA historical finals for both season splits
         run: |
