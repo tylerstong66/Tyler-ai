@@ -1,5 +1,6 @@
 """Independent read-only SHA-linked college football/hoops/NBA source audit."""
 import gzip
+import io
 import hashlib
 import json
 from collections import defaultdict
@@ -10,6 +11,22 @@ import sports_expansion_observer as source
 
 MAX_CAPTURES = 3000
 MAX_BLOB_SIZE = 8_500_000
+
+
+def bounded_gzip_read(blob, limit=8_000_000):
+    """Reject decompression bombs before allocating beyond the source size limit."""
+    output = bytearray()
+    try:
+        with gzip.GzipFile(fileobj=io.BytesIO(blob), mode="rb") as stream:
+            while True:
+                chunk = stream.read(min(65536, limit + 1 - len(output)))
+                if not chunk:
+                    return bytes(output)
+                output.extend(chunk)
+                if len(output) > limit:
+                    raise ValueError("Decompressed source exceeds maximum response size")
+    except (OSError, EOFError) as exc:
+        raise ValueError("Corrupt or incomplete compressed source archive") from exc
 
 
 def audit(base=Path(".")):
@@ -54,7 +71,7 @@ def audit(base=Path(".")):
             blob=file.parent/filename
             if not blob.exists() or blob.stat().st_size>MAX_BLOB_SIZE:
                 raise ValueError("Missing or oversized retained source archive")
-            raw=gzip.decompress(blob.read_bytes())
+            raw=bounded_gzip_read(blob.read_bytes())
             if (len(raw)>8_000_000 or
                     hashlib.sha256(raw).hexdigest()!=snap["original_response_sha256"]):
                 raise ValueError("Compressed source did not reproduce archived response SHA256")
