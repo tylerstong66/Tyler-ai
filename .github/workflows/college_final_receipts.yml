@@ -1,0 +1,41 @@
+name: Archived college final receipt checks
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - 'sports_college*.py'
+      - 'sports_ncaa*.py'
+      - 'test_sports_college*.py'
+      - 'test_sports_ncaa*.py'
+      - '.github/workflows/college_final_receipts.yml'
+      - '.github/workflows/college_nba_source_observation.yml'
+permissions:
+  contents: read
+jobs:
+  receipts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install requests==2.32.5
+      - name: Test final receipt replay and research isolation
+        run: python -m unittest -v test_sports_college_final_receipts test_sports_college_dual_source_finals test_sports_ncaa_espn_crosswalk_receipts test_sports_college_nba_chronology test_sports_college_nba_eligibility
+      - name: Replay retained final evidence without collecting network data
+        run: |
+          python - <<'PYCODE'
+          from pathlib import Path
+          import sports_ncaa_espn_identity as identity
+          from sports_college_final_receipts import build
+          files = sorted((identity.ROOT / 'captures').glob('*/manifest.json'))
+          if not files:
+              raise ValueError('Missing archived college crosswalk')
+          report = build(Path('.'), files[-1].parent.name)
+          assert report['NO_BET'] and report['actual_wagers'] == 0
+          assert not report['historical_evaluation_enabled']
+          print({'agreements': report['two_source_final_agreements'],
+                 'pending': report['pending_or_quarantined']})
+          PYCODE
