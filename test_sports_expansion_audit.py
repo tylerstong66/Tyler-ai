@@ -93,6 +93,24 @@ class SourceArchiveAuditTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     audit.audit(root)
 
+    def test_bounded_gzip_rejects_expansion_bomb_and_truncation(self):
+        oversized = gzip.compress(b'x' * 8_000_001, mtime=0)
+        with self.assertRaisesRegex(ValueError, 'exceeds maximum'):
+            audit.bounded_gzip_read(oversized)
+        valid = gzip.compress(b'valid', mtime=0)
+        self.assertEqual(audit.bounded_gzip_read(valid), b'valid')
+        with self.assertRaisesRegex(ValueError, 'Corrupt or incomplete'):
+            audit.bounded_gzip_read(valid[:-5])
+
+    def test_expansion_bomb_in_capture_fails_closed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            capture = self.build(root)
+            target = capture / 'NBA_2026-10-17.json.gz'
+            target.write_bytes(gzip.compress(b'x' * 8_000_001, mtime=0))
+            with self.assertRaisesRegex(ValueError, 'exceeds maximum'):
+                audit.audit(root)
+
     def test_no_existing_captures_does_not_claim_completeness(self):
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaisesRegex(ValueError,"Missing or unexpectedly many"):
