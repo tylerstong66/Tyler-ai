@@ -16,3 +16,14 @@ Validation: all 435 offline sports tests passed; 23 unique raw-replayed FBS fina
 Next high-value work: finish closed-season historical acquisition in bounded batches, audit game IDs and event chronology across train/validation archives, and resolve official NBA source availability before any model evaluation. Keep existing prospective NFL/NHL/MLB cohorts and frozen challenger weights unchanged; follow original first-100 checkpoint protocols. Issue #98 remains a separate MLB cross-cohort schedule-drift integrity question.
 
 Always retain NO_BET=true, actual_wagers=0, no automatic promotion, no production deployment and no unverified training/evaluation authorization. Repository research changes do not imply an updated Render runtime.
+
+## Subsequent verified continuation
+
+PR #129 merged after all 12 head checks passed; all post-merge workflows and
+its historical fetch/publication job succeeded. Its automatic collector added
+another 60 dates, bringing retained provider coverage to 150 dates per sport.
+The new historical game-identity audit replayed all 450 daily receipts and
+8,306 provider IDs without detected duplicate, split or date contamination.
+Validation source coverage was still zero at that snapshot. Offline sports
+suite now passes 440 tests. The audit remains research-only, with all training,
+evaluation, forecasting, promotion and wagering disabled.

@@ -4,6 +4,8 @@ on:
     branches: ['main']
     paths:
       - sports_expansion_historical_capture.py
+      - sports_historical_identity_audit.py
+      - test_sports_historical_identity_audit.py
       - sports_expansion_audit.py
       - test_sports_expansion_audit.py
       - test_sports_expansion_historical_capture.py
@@ -28,9 +30,16 @@ jobs:
       - name: Install pinned network transport
         run: python -m pip install requests==2.32.5
       - name: Test prospective isolation, chronology and sealed history
-        run: python -m unittest -v test_sports_expansion_historical_capture
+        run: python -m unittest -v test_sports_expansion_historical_capture test_sports_historical_identity_audit
       - name: Fetch bounded 2024 training / 2025 validation season history
         run: python sports_expansion_historical_capture.py
+      - name: Audit archived provider identities, split separation and game dates
+        run: python sports_historical_identity_audit.py > historical-identity-audit.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: historical-provider-identity-audit
+          path: historical-identity-audit.json
+          retention-days: 30
       - name: Publish historical SOURCE receipts only after entire batch succeeds
         run: |
           git add benchmarks/college_nba_history_v1

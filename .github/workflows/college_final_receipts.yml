@@ -5,6 +5,8 @@ on:
   push:
     branches: [main]
     paths:
+      - 'sports_historical_identity_audit.py'
+      - 'test_sports_historical_identity_audit.py'
       - 'sports_expansion_historical_capture.py'
       - 'test_sports_expansion_historical_capture.py'
       - 'sports_expansion_audit.py'
@@ -29,7 +31,7 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install requests==2.32.5
       - name: Test final receipt replay and research isolation
-        run: python -m unittest -v test_sports_college_final_receipts test_sports_college_dual_source_finals test_sports_ncaa_espn_crosswalk_receipts test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_result_dataset test_sports_nba_final_receipts test_sports_nba_schedule_receipts test_sports_nba_official_schedule_audit test_sports_college_d1_receipts test_sports_expansion_audit test_sports_expansion_historical_capture
+        run: python -m unittest -v test_sports_college_final_receipts test_sports_college_dual_source_finals test_sports_ncaa_espn_crosswalk_receipts test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_result_dataset test_sports_nba_final_receipts test_sports_nba_schedule_receipts test_sports_nba_official_schedule_audit test_sports_college_d1_receipts test_sports_expansion_audit test_sports_expansion_historical_capture test_sports_historical_identity_audit
       - name: Replay retained final evidence without collecting network data
         run: |
           python - <<'PYCODE'
@@ -58,4 +60,11 @@ jobs:
         with:
           name: nba-final-research-status
           path: nba-final-research.json
+          retention-days: 30
+      - name: Audit actual retained historical provider identities
+        run: python sports_historical_identity_audit.py > historical-identity-audit.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: historical-provider-identity-audit
+          path: historical-identity-audit.json
           retention-days: 30
