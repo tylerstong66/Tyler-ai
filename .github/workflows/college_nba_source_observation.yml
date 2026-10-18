@@ -15,6 +15,8 @@ on:
       - test_sports_ncaa_espn_identity.py
       - sports_college_nba_chronology.py
       - test_sports_college_nba_chronology.py
+      - sports_college_nba_eligibility.py
+      - test_sports_college_nba_eligibility.py
       - .github/workflows/college_nba_source_observation.yml
   workflow_dispatch:
   schedule:
@@ -36,7 +38,7 @@ jobs:
       - name: Install pinned transport
         run: python -m pip install requests==2.32.5
       - name: Check game-source parser and forecast isolation
-        run: python -m unittest -v test_sports_expansion_observer test_sports_expansion_audit test_sports_nba_official_schedule_audit test_sports_ncaa_official_source test_sports_ncaa_espn_identity test_sports_college_nba_chronology
+        run: python -m unittest -v test_sports_expansion_observer test_sports_expansion_audit test_sports_nba_official_schedule_audit test_sports_ncaa_official_source test_sports_ncaa_espn_identity test_sports_college_nba_chronology test_sports_college_nba_eligibility
       - name: Retain timestamped source-only college and NBA snapshots
         id: observation
         run: python sports_expansion_observer.py --days-ahead 3
