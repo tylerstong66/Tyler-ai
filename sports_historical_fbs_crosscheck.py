@@ -40,17 +40,21 @@ def build(base=Path('.'), *, split='train', now=None, league='NCAAF_FBS', verifi
     audit = historical_audit.audit(base, now=now)
     excluded_provider_ids = {row['game_id'] for row in audit['quarantined']
                              if row['league'] == league}
-    official = defaultdict(list); nrefs = defaultdict(list)
+    official = defaultdict(list); nrefs = defaultdict(list); source_quarantines = []
     for saved, path, period in _owned_sources(base, league, split, now):
         ref = {**period, 'receipt_sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
                'response_sha256': saved['original_response_sha256'],
                'observed_at_utc': saved['recorded_at_utc']}
+        source_quarantines.extend({**row, 'league':league, 'source_receipt':ref}
+                                  for row in saved.get('quarantined_ncaa_contests',[]))
         for row in saved['parsed_ncaa_games']:
             official[row['ncaa_game_id']].append({'league': league, **row})
             nrefs[row['ncaa_game_id']].append(ref)
     ncaa_conflicts = {game_id for game_id, rows in official.items()
                       if any(row != rows[0] for row in rows[1:])}
-    ncaa_rows = [rows[0] for game_id, rows in sorted(official.items()) if game_id not in ncaa_conflicts]
+    quarantined_ncaa_ids = {row['ncaa_game_id'] for row in source_quarantines}
+    ncaa_rows = [rows[0] for game_id, rows in sorted(official.items())
+                 if game_id not in ncaa_conflicts and game_id not in quarantined_ncaa_ids]
     provider = defaultdict(list); erefs = defaultdict(list)
     for day in history.dates_by_league()[league][split]:
         if not history.verify_existing(base, league, split, day, as_of=now):
@@ -118,6 +122,11 @@ def build(base=Path('.'), *, split='train', now=None, league='NCAAF_FBS', verifi
             'training_allowed': False, 'historical_evaluation_enabled': False,
             'forecasting_enabled': False, 'promotion_allowed': False,
             'NO_BET': True, 'actual_wagers': 0}
+    if source_quarantines:
+        result.update(schema=('tyler-historical-d1-source-crosscheck-v2' if league=='NCAAM_D1'
+                              else 'tyler-historical-fbs-source-crosscheck-v2'),
+                      quarantined_ncaa_source_game_ids=sorted(quarantined_ncaa_ids),
+                      quarantined_ncaa_source_observations=source_quarantines)
     if policy is not None:
         result.update(schema='tyler-historical-fbs-reviewed-identity-crosscheck-v2',
                       school_identity_policy=policy['policy'],

@@ -72,3 +72,14 @@ agreement and 72-hour ambiguity checks remain unchanged; 14/33 cases remain
 pending. This identity metadata does not enable pregame availability, model
 training, forecasts, evaluation, promotion or wagering. Details and limits are
 in `HISTORICAL_FBS_SCHOOL_IDENTITY_PROTOCOL.md`.
+
+## D1 malformed-final source quarantine
+
+Historical D1 acquisition encountered NCAA contest 6442390 (UTEP/Sam Houston,
+March 11, 2025) reported final at 0-0, while the archived ESPN source reports
+79-65. The strict final parser still rejects the tied score. A separate v2
+source receipt preserves the entire original response, retains its 23 other
+valid observations, and quarantines this contest without creating a result
+label. Crosschecks exclude the NCAA ID across all retained observations.
+All other source/schema/identity/date failures still fail the batch. See
+`NCAA_D1_SOURCE_QUARANTINE_PROTOCOL.md`; no wagering or model gates changed.

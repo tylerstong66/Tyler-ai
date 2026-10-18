@@ -53,6 +53,10 @@ def graph_url(sport,*,year,week=None,day=None):
     })
 
 
+class TiedNcaaFinalError(ValueError):
+    """The original source claims a final with equal scores; never a result."""
+
+
 def _positive_id(value,label):
     s=str(value)
     if not s.isdigit() or int(s)<=0:
@@ -107,7 +111,7 @@ def official_scoreboard(raw,sport):
                 else:
                     raise ValueError("Incomplete final NCAA source score")
             if scores["home"]==scores["away"]:
-                raise ValueError("NCAA final scoreboard cannot imply a tied winner")
+                raise TiedNcaaFinalError("NCAA final scoreboard cannot imply a tied winner")
         games.append({
             "ncaa_game_id":identifier,
             "home_name":sides["home"]["nameShort"],
