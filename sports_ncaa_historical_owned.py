@@ -72,7 +72,7 @@ def verify(base, split, week, *, now=None):
 
 
 def capture(fetch, *, base=Path('.'), split='train', per_run=3, now=None):
-    if split not in YEARS or type(per_run) is not int or not 1 <= per_run <= 3:
+    if split not in (*YEARS, 'auto') or type(per_run) is not int or not 1 <= per_run <= 3:
         raise ValueError('Historical NCAA fetch budget is 1..3 weeks')
     now = now or datetime.now(timezone.utc)
     if now.tzinfo is None:
@@ -88,6 +88,9 @@ def capture(fetch, *, base=Path('.'), split='train', per_run=3, now=None):
     for part in YEARS:
         for week in WEEKS:
             existing[(part, week)] = verify(base, part, week, now=now)
+    if split == 'auto':
+        split = next((part for part in YEARS
+                      if any(existing[(part, week)] is None for week in WEEKS)), 'validation')
     selected = [week for week in WEEKS if existing[(split, week)] is None][:per_run]
     prepared = []
     for week in selected:
@@ -125,7 +128,7 @@ def main():
     import requests
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--split', choices=tuple(YEARS), default='train')
+    parser.add_argument('--split', choices=(*YEARS, 'auto'), default='auto')
     args = parser.parse_args()
     def fetch(url):
         response = requests.get(url, timeout=18, headers={
