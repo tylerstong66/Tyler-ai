@@ -49,3 +49,12 @@ This collector sets `training_allowed=false`,
 `live_forecasts_allowed=false`, `historical_backfilled_forecasts=0`,
 `NO_BET=true`, `actual_wagers=0` and
 `promotion_allowed=false` until a separate evidence-reviewed phase.
+
+## Historical archive resource and safety bounds
+
+Historical receipt replay now uses the same streaming 8 MB decompression bound
+as current-season source audit and rejects compressed files above 8.5 MB.
+Truncated gzip and expansion bombs fail before any outbound acquisition or new
+batch writes. Replay also enforces integer zero wagers, promotion disabled and
+provider-only official-result status from every existing receipt. Original
+archives are never repaired or overwritten by these checks.

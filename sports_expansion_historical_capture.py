@@ -13,6 +13,7 @@ from pathlib import Path
 
 import requests
 import sports_expansion_observer as observer
+from sports_expansion_audit import bounded_gzip_read, MAX_BLOB_SIZE
 
 ROOT=Path("benchmarks/college_nba_history_v1")
 # Explicit complete-date REQUEST windows, not a declaration that every event
@@ -65,9 +66,14 @@ def verify_existing(base, sport, split, day, *, as_of=None):
             or r.get("source_date")!=day
             or r.get("source_url")!=observer.scoreboard_url(sport,day)
             or r.get("NO_BET") is not True
+            or type(r.get("actual_wagers")) is not int or r.get("actual_wagers") != 0
+            or r.get("promotion_allowed") is not False
+            or r.get("independently_verified_official_scores") is not False
             or r.get("historical_results_are_not_pregame_forecasts") is not True):
         raise ValueError("Historical source identity, split or safety metadata changed")
-    raw=gzip.decompress(artifact.read_bytes())
+    if artifact.stat().st_size > MAX_BLOB_SIZE:
+        raise ValueError("Historical compressed source exceeds maximum archive size")
+    raw=bounded_gzip_read(artifact.read_bytes())
     if hashlib.sha256(raw).hexdigest()!=r["original_response_sha256"]:
         raise ValueError("Original historical source bytes no longer match receipt")
     parsed=observer.parse_scoreboard(json.loads(raw),sport)
