@@ -13,6 +13,9 @@ on:
       - sports_historical_identity_audit.py
       - sports_historical_content_seal.py
       - test_sports_historical_content_seal.py
+      - sports_historical_school_identities.py
+      - test_sports_historical_school_identities.py
+      - benchmarks/college_nba_history_v1/school_identity_v1/**
       - sports_historical_fbs_crosscheck.py
       - test_sports_historical_fbs_crosscheck.py
       - sports_ncaa_espn_identity.py
@@ -47,7 +50,7 @@ jobs:
       - name: Install pinned network transport
         run: python -m pip install requests==2.32.5
       - name: Test prospective isolation, chronology and sealed history
-        run: python -m unittest -v test_sports_expansion_historical_capture test_sports_historical_identity_audit test_sports_ncaa_historical_owned test_sports_historical_fbs_crosscheck test_sports_ncaa_d1_historical_owned test_sports_historical_d1_crosscheck test_sports_historical_content_seal test_sports_nba_historical_owned test_sports_historical_nba_crosscheck
+        run: python -m unittest -v test_sports_expansion_historical_capture test_sports_historical_identity_audit test_sports_ncaa_historical_owned test_sports_historical_fbs_crosscheck test_sports_ncaa_d1_historical_owned test_sports_historical_d1_crosscheck test_sports_historical_content_seal test_sports_nba_historical_owned test_sports_historical_nba_crosscheck test_sports_historical_school_identities
       - name: Verify the frozen original source-content index before acquisition
         run: python sports_historical_content_seal.py
       - name: Fetch bounded 2024 training / 2025 validation season history
@@ -93,6 +96,15 @@ jobs:
         with:
           name: historical-nba-source-crosscheck
           path: historical-nba-*-crosscheck.json
+          retention-days: 30
+      - name: Replay separately reviewed historical FBS school identities
+        run: |
+          python sports_historical_fbs_crosscheck.py --verified-school-aliases --split train > historical-fbs-reviewed-train.json
+          python sports_historical_fbs_crosscheck.py --verified-school-aliases --split validation > historical-fbs-reviewed-validation.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: historical-fbs-reviewed-identities
+          path: historical-fbs-reviewed-*.json
           retention-days: 30
       - name: Publish historical SOURCE receipts only after entire batch succeeds
         run: |

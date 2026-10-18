@@ -61,3 +61,14 @@ research finals respectively. Pending identities remain excluded, including
 four 2026 All-Star team-code games. Existing ambiguity safeguards and all
 model/wagering restrictions remain in effect. See
 `NBA_HISTORICAL_OWNED_SOURCE_PROTOCOL.md` for scope, counts and replay commands.
+
+## Separately reviewed historical FBS identities
+
+An opt-in v2 spelling policy now replays 83 explicit institutional aliases
+against original receipts in both 2024/2025 source splits. Strict agreeing
+finals rise from 468/450 to 951/925, with the exact v1 results preserved as
+subsets. No scores select identity. Source chronology, bijection, 30-minute
+agreement and 72-hour ambiguity checks remain unchanged; 14/33 cases remain
+pending. This identity metadata does not enable pregame availability, model
+training, forecasts, evaluation, promotion or wagering. Details and limits are
+in `HISTORICAL_FBS_SCHOOL_IDENTITY_PROTOCOL.md`.

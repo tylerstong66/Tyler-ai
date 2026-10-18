@@ -28,7 +28,7 @@ def _owned_sources(base, league, split, now):
                 yield saved, base/d1.ROOT/split/(day+'.receipt.json'), {'source_date': day}
 
 
-def build(base=Path('.'), *, split='train', now=None, league='NCAAF_FBS'):
+def build(base=Path('.'), *, split='train', now=None, league='NCAAF_FBS', verified_school_aliases=False):
     if league not in ('NCAAF_FBS', 'NCAAM_D1'):
         raise ValueError('Unsupported historical independent-source league')
     if split not in owned.YEARS:
@@ -81,6 +81,13 @@ def build(base=Path('.'), *, split='train', now=None, league='NCAAF_FBS'):
     provider_conflicts = {game_id for game_id, rows in provider.items()
                           if any(row != rows[0] for row in rows[1:])}
     espn_rows = [rows[0] for game_id, rows in sorted(provider.items()) if game_id not in provider_conflicts]
+    policy = None
+    if verified_school_aliases:
+        import sports_historical_school_identities as schools
+        policy = schools.load(base,league=league,split=split,now=now)
+        ncaa_rows = [{**row, **{side+'_name':policy['aliases'].get(
+                         identity.name(row[side+'_name']),row[side+'_name'])
+                         for side in ('home','away')}} for row in ncaa_rows]
     report = finals.classify(ncaa_rows, espn_rows, use_curated_fbs_aliases=False)
     ncaa_by_id = {row['ncaa_game_id']: row for row in ncaa_rows}
     output = []; pending = list(report['pending'])
@@ -97,7 +104,7 @@ def build(base=Path('.'), *, split='train', now=None, league='NCAAF_FBS'):
                        'corroboration_available_at_utc': max(nt, et).isoformat(),
                        'postgame_source_chronology_verified': True,
                        'historical_pregame_features_verified': False})
-    return {'schema': ('tyler-historical-fbs-source-crosscheck-v1' if league=='NCAAF_FBS'
+    result = {'schema': ('tyler-historical-fbs-source-crosscheck-v1' if league=='NCAAF_FBS'
                        else 'tyler-historical-d1-source-crosscheck-v1'), 'split': split,
             'school_identity_policy': 'EXACT_NORMALIZED_SCHOOL_NAMES_NO_2026_ALIASES',
             'independent_ncaa_source_available': bool(official),
@@ -111,6 +118,12 @@ def build(base=Path('.'), *, split='train', now=None, league='NCAAF_FBS'):
             'training_allowed': False, 'historical_evaluation_enabled': False,
             'forecasting_enabled': False, 'promotion_allowed': False,
             'NO_BET': True, 'actual_wagers': 0}
+    if policy is not None:
+        result.update(schema='tyler-historical-fbs-reviewed-identity-crosscheck-v2',
+                      school_identity_policy=policy['policy'],
+                      school_identity_manifest_sha256=policy['manifest_sha256'],
+                      reviewed_school_spellings=policy['reviewed_school_spellings'])
+    return result
 
 
 def main():
@@ -118,8 +131,10 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--league',choices=('NCAAF_FBS','NCAAM_D1'),default='NCAAF_FBS')
     parser.add_argument('--split',choices=tuple(owned.YEARS),default='train')
+    parser.add_argument('--verified-school-aliases',action='store_true',
+                        help='Opt into independently replayed historical FBS spelling evidence')
     args=parser.parse_args()
-    print(json.dumps(build(league=args.league,split=args.split), sort_keys=True, indent=2))
+    print(json.dumps(build(league=args.league,split=args.split,verified_school_aliases=args.verified_school_aliases), sort_keys=True, indent=2))
 
 
 if __name__ == '__main__':
