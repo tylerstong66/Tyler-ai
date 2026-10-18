@@ -178,6 +178,26 @@ class CollegeIdentityTests(unittest.TestCase):
                 identity.run(base=root,now=AT+timedelta(hours=13))
             self.assertFalse((root/identity.ROOT).exists())
 
+    def test_ncaa_expansion_bomb_rejected_before_crosswalk(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td);self.seed(root)
+            capture=next((root/ncaa.ROOT/'captures').iterdir())
+            target=capture/'NCAAF_FBS_week-08.json.gz'
+            target.write_bytes(gzip.compress(b'x' * (ncaa.MAX_BYTES+1),mtime=0))
+            with self.assertRaisesRegex(ValueError,'exceeds maximum'):
+                identity.run(base=root,now=AT+timedelta(minutes=10))
+            self.assertFalse((root/identity.ROOT).exists())
+
+    def test_espn_truncated_gzip_rejected_before_crosswalk(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td);self.seed(root)
+            capture=next((root/espn.ROOT/'captures').iterdir())
+            target=capture/'NCAAF_FBS_2026-10-17.json.gz'
+            target.write_bytes(target.read_bytes()[:-6])
+            with self.assertRaisesRegex(ValueError,'Corrupt or incomplete'):
+                identity.run(base=root,now=AT+timedelta(minutes=10))
+            self.assertFalse((root/identity.ROOT).exists())
+
     def test_duplicated_official_fixture_candidates_are_never_chosen(self):
         ncaa_entries=[{
             "league":"NCAAF_FBS","ncaa_game_id":str(i),
