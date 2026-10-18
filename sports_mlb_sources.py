@@ -86,10 +86,11 @@ def official_counts(data, season, game_type="R"):
 
 class OfficialMlbReader:
     """Fixed-origin, bounded-HTTP transport; caller cannot supply arbitrary URLs."""
-    def __init__(self, *, get=None, clock=None):
+    def __init__(self, *, get=None, clock=None, archive_dir=None):
         self.get = get or requests.get
         self.clock = clock or (lambda: datetime.now(timezone.utc))
         self.audit = []
+        self.archive_dir = archive_dir
 
     def load(self, path, params=None, api_version="v1"):
         if not isinstance(path, str) or not path or any(c not in
@@ -117,6 +118,9 @@ class OfficialMlbReader:
                     "retrieved_at": captured,
                     "data_through": captured,  # observed availability, NOT verified publication time
                     "response_sha256": hashlib.sha256(normalized.encode()).hexdigest()}
+        if self.archive_dir is not None:
+            from sports_mlb_source_archives import retain
+            evidence.update(retain(self.archive_dir, response.content, evidence['response_sha256']))
         self.audit.append(evidence)
         return data, evidence
 

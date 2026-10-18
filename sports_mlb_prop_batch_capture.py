@@ -26,7 +26,12 @@ def capture_current_day(date_string=None, *, reader=None, root=DEFAULT_ROOT,
         raise ValueError("Select between one and four active-roster hitters per team.")
     if isinstance(max_games,bool) or not isinstance(max_games,int) or not 1<=max_games<=20:
         raise ValueError("Bound the official schedule to 1-20 games.")
-    reader=reader or OfficialMlbReader()
+    root=Path(root)
+    if reader is None:
+        from sports_mlb_source_archives import audit_directory
+        archive=root/'source_archives'
+        audit_directory(archive)
+        reader=OfficialMlbReader(archive_dir=archive)
     start_run=utc(reader.clock())
     local_day=start_run.astimezone(EASTERN).date()
     if date_string is None:
