@@ -1,3 +1,4 @@
+import re
 """Replay NBA-owned schedule and linked ESPN source receipts; research only."""
 import hashlib
 import json
@@ -7,7 +8,7 @@ import sports_expansion_observer as espn
 from sports_expansion_audit import bounded_gzip_read
 
 def verify(root, stamp):
-    if not isinstance(stamp,str) or len(stamp)!=22 or not stamp.endswith("Z") or not stamp[:-1].isdigit():
+    if not isinstance(stamp,str) or not re.fullmatch(r"[0-9]{8}T[0-9]{12}Z",stamp):
         raise ValueError("Invalid NBA capture identifier")
     folder=Path(root)/nba.ROOT/"captures"/stamp
     saved=json.loads((folder/"manifest.json").read_bytes())
@@ -21,7 +22,7 @@ def verify(root, stamp):
         raise ValueError("NBA original schedule digest mismatch")
     official=nba.official_games(raw)
     linked=saved["espn_capture"]
-    if not isinstance(linked,str) or len(linked)!=22 or not linked.endswith("Z") or not linked[:-1].isdigit():
+    if not isinstance(linked,str) or not re.fullmatch(r"[0-9]{8}T[0-9]{12}Z",linked):
         raise ValueError("Invalid linked ESPN capture")
     espn_folder=Path(root)/espn.ROOT/"captures"/linked
     original=(espn_folder/"manifest.json").read_bytes()
