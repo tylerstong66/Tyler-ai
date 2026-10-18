@@ -8,7 +8,7 @@ non-tied scores, and both source observations later than both saved starts.
 Changed score or identity is never resolved by selecting a preferred source.
 
 Official endpoint, manifest timestamps, capture directory identity, closed NBA
-archive file set, raw response digests and ESPN full archive audit are checked.
+archive file set, raw response digests and linked ESPN capture audit are checked.
 The later retrieval time denotes corroboration availability, not the actual
 final horn or historical pregame information. Output retains exact official and
 ESPN IDs, team identities, scores and source manifest/response hashes.

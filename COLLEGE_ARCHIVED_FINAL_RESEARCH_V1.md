@@ -54,3 +54,18 @@ unique games. Incompatible saved reports never contribute labels; malformed
 raw bytes or other receipt violations abort the build. No source archives or
 legacy reports were rewritten. Later nonfinal regression also quarantines a
 previously agreeing label, while genuine earlier pregame observations do not.
+
+## Scoped replay and Division I coverage
+
+`audit_capture` retains all endpoint, timestamp, file-closure, digest,
+normalization and quarantine checks for one linked ESPN capture. Full source
+coverage auditing still checks every archive. Result readers replay only their
+linked sources, preventing an all-capture dataset from rescanning the full
+archive for every result receipt. A local retained-data run decreased from
+3.300 to 0.482 seconds, with byte-identical aggregate JSON (23 games). These
+single-machine measurements are descriptive, not a general latency guarantee.
+
+Dedicated D1 end-to-end fixtures exercise original NCAA MBB division-1 source
+queries, raw ESPN archive replay, agreeing finals and aggregate assembly;
+unknown school aliases and nonfinal observations remain excluded. These
+software fixtures do not add real historical or prospective D1 games.

@@ -41,9 +41,9 @@ def build(root, stamp):
     es, et, esha = _manifest(ef)
     if nt > recorded or et > recorded:
         raise ValueError("Source captured after crosswalk receipt")
-    # Full ESPN audit verifies original endpoints, timestamps, closed filenames,
-    # response digests, normalization and quarantines, including this capture.
-    audit.audit(root)
+    # Replay every original endpoint, timestamp, filename, digest and quarantine
+    # in the linked capture; dataset assembly must not rescan unrelated archives.
+    audit.audit_capture(ef / "manifest.json")
     if ns.get("source_query_hash") != ncaa.SCOREBOARD_QUERY_HASH:
         raise ValueError("Unexpected NCAA source query identity")
     for snap in ns["snapshots"]:
