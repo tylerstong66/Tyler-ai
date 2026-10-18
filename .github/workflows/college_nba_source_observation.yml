@@ -26,6 +26,8 @@ on:
       - test_sports_ncaa_espn_crosswalk_receipts.py
       - sports_college_dual_source_finals.py
       - sports_college_final_receipts.py
+      - sports_college_result_dataset.py
+      - test_sports_college_result_dataset.py
       - test_sports_college_final_receipts.py
       - test_sports_college_dual_source_finals.py
       - test_sports_college_nba_receipts.py
@@ -50,7 +52,7 @@ jobs:
       - name: Install pinned transport
         run: python -m pip install requests==2.32.5
       - name: Check game-source parser and forecast isolation
-        run: python -m unittest -v test_sports_expansion_observer test_sports_expansion_audit test_sports_nba_official_schedule_audit test_sports_ncaa_official_source test_sports_ncaa_espn_identity test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_nba_receipts test_sports_nba_schedule_receipts test_sports_ncaa_owned_receipts test_sports_ncaa_espn_crosswalk_receipts test_sports_college_dual_source_finals test_sports_college_final_receipts
+        run: python -m unittest -v test_sports_expansion_observer test_sports_expansion_audit test_sports_nba_official_schedule_audit test_sports_ncaa_official_source test_sports_ncaa_espn_identity test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_nba_receipts test_sports_nba_schedule_receipts test_sports_ncaa_owned_receipts test_sports_ncaa_espn_crosswalk_receipts test_sports_college_dual_source_finals test_sports_college_final_receipts test_sports_college_result_dataset
       - name: Retain timestamped source-only college and NBA snapshots
         id: observation
         run: python sports_expansion_observer.py --days-ahead 3
@@ -84,6 +86,18 @@ jobs:
           print({'agreements': report['two_source_final_agreements'],
                  'pending': report['pending_or_quarantined'], 'NO_BET': True})
           PYCODE
+      - name: Assemble result observations from all retained crosswalk receipts
+        id: college_dataset
+        if: steps.college_finals.outcome == 'success'
+        continue-on-error: true
+        run: python sports_college_result_dataset.py > college-result-dataset.json
+      - name: Attach replayed college result observation dataset
+        if: steps.college_dataset.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: college-result-observation-dataset
+          path: college-result-dataset.json
+          retention-days: 30
       - name: Report independent source verification outcomes
         if: always()
         env:
@@ -93,13 +107,14 @@ jobs:
           NCAA_OWNED_SOURCE: ${{ steps.ncaa_source.outcome }}
           NCAA_ESPN_CROSSWALK: ${{ steps.college_identity.outcome }}
           NCAA_FINAL_RECEIPTS: ${{ steps.college_finals.outcome }}
+          NCAA_RESULT_DATASET: ${{ steps.college_dataset.outcome }}
         run: |
           python - <<'PY'
           import json, os
           from pathlib import Path
           outcomes = {name: os.environ[name] for name in (
               'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE',
-              'NCAA_OWNED_SOURCE', 'NCAA_ESPN_CROSSWALK', 'NCAA_FINAL_RECEIPTS')}
+              'NCAA_OWNED_SOURCE', 'NCAA_ESPN_CROSSWALK', 'NCAA_FINAL_RECEIPTS', 'NCAA_RESULT_DATASET')}
           receipt = {
               'schema': 'tyler-independent-source-workflow-status-v1',
               'step_outcomes': outcomes,

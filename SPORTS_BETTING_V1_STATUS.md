@@ -1,5 +1,17 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-16)
 
+## October 18 — cross-capture college result dataset and identity uniqueness
+
+Added strict one-NCAA/one-ESPN identity use, original school/team IDs in separate
+v2 receipts (v1 bytes preserved), and all-capture result deduplication. Changed
+scores, source state regression and reassigned IDs quarantine observations.
+Retained 18 crosswalks: 17 replayed / 1 explicitly excluded as nonreproducible
+under current identity policy; 23 unique FBS agreements / 0 accepted-game
+quarantines. No model eligibility, wagers or accuracy claim. 103 local source
+pipeline tests passed. Dedicated CI and source collection retain aggregate JSON
+as a 30-day artifact. See `SPORTS_RESEARCH_MATURITY_2026_10_18.md` for the six
+separate sports and their actual remaining evidence gaps.
+
 ## October 18 — archived NCAA/ESPN final research receipt reader
 
 Implemented `sports_college_final_receipts.py` and dedicated PR CI. Every

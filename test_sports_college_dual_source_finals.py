@@ -42,6 +42,15 @@ class DualSourceFinalTests(unittest.TestCase):
         self.assertEqual(out["two_source_final_agreements"],0)
         self.assertEqual(out["pending"][0]["reason"],"CONFLICTING_FINAL_SCORES_NO_GRADE")
 
+    def test_two_provider_events_cannot_reuse_one_ncaa_identity(self):
+        nc, es = rows()
+        second = {**es, "espn_game_id": "401100002", "game_id": "401100002"}
+        out = finals.classify([nc], [es, second])
+        self.assertEqual(out["two_source_final_agreements"], 0)
+        self.assertEqual(out["pending_or_quarantined"], 2)
+        self.assertTrue(all(r["reason"] == "NON_BIJECTIVE_GAME_IDENTITY"
+                            for r in out["pending"]))
+
     def test_duplicate_ncaa_game_identity_rejected(self):
         nc,es=rows()
         with self.assertRaisesRegex(ValueError,"Duplicate"):

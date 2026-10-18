@@ -62,6 +62,7 @@ def build(root, stamp):
     accepted = []
     pending = list(report["pending"])
     official_by_id = {(r["league"], r["ncaa_game_id"]): r for r in official}
+    provider_by_id = {(r["league"], r["espn_game_id"]): r for r in provider}
     for row in report["corroborated_research_only"]:
         # Both final-bearing source observations must follow BOTH saved starts.
         # The later retrieval is availability of corroboration, not game end time.
@@ -74,7 +75,11 @@ def build(root, stamp):
                             "ncaa_game_id": row["ncaa_game_id"],
                             "reason": "FINAL_OBSERVED_AT_OR_BEFORE_SAVED_START"})
             continue
+        e = provider_by_id[(row["league"], row["espn_game_id"])]
         accepted.append({**row,
+            "ncaa_home_school": n["home_name"], "ncaa_away_school": n["away_name"],
+            "espn_home_team_id": e["home_team_id"],
+            "espn_away_team_id": e["away_team_id"],
             "ncaa_source_observed_at_utc": nt.isoformat(),
             "espn_source_observed_at_utc": et.isoformat(),
             "corroboration_available_at_utc": max(nt, et).isoformat(),
@@ -84,8 +89,9 @@ def build(root, stamp):
             "pregame_feature_chronology_verified": False,
         })
     return {
-        "schema": "tyler-college-archived-final-research-v1",
+        "schema": "tyler-college-archived-final-research-v2",
         "crosswalk_capture": stamp, "crosswalk_manifest_sha256": crosswalk_sha,
+        "source_pair_observed_at_utc": max(nt, et).isoformat(),
         "ncaa_capture": nf.name, "ncaa_manifest_sha256": nsha,
         "espn_capture": ef.name, "espn_manifest_sha256": esha,
         "ncaa_response_sha256": sorted({s["source_sha256"] for s in ns["snapshots"]}),
@@ -105,7 +111,7 @@ def publish(root, stamp):
     """Write only reproducible bytes, preserving any existing immutable result."""
     result = build(root, stamp)
     raw = espn.canonical(result)
-    dest = Path(root) / ROOT / "captures" / stamp / "manifest.json"
+    dest = Path(root) / ROOT / "captures_v2" / stamp / "manifest.json"
     if dest.exists():
         if dest.read_bytes() != raw:
             raise ValueError("Existing final research receipt differs from replay")
