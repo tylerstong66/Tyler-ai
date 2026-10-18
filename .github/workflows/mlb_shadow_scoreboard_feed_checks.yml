@@ -5,6 +5,8 @@ on:
     paths:
       - sports_mlb_prop_scoreboard_feed.py
       - sports_mlb_prop_scoreboard_reader.py
+      - app_v2_19_3_38.py
+      - test_v2_19_3_38_mlb_context_http.py
       - app_v2_19_3_39.py
       - test_sports_mlb_prop_scoreboard_feed.py
       - test_v2_19_3_39_mlb_scoreboard_http.py
@@ -14,6 +16,8 @@ on:
     paths:
       - sports_mlb_prop_scoreboard_feed.py
       - sports_mlb_prop_scoreboard_reader.py
+      - app_v2_19_3_38.py
+      - test_v2_19_3_38_mlb_context_http.py
       - app_v2_19_3_39.py
       - test_sports_mlb_prop_scoreboard_feed.py
       - test_v2_19_3_39_mlb_scoreboard_http.py
@@ -30,4 +34,6 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r requirements.txt
+      - name: Verify authenticated context and strict null probability guards in an isolated app process
+        run: python -m unittest -v test_v2_19_3_38_mlb_context_http
       - run: python -m unittest -v test_sports_mlb_prop_scoreboard_feed test_v2_19_3_39_mlb_scoreboard_http

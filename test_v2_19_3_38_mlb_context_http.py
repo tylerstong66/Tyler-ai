@@ -8,6 +8,7 @@ KEY="synthetic-hitter-context-test-key"
 
 def payload():
     r=report()
+    r["estimated_hit_probability"]=None
     r["matchup_research"]["starter_matchup"]={"pitcher":r["probable_starter"],
         "hits":0,"at_bats":3,"plate_appearances":3,"historical_batting_average":0.0}
     r["hitter_season_context"]={
@@ -30,6 +31,21 @@ class RouteTests(unittest.TestCase):
                          ["season_statistics"][0]["hits"],88)
         self.assertIsNone(obj["sports_mlb_contextual_research"]["estimated_home_run_probability"])
         work.assert_called_once()
+    def test_probability_estimates_and_missing_guards_fail_closed(self):
+        for field in ("estimated_hit_probability","estimated_home_run_probability","wager_executed"):
+            for missing in (False,True):
+                with self.subTest(field=field,missing=missing):
+                    value=payload()
+                    if missing: value.pop(field)
+                    else: value[field]=True if field=="wager_executed" else 0.5
+                    with patch.object(core,"TYLER_API_KEY",KEY),patch.object(
+                         latest,"resolve_named_pregame",return_value=resolved()),patch.object(
+                         latest,"contextual_mlb_research",return_value=value):
+                        res=self.client.post("/chat",json={"message":MSG},headers={"X-Tyler-Key":KEY})
+                    self.assertEqual(res.status_code,409)
+                    self.assertFalse(res.get_json()["success"])
+                    self.assertNotIn("sports_mlb_contextual_research",res.get_json())
+
     def test_unauthorized_request_blocked(self):
         with patch.object(core,"TYLER_API_KEY",KEY),patch.object(
              latest,"contextual_mlb_research",side_effect=AssertionError("not authorized")) as fn:
