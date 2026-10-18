@@ -1,0 +1,74 @@
+{
+  "NO_BET": true,
+  "actual_wagers": 0,
+  "as_of_utc": "2026-10-18T18:03:24.753700+00:00",
+  "fbs_crosscheck": {
+    "train": {
+      "conflicting_espn_school_observations": [],
+      "conflicting_ncaa_game_ids": [],
+      "espn_source_game_ids": 965,
+      "excluded_provider_game_ids": [],
+      "ncaa_source_game_ids": 965,
+      "pending_or_quarantined": 497,
+      "two_source_final_agreements": 468
+    },
+    "validation": {
+      "conflicting_espn_school_observations": [],
+      "conflicting_ncaa_game_ids": [],
+      "espn_source_game_ids": 958,
+      "excluded_provider_game_ids": [],
+      "ncaa_source_game_ids": 958,
+      "pending_or_quarantined": 508,
+      "two_source_final_agreements": 450
+    }
+  },
+  "forecasting_enabled": false,
+  "historical_evaluation_enabled": false,
+  "independent_ncaa": {
+    "train": {
+      "all_declared_week_requests_retained": true,
+      "distinct_contests": 965,
+      "weeks_retained": 21
+    },
+    "validation": {
+      "all_declared_week_requests_retained": true,
+      "distinct_contests": 958,
+      "weeks_retained": 21
+    }
+  },
+  "official_schedule_completeness_certified": false,
+  "promotion_allowed": false,
+  "provider_coverage": {
+    "NBA": {
+      "all_declared_dates_retrieved": true,
+      "archived_source_dates": 490,
+      "expected_source_dates": 490,
+      "official_result_completeness_verified": false,
+      "remaining_source_dates": 0
+    },
+    "NCAAF_FBS": {
+      "all_declared_dates_retrieved": true,
+      "archived_source_dates": 302,
+      "expected_source_dates": 302,
+      "official_result_completeness_verified": false,
+      "remaining_source_dates": 0
+    },
+    "NCAAM_D1": {
+      "all_declared_dates_retrieved": true,
+      "archived_source_dates": 312,
+      "expected_source_dates": 312,
+      "official_result_completeness_verified": false,
+      "remaining_source_dates": 0
+    }
+  },
+  "provider_identity_audit": {
+    "quarantined_game_ids": 0,
+    "repeated_same_game_observations": 0,
+    "unique_provider_game_ids": 17187,
+    "verified_source_days": 1104
+  },
+  "schema": "tyler-completed-historical-source-acquisition-v1",
+  "source_file_index_sha256": "ddb96d6f9dbdf0ef55abcdf078aacaed34935180057cefed540b2d03a332f698",
+  "source_files": 2292,
+  "training_allowed": false
+}

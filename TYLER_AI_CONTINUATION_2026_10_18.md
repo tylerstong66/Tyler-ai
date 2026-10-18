@@ -27,3 +27,25 @@ The new historical game-identity audit replayed all 450 daily receipts and
 Validation source coverage was still zero at that snapshot. Offline sports
 suite now passes 440 tests. The audit remains research-only, with all training,
 evaluation, forecasting, promotion and wagering disabled.
+
+## Completed raw-source acquisition and additional published engineering
+
+PRs #125–#134 shipped archived NCAA/ESPN final replay, result deduplication,
+NBA final replay, bounded linear audits, complete-split acquisition support,
+independent NCAA history and exact-name historical final crosschecks. Every
+merged head passed its relevant CI; post-merge workflows were verified. All
+455 offline sports tests passed after the MLB response-retention addition.
+
+PR #134 preserves original MLB response bodies for future hitter captures with
+a separate staged-source guard, then the unchanged forecast-only pregame guard.
+Its post-merge collector published four original response archives, all replayed
+from a fresh checkout. Older digest-only source gaps and issue #98 remain
+explicitly unresolved; no old forecasts or source times were rewritten.
+
+A bounded local acquisition continuation has now completed all 1,104 historical
+provider date requests and 42 independent NCAA FBS week requests. Full replay:
+17,187 provider IDs, no detected identity/split/date quarantines; strict FBS
+final agreement 468 training / 450 validation. See
+`HISTORICAL_SOURCE_COMPLETION_2026_10_18.md` and the sealed completion JSON.
+Do not confuse complete request-date retention with certified event coverage,
+accepted pregame features, model evaluation or an established betting edge.
