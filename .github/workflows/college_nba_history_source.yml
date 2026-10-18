@@ -10,6 +10,9 @@ on:
       - sports_ncaa_espn_identity.py
       - sports_college_dual_source_finals.py
       - sports_ncaa_historical_owned.py
+      - sports_ncaa_d1_historical_owned.py
+      - test_sports_ncaa_d1_historical_owned.py
+      - test_sports_historical_d1_crosscheck.py
       - test_sports_ncaa_historical_owned.py
       - test_sports_historical_identity_audit.py
       - sports_expansion_audit.py
@@ -36,13 +39,17 @@ jobs:
       - name: Install pinned network transport
         run: python -m pip install requests==2.32.5
       - name: Test prospective isolation, chronology and sealed history
-        run: python -m unittest -v test_sports_expansion_historical_capture test_sports_historical_identity_audit test_sports_ncaa_historical_owned test_sports_historical_fbs_crosscheck
+        run: python -m unittest -v test_sports_expansion_historical_capture test_sports_historical_identity_audit test_sports_ncaa_historical_owned test_sports_historical_fbs_crosscheck test_sports_ncaa_d1_historical_owned test_sports_historical_d1_crosscheck
       - name: Fetch bounded 2024 training / 2025 validation season history
         run: python sports_expansion_historical_capture.py
       - name: Retain bounded NCAA-owned historical FBS source weeks
         id: ncaa_owned
         continue-on-error: true
         run: python sports_ncaa_historical_owned.py
+      - name: Retain bounded NCAA-owned historical D1 men's source days
+        id: d1_owned
+        continue-on-error: true
+        run: python sports_ncaa_d1_historical_owned.py
       - name: Audit archived provider identities, split separation and game dates
         run: python sports_historical_identity_audit.py > historical-identity-audit.json
       - uses: actions/upload-artifact@v4
@@ -57,13 +64,25 @@ jobs:
           name: historical-fbs-source-crosscheck
           path: historical-fbs-crosscheck.json
           retention-days: 30
+      - name: Crosscheck retained D1 historical original source finals
+        run: python sports_historical_fbs_crosscheck.py --league NCAAM_D1 > historical-d1-crosscheck.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: historical-d1-source-crosscheck
+          path: historical-d1-crosscheck.json
+          retention-days: 30
       - name: Publish historical SOURCE receipts only after entire batch succeeds
         run: |
           git add benchmarks/college_nba_history_v1/sources benchmarks/college_nba_history_v1/COVERAGE.latest.json
           if [ "${{ steps.ncaa_owned.outcome }}" = "success" ]; then
-            git add benchmarks/college_nba_history_v1/ncaa_owned
+            git add benchmarks/college_nba_history_v1/ncaa_owned/NCAAF_FBS
           else
             echo '::warning::Independent NCAA history unavailable; preserve provider observations separately'
+          fi
+          if [ "${{ steps.d1_owned.outcome }}" = "success" ]; then
+            git add benchmarks/college_nba_history_v1/ncaa_owned/NCAAM_D1
+          else
+            echo '::warning::Independent D1 source unavailable; do not certify D1 results'
           fi
           if ! git diff --cached --quiet; then
             git config user.name github-actions\[bot\]

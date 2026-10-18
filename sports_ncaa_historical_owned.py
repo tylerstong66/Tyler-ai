@@ -21,14 +21,20 @@ def _scope(split, week):
     return f'week-{week:02d}'
 
 
-def _rows(raw, split, observed):
-    rows = ncaa.official_scoreboard(raw, 'NCAAF_FBS')
-    low, high = history.SEASONS['NCAAF_FBS'][split]
+def _rows(raw, split, observed, *, league='NCAAF_FBS'):
+    rows = ncaa.official_scoreboard(raw, league)
+    low, high = history.SEASONS[league][split]
     for row in rows:
         value = row['source_start_time_epoch']
         if isinstance(value, bool) or not str(value).isdigit():
             raise ValueError('Missing NCAA historical kickoff identity')
         kickoff = datetime.fromtimestamp(int(value), timezone.utc)
+        display = row['source_start_date']
+        if not isinstance(display, str):
+            raise ValueError('Missing NCAA historical published game date')
+        published_date = datetime.strptime(display, '%m/%d/%Y').date()
+        if abs((published_date - kickoff.date()).days) > 1:
+            raise ValueError('NCAA published game date contradicts kickoff epoch')
         if not date.fromisoformat(low) <= kickoff.date() <= date.fromisoformat(high) + timedelta(days=1):
             raise ValueError('NCAA historical event outside declared source season')
         if row['provider_reported_final'] and observed <= kickoff:

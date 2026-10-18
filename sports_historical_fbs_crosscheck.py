@@ -14,7 +14,23 @@ import sports_college_dual_source_finals as finals
 from sports_expansion_audit import bounded_gzip_read
 
 
-def build(base=Path('.'), *, split='train', now=None):
+def _owned_sources(base, league, split, now):
+    if league == 'NCAAF_FBS':
+        for week in owned.WEEKS:
+            saved = owned.verify(base, split, week, now=now)
+            if saved is not None:
+                yield saved, base/owned.ROOT/split/f'week-{week:02d}.receipt.json', {'week': week}
+    else:
+        import sports_ncaa_d1_historical_owned as d1
+        for day in d1.DATES[split]:
+            saved = d1.verify(base, split, day, now=now)
+            if saved is not None:
+                yield saved, base/d1.ROOT/split/(day+'.receipt.json'), {'source_date': day}
+
+
+def build(base=Path('.'), *, split='train', now=None, league='NCAAF_FBS'):
+    if league not in ('NCAAF_FBS', 'NCAAM_D1'):
+        raise ValueError('Unsupported historical independent-source league')
     if split not in owned.YEARS:
         raise ValueError('Unsupported historical FBS source split')
     now = now or datetime.now(timezone.utc)
@@ -23,27 +39,23 @@ def build(base=Path('.'), *, split='train', now=None):
     base = Path(base)
     audit = historical_audit.audit(base, now=now)
     excluded_provider_ids = {row['game_id'] for row in audit['quarantined']
-                             if row['league'] == 'NCAAF_FBS'}
+                             if row['league'] == league}
     official = defaultdict(list); nrefs = defaultdict(list)
-    for week in owned.WEEKS:
-        saved = owned.verify(base, split, week, now=now)
-        if saved is None:
-            continue
-        path = base / owned.ROOT / split / f'week-{week:02d}.receipt.json'
-        ref = {'week': week, 'receipt_sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
+    for saved, path, period in _owned_sources(base, league, split, now):
+        ref = {**period, 'receipt_sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
                'response_sha256': saved['original_response_sha256'],
                'observed_at_utc': saved['recorded_at_utc']}
         for row in saved['parsed_ncaa_games']:
-            official[row['ncaa_game_id']].append({'league': 'NCAAF_FBS', **row})
+            official[row['ncaa_game_id']].append({'league': league, **row})
             nrefs[row['ncaa_game_id']].append(ref)
     ncaa_conflicts = {game_id for game_id, rows in official.items()
                       if any(row != rows[0] for row in rows[1:])}
     ncaa_rows = [rows[0] for game_id, rows in sorted(official.items()) if game_id not in ncaa_conflicts]
     provider = defaultdict(list); erefs = defaultdict(list)
-    for day in history.dates_by_league()['NCAAF_FBS'][split]:
-        if not history.verify_existing(base, 'NCAAF_FBS', split, day, as_of=now):
+    for day in history.dates_by_league()[league][split]:
+        if not history.verify_existing(base, league, split, day, as_of=now):
             continue
-        folder = base / history.ROOT / 'sources' / 'NCAAF_FBS' / split
+        folder = base / history.ROOT / 'sources' / league / split
         path = folder / (day + '.receipt.json'); raw_receipt = path.read_bytes()
         saved = json.loads(raw_receipt)
         raw = bounded_gzip_read((folder / (day + '.json.gz')).read_bytes())
@@ -63,7 +75,7 @@ def build(base=Path('.'), *, split='train', now=None):
                 names[team['homeAway']] = identity.name(school) if school else None
             if set(names) != {'home', 'away'}:
                 raise ValueError('Missing historical ESPN school identity')
-            provider[game_id].append({**row, 'league': 'NCAAF_FBS',
+            provider[game_id].append({**row, 'league': league,
                                       'espn_game_id': game_id, 'school_names': names})
             erefs[game_id].append(ref)
     provider_conflicts = {game_id for game_id, rows in provider.items()
@@ -85,7 +97,8 @@ def build(base=Path('.'), *, split='train', now=None):
                        'corroboration_available_at_utc': max(nt, et).isoformat(),
                        'postgame_source_chronology_verified': True,
                        'historical_pregame_features_verified': False})
-    return {'schema': 'tyler-historical-fbs-source-crosscheck-v1', 'split': split,
+    return {'schema': ('tyler-historical-fbs-source-crosscheck-v1' if league=='NCAAF_FBS'
+                       else 'tyler-historical-d1-source-crosscheck-v1'), 'split': split,
             'school_identity_policy': 'EXACT_NORMALIZED_SCHOOL_NAMES_NO_2026_ALIASES',
             'independent_ncaa_source_available': bool(official),
             'ncaa_source_game_ids': len(official), 'espn_source_game_ids': len(provider),
@@ -101,7 +114,12 @@ def build(base=Path('.'), *, split='train', now=None):
 
 
 def main():
-    print(json.dumps(build(), sort_keys=True, indent=2))
+    import argparse
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--league',choices=('NCAAF_FBS','NCAAM_D1'),default='NCAAF_FBS')
+    parser.add_argument('--split',choices=tuple(owned.YEARS),default='train')
+    args=parser.parse_args()
+    print(json.dumps(build(league=args.league,split=args.split), sort_keys=True, indent=2))
 
 
 if __name__ == '__main__':
