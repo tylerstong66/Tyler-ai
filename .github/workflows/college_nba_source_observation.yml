@@ -54,6 +54,45 @@ jobs:
         if: steps.ncaa_source.outcome == 'success'
         continue-on-error: true
         run: python sports_ncaa_espn_identity.py
+      - name: Report independent source verification outcomes
+        if: always()
+        env:
+          ESPN_OBSERVATION: ${{ steps.observation.outcome }}
+          ESPN_REPLAY_AUDIT: ${{ steps.audit.outcome }}
+          NBA_SCHEDULE_SOURCE: ${{ steps.nba_source.outcome }}
+          NCAA_OWNED_SOURCE: ${{ steps.ncaa_source.outcome }}
+          NCAA_ESPN_CROSSWALK: ${{ steps.college_identity.outcome }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          outcomes = {name: os.environ[name] for name in (
+              'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE',
+              'NCAA_OWNED_SOURCE', 'NCAA_ESPN_CROSSWALK')}
+          receipt = {
+              'schema': 'tyler-independent-source-workflow-status-v1',
+              'step_outcomes': outcomes,
+              'independent_nba_schedule_checked': outcomes['NBA_SCHEDULE_SOURCE'] == 'success',
+              'independent_ncaa_source_checked': outcomes['NCAA_OWNED_SOURCE'] == 'success',
+              'college_identity_crosswalk_checked': outcomes['NCAA_ESPN_CROSSWALK'] == 'success',
+              'independent_official_final_results_verified': False,
+              'forecasting_enabled': False, 'NO_BET': True, 'actual_wagers': 0,
+          }
+          Path('college_nba_workflow_status.json').write_text(json.dumps(receipt, indent=2, sort_keys=True) + '\n')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write('## Independent NCAA/NBA source checks\n\n')
+              for name, value in outcomes.items():
+                  summary.write(f'- {name}: **{value}**\n')
+              summary.write('\nSource checks do not verify official final scores, enable forecasts, or authorize wagers.\n')
+          PY
+      - name: Attach source-verification status to workflow run
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: college-nba-independent-source-status
+          path: college_nba_workflow_status.json
+          if-no-files-found: error
+          retention-days: 30
       - name: Publish only fully validated research capture
         if: ${{ steps.observation.outcome == 'success' && steps.audit.outcome == 'success' }}
         run: |
