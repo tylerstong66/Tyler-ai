@@ -1,15 +1,21 @@
 name: MLB batch pregame shadow capture safeguards
 on:
   push:
-    branches: ['feature/mlb-hitter-shadow-batch-capture-v1']
+    branches: ['main', 'feature/mlb-hitter-shadow-batch-capture-v1']
     paths:
       - sports_mlb_prop_batch_capture.py
+      - sports_mlb_source_archives.py
+      - sports_mlb_sources.py
+      - test_sports_mlb_source_archives.py
       - test_sports_mlb_prop_batch_capture.py
       - .github/workflows/mlb_prop_batch_capture_tests.yml
   pull_request:
     branches: [main]
     paths:
       - sports_mlb_prop_batch_capture.py
+      - sports_mlb_source_archives.py
+      - sports_mlb_sources.py
+      - test_sports_mlb_source_archives.py
       - test_sports_mlb_prop_batch_capture.py
       - .github/workflows/mlb_prop_batch_capture_tests.yml
 permissions:
@@ -24,4 +30,4 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r requirements.txt
-      - run: python -m unittest -v test_sports_mlb_prop_batch_capture test_sports_mlb_prop_prospective
+      - run: python -m unittest -v test_sports_mlb_prop_batch_capture test_sports_mlb_prop_prospective test_sports_mlb_source_archives test_sports_mlb_sources test_sports_mlb_shadow_publication

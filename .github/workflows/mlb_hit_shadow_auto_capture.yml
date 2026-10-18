@@ -23,8 +23,18 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r requirements.txt
-      - run: python -m unittest -v test_sports_mlb_prop_batch_capture test_sports_mlb_shadow_publication
+      - run: python -m unittest -v test_sports_mlb_prop_batch_capture test_sports_mlb_shadow_publication test_sports_mlb_source_archives
       - run: python sports_mlb_prop_batch_capture.py --per-side 3
+      - name: Publish independently validated original responses before forecasts
+        run: |
+          if [ ! -d benchmarks/mlb_hitter_props_shadow_v1/source_archives ]; then exit 0; fi
+          git add benchmarks/mlb_hitter_props_shadow_v1/source_archives
+          if git diff --cached --quiet; then exit 0; fi
+          python sports_mlb_source_archives.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Archive original MLB hitter research sources [no bets]"
+          git push origin HEAD:main
       - name: Commit immutable, early forecasts
         run: |
           if [ ! -d benchmarks/mlb_hitter_props_shadow_v1/predictions ]; then exit 0; fi
