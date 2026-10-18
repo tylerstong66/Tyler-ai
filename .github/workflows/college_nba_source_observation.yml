@@ -30,6 +30,7 @@ on:
       - sports_college_final_receipts.py
       - sports_college_result_dataset.py
       - test_sports_college_result_dataset.py
+      - test_sports_college_d1_receipts.py
       - test_sports_college_final_receipts.py
       - test_sports_college_dual_source_finals.py
       - test_sports_college_nba_receipts.py
@@ -54,7 +55,7 @@ jobs:
       - name: Install pinned transport
         run: python -m pip install requests==2.32.5
       - name: Check game-source parser and forecast isolation
-        run: python -m unittest -v test_sports_expansion_observer test_sports_expansion_audit test_sports_nba_official_schedule_audit test_sports_ncaa_official_source test_sports_ncaa_espn_identity test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_nba_receipts test_sports_nba_schedule_receipts test_sports_ncaa_owned_receipts test_sports_ncaa_espn_crosswalk_receipts test_sports_college_dual_source_finals test_sports_college_final_receipts test_sports_college_result_dataset test_sports_nba_final_receipts
+        run: python -m unittest -v test_sports_expansion_observer test_sports_expansion_audit test_sports_nba_official_schedule_audit test_sports_ncaa_official_source test_sports_ncaa_espn_identity test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_nba_receipts test_sports_nba_schedule_receipts test_sports_ncaa_owned_receipts test_sports_ncaa_espn_crosswalk_receipts test_sports_college_dual_source_finals test_sports_college_final_receipts test_sports_college_result_dataset test_sports_nba_final_receipts test_sports_college_d1_receipts
       - name: Retain timestamped source-only college and NBA snapshots
         id: observation
         run: python sports_expansion_observer.py --days-ahead 3

@@ -7,6 +7,7 @@ from pathlib import Path
 
 import sports_college_final_receipts as receipts
 import sports_expansion_observer as espn
+import sports_expansion_audit as audit
 import sports_ncaa_espn_identity as identity
 import sports_ncaa_official_source as ncaa
 from test_sports_ncaa_espn_identity import AT, official_game, espn_game
@@ -117,6 +118,20 @@ class FinalReceiptTests(unittest.TestCase):
             out = receipts.publish(root, stamp)
             self.assertEqual(out['schema'], 'tyler-college-archived-final-research-v2')
             self.assertEqual(legacy.read_bytes(), b'original v1 bytes')
+
+    def test_linked_receipt_isolated_from_unrelated_corrupt_capture(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td); stamp, _ = self.seed(root)
+            # This unrelated ESPN capture is not linked by the chosen receipt.
+            later = AT + timedelta(hours=10)
+            espn.capture(lambda _: b'{"count":0,"events":[]}', base=root,
+                         now=later, days_ahead=0)
+            folder = root / espn.ROOT / 'captures' / later.strftime('%Y%m%dT%H%M%S%fZ')
+            next(folder.glob('*.gz')).write_bytes(b'corrupt')
+            out = receipts.build(root, stamp)
+            self.assertEqual(out['two_source_final_agreements'], 1)
+            with self.assertRaises(ValueError):
+                audit.audit(root)
 
     def test_traversal_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'identifier'):

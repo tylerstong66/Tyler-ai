@@ -1,5 +1,16 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-16)
 
+## October 18 — linear linked-source replay and end-to-end D1 regressions
+
+Extracted the unchanged single-capture ESPN integrity audit so receipt readers
+validate only linked sources; full coverage audits still replay all captures.
+Local aggregate timing: 3.300s before / 0.482s after, byte-identical 23-game
+output; full source audit equals the retained coverage report. Added original
+NCAA MBB/ESPN D1 fixtures including nonfinal and unknown-alias exclusions.
+112 combined source-pipeline tests passed. NBA archived-final reader PR #127
+merged with all 13 checks; all post-merge workflows succeeded, with unavailable
+independent NBA source still explicit. No wagers, promotion or runtime deploy.
+
 ## October 18 — cross-capture college result dataset and identity uniqueness
 
 Added strict one-NCAA/one-ESPN identity use, original school/team IDs in separate

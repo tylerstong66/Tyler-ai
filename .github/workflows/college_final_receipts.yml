@@ -5,6 +5,8 @@ on:
   push:
     branches: [main]
     paths:
+      - 'sports_expansion_audit.py'
+      - 'test_sports_expansion_audit.py'
       - 'sports_college*.py'
       - 'sports_ncaa*.py'
       - 'sports_nba*.py'
@@ -25,7 +27,7 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install requests==2.32.5
       - name: Test final receipt replay and research isolation
-        run: python -m unittest -v test_sports_college_final_receipts test_sports_college_dual_source_finals test_sports_ncaa_espn_crosswalk_receipts test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_result_dataset test_sports_nba_final_receipts test_sports_nba_schedule_receipts test_sports_nba_official_schedule_audit
+        run: python -m unittest -v test_sports_college_final_receipts test_sports_college_dual_source_finals test_sports_ncaa_espn_crosswalk_receipts test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_result_dataset test_sports_nba_final_receipts test_sports_nba_schedule_receipts test_sports_nba_official_schedule_audit test_sports_college_d1_receipts test_sports_expansion_audit
       - name: Replay retained final evidence without collecting network data
         run: |
           python - <<'PYCODE'

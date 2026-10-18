@@ -89,7 +89,7 @@ def build(root, stamp):
     et = _timestamp(ef, es, 'recorded_at_utc')
     if et > nt:
         raise ValueError('Linked ESPN source was captured after NBA receipt')
-    audit.audit(root)
+    audit.audit_capture(ef / "manifest.json")
     original = audit.bounded_gzip_read((folder / 'nba_schedule.json.gz').read_bytes(), limit=nba.MAX_BYTES)
     result = classify(nba.official_games(original), nba.espn_games(es, ef),
                       nba_observed_at=nt.isoformat(), espn_observed_at=et.isoformat())
