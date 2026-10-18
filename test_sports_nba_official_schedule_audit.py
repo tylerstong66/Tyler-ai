@@ -133,6 +133,26 @@ class NbaOfficialCorroborationTests(unittest.TestCase):
                 nba.run(lambda _:b"not json",base=root)
             self.assertFalse((root/nba.ROOT).exists())
 
+    def test_oversized_espn_archive_fails_closed_before_nba_crosswalk(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);self.espn_root(root)
+            capture=next((root/observer.ROOT/'captures').glob('*'))
+            target=capture/'NBA_2026-10-20.json.gz'
+            target.write_bytes(gzip.compress(b'x' * 8_000_001,mtime=0))
+            with self.assertRaisesRegex(ValueError,'exceeds maximum'):
+                nba.run(lambda _:official_games(),base=root)
+            self.assertFalse((root/nba.ROOT).exists())
+
+    def test_truncated_espn_archive_fails_closed_before_nba_crosswalk(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);self.espn_root(root)
+            capture=next((root/observer.ROOT/'captures').glob('*'))
+            target=capture/'NBA_2026-10-20.json.gz'
+            target.write_bytes(target.read_bytes()[:-6])
+            with self.assertRaisesRegex(ValueError,'Corrupt or incomplete'):
+                nba.run(lambda _:official_games(),base=root)
+            self.assertFalse((root/nba.ROOT).exists())
+
     def test_espn_raw_source_identity_must_be_unambiguous(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);self.espn_root(root)
