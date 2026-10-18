@@ -25,6 +25,8 @@ on:
       - sports_ncaa_espn_crosswalk_receipts.py
       - test_sports_ncaa_espn_crosswalk_receipts.py
       - sports_college_dual_source_finals.py
+      - sports_college_final_receipts.py
+      - test_sports_college_final_receipts.py
       - test_sports_college_dual_source_finals.py
       - test_sports_college_nba_receipts.py
       - .github/workflows/college_nba_source_observation.yml
@@ -48,7 +50,7 @@ jobs:
       - name: Install pinned transport
         run: python -m pip install requests==2.32.5
       - name: Check game-source parser and forecast isolation
-        run: python -m unittest -v test_sports_expansion_observer test_sports_expansion_audit test_sports_nba_official_schedule_audit test_sports_ncaa_official_source test_sports_ncaa_espn_identity test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_nba_receipts test_sports_nba_schedule_receipts test_sports_ncaa_owned_receipts test_sports_ncaa_espn_crosswalk_receipts
+        run: python -m unittest -v test_sports_expansion_observer test_sports_expansion_audit test_sports_nba_official_schedule_audit test_sports_ncaa_official_source test_sports_ncaa_espn_identity test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_nba_receipts test_sports_nba_schedule_receipts test_sports_ncaa_owned_receipts test_sports_ncaa_espn_crosswalk_receipts test_sports_college_dual_source_finals test_sports_college_final_receipts
       - name: Retain timestamped source-only college and NBA snapshots
         id: observation
         run: python sports_expansion_observer.py --days-ahead 3
@@ -68,6 +70,20 @@ jobs:
         if: steps.ncaa_source.outcome == 'success'
         continue-on-error: true
         run: python sports_ncaa_espn_identity.py
+      - name: Replay archived college finals with postgame chronology gates
+        id: college_finals
+        if: steps.college_identity.outcome == 'success'
+        continue-on-error: true
+        run: |
+          python - <<'PYCODE'
+          from pathlib import Path
+          import sports_ncaa_espn_identity as identity
+          from sports_college_final_receipts import publish
+          files = sorted((identity.ROOT / 'captures').glob('*/manifest.json'))
+          report = publish(Path('.'), files[-1].parent.name)
+          print({'agreements': report['two_source_final_agreements'],
+                 'pending': report['pending_or_quarantined'], 'NO_BET': True})
+          PYCODE
       - name: Report independent source verification outcomes
         if: always()
         env:
@@ -76,13 +92,14 @@ jobs:
           NBA_SCHEDULE_SOURCE: ${{ steps.nba_source.outcome }}
           NCAA_OWNED_SOURCE: ${{ steps.ncaa_source.outcome }}
           NCAA_ESPN_CROSSWALK: ${{ steps.college_identity.outcome }}
+          NCAA_FINAL_RECEIPTS: ${{ steps.college_finals.outcome }}
         run: |
           python - <<'PY'
           import json, os
           from pathlib import Path
           outcomes = {name: os.environ[name] for name in (
               'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE',
-              'NCAA_OWNED_SOURCE', 'NCAA_ESPN_CROSSWALK')}
+              'NCAA_OWNED_SOURCE', 'NCAA_ESPN_CROSSWALK', 'NCAA_FINAL_RECEIPTS')}
           receipt = {
               'schema': 'tyler-independent-source-workflow-status-v1',
               'step_outcomes': outcomes,
@@ -125,6 +142,9 @@ jobs:
             git add benchmarks/college_nba_source_v1/college_identity
           else
             echo '::warning::No validated NCAA/ESPN identity crosswalk; retain original source evidence separately'
+          fi
+          if [ "${{ steps.college_finals.outcome }}" = "success" ]; then
+            git add benchmarks/college_nba_source_v1/college_final_research
           fi
           if ! git diff --cached --quiet; then
             git config user.name github-actions\[bot\]

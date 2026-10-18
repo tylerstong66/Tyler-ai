@@ -1,5 +1,17 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-16)
 
+## October 18 — archived NCAA/ESPN final research receipt reader
+
+Implemented `sports_college_final_receipts.py` and dedicated PR CI. Every
+research-only final agreement now can be replayed from an explicit crosswalk,
+linked manifest hashes and original NCAA/ESPN raw responses. Both source
+observations must follow both saved starts; invalid chronology is quarantined.
+No historical model eligibility or independent final certification is granted.
+Local 85-test source suite passed; latest real crosswalk
+`20261018T171012515514Z` produced 0 qualifying finals / 4 pending or quarantined.
+See `COLLEGE_ARCHIVED_FINAL_RESEARCH_V1.md`. GitHub research code only; no
+production deployment, model promotion or actual wagers.
+
 ## October 17, 2026 — New leagues: FBS college football, Division I men's basketball, NBA
 
 **Explicit user-requested three-league expansion.** Each is separately scoped and source-only in version 1, not a copied NFL/NHL/MLB model. No current new-league betting picks, historical-fitted model, scored probability, official verified result or production deployment.
