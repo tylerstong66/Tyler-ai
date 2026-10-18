@@ -13,6 +13,7 @@ def classify(ncaa_rows,espn_rows):
     provider_by_id={(r["league"],r["espn_game_id"]):r for r in espn_rows}
     if len(official_by_id)!=len(ncaa_rows) or len(provider_by_id)!=len(espn_rows):
         raise ValueError("Duplicate source game identity")
+    identity_uses=Counter((r["league"],r["ncaa_game_id"]) for r in crosswalk["matched"])
     corroborated=[]
     pending=[]
     for matched in crosswalk["matched"]:
@@ -23,6 +24,9 @@ def classify(ncaa_rows,espn_rows):
         base={"league":matched["league"],"ncaa_game_id":matched["ncaa_game_id"],
               "espn_game_id":matched["espn_game_id"],
               "scheduled_start_utc":matched["espn_scheduled_start_utc"]}
+        if identity_uses[key] != 1:
+            pending.append({**base,"reason":"NON_BIJECTIVE_GAME_IDENTITY"})
+            continue
         if not (nc["provider_reported_final"] and es["provider_completed"]):
             pending.append({**base,"reason":"BOTH_SOURCES_NOT_FINAL"})
             continue
@@ -37,7 +41,9 @@ def classify(ncaa_rows,espn_rows):
                              "independently_certified_official_final":False,
                              "eligible_for_historical_evaluation":False})
     pending.extend({"league":r["league"],"espn_game_id":r["espn_game_id"],
-                    "reason":r["reason"]} for r in crosswalk["unverified"])
+                    "reason":r["reason"],
+                    **({"ncaa_game_id":r["ncaa_game_id"]} if "ncaa_game_id" in r else {})}
+                   for r in crosswalk["unverified"])
     return {"schema":"tyler-college-dual-source-final-research-v1",
             "two_source_final_agreements":len(corroborated),
             "pending_or_quarantined":len(pending),

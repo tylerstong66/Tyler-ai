@@ -13,13 +13,21 @@ from test_sports_ncaa_espn_identity import AT, official_game, espn_game
 
 
 class FinalReceiptTests(unittest.TestCase):
-    def seed(self, root, *, at=None, completed=True, conflict=False):
+    def seed(self, root, *, at=None, completed=True, conflict=False, score=28, game_id="401100001"):
+
         at = at or AT + timedelta(hours=8)
-        ncaa.run(lambda url: json.dumps({"data": {"contests": [
-            official_game(final=completed)]}}).encode(), base=root, now=at)
+        def official(url):
+            game = official_game(final=completed)
+            if completed:
+                game['teams'][0]['score'] = str(score)
+            return json.dumps({'data': {'contests': [game]}}).encode()
+        ncaa.run(official, base=root, now=at)
         def fetch(url):
             if "football/college-football" in url and "dates=20261017" in url:
                 game = espn_game(completed=completed)
+                game['id'] = game_id
+                if completed:
+                    game['competitions'][0]['competitors'][0]['score'] = str(score)
                 if conflict:
                     game["competitions"][0]["competitors"][0]["score"] = "31"
                 return json.dumps({"count": 1, "events": [game]}).encode()
@@ -94,11 +102,21 @@ class FinalReceiptTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td); stamp, _ = self.seed(root)
             receipts.publish(root, stamp)
-            path = root / receipts.ROOT / 'captures' / stamp / 'manifest.json'
+            path = root / receipts.ROOT / 'captures_v2' / stamp / 'manifest.json'
             path.write_bytes(b'altered')
             with self.assertRaisesRegex(ValueError, 'differs from replay'):
                 receipts.publish(root, stamp)
             self.assertEqual(path.read_bytes(), b'altered')
+
+    def test_v1_derived_bytes_remain_untouched_by_v2_publication(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td); stamp, _ = self.seed(root)
+            legacy = root / receipts.ROOT / 'captures' / stamp / 'manifest.json'
+            legacy.parent.mkdir(parents=True)
+            legacy.write_bytes(b'original v1 bytes')
+            out = receipts.publish(root, stamp)
+            self.assertEqual(out['schema'], 'tyler-college-archived-final-research-v2')
+            self.assertEqual(legacy.read_bytes(), b'original v1 bytes')
 
     def test_traversal_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'identifier'):

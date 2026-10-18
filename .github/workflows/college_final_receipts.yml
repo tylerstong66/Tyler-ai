@@ -23,7 +23,7 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install requests==2.32.5
       - name: Test final receipt replay and research isolation
-        run: python -m unittest -v test_sports_college_final_receipts test_sports_college_dual_source_finals test_sports_ncaa_espn_crosswalk_receipts test_sports_college_nba_chronology test_sports_college_nba_eligibility
+        run: python -m unittest -v test_sports_college_final_receipts test_sports_college_dual_source_finals test_sports_ncaa_espn_crosswalk_receipts test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_result_dataset
       - name: Replay retained final evidence without collecting network data
         run: |
           python - <<'PYCODE'
@@ -39,3 +39,10 @@ jobs:
           print({'agreements': report['two_source_final_agreements'],
                  'pending': report['pending_or_quarantined']})
           PYCODE
+      - name: Assemble all retained crosswalk observations without duplicate games
+        run: python sports_college_result_dataset.py > college-result-dataset.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: college-result-observation-dataset
+          path: college-result-dataset.json
+          retention-days: 30
