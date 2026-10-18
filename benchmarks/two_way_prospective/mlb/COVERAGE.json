@@ -1,8 +1,8 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-10-18T05:55:00.042420+00:00",
-  "capture_count": 53,
+  "as_of_evidence_at": "2026-10-18T11:06:16.865917+00:00",
+  "capture_count": 54,
   "cohort_started_at": "2026-10-11T15:59:30.281973+00:00",
   "completion_note": "Only manifests without an explicit incomplete state are audited; legacy manifests are retained.",
   "decisive_market_paired": 5,
@@ -133,7 +133,7 @@
         "game_id": "849817"
       },
       "lead_hours": 70.81021366027778,
-      "pregame_schedule_observations_in_window": 37,
+      "pregame_schedule_observations_in_window": 39,
       "recorded_at": "2026-10-15T22:19:23.230823+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -170,7 +170,7 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "fe6ea380c62758a75b15b3f005bd28a7f1554e5dc1890ab22b54379ef4d91e42",
+  "input_digest": "338d6c1d3356233643f86e27ece53884071814a8796862fcbd9137dcd829b5d7",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -199,22 +199,22 @@
       "to": "2026-10-12T07:21:47.631288+00:00"
     }
   ],
-  "latest_attempted_capture": "20261018T055457202646Z",
-  "latest_capture": "20261018T055457202646Z",
+  "latest_attempted_capture": "20261018T110607012364Z",
+  "latest_capture": "20261018T110607012364Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
       "game_id": "849816"
     },
     {
-      "checked_at": "2026-10-18T05:55:00.043946+00:00",
+      "checked_at": "2026-10-18T11:06:16.867922+00:00",
       "decision": "outside_24h_window",
       "game_id": "849815"
     }
   ],
   "latest_official_daily_conflicts": [
     {
-      "capture": "20261018T055457202646Z",
+      "capture": "20261018T110607012364Z",
       "decision": "no_forecast_no_settlement_no_start_rewrite",
       "game_id": "849817",
       "observations": [
@@ -243,7 +243,7 @@
     }
   ],
   "latest_official_schedule_complete": false,
-  "latest_official_schedule_observed_at": "2026-10-18T05:54:59.930635+00:00",
+  "latest_official_schedule_observed_at": "2026-10-18T11:06:16.824881+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [
     {
@@ -320,10 +320,10 @@
   ],
   "minimum_forecast_lead_hours": 7.97023246888889,
   "observed_missing_started_games": [],
-  "official_daily_conflicted_capture_count": 8,
+  "official_daily_conflicted_capture_count": 9,
   "pending": 3,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-10-18T05:55:00.042420+00:00",
+    "as_of_evidence_at": "2026-10-18T11:06:16.865917+00:00",
     "games": [
       {
         "away": "Tampa Bay Rays",
@@ -340,7 +340,7 @@
           "latest_scoreboard_market_pair_missing"
         ],
         "kickoff": "2026-10-18T21:08:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-18T05:54:59.297006+00:00",
+        "latest_scoreboard_observed_at": "2026-10-18T11:06:16.314630+00:00",
         "latest_scoreboard_priced": false,
         "ready": false,
         "saved_vs_latest_official_start": {
@@ -512,6 +512,17 @@
     },
     {
       "capture": "20261018T055457202646Z",
+      "error": "OFFICIAL_DAILY_SNAPSHOT_CONFLICT_NO_NEW_QUOTE",
+      "game_id": "849817",
+      "stage": "market_followup"
+    },
+    {
+      "capture": "20261018T110607012364Z",
+      "game_id": "849816",
+      "reason": "Final identity differs from saved forecast"
+    },
+    {
+      "capture": "20261018T110607012364Z",
       "error": "OFFICIAL_DAILY_SNAPSHOT_CONFLICT_NO_NEW_QUOTE",
       "game_id": "849817",
       "stage": "market_followup"
