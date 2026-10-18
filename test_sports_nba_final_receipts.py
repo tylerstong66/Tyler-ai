@@ -68,6 +68,11 @@ class NbaFinalReceiptTests(unittest.TestCase):
                 self.assertEqual(out['two_source_final_agreements'], 0)
                 self.assertTrue(all(row['reason'] == reason for row in out['pending']))
 
+    def test_explicit_official_nonpostponed_N_is_supported(self):
+        with tempfile.TemporaryDirectory() as td:
+            stamp=self.seed(Path(td),postponed='N')
+            self.assertEqual(finals.build(td,stamp)['two_source_final_agreements'],1)
+
     def test_official_timestamp_and_endpoint_mutation_fail_closed(self):
         for field, value in (('created_at_utc', '2026-10-21T01:00:00Z'),
                              ('nba_official_source_url', 'https://example.org/fake')):
