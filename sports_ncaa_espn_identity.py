@@ -167,11 +167,14 @@ def verify_espn(folder,manifest):
     return output
 
 
-def reconcile(source_rows,espn_rows):
+def reconcile(source_rows,espn_rows,*,use_curated_fbs_aliases=True):
+    # Historical source cohorts must explicitly opt out of the 2026-only
+    # curated spelling policy; default preserves all existing receipt bytes.
+    resolve = official_school_name if use_curated_fbs_aliases else lambda sport, school: name(school)
     ncaa_keys=defaultdict(list)
     for row in source_rows:
-        ncaa_keys[(row["league"],official_school_name(row["league"],row["home_name"]),
-                   official_school_name(row["league"],row["away_name"]))].append(row)
+        ncaa_keys[(row["league"],resolve(row["league"],row["home_name"]),
+                   resolve(row["league"],row["away_name"]))].append(row)
     matched=[];unverified=[]
     for item in sorted(espn_rows,key=lambda x:(x["league"],x["espn_game_id"])):
         names=item["school_names"]
@@ -212,9 +215,9 @@ def reconcile(source_rows,espn_rows):
                         "ncaa_home_school_as_recorded":nc["home_name"],
                         "ncaa_away_school_as_recorded":nc["away_name"],
                         "curated_fbs_home_alias":(name(nc["home_name"])!=
-                                                  official_school_name(item["league"],nc["home_name"])),
+                                                  resolve(item["league"],nc["home_name"])),
                         "curated_fbs_away_alias":(name(nc["away_name"])!=
-                                                  official_school_name(item["league"],nc["away_name"])),
+                                                  resolve(item["league"],nc["away_name"])),
                         "ncaa_source_start_utc":at.isoformat(),
                         "start_difference_minutes":(at-start).total_seconds()/60,
                         "espn_provider_completed":item["provider_completed"],

@@ -1,0 +1,108 @@
+"""Join verified 2024/2025 FBS source archives under strict historical identity."""
+from collections import defaultdict
+from pathlib import Path
+from datetime import datetime, timezone
+import hashlib
+import json
+
+import sports_ncaa_historical_owned as owned
+import sports_expansion_historical_capture as history
+import sports_historical_identity_audit as historical_audit
+import sports_expansion_observer as espn
+import sports_ncaa_espn_identity as identity
+import sports_college_dual_source_finals as finals
+from sports_expansion_audit import bounded_gzip_read
+
+
+def build(base=Path('.'), *, split='train', now=None):
+    if split not in owned.YEARS:
+        raise ValueError('Unsupported historical FBS source split')
+    now = now or datetime.now(timezone.utc)
+    if now.tzinfo is None:
+        raise ValueError('Aware crosscheck clock required')
+    base = Path(base)
+    audit = historical_audit.audit(base, now=now)
+    excluded_provider_ids = {row['game_id'] for row in audit['quarantined']
+                             if row['league'] == 'NCAAF_FBS'}
+    official = defaultdict(list); nrefs = defaultdict(list)
+    for week in owned.WEEKS:
+        saved = owned.verify(base, split, week, now=now)
+        if saved is None:
+            continue
+        path = base / owned.ROOT / split / f'week-{week:02d}.receipt.json'
+        ref = {'week': week, 'receipt_sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
+               'response_sha256': saved['original_response_sha256'],
+               'observed_at_utc': saved['recorded_at_utc']}
+        for row in saved['parsed_ncaa_games']:
+            official[row['ncaa_game_id']].append({'league': 'NCAAF_FBS', **row})
+            nrefs[row['ncaa_game_id']].append(ref)
+    ncaa_conflicts = {game_id for game_id, rows in official.items()
+                      if any(row != rows[0] for row in rows[1:])}
+    ncaa_rows = [rows[0] for game_id, rows in sorted(official.items()) if game_id not in ncaa_conflicts]
+    provider = defaultdict(list); erefs = defaultdict(list)
+    for day in history.dates_by_league()['NCAAF_FBS'][split]:
+        if not history.verify_existing(base, 'NCAAF_FBS', split, day, as_of=now):
+            continue
+        folder = base / history.ROOT / 'sources' / 'NCAAF_FBS' / split
+        path = folder / (day + '.receipt.json'); raw_receipt = path.read_bytes()
+        saved = json.loads(raw_receipt)
+        raw = bounded_gzip_read((folder / (day + '.json.gz')).read_bytes())
+        if hashlib.sha256(raw).hexdigest() != saved['original_response_sha256']:
+            raise ValueError('ESPN historical response changed during crosscheck')
+        events = {str(row['id']): row for row in json.loads(raw)['events']}
+        ref = {'source_date': day, 'receipt_sha256': hashlib.sha256(raw_receipt).hexdigest(),
+               'response_sha256': saved['original_response_sha256'],
+               'observed_at_utc': saved['recorded_at_utc']}
+        for row in saved['parsed_provider_scoreboard']['games']:
+            game_id = row['game_id']
+            if game_id in excluded_provider_ids:
+                continue
+            names = {}
+            for team in events[game_id]['competitions'][0]['competitors']:
+                school = team['team'].get('location')
+                names[team['homeAway']] = identity.name(school) if school else None
+            if set(names) != {'home', 'away'}:
+                raise ValueError('Missing historical ESPN school identity')
+            provider[game_id].append({**row, 'league': 'NCAAF_FBS',
+                                      'espn_game_id': game_id, 'school_names': names})
+            erefs[game_id].append(ref)
+    provider_conflicts = {game_id for game_id, rows in provider.items()
+                          if any(row != rows[0] for row in rows[1:])}
+    espn_rows = [rows[0] for game_id, rows in sorted(provider.items()) if game_id not in provider_conflicts]
+    report = finals.classify(ncaa_rows, espn_rows, use_curated_fbs_aliases=False)
+    ncaa_by_id = {row['ncaa_game_id']: row for row in ncaa_rows}
+    output = []; pending = list(report['pending'])
+    for row in report['corroborated_research_only']:
+        nr = nrefs[row['ncaa_game_id']]; er = erefs[row['espn_game_id']]
+        nt = min(espn.utc(ref['observed_at_utc']) for ref in nr)
+        et = min(espn.utc(ref['observed_at_utc']) for ref in er)
+        nc = ncaa_by_id[row['ncaa_game_id']]
+        nstart = datetime.fromtimestamp(int(nc['source_start_time_epoch']), timezone.utc)
+        if min(nt, et) <= max(nstart, espn.utc(row['scheduled_start_utc'])):
+            pending.append({**row, 'reason': 'FINAL_OBSERVED_AT_OR_BEFORE_SAVED_START'})
+            continue
+        output.append({**row, 'ncaa_receipts': nr, 'espn_receipts': er,
+                       'corroboration_available_at_utc': max(nt, et).isoformat(),
+                       'postgame_source_chronology_verified': True,
+                       'historical_pregame_features_verified': False})
+    return {'schema': 'tyler-historical-fbs-source-crosscheck-v1', 'split': split,
+            'school_identity_policy': 'EXACT_NORMALIZED_SCHOOL_NAMES_NO_2026_ALIASES',
+            'independent_ncaa_source_available': bool(official),
+            'ncaa_source_game_ids': len(official), 'espn_source_game_ids': len(provider),
+            'conflicting_ncaa_game_ids': sorted(ncaa_conflicts),
+            'conflicting_espn_school_observations': sorted(provider_conflicts),
+            'excluded_provider_game_ids': sorted(excluded_provider_ids),
+            'two_source_final_agreements': len(output), 'corroborated_research_only': output,
+            'pending_or_quarantined': len(pending), 'pending': pending,
+            'source_scope_complete': False, 'independent_final_certification_complete': False,
+            'training_allowed': False, 'historical_evaluation_enabled': False,
+            'forecasting_enabled': False, 'promotion_allowed': False,
+            'NO_BET': True, 'actual_wagers': 0}
+
+
+def main():
+    print(json.dumps(build(), sort_keys=True, indent=2))
+
+
+if __name__ == '__main__':
+    main()
