@@ -1,58 +1,22 @@
 """Replay GitHub server observation of exact pregame feature bytes; no forecasts."""
 from datetime import datetime, timezone
 from pathlib import Path
-import base64
 import hashlib
 import json
-import os
 import re
 
-import requests
 import sports_expansion_observer as source
 import sports_nba_pregame_features as features
+import sports_github_server_evidence as server
+from sports_github_server_evidence import API, REPOSITORY, fetch_json
 
-REPOSITORY = 'tylerstong66/Tyler-ai'
-API = 'https://api.github.com/repos/' + REPOSITORY
 WORKFLOW = '.github/workflows/college_final_receipts.yml'
 
 
-def fetch_json(url):
-    if not url.startswith(API + '/'):
-        raise ValueError('Unapproved publication evidence URL')
-    headers = {'Accept': 'application/vnd.github+json', 'User-Agent': 'Tyler-AI-feature-chronology'}
-    token = os.environ.get('GITHUB_TOKEN')
-    if token:
-        headers['Authorization'] = 'Bearer ' + token
-    with requests.get(url, headers=headers, timeout=(10, 30), stream=True,
-                      allow_redirects=False) as response:
-        response.raise_for_status()
-        if response.status_code != 200:
-            raise ValueError('GitHub evidence did not return HTTP 200')
-        parts = []
-        size = 0
-        for part in response.iter_content(65536):
-            size += len(part)
-            if size > 1_000_000:
-                raise ValueError('Oversized GitHub publication evidence')
-            parts.append(part)
-    return json.loads(b''.join(parts))
-
-
 def _attest(records, raw_files, run_id, now, fetch):
-    if type(run_id) is not int or run_id <= 0:
-        raise ValueError('Positive integer GitHub run ID required')
-    run = fetch(API + '/actions/runs/' + str(run_id))
-    sha = run.get('head_sha', '')
-    if (type(run.get('id')) is not int or run['id'] != run_id
-            or run.get('repository', {}).get('full_name') != REPOSITORY
-            or run.get('head_repository', {}).get('full_name') != REPOSITORY
-            or run.get('path') != WORKFLOW
-            or run.get('event') not in ('pull_request', 'push')
-            or not isinstance(sha, str) or not re.fullmatch('[0-9a-f]{40}', sha)):
-        raise ValueError('Wrong GitHub repository, workflow, run, event or commit')
-    observed = source.utc(run['created_at'])
-    if observed > now:
-        raise ValueError('Future GitHub server timestamp')
+    run = server.run_observation(run_id, now=now, workflow=WORKFLOW,
+                                 events=('pull_request', 'push'), fetch=fetch)
+    sha = run['head_sha']; observed = source.utc(run['server_created_at_utc'])
     evidence = []
     if not records or set(records) != set(raw_files):
         raise ValueError('Missing or inconsistent feature cohort')
@@ -64,15 +28,7 @@ def _attest(records, raw_files, run_id, now, fetch):
             raise ValueError('GitHub observation not between feature freeze and both saved starts')
         path = (features.ROOT / (game_id + '.json')).as_posix()
         raw = raw_files[game_id]
-        blob = hashlib.sha1(b'blob ' + str(len(raw)).encode() + b'\0' + raw).hexdigest()
-        item = fetch(API + '/contents/' + path + '?ref=' + sha)
-        if (item.get('type') != 'file' or item.get('path') != path
-                or item.get('sha') != blob or type(item.get('size')) is not int
-                or item['size'] != len(raw) or item.get('encoding') != 'base64'):
-            raise ValueError('GitHub immutable commit does not contain expected feature blob')
-        content = item.get('content')
-        if not isinstance(content, str) or base64.b64decode(''.join(content.split()), validate=True) != raw:
-            raise ValueError('GitHub immutable feature bytes differ')
+        blob = server.verify_blob(path, raw, sha, fetch=fetch)
         evidence.append({'nba_game_id': game_id, 'path': path, 'git_blob_sha1': blob,
                          'file_sha256': hashlib.sha256(raw).hexdigest(),
                          'frozen_at_utc': record['frozen_at_utc'],
@@ -80,7 +36,7 @@ def _attest(records, raw_files, run_id, now, fetch):
     return {'schema': 'tyler-nba-feature-github-server-observation-v1',
             'repository': REPOSITORY, 'run_id': run_id, 'head_sha': sha,
             'workflow_path': WORKFLOW, 'event': run['event'],
-            'github_server_created_at_utc': run['created_at'],
+            'github_server_created_at_utc': run['server_created_at_utc'],
             'checked_at_utc': now.isoformat(), 'feature_observations_verified': len(evidence),
             'evidence': evidence,
             'claim_scope': 'GITHUB_SERVER_OBSERVED_EXACT_COMMIT_FEATURE_BYTES_BEFORE_SAVED_STARTS',
