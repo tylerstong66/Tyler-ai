@@ -1,5 +1,33 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-19)
 
+## October 19 continuation — D1 lifecycle and shared college result checks
+
+PR #164 merged the prospective D1 reference collector after all 13 CI workflows
+passed. Its first post-merge source receipt at 2026-10-19T23:03:04Z records
+D1_FEATURE_OBSERVATIONS success, alongside valid ESPN/NCAA collection. NBA
+schedule acquisition still failed; new NBA collection remained skipped.
+
+PR #165 merged the fix for non-UTC NBA/FBS collection clocks producing records
+that failed subsequent replay. The two new tests reproduced both failures before
+the fix; 27 focused and 671 integrated sports tests passed afterward. Read-only
+audits reverified all 16 original NBA and five FBS files without byte changes.
+All 13 PR workflows passed before that merge.
+
+The D1 lifecycle reader in this change replays original feature inputs and
+attaches only source-backed, identity-consistent, chronologically valid final
+observations. It shares the classification core with FBS while preserving
+separate protocol scopes, schemas and actual-start disclaimers. All 682 sports
+tests pass, including 21 FBS/D1 lifecycle cases. The real five-record FBS report
+is unchanged under canonical JSON at a fixed clock after extracting the core.
+The real D1 reader returns an empty cohort with zero result observations.
+
+See D1_FROZEN_FEATURE_COHORT_V1.md. Source artifacts and outcomes expose D1
+collection and lifecycle checks separately. Missing games do not become
+cancellations, saved starts do not attest actual tipoff, and source quarantines
+cannot become results. No original feature, source receipt or forecast is
+rewritten; predictions, accuracy, fitting, evaluation, activation, promotion
+and wagers remain disabled in this preparation work.
+
 ## October 19 continuation — prospective D1 collection readiness
 
 PR #163 merged the existing six-record MLB declared-source publication audit
