@@ -7,6 +7,9 @@ on:
     paths:
       - benchmarks/fbs_pregame_reference_features_v1/**
       - sports_fbs_pregame_features.py
+      - sports_d1_pregame_features.py
+      - test_sports_d1_pregame_features.py
+      - benchmarks/d1_pregame_reference_features_v1/**
       - test_sports_fbs_pregame_features.py
       - benchmarks/nba_pregame_features_v1/**
       - sports_historical_college_features.py
@@ -67,7 +70,7 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install requests==2.32.5
       - name: Test final receipt replay and research isolation
-        run: python -m unittest -v test_sports_fbs_feature_cohort test_sports_fbs_pregame_features test_sports_nba_feature_cohort test_sports_nba_feature_publication test_sports_nba_pregame_features test_sports_nba_schedule_slots test_sports_historical_college_features test_sports_historical_d1_school_identities test_sports_historical_d1_identity_review test_sports_historical_nba_features test_sports_historical_extension_seal test_sports_historical_college_disputes test_sports_college_final_receipts test_sports_college_dual_source_finals test_sports_ncaa_espn_crosswalk_receipts test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_result_dataset test_sports_nba_final_receipts test_sports_nba_schedule_receipts test_sports_nba_official_schedule_audit test_sports_college_d1_receipts test_sports_expansion_audit test_sports_expansion_historical_capture test_sports_historical_identity_audit test_sports_ncaa_historical_owned test_sports_historical_fbs_crosscheck test_sports_ncaa_d1_historical_owned test_sports_ncaa_d1_source_quarantine test_sports_historical_d1_crosscheck test_sports_historical_content_seal test_sports_nba_historical_owned test_sports_historical_nba_crosscheck test_sports_historical_school_identities
+        run: python -m unittest -v test_sports_d1_pregame_features test_sports_fbs_feature_cohort test_sports_fbs_pregame_features test_sports_nba_feature_cohort test_sports_nba_feature_publication test_sports_nba_pregame_features test_sports_nba_schedule_slots test_sports_historical_college_features test_sports_historical_d1_school_identities test_sports_historical_d1_identity_review test_sports_historical_nba_features test_sports_historical_extension_seal test_sports_historical_college_disputes test_sports_college_final_receipts test_sports_college_dual_source_finals test_sports_ncaa_espn_crosswalk_receipts test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_result_dataset test_sports_nba_final_receipts test_sports_nba_schedule_receipts test_sports_nba_official_schedule_audit test_sports_college_d1_receipts test_sports_expansion_audit test_sports_expansion_historical_capture test_sports_historical_identity_audit test_sports_ncaa_historical_owned test_sports_historical_fbs_crosscheck test_sports_ncaa_d1_historical_owned test_sports_ncaa_d1_source_quarantine test_sports_historical_d1_crosscheck test_sports_historical_content_seal test_sports_nba_historical_owned test_sports_historical_nba_crosscheck test_sports_historical_school_identities
       - name: Replay retained final evidence without collecting network data
         run: |
           python - <<'PYCODE'
@@ -240,4 +243,11 @@ jobs:
         with:
           name: fbs-frozen-feature-cohort-lifecycle
           path: fbs-feature-cohort.json
+          retention-days: 30
+      - name: Audit prospective D1 reference features without creating records
+        run: python sports_d1_pregame_features.py > d1-pregame-feature-audit.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: d1-pregame-reference-feature-audit
+          path: d1-pregame-feature-audit.json
           retention-days: 30
