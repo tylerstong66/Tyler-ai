@@ -1,0 +1,67 @@
+{
+  "actual_wager": 0,
+  "condition": "at_least_one_official_at_bat",
+  "conditional_at_bat_probabilities": {
+    "hit": 0.63,
+    "hr": 0.076
+  },
+  "event_start_utc": "2026-10-20T00:08:00+00:00",
+  "frozen_at_utc": "2026-10-19T20:00:57.175008+00:00",
+  "game_id": 849815,
+  "historical_input_sha256": "3b0e1f41fffb584e10ff93eab5f6290308dce7e0cc777db5e0f3d5cc2806813c",
+  "hitter_id": 608070,
+  "hitter_name": "Jos\u00e9 Ram\u00edrez",
+  "hitter_side": "away",
+  "hitter_team_id": 114,
+  "model": "mlb_hitter_game_frequency_shadow_v1",
+  "model_calibrated": false,
+  "official_historical_at_bat_eligible_games": 282,
+  "official_historical_games_observed": 283,
+  "opponent_team_id": 139,
+  "record_digest_sha256": "3c550bb1d08a9e807ae3080e05d0715519bfac186d73802a5144ad6805f378f3",
+  "schema": "mlb_hit_prop_shadow_ledger_v1",
+  "source_capture_started_at_utc": "2026-10-19T20:00:56.649056+00:00",
+  "source_receipts": {
+    "active_roster": {
+      "data_through": "2026-10-19T20:00:56.850163+00:00",
+      "original_response_archive_schema": "mlb-original-response-archive-v1",
+      "original_response_sha256": "0dc00b151caba1ea4586a3723f5327f412253a41e7551c4a48fd3bad0b2a8bc6",
+      "response_sha256": "76474c2d14441498bceba967530b39de7a786c1887a857f51c62a3e7a677f05d",
+      "retrieved_at": "2026-10-19T20:00:56.850163+00:00",
+      "source_archive_file": "0dc00b151caba1ea4586a3723f5327f412253a41e7551c4a48fd3bad0b2a8bc6.json.gz",
+      "source_url": "https://statsapi.mlb.com/api/v1/teams/114/roster?date=2026-10-19&rosterType=active"
+    },
+    "hitter_game_logs": [
+      {
+        "data_through": "2026-10-19T20:00:57.039333+00:00",
+        "original_response_archive_schema": "mlb-original-response-archive-v1",
+        "original_response_sha256": "916d6457991523f3fcbf5b22f58a581021e71b7b46e5a484319c76f8c3808745",
+        "response_sha256": "3f312da10a1dd832f338aa35385163d21f3346be993f081ee7ed27574a4c0c49",
+        "retrieved_at": "2026-10-19T20:00:57.039333+00:00",
+        "source_archive_file": "916d6457991523f3fcbf5b22f58a581021e71b7b46e5a484319c76f8c3808745.json.gz",
+        "source_url": "https://statsapi.mlb.com/api/v1/people/608070/stats?gameType=R&group=hitting&season=2025&stats=gameLog"
+      },
+      {
+        "data_through": "2026-10-19T20:00:57.164195+00:00",
+        "original_response_archive_schema": "mlb-original-response-archive-v1",
+        "original_response_sha256": "3f758c115f62e8b9be3df3756cf6a8b69d65b3fb3480a45a4354b71e46361769",
+        "response_sha256": "b997ab719035d9a1a0af0e5cf4b0fddc6a10fdc3398a198480e62bab821e4d35",
+        "retrieved_at": "2026-10-19T20:00:57.164195+00:00",
+        "source_archive_file": "3f758c115f62e8b9be3df3756cf6a8b69d65b3fb3480a45a4354b71e46361769.json.gz",
+        "source_url": "https://statsapi.mlb.com/api/v1/people/608070/stats?gameType=R&group=hitting&season=2026&stats=gameLog"
+      }
+    ],
+    "pregame_game": {
+      "data_through": "2026-10-19T20:00:56.745130+00:00",
+      "original_response_archive_schema": "mlb-original-response-archive-v1",
+      "original_response_sha256": "e633ef7c73ac8d625c5f5323404ee6a530812458bb1b442b46f558fdee89c30c",
+      "response_sha256": "ec38392015e9037646e2492d9a29e97aa7eeb8301d5a884dc8305251ae656a43",
+      "retrieved_at": "2026-10-19T20:00:56.745130+00:00",
+      "source_archive_file": "e633ef7c73ac8d625c5f5323404ee6a530812458bb1b442b46f558fdee89c30c.json.gz",
+      "source_url": "https://statsapi.mlb.com/api/v1.1/game/849815/feed/live"
+    }
+  },
+  "sportsbook_wager_eligible": false,
+  "status": "IMMUTABLE_PREGAME_SHADOW_NO_BET",
+  "training_game_day_before": "2026-10-19"
+}

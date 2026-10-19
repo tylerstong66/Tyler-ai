@@ -1,0 +1,67 @@
+{
+  "actual_wager": 0,
+  "condition": "at_least_one_official_at_bat",
+  "conditional_at_bat_probabilities": {
+    "hit": 0.56,
+    "hr": 0.096
+  },
+  "event_start_utc": "2026-10-20T00:08:00+00:00",
+  "frozen_at_utc": "2026-10-19T20:00:57.726111+00:00",
+  "game_id": 849815,
+  "historical_input_sha256": "dadcbede76379e6ff6d74b07b1116b40444d588efae51651327b0b7d599497a9",
+  "hitter_id": 663993,
+  "hitter_name": "Nathaniel Lowe",
+  "hitter_side": "away",
+  "hitter_team_id": 114,
+  "model": "mlb_hitter_game_frequency_shadow_v1",
+  "model_calibrated": false,
+  "official_historical_at_bat_eligible_games": 270,
+  "official_historical_games_observed": 279,
+  "opponent_team_id": 139,
+  "record_digest_sha256": "a1de32ac90b834c49328fd6e2210717b796c48451ffb9a6fb5839663b5d4af0e",
+  "schema": "mlb_hit_prop_shadow_ledger_v1",
+  "source_capture_started_at_utc": "2026-10-19T20:00:57.175613+00:00",
+  "source_receipts": {
+    "active_roster": {
+      "data_through": "2026-10-19T20:00:57.376345+00:00",
+      "original_response_archive_schema": "mlb-original-response-archive-v1",
+      "original_response_sha256": "0dc00b151caba1ea4586a3723f5327f412253a41e7551c4a48fd3bad0b2a8bc6",
+      "response_sha256": "76474c2d14441498bceba967530b39de7a786c1887a857f51c62a3e7a677f05d",
+      "retrieved_at": "2026-10-19T20:00:57.376345+00:00",
+      "source_archive_file": "0dc00b151caba1ea4586a3723f5327f412253a41e7551c4a48fd3bad0b2a8bc6.json.gz",
+      "source_url": "https://statsapi.mlb.com/api/v1/teams/114/roster?date=2026-10-19&rosterType=active"
+    },
+    "hitter_game_logs": [
+      {
+        "data_through": "2026-10-19T20:00:57.571176+00:00",
+        "original_response_archive_schema": "mlb-original-response-archive-v1",
+        "original_response_sha256": "c5b4d4f9d36cff336beb74f77a6424ad3a19d3608ab23e6c070da4050b34645d",
+        "response_sha256": "afcdaf66028074f885ed3bdf51d505cfc2cdf1552634f6d4bb02661d13594c75",
+        "retrieved_at": "2026-10-19T20:00:57.571176+00:00",
+        "source_archive_file": "c5b4d4f9d36cff336beb74f77a6424ad3a19d3608ab23e6c070da4050b34645d.json.gz",
+        "source_url": "https://statsapi.mlb.com/api/v1/people/663993/stats?gameType=R&group=hitting&season=2025&stats=gameLog"
+      },
+      {
+        "data_through": "2026-10-19T20:00:57.715763+00:00",
+        "original_response_archive_schema": "mlb-original-response-archive-v1",
+        "original_response_sha256": "77b6a07f0fa252042e2eff91ee91e9b4bc8e33934e15d4cd98a9504e2b9fd606",
+        "response_sha256": "a0a59bb7ba5d14b4b953353f0105bf2e5c69e4c6ba88c9f106c8a3662efca32b",
+        "retrieved_at": "2026-10-19T20:00:57.715763+00:00",
+        "source_archive_file": "77b6a07f0fa252042e2eff91ee91e9b4bc8e33934e15d4cd98a9504e2b9fd606.json.gz",
+        "source_url": "https://statsapi.mlb.com/api/v1/people/663993/stats?gameType=R&group=hitting&season=2026&stats=gameLog"
+      }
+    ],
+    "pregame_game": {
+      "data_through": "2026-10-19T20:00:57.273355+00:00",
+      "original_response_archive_schema": "mlb-original-response-archive-v1",
+      "original_response_sha256": "e633ef7c73ac8d625c5f5323404ee6a530812458bb1b442b46f558fdee89c30c",
+      "response_sha256": "ec38392015e9037646e2492d9a29e97aa7eeb8301d5a884dc8305251ae656a43",
+      "retrieved_at": "2026-10-19T20:00:57.273355+00:00",
+      "source_archive_file": "e633ef7c73ac8d625c5f5323404ee6a530812458bb1b442b46f558fdee89c30c.json.gz",
+      "source_url": "https://statsapi.mlb.com/api/v1.1/game/849815/feed/live"
+    }
+  },
+  "sportsbook_wager_eligible": false,
+  "status": "IMMUTABLE_PREGAME_SHADOW_NO_BET",
+  "training_game_day_before": "2026-10-19"
+}
