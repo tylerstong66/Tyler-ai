@@ -2,12 +2,12 @@
 
 `sports_github_server_evidence.py` centralizes the existing NBA/MLB publication
 readers' fixed-repository HTTPS transport, server run metadata checks and exact
-immutable JSON blob verification. The sport-specific readers retain their own
+immutable JSON/source-archive blob verification. The sport-specific readers retain their own
 cohort identity, source replay, freeze/start chronology and report schemas.
 Original records and saved NBA/MLB reports are unchanged.
 
 The client accepts only this repository's numeric workflow-run endpoint and
-benchmark JSON file paths at a literal 40-character commit SHA. Traversal,
+benchmark `.json` or `.json.gz` file paths at a literal 40-character commit SHA. Traversal,
 foreign origins/repositories, arbitrary API routes and mutable refs fail before
 network access. Responses are streamed with a 1 MB bound, explicit timeouts and
 redirects disabled. Optional GITHUB_TOKEN goes only into the request header.

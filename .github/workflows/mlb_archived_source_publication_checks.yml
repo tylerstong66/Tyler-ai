@@ -1,0 +1,36 @@
+name: MLB declared source archive publication checks
+on:
+  pull_request:
+    paths:
+      - sports_mlb_archived_source_publication.py
+      - test_sports_mlb_archived_source_publication.py
+      - sports_github_server_evidence.py
+      - test_sports_github_server_evidence.py
+      - sports_mlb_legacy_source_inventory.py
+      - sports_mlb_cross_cohort_audit.py
+      - sports_mlb_source_archives.py
+      - benchmarks/mlb_archived_source_publication_v1/**
+      - benchmarks/mlb_hitter_props_shadow_v1/**
+      - .github/workflows/mlb_archived_source_publication_checks.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  publication:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install requests==2.32.5
+      - run: python -m unittest -v test_sports_mlb_archived_source_publication test_sports_github_server_evidence test_sports_mlb_cohort_publication test_sports_nba_feature_publication test_sports_fbs_feature_publication
+      - name: Freshly replay immutable records and declared source archive publication
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python sports_mlb_archived_source_publication.py --replay benchmarks/mlb_archived_source_publication_v1/first_cohort.json > /tmp/mlb-archived-source-publication.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mlb-declared-source-publication
+          path: /tmp/mlb-archived-source-publication.json

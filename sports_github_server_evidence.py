@@ -1,4 +1,4 @@
-"""Fixed-repository server timestamps and exact immutable JSON blobs; no model use."""
+"""Fixed-repository server timestamps and exact JSON/source archive blobs; no model use."""
 import base64
 from datetime import datetime
 import hashlib
@@ -10,14 +10,14 @@ import requests
 
 REPOSITORY = 'tylerstong66/Tyler-ai'
 API = 'https://api.github.com/repos/' + REPOSITORY
-PATH = re.compile(r'benchmarks/(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+\.json')
+PATH = re.compile(r'benchmarks/(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+\.json(?:\.gz)?')
 SHA = re.compile(r'[0-9a-f]{40}')
 
 
 def _path(path):
     if (not isinstance(path, str) or not PATH.fullmatch(path)
             or any(segment in ('.', '..') for segment in path.split('/'))):
-        raise ValueError('Invalid original benchmark JSON path')
+        raise ValueError('Invalid original benchmark JSON or JSON archive path')
 
 
 def _sha(sha):
@@ -72,13 +72,13 @@ def run_observation(run_id, *, now, workflow, events, fetch=fetch_json):
 def verify_blob(path, raw, head_sha, *, fetch=fetch_json):
     _path(path); _sha(head_sha)
     if not isinstance(raw, bytes) or len(raw) > 1_000_000:
-        raise ValueError('Bounded original forecast bytes required')
+        raise ValueError('Bounded original benchmark bytes required')
     blob = hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
     item = fetch(API+'/contents/'+path+'?ref='+head_sha)
     if (not isinstance(item, dict) or item.get('type') != 'file' or item.get('path') != path
             or item.get('sha') != blob or type(item.get('size')) is not int or item['size'] != len(raw)
             or item.get('encoding') != 'base64' or not isinstance(item.get('content'), str)):
-        raise ValueError('Immutable GitHub commit does not contain expected original JSON blob')
+        raise ValueError('Immutable GitHub commit does not contain expected original benchmark blob')
     if base64.b64decode(''.join(item['content'].split()), validate=True) != raw:
-        raise ValueError('Immutable GitHub original JSON bytes differ')
+        raise ValueError('Immutable GitHub original benchmark bytes differ')
     return blob
