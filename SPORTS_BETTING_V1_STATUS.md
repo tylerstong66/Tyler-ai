@@ -1,5 +1,23 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-19)
 
+## October 19 continuation — GitHub server chronology for the first NBA feature cohort
+
+PR #151 merged the 16 original feature observations with all 12 GitHub CI
+workflows passing. A live GitHub API audit now verifies the exact bytes of all
+16 records at immutable head f160b9ba98148b67dd8ecb077e27b291a39a9361.
+GitHub created workflow run 39262563627 at 2026-10-19T13:43:22Z, after the
+original feature freeze and before both saved starts for every record.
+
+The separate report and auditor in this change retain that narrow claim:
+GitHub's server observed a commit containing those exact feature bytes before
+saved start times. They do not certify public visibility, actual tipoff,
+source-origin truth, forecasts, model quality or profitability. Original feature
+records remain byte-for-byte unchanged and still decline publication attestation.
+Saved reports require fresh API replay; they are not standalone server proof.
+Replay explicitly preserves the original cohort even after future records arrive.
+See NBA_FEATURE_PUBLICATION_CHRONOLOGY_V1.md. NO_BET remains enforced;
+training, historical evaluation, forecasting, promotion and wagers stay disabled.
+
 ## October 19 continuation — original pregame NBA feature observations
 
 PRs #146–#150 merged source-backed NBA/FBS/D1 feature diagnostics, reviewed D1
