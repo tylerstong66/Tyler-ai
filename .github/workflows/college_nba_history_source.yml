@@ -11,6 +11,9 @@ on:
       - sports_nba_official_schedule_audit.py
       - sports_expansion_historical_capture.py
       - sports_historical_identity_audit.py
+      - sports_historical_extension_seal.py
+      - test_sports_historical_extension_seal.py
+      - benchmarks/college_nba_history_v1/INDEPENDENT_SOURCE_COMPLETION_2026_10_19.json
       - sports_historical_content_seal.py
       - test_sports_historical_content_seal.py
       - sports_historical_school_identities.py
@@ -52,9 +55,11 @@ jobs:
       - name: Install pinned network transport
         run: python -m pip install requests==2.32.5
       - name: Test prospective isolation, chronology and sealed history
-        run: python -m unittest -v test_sports_expansion_historical_capture test_sports_historical_identity_audit test_sports_ncaa_historical_owned test_sports_historical_fbs_crosscheck test_sports_ncaa_d1_historical_owned test_sports_ncaa_d1_source_quarantine test_sports_historical_d1_crosscheck test_sports_historical_content_seal test_sports_nba_historical_owned test_sports_historical_nba_crosscheck test_sports_historical_school_identities
+        run: python -m unittest -v test_sports_historical_extension_seal test_sports_expansion_historical_capture test_sports_historical_identity_audit test_sports_ncaa_historical_owned test_sports_historical_fbs_crosscheck test_sports_ncaa_d1_historical_owned test_sports_ncaa_d1_source_quarantine test_sports_historical_d1_crosscheck test_sports_historical_content_seal test_sports_nba_historical_owned test_sports_historical_nba_crosscheck test_sports_historical_school_identities
       - name: Verify the frozen original source-content index before acquisition
         run: python sports_historical_content_seal.py
+      - name: Verify completed independent-source archive before acquisition
+        run: python sports_historical_extension_seal.py
       - name: Fetch bounded 2024 training / 2025 validation season history
         run: python sports_expansion_historical_capture.py
       - name: Retain bounded NCAA-owned historical FBS source weeks
