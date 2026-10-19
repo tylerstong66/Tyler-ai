@@ -149,7 +149,7 @@ def verify_espn(folder,manifest):
             if set(sides)!={"home","away"}:
                 raise ValueError("Missing ESPN home/away identity")
             by_identity[(sport,eid)].append(sides)
-    unique,conflicts=espn.reconcile(normalized)
+    unique,conflicts=espn.reconcile_for_manifest(manifest,normalized)
     valid=[x for x in manifest["undisputed_provider_games"] if x["league"] in ncaa.SPORTS]
     quarantined={(x["league"],x["game_id"]) for x in manifest["quarantined_provider_games"]
                  if x["league"] in ncaa.SPORTS}

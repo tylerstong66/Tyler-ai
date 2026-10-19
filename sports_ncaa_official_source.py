@@ -13,6 +13,7 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 import requests
+import sports_source_collection_window as collection_window
 import sports_expansion_observer as existing
 
 ROOT=existing.ROOT/"ncaa_official"
@@ -127,18 +128,21 @@ def official_scoreboard(raw,sport):
     return games
 
 
-def requested_windows(today,days_ahead=3):
-    if not 0<=days_ahead<=7:
-        raise ValueError("Source horizon exceeds one week")
+def requested_windows(today,days_ahead=3,days_back=0):
+    collection_window.bounds(days_ahead,days_back)
     requested=[]
-    if date(2026,8,1)<=today<=date(2027,1,31):
+    fbs_start,fbs_end=date(2026,8,1),date(2027,1,31)
+    use_fbs=(fbs_start<=today<=fbs_end) if not days_back else (
+        today-timedelta(days=days_back)<=fbs_end and today+timedelta(days=days_ahead)>=fbs_start)
+    if use_fbs:
         # Conservative estimated adjacent football week candidates from the
         # 2026 late-August week 0; NOT a complete governing-body week index.
-        midpoint=max(1,1+((today-date(2026,8,29)).days//7))
+        anchor=today if not days_back else max(fbs_start,min(today,fbs_end))
+        midpoint=max(1,1+((anchor-date(2026,8,29)).days//7))
         for week in range(max(1,midpoint-2),min(21,midpoint+2)+1):
             requested.append(("NCAAF_FBS",f"week-{week:02d}",
                               graph_url("NCAAF_FBS",year=2026,week=week)))
-    for shift in range(days_ahead+1):
+    for shift in range(-days_back,days_ahead+1):
         day=today+timedelta(days=shift)
         if date(2026,10,30)<=day<=date(2027,4,7):
             requested.append(("NCAAM_D1",day.isoformat(),
@@ -146,12 +150,13 @@ def requested_windows(today,days_ahead=3):
     return requested
 
 
-def run(fetch,*,base=Path("."),now=None,days_ahead=3):
+def run(fetch,*,base=Path("."),now=None,days_ahead=3,days_back=0):
     base=Path(base)
     now=now or datetime.now(timezone.utc)
     if now.tzinfo is None:
         raise ValueError("Aware observation time required")
-    windows=requested_windows(now.date(),days_ahead)
+    anchor=now.astimezone(timezone.utc).date() if days_back else now.date()
+    windows=requested_windows(anchor,days_ahead,days_back)
     if not windows:
         raise ValueError("Outside all NCAA seasonal query windows")
     snapshots=[]
@@ -203,6 +208,8 @@ def run(fetch,*,base=Path("."),now=None,days_ahead=3):
         "forecasting_enabled":False,"model_training_enabled":False,
         "NO_BET":True,"actual_wagers":0,"promotion_allowed":False,
     }
+    if days_back:
+        report["collection_window"]=collection_window.policy(now,days_ahead,days_back)
     dest.mkdir(parents=True)
     for name,blob in blobs.items():
         (dest/name).write_bytes(blob)
@@ -211,13 +218,18 @@ def run(fetch,*,base=Path("."),now=None,days_ahead=3):
 
 
 def main():
+    import argparse
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--days-back',type=int,default=0)
+    parser.add_argument('--days-ahead',type=int,default=3)
+    args=parser.parse_args()
     def fetch(url):
         response=requests.get(url,timeout=17,headers={
             "Accept":"application/json",
             "User-Agent":"TylerAI-CollegeResearch/1.0"})
         response.raise_for_status()
         return response.content
-    report=run(fetch)
+    report=run(fetch,days_ahead=args.days_ahead,days_back=args.days_back)
     print(json.dumps({
         "captured":len(report["snapshots"]),
         "games":len(report["unambiguous_ncaa_contests"]),

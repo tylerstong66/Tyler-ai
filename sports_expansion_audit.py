@@ -4,7 +4,7 @@ import io
 import hashlib
 import json
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import sports_expansion_observer as source
@@ -46,6 +46,15 @@ def audit_capture(file):
             or manifest.get("NO_BET") is not True
             or manifest.get("actual_wagers")!=0):
         raise ValueError("Expansion safety or immutable protocol flag mismatch")
+    if 'collection_window' in manifest:
+        window=source.collection_window.verify(manifest['collection_window'],recorded)
+        anchor=recorded.date()
+        expected=[(league,(anchor+timedelta(days=shift)).isoformat())
+                  for league,config in source.LEAGUES.items()
+                  for shift in range(-window['days_back'],window['days_ahead']+1)
+                  if config['start']<=(anchor+timedelta(days=shift)).isoformat()<=config['end']]
+        if [(snap['league'],snap['day']) for snap in manifest['snapshots']]!=expected:
+            raise ValueError('Lookback capture does not match declared bounded source dates')
     rebuilt=[]
     expected_names={"manifest.json"}
     for snap in manifest["snapshots"]:
@@ -74,7 +83,7 @@ def audit_capture(file):
         rebuilt.append(snap)
     if set(x.name for x in file.parent.iterdir())!=expected_names:
         raise ValueError("Untracked source file in supposed closed immutable capture")
-    accepted,conflicts=source.reconcile(rebuilt)
+    accepted,conflicts=source.reconcile_for_manifest(manifest,rebuilt)
     if (accepted!=manifest["undisputed_provider_games"]
             or conflicts!=manifest["quarantined_provider_games"]):
         raise ValueError("Stored provider quarantine and game selection differ from source evidence")
