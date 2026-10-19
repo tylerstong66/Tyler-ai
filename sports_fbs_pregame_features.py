@@ -229,6 +229,7 @@ def inspect(base=Path('.'), *, now=None, collect=False):
     base = Path(base); now = now or datetime.now(timezone.utc)
     if now.tzinfo is None or type(collect) is not bool:
         raise ValueError('Aware FBS audit clock and explicit collection mode required')
+    now = now.astimezone(timezone.utc)
     reference = _reference(base, now); snapshots = {}; existing = _existing(base, now, reference, snapshots)
     prepared = []; pending = []; captures = sorted((base/identity.ROOT/'captures').glob('*/manifest.json'))
     if collect and captures:

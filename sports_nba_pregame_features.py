@@ -174,6 +174,7 @@ def audit(base=Path('.'),*,now=None):
 def collect(base=Path('.'),*,now=None):
     base=Path(base);now=now or datetime.now(timezone.utc)
     if now.tzinfo is None:raise ValueError('Aware NBA feature collection clock required')
+    now=now.astimezone(timezone.utc)
     reference=_reference(base,now);snapshots={};existing=_existing(base,now,reference,snapshots)
     root=base/ROOT
     captures=sorted((base/nba.ROOT/'captures').glob('*/manifest.json'))

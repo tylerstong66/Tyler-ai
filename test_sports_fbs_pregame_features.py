@@ -28,6 +28,16 @@ def reference():
 
 
 class FbsFeatureTests(unittest.TestCase):
+    def test_non_utc_collection_clock_creates_replayable_canonical_utc_record(self):
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td); self.seed(base)
+            clock = NOW.astimezone(timezone(timedelta(hours=-4)))
+            features.inspect(base, now=clock, collect=True)
+            path = next((base/features.ROOT).glob('*.json')); before = path.read_bytes()
+            self.assertEqual(features.inspect(base, now=NOW+timedelta(days=1))['verified_existing'], 1)
+            self.assertEqual(json.loads(before)['record']['frozen_at_utc'], NOW.isoformat())
+            self.assertEqual(path.read_bytes(), before)
+
     def seed(self, base, *, later_start=False):
         kwargs = {}
         if later_start:
