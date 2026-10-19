@@ -127,8 +127,10 @@ def espn_games(manifest, capture_folder):
             for game_id,record in eligible.items()}
 
 
-def compare(official,espn):
+def compare(official,espn,*,exact_tipoff_identity=False):
     """Select by unique team identity, then validate time; never fuzzy-force."""
+    if type(exact_tipoff_identity) is not bool:
+        raise ValueError('NBA identity policy must be an explicit boolean')
     by_teams=defaultdict(list)
     for game in official:
         by_teams[(game["home_tricode"],game["away_tricode"])].append(game)
@@ -141,7 +143,12 @@ def compare(official,espn):
         base={"espn_game_id":game["espn_game_id"],
               "teams":game["away_tricode"]+" at "+game["home_tricode"],
               "espn_saved_tipoff_utc":game["scheduled_start_utc"]}
-        if len(close)==1 and len(possibilities)==1:
+        # Opt-in historical policy: two distinct repeat fixtures may share a
+        # 72-hour window. Require an exact UTC match and no competing fixture
+        # within the existing 30-minute tolerance. Never select by score.
+        exact=[n for n in close if obs.utc(n['tipoff_utc'])==expected]
+        if len(close)==1 and (len(possibilities)==1 or
+                             (exact_tipoff_identity and len(exact)==1)):
             chosen=close[0]
             diff=(obs.utc(chosen["tipoff_utc"])-expected).total_seconds()/60
             matched.append({**base,"nba_official_game_id":chosen["nba_game_id"],
