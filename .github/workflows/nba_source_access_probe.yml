@@ -1,0 +1,31 @@
+name: NBA public endpoint access diagnostic
+on:
+  pull_request:
+    paths:
+      - sports_nba_source_access_probe.py
+      - test_sports_nba_source_access_probe.py
+      - sports_nba_historical_owned.py
+      - sports_nba_official_schedule_audit.py
+      - .github/workflows/nba_source_access_probe.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install requests==2.32.5
+      - run: python -m unittest -v test_sports_nba_source_access_probe
+      - name: Observe fixed public NBA endpoint access without enabling a source
+        run: python sports_nba_source_access_probe.py --probe --output-dir nba-source-access-probe
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nba-public-endpoint-access-diagnostic
+          path: nba-source-access-probe/
+          if-no-files-found: error
+          retention-days: 30
