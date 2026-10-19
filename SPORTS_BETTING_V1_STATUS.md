@@ -1,5 +1,34 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-19)
 
+## October 19 continuation — original pregame NBA feature observations
+
+PRs #146–#150 merged source-backed NBA/FBS/D1 feature diagnostics, reviewed D1
+source identities and current NBA schedule acquisition. Local all-sports tests
+now pass 546 cases. The historical diagnostics retain the explicit distinction
+between post-hoc reconstruction and genuinely observed pregame availability.
+
+The current NBA source fix preserves 1,200 concrete supported games and six
+future Cup TBD slots in a separately replayed quarantine. Its first original
+capture matched 16 future ESPN/NBA schedule identities, with zero final results.
+Strict v1 receipt/parser behavior and all original archives remain unchanged.
+
+The new digest-pinned NBA reference-feature collector in this change froze 16
+feature observations at 2026-10-19T13:33:36.525177Z before their October 20–22
+Eastern-date saved starts. Each team has ten corroborated prior-season results
+whose original receipts were available by the freeze. A second collection and
+read-only audit verified all sixteen without replacements. These are feature
+observations, not predictions or a trained-model activation; original records
+explicitly decline independent publication-time attestation.
+
+The scheduled source workflow stages feature records only after successful
+full preflight and source replay. Invalid existing records stop new feature
+writes; started, stale, ambiguous or incomplete targets stay unenrolled. Later
+source snapshots and postgame audits cannot rewrite original feature records.
+No odds, probabilities, fitting, outcome grading, model promotion, deployment
+or actual wagers are enabled. Next: independently inspect original publication
+chronology and preserve the first prospective feature cohort as future data arrive.
+
+
 ## October 19 continuation — source-backed feature preparation and D1 identities
 
 PR #146 merged the NBA-only source-backed team-form diagnostic reader. Both

@@ -3,6 +3,9 @@ on:
   push:
     branches: ['main']
     paths:
+      - sports_nba_pregame_features.py
+      - test_sports_nba_pregame_features.py
+      - benchmarks/nba_pregame_features_v1/protocol.json
       - sports_nba_schedule_slots.py
       - test_sports_nba_schedule_slots.py
       - sports_expansion_observer.py
@@ -57,7 +60,7 @@ jobs:
       - name: Install pinned transport
         run: python -m pip install requests==2.32.5
       - name: Check game-source parser and forecast isolation
-        run: python -m unittest -v test_sports_nba_schedule_slots test_sports_expansion_observer test_sports_expansion_audit test_sports_nba_official_schedule_audit test_sports_ncaa_official_source test_sports_ncaa_espn_identity test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_nba_receipts test_sports_nba_schedule_receipts test_sports_ncaa_owned_receipts test_sports_ncaa_espn_crosswalk_receipts test_sports_college_dual_source_finals test_sports_college_final_receipts test_sports_college_result_dataset test_sports_nba_final_receipts test_sports_college_d1_receipts
+        run: python -m unittest -v test_sports_nba_pregame_features test_sports_nba_schedule_slots test_sports_expansion_observer test_sports_expansion_audit test_sports_nba_official_schedule_audit test_sports_ncaa_official_source test_sports_ncaa_espn_identity test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_nba_receipts test_sports_nba_schedule_receipts test_sports_ncaa_owned_receipts test_sports_ncaa_espn_crosswalk_receipts test_sports_college_dual_source_finals test_sports_college_final_receipts test_sports_college_result_dataset test_sports_nba_final_receipts test_sports_college_d1_receipts
       - name: Retain timestamped source-only college and NBA snapshots
         id: observation
         run: python sports_expansion_observer.py --days-ahead 3
@@ -113,6 +116,17 @@ jobs:
           name: nba-final-research-status
           path: nba-final-research.json
           retention-days: 30
+      - name: Freeze source-backed NBA pregame feature observations without predictions
+        id: nba_features
+        if: steps.nba_source.outcome == 'success'
+        continue-on-error: true
+        run: python sports_nba_pregame_features.py > nba-pregame-feature-status.json
+      - uses: actions/upload-artifact@v4
+        if: steps.nba_features.outcome == 'success'
+        with:
+          name: nba-pregame-feature-collection-status
+          path: nba-pregame-feature-status.json
+          retention-days: 30
       - name: Report independent source verification outcomes
         if: always()
         env:
@@ -124,13 +138,14 @@ jobs:
           NCAA_FINAL_RECEIPTS: ${{ steps.college_finals.outcome }}
           NCAA_RESULT_DATASET: ${{ steps.college_dataset.outcome }}
           NBA_FINAL_REPLAY: ${{ steps.nba_finals.outcome }}
+          NBA_FEATURE_OBSERVATIONS: ${{ steps.nba_features.outcome }}
         run: |
           python - <<'PY'
           import json, os
           from pathlib import Path
           outcomes = {name: os.environ[name] for name in (
               'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE',
-              'NCAA_OWNED_SOURCE', 'NCAA_ESPN_CROSSWALK', 'NCAA_FINAL_RECEIPTS', 'NCAA_RESULT_DATASET', 'NBA_FINAL_REPLAY')}
+              'NCAA_OWNED_SOURCE', 'NCAA_ESPN_CROSSWALK', 'NCAA_FINAL_RECEIPTS', 'NCAA_RESULT_DATASET', 'NBA_FINAL_REPLAY', 'NBA_FEATURE_OBSERVATIONS')}
           receipt = {
               'schema': 'tyler-independent-source-workflow-status-v1',
               'step_outcomes': outcomes,
@@ -163,6 +178,11 @@ jobs:
             git add benchmarks/college_nba_source_v1/nba_official
           else
             echo '::warning::NBA official source unverified; still retain independent ESPN archive'
+          fi
+          if [ "${{ steps.nba_features.outcome }}" = "success" ]; then
+            git add benchmarks/nba_pregame_features_v1/records
+          else
+            echo '::warning::NBA feature observation step did not succeed; do not publish new feature files'
           fi
           if [ "${{ steps.ncaa_source.outcome }}" = "success" ]; then
             git add benchmarks/college_nba_source_v1/ncaa_official
