@@ -87,7 +87,10 @@ def build(base=Path('.'), *, split='train', now=None, league='NCAAF_FBS', verifi
     espn_rows = [rows[0] for game_id, rows in sorted(provider.items()) if game_id not in provider_conflicts]
     policy = None
     if verified_school_aliases:
-        import sports_historical_school_identities as schools
+        if league=='NCAAF_FBS':
+            import sports_historical_school_identities as schools
+        else:
+            import sports_historical_d1_school_identities as schools
         policy = schools.load(base,league=league,split=split,now=now)
         ncaa_rows = [{**row, **{side+'_name':policy['aliases'].get(
                          identity.name(row[side+'_name']),row[side+'_name'])
@@ -128,10 +131,13 @@ def build(base=Path('.'), *, split='train', now=None, league='NCAAF_FBS', verifi
                       quarantined_ncaa_source_game_ids=sorted(quarantined_ncaa_ids),
                       quarantined_ncaa_source_observations=source_quarantines)
     if policy is not None:
-        result.update(schema='tyler-historical-fbs-reviewed-identity-crosscheck-v2',
+        result.update(schema=('tyler-historical-fbs-reviewed-identity-crosscheck-v2' if league=='NCAAF_FBS'
+                              else 'tyler-historical-d1-reviewed-identity-crosscheck-v3'),
                       school_identity_policy=policy['policy'],
                       school_identity_manifest_sha256=policy['manifest_sha256'],
                       reviewed_school_spellings=policy['reviewed_school_spellings'])
+        if league=='NCAAM_D1':
+            result.update(division_one_membership_verified=False,institutional_identity_certified=False)
     return result
 
 
@@ -141,7 +147,7 @@ def main():
     parser.add_argument('--league',choices=('NCAAF_FBS','NCAAM_D1'),default='NCAAF_FBS')
     parser.add_argument('--split',choices=tuple(owned.YEARS),default='train')
     parser.add_argument('--verified-school-aliases',action='store_true',
-                        help='Opt into independently replayed historical FBS spelling evidence')
+                        help='Opt into separately reviewed and replayed historical school spelling evidence')
     args=parser.parse_args()
     print(json.dumps(build(league=args.league,split=args.split,verified_school_aliases=args.verified_school_aliases), sort_keys=True, indent=2))
 

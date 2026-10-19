@@ -3,6 +3,10 @@ on:
   push:
     branches: ['main']
     paths:
+      - sports_historical_d1_school_identities.py
+      - sports_historical_d1_identity_review.py
+      - test_sports_historical_d1_school_identities.py
+      - test_sports_historical_d1_identity_review.py
       - sports_nba_historical_owned.py
       - sports_historical_nba_crosscheck.py
       - test_sports_nba_historical_owned.py
@@ -55,7 +59,7 @@ jobs:
       - name: Install pinned network transport
         run: python -m pip install requests==2.32.5
       - name: Test prospective isolation, chronology and sealed history
-        run: python -m unittest -v test_sports_historical_extension_seal test_sports_expansion_historical_capture test_sports_historical_identity_audit test_sports_ncaa_historical_owned test_sports_historical_fbs_crosscheck test_sports_ncaa_d1_historical_owned test_sports_ncaa_d1_source_quarantine test_sports_historical_d1_crosscheck test_sports_historical_content_seal test_sports_nba_historical_owned test_sports_historical_nba_crosscheck test_sports_historical_school_identities
+        run: python -m unittest -v test_sports_historical_d1_school_identities test_sports_historical_d1_identity_review test_sports_historical_extension_seal test_sports_expansion_historical_capture test_sports_historical_identity_audit test_sports_ncaa_historical_owned test_sports_historical_fbs_crosscheck test_sports_ncaa_d1_historical_owned test_sports_ncaa_d1_source_quarantine test_sports_historical_d1_crosscheck test_sports_historical_content_seal test_sports_nba_historical_owned test_sports_historical_nba_crosscheck test_sports_historical_school_identities
       - name: Verify the frozen original source-content index before acquisition
         run: python sports_historical_content_seal.py
       - name: Verify completed independent-source archive before acquisition
