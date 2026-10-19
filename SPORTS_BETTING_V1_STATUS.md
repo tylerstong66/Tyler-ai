@@ -21,11 +21,15 @@ The first original NBA/FBS saved starts are October 20 UTC.
 Source workflow run 39307568503 completed successfully after PR #160. Its
 20261019T190225407561Z ESPN capture declares two prior UTC days and three
 forward days and retains 52 provider-reported FBS final observations. These
-are source observations, not graded predictions. The latest persisted workflow
+are source observations, not graded predictions. A persisted workflow
 receipt at 2026-10-19T19:18:47Z records successful ESPN/NCAA collection and replay,
 crosswalk, result-dataset, FBS-feature and NBA-cohort checks, while independent
 NBA schedule acquisition failed and new NBA feature collection was skipped.
 Workflow success therefore continues to mean partial source availability.
+After #161 merged, source run 39325179589 completed successfully and its
+2026-10-19T21:09:30Z receipt additionally records FBS_FEATURE_COHORT_AUDIT
+success. NBA schedule acquisition still failed and new NBA features stayed
+skipped in that run; the successful workflow does not close that source gap.
 
 MLB's original 19-hitter/three-winner cohort publication chronology was separately
 verified. Original saved starts differ by 120 minutes for six hitter records and
