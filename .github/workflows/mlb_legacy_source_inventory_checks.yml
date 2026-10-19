@@ -1,0 +1,31 @@
+name: MLB legacy source content inventory checks
+on:
+  pull_request:
+    paths:
+      - sports_mlb_legacy_source_inventory.py
+      - test_sports_mlb_legacy_source_inventory.py
+      - sports_mlb_cross_cohort_audit.py
+      - sports_mlb_source_archives.py
+      - benchmarks/mlb_legacy_source_inventory_v1/**
+      - benchmarks/mlb_hitter_props_shadow_v1/**
+      - benchmarks/mlb_cohort_publication_v1/**
+      - .github/workflows/mlb_legacy_source_inventory_checks.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install requests==2.32.5
+      - run: python -m unittest -v test_sports_mlb_legacy_source_inventory test_sports_mlb_cross_cohort_audit test_sports_mlb_source_archives
+      - name: Replay current content inventory without new forecasts
+        run: python sports_mlb_legacy_source_inventory.py --cohort-report benchmarks/mlb_cohort_publication_v1/first_three_games.json > /tmp/mlb-legacy-source-inventory.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mlb-legacy-source-content-inventory
+          path: /tmp/mlb-legacy-source-inventory.json

@@ -1,5 +1,50 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-19)
 
+## October 19 continuation — prospective feature cohorts and overnight source coverage
+
+PRs #154–#161 merged the NBA and FBS feature lifecycle readers, MLB cross-cohort
+schedule audit and original publication chronology, five prospective FBS
+reference-feature records and their separate publication chronology, shared
+bounded GitHub server-evidence transport, and opt-in overnight source lookback.
+The combined sports suite passed 645 tests after integrating the FBS lifecycle
+change with current main. PR #161 merged after all 13 refreshed workflows passed.
+
+The 16 original NBA and five original FBS records are feature observations,
+not predictions. FBS uses four corroborated previous-season games per team;
+NBA uses ten. Original sealed records remain unchanged. GitHub server-created
+workflow observations separately bind the exact cohort bytes before both saved
+starts; these proofs do not attest actual kickoff/tipoff or upstream truth.
+The FBS read-only lifecycle replay on October 19 returned five pending records,
+zero result observations, zero schedule drift and zero identity quarantines.
+The first original NBA/FBS saved starts are October 20 UTC.
+
+Source workflow run 39307568503 completed successfully after PR #160. Its
+20261019T190225407561Z ESPN capture declares two prior UTC days and three
+forward days and retains 52 provider-reported FBS final observations. These
+are source observations, not graded predictions. The latest persisted workflow
+receipt at 2026-10-19T19:18:47Z records successful ESPN/NCAA collection and replay,
+crosswalk, result-dataset, FBS-feature and NBA-cohort checks, while independent
+NBA schedule acquisition failed and new NBA feature collection was skipped.
+Workflow success therefore continues to mean partial source availability.
+
+MLB's original 19-hitter/three-winner cohort publication chronology was separately
+verified. Original saved starts differ by 120 minutes for six hitter records and
+eight minutes for another six; joint performance comparisons remain disabled.
+The original pregame game-response bodies remain unreplayed. Later archive
+canonical-JSON matches do not establish original wire bytes or availability at
+freeze. The new read-only inventory verifies 18 current archives and finds
+canonical-JSON matches for 12 roster and 24 hitter-history references among the
+original 76 receipt references. None matches the 19 original pregame game-feed
+references. Its seven new tests and the related archive/cross-cohort tests pass
+24 focused cases. See MLB_LEGACY_SOURCE_CONTENT_INVENTORY_V1.md. Issue #98
+remains open; original forecasts and receipts are unchanged.
+
+Next: retain source final observations as the original feature events occur and
+investigate legacy MLB source gaps without rewriting old receipts or upgrading
+their provenance claims. Training,
+new forecasting, historical evaluation, model promotion and wagers remain
+disabled in this feature-preparation work. NO_BET remains true.
+
 ## October 19 continuation — GitHub server chronology for the first NBA feature cohort
 
 PR #151 merged the 16 original feature observations with all 12 GitHub CI
