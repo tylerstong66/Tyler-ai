@@ -142,12 +142,21 @@ jobs:
         run: |
           python - <<'PY'
           import json, os
+          from datetime import datetime, timezone
           from pathlib import Path
           outcomes = {name: os.environ[name] for name in (
               'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE',
               'NCAA_OWNED_SOURCE', 'NCAA_ESPN_CROSSWALK', 'NCAA_FINAL_RECEIPTS', 'NCAA_RESULT_DATASET', 'NBA_FINAL_REPLAY', 'NBA_FEATURE_OBSERVATIONS')}
           receipt = {
-              'schema': 'tyler-independent-source-workflow-status-v1',
+              'schema': 'tyler-independent-source-workflow-status-v2',
+              'recorded_at_utc': datetime.now(timezone.utc).isoformat(),
+              'workflow_run_id': int(os.environ['GITHUB_RUN_ID']),
+              'workflow_run_url': 'https://github.com/' + os.environ['GITHUB_REPOSITORY'] + '/actions/runs/' + os.environ['GITHUB_RUN_ID'],
+              'source_head_sha': os.environ['GITHUB_SHA'],
+              'partial_source_availability': any(outcomes[name] != 'success' for name in (
+                  'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE', 'NCAA_OWNED_SOURCE')),
+              'new_nba_feature_collection_succeeded': outcomes['NBA_FEATURE_OBSERVATIONS'] == 'success',
+              'green_workflow_certifies_all_sources': False,
               'step_outcomes': outcomes,
               'independent_nba_schedule_checked': outcomes['NBA_SCHEDULE_SOURCE'] == 'success',
               'independent_ncaa_source_checked': outcomes['NCAA_OWNED_SOURCE'] == 'success',
@@ -155,7 +164,11 @@ jobs:
               'independent_official_final_results_verified': False,
               'forecasting_enabled': False, 'NO_BET': True, 'actual_wagers': 0,
           }
-          Path('college_nba_workflow_status.json').write_text(json.dumps(receipt, indent=2, sort_keys=True) + '\n')
+          encoded = json.dumps(receipt, indent=2, sort_keys=True) + '\n'
+          Path('college_nba_workflow_status.json').write_text(encoded)
+          durable = Path('benchmarks/college_nba_source_v1/WORKFLOW_STATUS.latest.json')
+          durable.parent.mkdir(parents=True, exist_ok=True)
+          durable.write_text(encoded)
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
               summary.write('## Independent NCAA/NBA source checks\n\n')
               for name, value in outcomes.items():
@@ -173,7 +186,7 @@ jobs:
       - name: Publish only fully validated research capture
         if: ${{ steps.observation.outcome == 'success' && steps.audit.outcome == 'success' }}
         run: |
-          git add benchmarks/college_nba_source_v1/captures benchmarks/college_nba_source_v1/COVERAGE.latest.json
+          git add benchmarks/college_nba_source_v1/captures benchmarks/college_nba_source_v1/COVERAGE.latest.json benchmarks/college_nba_source_v1/WORKFLOW_STATUS.latest.json
           if [ "${{ steps.nba_source.outcome }}" = "success" ]; then
             git add benchmarks/college_nba_source_v1/nba_official
           else
@@ -200,7 +213,7 @@ jobs:
           if ! git diff --cached --quiet; then
             git config user.name github-actions\[bot\]
             git config user.email 41898282+github-actions\[bot\]@users.noreply.github.com
-            git commit -m 'Record provider-only NCAA and NBA schedule evidence [no bets]'
+            git commit -m 'Record validated source evidence and availability status [no bets]'
             git pull --rebase origin main
             git push origin HEAD:main
           fi
