@@ -14,9 +14,10 @@ import sports_expansion_historical_capture as history
 import sports_expansion_observer as source
 
 
-def build(base=Path('.'), *, league='NCAAM_D1', split='validation', now=None):
+def build(base=Path('.'), *, league='NCAAM_D1', split='validation', now=None,verified_school_aliases=False):
     base=Path(base); now=now or datetime.now(timezone.utc)
-    report=crosscheck.build(base,league=league,split=split,now=now)
+    report=crosscheck.build(base,league=league,split=split,now=now,
+                            verified_school_aliases=verified_school_aliases)
     disputes=[row for row in report['pending']
               if row['reason']=='CONFLICTING_FINAL_SCORES_NO_GRADE']
     ncaa_ids={row['ncaa_game_id'] for row in disputes}
@@ -59,7 +60,7 @@ def build(base=Path('.'), *, league='NCAAM_D1', split='validation', now=None):
         cases.append({**row,'ncaa_observations':ns,'espn_observations':es,
                       'resolution':'UNRESOLVED_NO_SOURCE_PREFERRED',
                       'eligible_for_result_agreement':False})
-    return {'schema':'tyler-historical-college-score-dispute-casebook-v1',
+    result={'schema':'tyler-historical-college-score-dispute-casebook-v1',
         'league':league,'split':split,'disputed_games':len(cases),'cases':cases,
         'selection_policy':'ALL_EXACT_IDENTITY_FINAL_SCORE_DISAGREEMENTS',
         'crosscheck_report_sha256':hashlib.sha256(source.canonical(report)).hexdigest(),
@@ -68,6 +69,11 @@ def build(base=Path('.'), *, league='NCAAM_D1', split='validation', now=None):
         'historical_evaluation_enabled':False,'forecasting_enabled':False,
         'official_result_grading_enabled':False,'promotion_allowed':False,
         'NO_BET':True,'actual_wagers':0}
+    if verified_school_aliases:
+        result.update(schema='tyler-historical-college-reviewed-score-dispute-casebook-v2',
+                      school_identity_policy=report['school_identity_policy'],
+                      school_identity_manifest_sha256=report['school_identity_manifest_sha256'])
+    return result
 
 
 if __name__=='__main__':
@@ -75,5 +81,7 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--league',choices=('NCAAF_FBS','NCAAM_D1'),default='NCAAM_D1')
     parser.add_argument('--split',choices=('train','validation'),default='validation')
+    parser.add_argument('--verified-school-aliases',action='store_true')
     args=parser.parse_args()
-    print(json.dumps(build(league=args.league,split=args.split),sort_keys=True,indent=2))
+    print(json.dumps(build(league=args.league,split=args.split,
+                          verified_school_aliases=args.verified_school_aliases),sort_keys=True,indent=2))

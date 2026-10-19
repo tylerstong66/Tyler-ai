@@ -1,4 +1,33 @@
-# Sports Betting Analyst v1 — verified handoff (2026-10-16)
+# Sports Betting Analyst v1 — verified handoff (2026-10-19)
+
+## October 19 continuation — source-backed feature preparation and D1 identities
+
+PR #146 merged the NBA-only source-backed team-form diagnostic reader. Both
+original source-content seals verify before feature extraction. Actual receipt
+timing and an explicit kickoff-plus-24-hour reconstruction use separate state;
+current/future outcomes and other-season data cannot enter a target's history.
+Both-team reconstructed history exists for 1,294/1,299 of 1,310/1,315 targets,
+while observed-receipt history is unavailable for those past seasons. No fit,
+probability, historical paper forecast, evaluation or model activation is enabled.
+
+PR #147 merged the source-backed D1 identity review packet: 127 candidate
+institution-name pairs, 112 excluded pairs, repeated exact-time/opponent anchors
+in both source seasons, stable source slugs/team IDs and no score-based identity
+selection. The packet adds no runtime aliases or Division I membership claims.
+
+The separate digest-pinned opt-in D1 spelling policy and source-dispute reader
+in this change preserve default exact replay and the FBS policy. Replay yields
+6,047 training / 5,977 validation source-final agreements; changed starts,
+nonfinals, ambiguous identities and all source quarantines remain excluded.
+Newly recognized Idaho State–Montana (NCAA 6349336 / ESPN 401720925) reports
+86–61 in NCAA and 86–62 in ESPN and stays excluded, alongside Belmont–Drake's
+validation disagreement. See D1_HISTORICAL_REVIEWED_SPELLINGS_V1.md.
+
+Next: prepare separately scoped FBS and D1 chronological feature diagnostics,
+retaining observed availability versus reconstruction assumptions and the same
+no-training/no-evaluation/no-forecast/no-promotion/no-wager restrictions.
+Completing a PR or these steps is not a request to pause autonomous work.
+
 
 ## October 19 — completed independent archives and stricter research diagnostics
 
