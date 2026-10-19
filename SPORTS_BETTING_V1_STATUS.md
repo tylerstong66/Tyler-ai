@@ -1,5 +1,27 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-19)
 
+## October 19 continuation — declared-source MLB cohort publication
+
+PR #162 merged the read-only legacy source inventory after all 13 CI workflows
+passed. The old 19 hitter records still lack replayable original pregame game
+bodies; current canonical-JSON matches do not repair their original provenance.
+
+Six newer records for game 849815, already created by the existing collector,
+have four explicitly declared original source responses each. A separate live
+audit and second replay verified their six exact sealed record blobs and 15
+distinct exact source archive blobs at immutable head
+d07e0a8ce2b281715bba61f0feef62032a9e8230. GitHub run 39325179589 was created at
+2026-10-19T21:08:55Z, after their 20:00:51–20:00:57Z freezes and before all saved
+2026-10-20T00:08:00Z starts. The new audit's 45 focused publication/transport
+tests passed. This local audit does not claim its own PR has merged.
+
+See MLB_ARCHIVED_SOURCE_PUBLICATION_V1.md for replay and evidence transport.
+These checks bind declared record/archive bytes to a server-observed commit;
+they do not certify response origin, receipt clocks, actual first pitch, every
+model input's semantics or prediction quality. No new forecasts, training,
+grading, model activation or wagers were performed. The original legacy source
+gap and issue #98 remain open.
+
 ## October 19 continuation — prospective feature cohorts and overnight source coverage
 
 PRs #154–#161 merged the NBA and FBS feature lifecycle readers, MLB cross-cohort

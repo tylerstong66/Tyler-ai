@@ -65,6 +65,20 @@ class ServerEvidenceTests(unittest.TestCase):
         for raw, sha in ((b'x'*1_000_001, SHA), ('not bytes', SHA), (b'x', 'main')):
             with self.assertRaises(ValueError): server.verify_blob(PATH, raw, sha, fetch=lambda _: self.fail('unexpected fetch'))
 
+    def test_exact_compressed_archive_bytes_and_literal_immutable_route(self):
+        import gzip
+        path = 'benchmarks/example/source_archives/'+('b'*64)+'.json.gz'
+        raw = gzip.compress(b'{"source":"original"}', mtime=0)
+        sha = hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
+        item = {'type': 'file', 'path': path, 'sha': sha, 'size': len(raw),
+                'encoding': 'base64', 'content': base64.b64encode(raw).decode()}
+        self.assertEqual(server.verify_blob(path, raw, SHA, fetch=lambda _: item), sha)
+        with patch.object(server.requests, 'get', return_value=self.response()) as get:
+            server.fetch_json(server.API+'/contents/'+path+'?ref='+SHA)
+            get.assert_called_once()
+        item['content'] = base64.b64encode(raw+b'changed').decode()
+        with self.assertRaises(ValueError): server.verify_blob(path, raw, SHA, fetch=lambda _: item)
+
     def test_fixed_origin_routes_reject_foreign_repositories_and_other_endpoints(self):
         for url in ('https://evil.example/test', server.API+'/../other/actions/runs/1',
                     server.API+'/issues/1', server.API+'/actions/runs/0',
