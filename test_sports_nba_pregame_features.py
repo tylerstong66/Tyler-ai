@@ -25,6 +25,16 @@ def reference():
 
 
 class NbaPregameFeatureTests(unittest.TestCase):
+    def test_non_utc_collection_clock_creates_replayable_canonical_utc_record(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td);self.seed(root)
+            clock=NOW.astimezone(timezone(timedelta(hours=-4)))
+            features.collect(root,now=clock)
+            path=next((root/features.ROOT).glob('*.json'));before=path.read_bytes()
+            features.verify(path,base=root,now=NOW+timedelta(days=1))
+            self.assertEqual(json.loads(before)['record']['frozen_at_utc'],NOW.isoformat())
+            self.assertEqual(path.read_bytes(),before)
+
     def seed(self,root):
         _,stamp,_=slot_fixtures.NbaFutureSlotTests().capture(root)
         self.enterContext(patch.object(features,'_reference',return_value=reference()))
