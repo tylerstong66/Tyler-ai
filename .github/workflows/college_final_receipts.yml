@@ -5,6 +5,8 @@ on:
   push:
     branches: [main]
     paths:
+      - sports_historical_nba_features.py
+      - test_sports_historical_nba_features.py
       - sports_historical_extension_seal.py
       - test_sports_historical_extension_seal.py
       - sports_historical_college_disputes.py
@@ -55,7 +57,7 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install requests==2.32.5
       - name: Test final receipt replay and research isolation
-        run: python -m unittest -v test_sports_historical_extension_seal test_sports_historical_college_disputes test_sports_college_final_receipts test_sports_college_dual_source_finals test_sports_ncaa_espn_crosswalk_receipts test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_result_dataset test_sports_nba_final_receipts test_sports_nba_schedule_receipts test_sports_nba_official_schedule_audit test_sports_college_d1_receipts test_sports_expansion_audit test_sports_expansion_historical_capture test_sports_historical_identity_audit test_sports_ncaa_historical_owned test_sports_historical_fbs_crosscheck test_sports_ncaa_d1_historical_owned test_sports_ncaa_d1_source_quarantine test_sports_historical_d1_crosscheck test_sports_historical_content_seal test_sports_nba_historical_owned test_sports_historical_nba_crosscheck test_sports_historical_school_identities
+        run: python -m unittest -v test_sports_historical_nba_features test_sports_historical_extension_seal test_sports_historical_college_disputes test_sports_college_final_receipts test_sports_college_dual_source_finals test_sports_ncaa_espn_crosswalk_receipts test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_result_dataset test_sports_nba_final_receipts test_sports_nba_schedule_receipts test_sports_nba_official_schedule_audit test_sports_college_d1_receipts test_sports_expansion_audit test_sports_expansion_historical_capture test_sports_historical_identity_audit test_sports_ncaa_historical_owned test_sports_historical_fbs_crosscheck test_sports_ncaa_d1_historical_owned test_sports_ncaa_d1_source_quarantine test_sports_historical_d1_crosscheck test_sports_historical_content_seal test_sports_nba_historical_owned test_sports_historical_nba_crosscheck test_sports_historical_school_identities
       - name: Replay retained final evidence without collecting network data
         run: |
           python - <<'PYCODE'
@@ -160,4 +162,13 @@ jobs:
         with:
           name: historical-college-score-disputes
           path: historical-college-score-disputes.json
+          retention-days: 30
+      - name: Replay separate NBA source-backed feature diagnostics without fitting
+        run: |
+          python sports_historical_nba_features.py --split train > historical-nba-train-features.json
+          python sports_historical_nba_features.py --split validation > historical-nba-validation-features.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: historical-nba-source-backed-feature-diagnostics
+          path: historical-nba-*-features.json
           retention-days: 30
