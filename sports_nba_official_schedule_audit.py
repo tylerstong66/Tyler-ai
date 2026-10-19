@@ -174,10 +174,12 @@ def compare(official,espn,*,exact_tipoff_identity=False):
             "forecasting_enabled":False,"NO_BET":True,"actual_wagers":0}
 
 
-def run(fetch,*,base=Path("."),now=None):
+def run(fetch,*,base=Path("."),now=None,quarantine_future_cup_slots=False):
     base=Path(base);now=now or datetime.now(timezone.utc)
     if now.tzinfo is None:
         raise ValueError("UTC clock required")
+    if type(quarantine_future_cup_slots) is not bool:
+        raise ValueError('Explicit NBA source-slot policy required')
     captures=sorted((base/obs.ROOT/"captures").glob("*/manifest.json"))
     if not captures:
         raise ValueError("No archived NBA ESPN capture available")
@@ -188,7 +190,11 @@ def run(fetch,*,base=Path("."),now=None):
     raw=fetch(NBA_URL)
     if not isinstance(raw,bytes) or len(raw)>MAX_BYTES:
         raise ValueError("Missing or oversized independent NBA schedule response")
-    official=official_games(raw)
+    if quarantine_future_cup_slots:
+        import sports_nba_schedule_slots as slots
+        official,quarantined=slots.parse(raw,observed_at=now.isoformat())
+    else:
+        official=official_games(raw)
     espn=espn_games(manifest,last.parent)
     report=compare(official,espn)
     stamp=now.astimezone(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
@@ -209,18 +215,21 @@ def run(fetch,*,base=Path("."),now=None):
         "not_an_independently_verified_final_result":True,
         "NO_BET":True,"actual_wagers":0,"promotion_allowed":False,
     }
+    if quarantine_future_cup_slots:
+        saved.update(schema='nba-espn-independent-schedule-corroboration-v2',
+                     nba_quarantine_policy=slots.POLICY,
+                     nba_source_season=json.loads(raw)['leagueSchedule']['seasonYear'],
+                     quarantined_future_cup_slots=quarantined,
+                     nba_known_game_count=len(official),source_scope_complete=False,
+                     forecasting_enabled=False,model_training_enabled=False,
+                     official_final_scoring_enabled=False)
     (dest/"manifest.json").write_bytes(obs.canonical(saved))
     return saved
 
 
 def main():
-    def fetch(url):
-        r=requests.get(url,timeout=18,headers={
-            "User-Agent":"Mozilla/5.0 (compatible; TylerAIResearchReadOnly/1.0)",
-            "Accept":"application/json"})
-        r.raise_for_status()
-        return r.content
-    report=run(fetch)
+    from sports_nba_historical_owned import fetch_bytes
+    report=run(fetch_bytes,quarantine_future_cup_slots=True)
     print(json.dumps({"at":report["created_at_utc"],
                       "matching":report["report"]["strict_schedule_correlated"],
                       "unverified":report["report"]["not_correlated"],

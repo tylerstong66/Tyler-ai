@@ -101,8 +101,12 @@ def build(root, stamp):
         raise ValueError('Linked ESPN source was captured after NBA receipt')
     audit.audit_capture(ef / "manifest.json")
     original = audit.bounded_gzip_read((folder / 'nba_schedule.json.gz').read_bytes(), limit=nba.MAX_BYTES)
-    result = classify(nba.official_games(original), nba.espn_games(es, ef),
+    result = classify(receipts.read_official_games(original,saved), nba.espn_games(es, ef),
                       nba_observed_at=nt.isoformat(), espn_observed_at=et.isoformat())
+    if saved['schema']=='nba-espn-independent-schedule-corroboration-v2':
+        result.update(schema='tyler-nba-final-research-with-slot-quarantine-v2',
+                      nba_quarantined_future_slot_ids=sorted(
+                          row['nba_game_id'] for row in saved['quarantined_future_cup_slots']))
     return {**result, 'nba_capture': stamp,
             'nba_manifest_sha256': hashlib.sha256(raw).hexdigest(),
             'nba_response_sha256': saved['nba_raw_sha256'],
