@@ -1,5 +1,38 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-16)
 
+## October 19 — completed independent archives and stricter research diagnostics
+
+PR #142 merged a separate opt-in historical NBA exact-tipoff identity policy.
+It recovers repeat fixtures only with one exact UTC start and no competing
+fixture within 30 minutes; original v1 policy and receipt bytes remain unchanged.
+The separate replay yields 1,310 training / 1,315 validation final agreements,
+versus 1,185 / 1,203 under v1. No outcome selects an identity.
+
+PR #143 merged the full NCAA-owned D1 validation request window. Both D1
+splits now retain 156/156 dates; scheduled main-branch training receipts won
+an overlap resolution without rewriting their original observations. There are
+6,346 unique NCAA training contest IDs and 6,332 validation IDs. Exact school
+matching yields 2,965 training / 2,954 validation final agreements. The original
+0–0 NCAA final for contest 6442390 remains quarantined. Belmont–Drake on
+March 6, 2026 (NCAA 6592612 / ESPN 401851488) remains excluded: NCAA reports
+81–100, ESPN 79–100. All other unmatched identities and changed starts stay
+excluded. Request-date completeness is not official schedule completeness.
+
+PR #144 merged diagnostics that retain both original claims, all source observations and
+receipt hashes for exact-identity score disputes. The separate completed
+628-file D1/NBA content index pins its manifest digest; the older 2,292-file
+seal remains unchanged. The new index and its checks accompany this handoff
+update; see the historical archive README for exact scope and limitations.
+
+Next research gate: derive sport-specific pregame feature availability and
+chronological split integrity from trusted source receipts. These historical
+responses were observed after their events and are not saved historical
+pregame predictions. Do not convert source agreements or caller-asserted flags
+into training/evaluation eligibility. D1 school identities remain exact-only;
+no fuzzy matching, score-based identity selection, automatic model activation,
+forecast generation, promotion, runtime deployment or actual wagers.
+
+
 ## October 18 — linear linked-source replay and end-to-end D1 regressions
 
 Extracted the unchanged single-capture ESPN integrity audit so receipt readers

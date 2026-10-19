@@ -89,3 +89,16 @@ both splits for FBS and D1 as a diagnostic artifact.
 
 The retained March 6, 2026 Belmont–Drake case (NCAA `6592612`, ESPN `401851488`)
 reports 81–100 in the NCAA archive and 79–100 in ESPN. It remains excluded.
+
+## Completed independent-source content index
+
+`python sports_historical_extension_seal.py` verifies the separately frozen
+628-file D1/NBA index in `INDEPENDENT_SOURCE_COMPLETION_2026_10_19.json`.
+This covers both 156-date NCAA-owned D1 source windows and both original
+NBA-owned season responses, including every corresponding receipt. The original
+2,292-file provider/FBS seal remains separate and unchanged. The new manifest's
+own SHA256 is pinned in code; source-plus-receipt alterations and a rewritten
+index both fail verification. Independent source collection verifies this seal
+before further requests. A source date is a retained request, not schedule
+completeness. Content hashes do not attest source origin, historical publication
+time, semantic correctness, pregame availability or model eligibility.
