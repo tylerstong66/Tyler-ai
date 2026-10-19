@@ -11,7 +11,7 @@ import sports_nba_schedule_receipts as receipts
 
 
 def classify(official, provider, *, nba_observed_at, espn_observed_at=None,
-             espn_observed_by_game=None):
+             espn_observed_by_game=None, exact_tipoff_identity=False):
     """No scores or winner affect which independently identified game is joined."""
     nt = espn.utc(nba_observed_at)
     if espn_observed_by_game is not None:
@@ -22,7 +22,7 @@ def classify(official, provider, *, nba_observed_at, espn_observed_at=None,
     else:
         at = espn.utc(espn_observed_at)
         observed = {key:at for key in provider}
-    report = nba.compare(official, provider)
+    report = nba.compare(official, provider, exact_tipoff_identity=exact_tipoff_identity)
     by_id = {row['nba_game_id']: row for row in official}
     if len(by_id) != len(official):
         raise ValueError('Duplicate official NBA game identity')

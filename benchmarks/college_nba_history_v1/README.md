@@ -58,3 +58,20 @@ Truncated gzip and expansion bombs fail before any outbound acquisition or new
 batch writes. Replay also enforces integer zero wagers, promotion disabled and
 provider-only official-result status from every existing receipt. Original
 archives are never repaired or overwritten by these checks.
+
+## Separate NBA exact-tipoff identity replay (October 19)
+
+`python sports_historical_nba_crosscheck.py --exact-tipoff-identity --split train`
+(and `--split validation`) produces the separate
+`tyler-historical-nba-exact-tipoff-crosscheck-v2` report. Original v1 replay and
+all source receipt bytes remain unchanged. When repeated home/away fixtures
+fall within 72 hours, this policy requires one exact UTC tipoff match and no
+other same-home/away fixture within 30 minutes. It never uses scores, winners,
+nearest-time ranking or outcome quality to select a game. Existing final,
+season, postponement, one-to-one identity and postgame observation checks apply.
+
+At the October 19 checkout, the separate policy replays 1,310 training and
+1,315 validation two-source final agreements, versus 1,185 and 1,203 under v1.
+The remaining unmatched observations stay excluded. These are postgame source
+agreements, not historical pregame predictions, accepted training data, schedule
+completeness or betting performance. CI publishes both policy outputs separately.

@@ -130,5 +130,14 @@ jobs:
           name: historical-fbs-reviewed-identities
           path: historical-fbs-reviewed-*.json
           retention-days: 30
+      - name: Replay separate NBA exact-tipoff historical identity policy
+        run: |
+          python sports_historical_nba_crosscheck.py --exact-tipoff-identity --split train > historical-nba-exact-train.json
+          python sports_historical_nba_crosscheck.py --exact-tipoff-identity --split validation > historical-nba-exact-validation.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: historical-nba-exact-tipoff-identities
+          path: historical-nba-exact-*.json
+          retention-days: 30
       - name: Verify frozen original input bytes without certifying model eligibility
         run: python sports_historical_content_seal.py

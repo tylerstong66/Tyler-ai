@@ -14,6 +14,67 @@ from test_sports_nba_official_schedule_audit import espn_event
 
 
 class HistoricalNbaCrosscheckTests(unittest.TestCase):
+    def repeat_fixture(self, *, second_hours=48, offset_minutes=0):
+        import sports_nba_official_schedule_audit as nba
+        obj=json.loads(original());games=obj['leagueSchedule']['gameDates'][0]['games']
+        second={**games[0], 'gameId':'0022499999',
+                'gameDateTimeUTC':(check.source.utc(games[0]['gameDateTimeUTC'])+
+                                   timedelta(hours=second_hours)).isoformat()}
+        games.append(second)
+        official=nba.official_games(json.dumps(obj).encode())
+        provider={'401234567':{'espn_game_id':'401234567','home_tricode':'NYK','away_tricode':'BOS',
+            'home_team_id':'18','away_team_id':'2','season_stage':2,'provider_completed':True,
+            'home_score':106,'away_score':104,
+            'scheduled_start_utc':(check.source.utc(games[0]['gameDateTimeUTC'])+
+                                   timedelta(minutes=offset_minutes)).isoformat()}}
+        return official,provider
+
+    def test_opt_in_repeat_fixtures_require_exact_tipoff_and_preserve_v1(self):
+        official,provider=self.repeat_fixture()
+        def run(**kwargs):
+            return finals.classify(official,provider,nba_observed_at=NOW.isoformat(),
+                                   espn_observed_at=NOW.isoformat(),**kwargs)
+        self.assertEqual(run()['pending'][0]['reason'],'AMBIGUOUS_NBA_IDENTITY')
+        out=run(exact_tipoff_identity=True)
+        self.assertEqual(out['two_source_final_agreements'],1)
+        self.assertEqual(out['corroborated_research_only'][0]['nba_game_id'],'0022400000')
+        self.assertEqual(run()['pending'][0]['reason'],'AMBIGUOUS_NBA_IDENTITY')
+
+    def test_exact_policy_never_resolves_near_duplicates_or_uses_nearest(self):
+        for kwargs in ({'second_hours':0},{'second_hours':0.25},{'offset_minutes':1},
+                       {'offset_minutes':31}):
+            with self.subTest(kwargs=kwargs):
+                official,provider=self.repeat_fixture(**kwargs)
+                out=finals.classify(official,provider,nba_observed_at=NOW.isoformat(),
+                                   espn_observed_at=NOW.isoformat(),exact_tipoff_identity=True)
+                self.assertEqual(out['two_source_final_agreements'],0)
+
+    def test_exact_policy_never_selects_by_scores_or_reuses_official_game(self):
+        official,provider=self.repeat_fixture()
+        provider['401234567']['home_score']=107
+        out=finals.classify(official,provider,nba_observed_at=NOW.isoformat(),
+                           espn_observed_at=NOW.isoformat(),exact_tipoff_identity=True)
+        self.assertEqual(out['pending'][0]['reason'],'CONFLICTING_FINAL_SCORES_NO_GRADE')
+        provider['401234567']['home_score']=106
+        provider['401234568']={**provider['401234567'],'espn_game_id':'401234568'}
+        out=finals.classify(official,provider,nba_observed_at=NOW.isoformat(),
+                           espn_observed_at=NOW.isoformat(),exact_tipoff_identity=True)
+        self.assertEqual(out['two_source_final_agreements'],0)
+        self.assertEqual({x['reason'] for x in out['pending']},{'NON_BIJECTIVE_GAME_IDENTITY'})
+
+    def test_historical_policy_version_and_guards_are_explicit(self):
+        with tempfile.TemporaryDirectory() as td:
+            self.seed(td)
+            old=check.build(td,now=NOW)
+            new=check.build(td,now=NOW,exact_tipoff_identity=True)
+            self.assertEqual(old['schema'],'tyler-historical-nba-source-crosscheck-v1')
+            self.assertEqual(new['schema'],'tyler-historical-nba-exact-tipoff-crosscheck-v2')
+            self.assertEqual(new['game_identity_policy'],'EXACT_UTC_TIPOFF_UNIQUE_WITHIN_30_MINUTES')
+            self.assertEqual(old['corroborated_research_only'],new['corroborated_research_only'])
+            for key in ('training_allowed','model_training_enabled','historical_evaluation_enabled',
+                        'forecasting_enabled','promotion_allowed','source_scope_complete'):
+                self.assertIs(new[key],False)
+
     def seed(self,root,*,score=106,code='NY',official=True):
         if official:owned.capture(lambda _:original(),base=root,now=NOW)
         plan={sport:{split:[bounds[0]] for split,bounds in splits.items()}
