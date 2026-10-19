@@ -121,3 +121,24 @@ freeze-before-kickoff evidence, official outcome verification and leakage tests
 before enabling prospective paper model comparisons.
 
 No actual wagers or sportsbook account/API access are used.
+
+
+## Scheduled source availability status
+
+`WORKFLOW_STATUS.latest.json` is published alongside provider captures only
+after provider acquisition and replay succeed. It records per-step outcomes,
+the GitHub run URL/head SHA and status timestamp. The workflow may finish green
+when optional NBA or NCAA acquisition fails. Read `partial_source_availability`
+and `step_outcomes`, not the overall workflow conclusion, before claiming a
+fresh independent source. Check timestamp and run identity for stale status.
+If provider acquisition/audit fails, no new repository status is published;
+the always-produced per-run status artifact remains available on GitHub.
+
+For example, run 39294290832 on October 19, 2026 retained fresh ESPN and NCAA
+captures, while NBA CDN acquisition returned HTTP 403 from the GitHub runner.
+New NBA feature collection was correctly skipped. The original 16 frozen NBA
+feature records were preserved. Availability from another environment does not
+prove availability from the scheduled runner. No alternative data is treated
+as successful NBA acquisition, and no failed source step can publish new NBA
+features. Status receipts certify workflow outcomes only; source-content replay
+and chronology requirements remain separate. NO_BET stays true, wagers zero.
