@@ -1,5 +1,32 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-19)
 
+## October 19 continuation — prospective D1 collection readiness
+
+PR #163 merged the existing six-record MLB declared-source publication audit
+after all 15 CI workflows passed. Its independent native API replay confirmed
+all 21 exact record/archive blobs. The combined sports suite passed 659 tests.
+
+The separate D1 collector in this change pins eight corroborated prior-season
+results per team for the 2026–27 source window. Its real-data preflight replayed
+5,977 historical reference games and found zero current D1 crosswalk matches;
+it created no live records. Both historical content seals, the reviewed D1
+identity policy and original provider team names/IDs are replayed. Current
+matching keeps strict live-source identities and enables no new live aliases.
+
+Ten new D1 tests and the existing FBS tests pass 25 focused cases; the final
+combined sports suite passes 669 tests. Tests cover
+last-eight selection, immutable replay, late/missing history, changed identities,
+calendar limits, schedule state, duplicate IDs, stale/future sources, source
+corruption and UTC normalization. Collector status distinguishes an existing
+college crosswalk from actual D1 source games; successful empty preflight cannot
+claim a current D1 cohort. Source publication skips absent record directories.
+
+See D1_PREGAME_REFERENCE_FEATURES_V1.md. New D1 cohorts will still need separate
+publication and lifecycle checks. These records are reference features, not
+predictions; fitting, historical evaluation, forecasting, promotion and actual
+wagers remain disabled. Existing NBA/FBS features and original archives are
+unchanged. NBA acquisition and legacy MLB source gaps remain unresolved.
+
 ## October 19 continuation — declared-source MLB cohort publication
 
 PR #162 merged the read-only legacy source inventory after all 13 CI workflows
