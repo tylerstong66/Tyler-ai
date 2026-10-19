@@ -14,8 +14,11 @@ import sports_expansion_observer as source
 from sports_expansion_audit import bounded_gzip_read
 
 
-def build(base=Path('.'),*,split='train',now=None):
+def build(base=Path('.'),*,split='train',now=None,exact_tipoff_identity=False):
     if split not in owned.YEARS: raise ValueError('Unsupported NBA historical split')
+    if type(exact_tipoff_identity) is not bool: raise ValueError('Explicit NBA identity policy required')
+    schema=('tyler-historical-nba-exact-tipoff-crosscheck-v2' if exact_tipoff_identity
+            else 'tyler-historical-nba-source-crosscheck-v1')
     now=now or datetime.now(timezone.utc)
     if now.tzinfo is None: raise ValueError('Aware historical NBA audit clock required')
     base=Path(base);integrity=audit.audit(base,now=now)
@@ -57,8 +60,10 @@ def build(base=Path('.'),*,split='train',now=None):
             'forecasting_enabled':False,'promotion_allowed':False,'NO_BET':True,'actual_wagers':0}
     unsupported_pending=[{'espn_game_id':game_id,'reason':'UNSUPPORTED_NBA_TEAM_CODES'}
                          for game_id in sorted(unsupported)]
+    if exact_tipoff_identity:
+        guards['game_identity_policy']='EXACT_UTC_TIPOFF_UNIQUE_WITHIN_30_MINUTES'
     if official is None:
-        return {'schema':'tyler-historical-nba-source-crosscheck-v1','league':'NBA','split':split,
+        return {'schema':schema,'league':'NBA','split':split,
                 'independent_nba_source_available':False,'two_source_final_agreements':0,
                 'corroborated_research_only':[],'pending_or_quarantined':len(provider)+len(unsupported),
                 'pending':[{'espn_game_id':game_id,'reason':'NO_ARCHIVED_INDEPENDENT_NBA_SEASON'}
@@ -66,7 +71,10 @@ def build(base=Path('.'),*,split='train',now=None):
     times={game_id:min(source.utc(ref['observed_at_utc']) for ref in evidence[game_id]).isoformat()
            for game_id in provider}
     report=finals.classify(official['parsed_nba_games'],provider,
-                          nba_observed_at=official['recorded_at_utc'],espn_observed_by_game=times)
+                          nba_observed_at=official['recorded_at_utc'],espn_observed_by_game=times,
+                          exact_tipoff_identity=exact_tipoff_identity)
+    if exact_tipoff_identity:
+        report['game_identity_policy']=guards['game_identity_policy']
     report['pending'].extend(unsupported_pending)
     report['pending_or_quarantined']=len(report['pending'])
     path=base/owned.ROOT/split/(owned.season(split)+'.receipt.json')
@@ -75,7 +83,7 @@ def build(base=Path('.'),*,split='train',now=None):
         row['nba_receipt_sha256']=receipt_digest
         row['nba_response_sha256']=official['original_response_sha256']
         row['espn_receipts']=evidence[row['espn_game_id']]
-    return {**report,'schema':'tyler-historical-nba-source-crosscheck-v1','league':'NBA','split':split,
+    return {**report,'schema':schema,'league':'NBA','split':split,
             'independent_nba_source_available':True,'nba_source_game_ids':len(official['parsed_nba_games']),
             'espn_source_game_ids':len(provider)+len(unsupported),'conflicting_provider_game_ids':sorted(conflicts),
             'excluded_provider_game_ids':sorted(excluded),'training_allowed':False}
@@ -85,5 +93,7 @@ if __name__=='__main__':
     import argparse
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--split',choices=tuple(owned.YEARS),default='train')
+    parser.add_argument('--exact-tipoff-identity',action='store_true',
+                        help='Separate historical repeat-fixture identity policy; preserves v1 replay')
     args=parser.parse_args()
-    print(json.dumps(build(split=args.split),sort_keys=True,indent=2))
+    print(json.dumps(build(split=args.split,exact_tipoff_identity=args.exact_tipoff_identity),sort_keys=True,indent=2))
