@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-18T23:13:17.149027+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-19T01:20:21.730108+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 55 / 51 / 4 |
-| Started games in retained official schedules / enrolled | 52 / 52 |
+| Recorded / settled / pending | 57 / 52 / 5 |
+| Started games in retained official schedules / enrolled | 53 / 53 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 55 / 55 |
-| Settled with enrollment prices / decisive market-paired | 51 / 51 |
+| Enrollment-time priced forecasts | 57 / 57 |
+| Settled with enrollment prices / decisive market-paired | 52 / 52 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,13 +23,14 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-18T23:13:17.149027+00:00. Ready: 3 / 3 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-19T01:20:21.730108+00:00. Ready: 4 / 4 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020136 | CAR at CGY | True | False | True | None |
 | 2026020137 | ANA at NYR | True | False | True | None |
 | 2026020138 | COL at PHI | True | False | True | None |
+| 2026020139 | SJS at TOR | True | False | True | None |
+| 2026020140 | PIT at UTA | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -92,10 +93,12 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020136 | CAR at CGY | 2026-10-19T00:00:00+00:00 | enrolled | — |
 | 2026020137 | ANA at NYR | 2026-10-19T23:00:00+00:00 | enrolled | — |
 | 2026020138 | COL at PHI | 2026-10-19T23:00:00+00:00 | enrolled | — |
+| 2026020139 | SJS at TOR | 2026-10-19T23:30:00+00:00 | enrolled | — |
+| 2026020140 | PIT at UTA | 2026-10-20T01:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 60. Latest: `20261018T231311380710Z`.
+Audited capture manifests: 61. Latest: `20261019T012020209472Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

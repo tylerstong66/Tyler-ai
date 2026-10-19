@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-18T23:13:10.575348+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-10-19T01:20:19.957170+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 26 / 23 / 3 |
-| Started games in retained official schedules / enrolled | 25 / 25 |
+| Recorded / settled / pending | 27 / 25 / 2 |
+| Started games in retained official schedules / enrolled | 26 / 26 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 26 / 26 |
-| Settled with enrollment prices / decisive market-paired | 23 / 22 |
+| Enrollment-time priced forecasts | 27 / 27 |
+| Settled with enrollment prices / decisive market-paired | 25 / 24 |
 | Separate later quotes recorded prospectively | 0 |
 
 A priced NFL tie is excluded only from binary decisive market comparisons.
@@ -25,11 +25,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-18T23:13:10.575348+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-19T01:20:19.957170+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026_06_DAL_GB | DAL at GB | True | False | True | None |
+| 2026_06_WAS_SF | WAS at SF | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -63,10 +63,11 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026_06_PIT_TB | PIT at TB | 2026-10-18T17:00:00+00:00 | enrolled | — |
 | 2026_06_SEA_DEN | SEA at DEN | 2026-10-16T00:15:00+00:00 | enrolled | — |
 | 2026_06_TEN_IND | TEN at IND | 2026-10-18T17:00:00+00:00 | enrolled | — |
+| 2026_06_WAS_SF | WAS at SF | 2026-10-20T00:15:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 62. Latest: `20261018T231307417336Z`.
+Audited capture manifests: 63. Latest: `20261019T012016569501Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
