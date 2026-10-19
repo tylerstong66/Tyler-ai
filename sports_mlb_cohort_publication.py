@@ -2,15 +2,14 @@
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
-import base64
 import hashlib
 import json
-import re
 
 import sports_expansion_observer as canonical_json
 import sports_mlb_cross_cohort_audit as cohorts
 from sports_mlb_sources import utc
-from sports_nba_feature_publication import API, REPOSITORY, fetch_json
+import sports_github_server_evidence as server
+from sports_github_server_evidence import API, REPOSITORY, fetch_json
 
 WORKFLOW = '.github/workflows/mlb_shadow_scoreboard_publisher.yml'
 SCHEMA = 'tyler-mlb-cohort-github-server-observation-v1'
@@ -31,20 +30,7 @@ def _inputs(base):
 
 
 def _run(run_id, now, fetch):
-    if type(run_id) is not int or run_id <= 0:
-        raise ValueError('Positive integer server run ID required')
-    run = fetch(API+'/actions/runs/'+str(run_id)); sha = run.get('head_sha')
-    if (type(run.get('id')) is not int or run['id'] != run_id
-            or run.get('repository', {}).get('full_name') != REPOSITORY
-            or run.get('head_repository', {}).get('full_name') != REPOSITORY
-            or run.get('path') != WORKFLOW or run.get('event') != 'schedule'
-            or not isinstance(sha, str) or not re.fullmatch('[0-9a-f]{40}', sha)):
-        raise ValueError('Wrong MLB server run repository, workflow, event or commit')
-    observed = utc(run['created_at'])
-    if observed > now:
-        raise ValueError('Future GitHub server timestamp')
-    return {'run_id': run_id, 'head_sha': sha, 'workflow_path': WORKFLOW,
-            'event': run['event'], 'server_created_at_utc': run['created_at']}
+    return server.run_observation(run_id, now=now, workflow=WORKFLOW, events=('schedule',), fetch=fetch)
 
 
 def _file(path, proof, raw, run, fetch):
@@ -53,14 +39,7 @@ def _file(path, proof, raw, run, fetch):
         raise ValueError('Server observation does not follow freeze and precede original saved start')
     if hashlib.sha256(raw).hexdigest() != proof['file_sha256']:
         raise ValueError('Original forecast changed during server audit')
-    blob = hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
-    item = fetch(API+'/contents/'+path+'?ref='+run['head_sha'])
-    if (item.get('type') != 'file' or item.get('path') != path or item.get('sha') != blob
-            or type(item.get('size')) is not int or item['size'] != len(raw)
-            or item.get('encoding') != 'base64' or not isinstance(item.get('content'), str)):
-        raise ValueError('Server-observed commit does not contain expected original forecast blob')
-    if base64.b64decode(''.join(item['content'].split()), validate=True) != raw:
-        raise ValueError('Server-observed forecast bytes differ from original')
+    blob = server.verify_blob(path, raw, run['head_sha'], fetch=fetch)
     return {'path': path, **proof, 'git_blob_sha1': blob, 'run_id': run['run_id'],
             'head_sha': run['head_sha'], 'server_created_at_utc': run['server_created_at_utc'],
             'server_observed_before_original_saved_start': True}
