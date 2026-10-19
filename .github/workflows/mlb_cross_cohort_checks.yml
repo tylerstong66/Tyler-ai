@@ -1,0 +1,47 @@
+name: MLB independent cohort identity and schedule audit
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - sports_mlb_cross_cohort_audit.py
+      - test_sports_mlb_cross_cohort_audit.py
+      - sports_mlb_prop_prospective.py
+      - sports_mlb_source_archives.py
+      - benchmarks/mlb_hitter_props_shadow_v1/predictions/**
+      - benchmarks/mlb_hitter_props_shadow_v1/source_archives/**
+      - benchmarks/two_way_prospective/mlb/predictions/**
+      - benchmarks/two_way_prospective/mlb/snapshots/**
+      - .github/workflows/mlb_cross_cohort_checks.yml
+  push:
+    branches: [main]
+    paths:
+      - sports_mlb_cross_cohort_audit.py
+      - test_sports_mlb_cross_cohort_audit.py
+      - sports_mlb_prop_prospective.py
+      - sports_mlb_source_archives.py
+      - benchmarks/mlb_hitter_props_shadow_v1/predictions/**
+      - benchmarks/mlb_hitter_props_shadow_v1/source_archives/**
+      - benchmarks/two_way_prospective/mlb/predictions/**
+      - benchmarks/two_way_prospective/mlb/snapshots/**
+      - .github/workflows/mlb_cross_cohort_checks.yml
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install requests==2.32.5
+      - name: Verify independent original cohorts without merging metrics
+        run: python -m unittest -v test_sports_mlb_cross_cohort_audit test_sports_mlb_prop_prospective test_sports_mlb_source_archives
+      - name: Audit retained original schedules and source limitations
+        run: python sports_mlb_cross_cohort_audit.py > mlb-independent-cohort-audit.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mlb-independent-cohort-schedule-audit
+          path: mlb-independent-cohort-audit.json
+          retention-days: 30
