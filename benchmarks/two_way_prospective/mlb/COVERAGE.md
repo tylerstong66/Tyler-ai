@@ -2,7 +2,7 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-19T01:20:25.570526+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
+Evidence through **2026-10-19T07:47:19.582147+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
 
 | Coverage | Games |
 |---|---:|
@@ -23,18 +23,14 @@ Evidence through **2026-10-19T01:20:25.570526+00:00**; cohort began 2026-10-11T1
 
 ## Official daily-source coverage
 
-Latest capture status: **partial_conflicting_daily_sources**. Quarantined games: **1**. Completed capture attempts with official daily-source conflicts: **14**.
-
-- Game 849817: conflicting official day rows (2026-10-16 -> 2026-10-17T00:00:00+00:00, 2026-10-18 -> 2026-10-18T21:08:00+00:00); no new forecasts, grading or market quote backfills for that game.
-
-Partial source coverage: collector execution succeeded for unaffected games only; quarantined games are not confirmed ready or graded.
+Latest capture status: **consistent_daily_sources**. Quarantined games: **0**. Completed capture attempts with official daily-source conflicts: **14**.
 
 
 Later archived pairs explain timing gaps; they are not retrospectively inserted into forecasts or scored market comparisons.
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-19T01:20:25.570526+00:00. Ready: 0 / 1 observed games. Status: attention.
+As of retained evidence: 2026-10-19T07:47:19.582147+00:00. Ready: 0 / 1 observed games. Status: attention.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
@@ -54,13 +50,13 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 849813 | Cleveland Guardians at Tampa Bay Rays | 2026-10-14T00:00:00+00:00 | enrolled | — |
 | 849815 | Cleveland Guardians at Tampa Bay Rays | 2026-10-20T00:08:00+00:00 | awaiting enrollment | Exact official/ESPN matchup and kickoff match required |
 | 849816 | Tampa Bay Rays at Cleveland Guardians | 2026-10-18T00:08:00+00:00 | enrolled | — |
-| 849817 | Tampa Bay Rays at Cleveland Guardians | 2026-10-18T21:08:00+00:00 | enrolled | — |
+| 849817 | Tampa Bay Rays at Cleveland Guardians | 2026-10-17T00:00:00+00:00 | enrolled | — |
 | 849818 | Tampa Bay Rays at Cleveland Guardians | 2026-10-15T17:00:00+00:00 | enrolled | — |
 | 849820 | Cleveland Guardians at Tampa Bay Rays | 2026-10-13T00:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 59. Latest: `20261019T012021845719Z`.
+Audited capture manifests: 60. Latest: `20261019T074715868600Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

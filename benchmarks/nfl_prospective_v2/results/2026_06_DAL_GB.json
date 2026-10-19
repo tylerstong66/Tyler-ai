@@ -1,0 +1,81 @@
+{
+  "away_score": 13,
+  "event_id": "401873007",
+  "game_id": "2026_06_DAL_GB",
+  "home_score": 23,
+  "outcome": "home",
+  "prediction_sha256": "76d2e3a487e53f8cf40b52f27d9412e3bebbf347daabd43034f2d5bdbf5e8bec",
+  "scores": {
+    "market": {
+      "binary_brier": 0.47856628897478554,
+      "conditional_log_loss": 0.6717101324293401,
+      "correct": true
+    },
+    "v1": {
+      "binary_brier": 0.3484393204159686,
+      "conditional_log_loss": 0.5402480609246304,
+      "correct": true,
+      "full_brier": 0.3489622511739298,
+      "full_log_loss": 0.5439005565062048
+    },
+    "v2": {
+      "binary_brier": 0.3768624174047084,
+      "conditional_log_loss": 0.5693142819704745,
+      "correct": true,
+      "full_brier": 0.3772997309896144,
+      "full_log_loss": 0.5729667775520488
+    }
+  },
+  "season": 2026,
+  "source_snapshots": [
+    {
+      "commit": "d1aab0378072e36c9cd7d0fcf4cf16bd4190e83f",
+      "path": "benchmarks/nfl_prospective_v2/snapshots/e0b44fd34654c2fdea89faa788d54478abc097e938b46489d94842f69268d0a9.csv",
+      "response_sha256": "b44db5b3ac1153f379382f6b931a02f759702c67eae1535a96aebe0097f0570c",
+      "retrieved_at": "2026-10-19T07:47:11.980292+00:00",
+      "sha256": "e0b44fd34654c2fdea89faa788d54478abc097e938b46489d94842f69268d0a9",
+      "source_url": "https://raw.githubusercontent.com/nflverse/nfldata/d1aab0378072e36c9cd7d0fcf4cf16bd4190e83f/data/games.csv"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/91058a59d894855377b2f39f40c4e7bdbeef96d12144289dc68215209a1c93cb.csv",
+      "release_digest": "sha256:91058a59d894855377b2f39f40c4e7bdbeef96d12144289dc68215209a1c93cb",
+      "response_sha256": "91058a59d894855377b2f39f40c4e7bdbeef96d12144289dc68215209a1c93cb",
+      "retrieved_at": "2026-10-19T07:47:12.997646+00:00",
+      "sha256": "91058a59d894855377b2f39f40c4e7bdbeef96d12144289dc68215209a1c93cb",
+      "source_url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2025.csv",
+      "updated_at": "2026-08-13T16:51:24Z"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/3c84c49602f50c48383cc21a07b7ab68a4c2672242911bd6ac50fe6178ff98cf.csv",
+      "release_digest": "sha256:3c84c49602f50c48383cc21a07b7ab68a4c2672242911bd6ac50fe6178ff98cf",
+      "response_sha256": "3c84c49602f50c48383cc21a07b7ab68a4c2672242911bd6ac50fe6178ff98cf",
+      "retrieved_at": "2026-10-19T07:47:13.211310+00:00",
+      "sha256": "3c84c49602f50c48383cc21a07b7ab68a4c2672242911bd6ac50fe6178ff98cf",
+      "source_url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2026.csv",
+      "updated_at": "2026-10-19T04:34:40Z"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/6199ff7370041f30fa4f28e4b30c247e2c3669b4c4761aeb9bbfc0f0120d3ef6.json",
+      "response_sha256": "c6fb7928becedfffe2e178d718d9228da0fd1cd6f8d0573f1b6feebcd8d0bfb3",
+      "retrieved_at": "2026-10-19T07:47:13.518023+00:00",
+      "sha256": "6199ff7370041f30fa4f28e4b30c247e2c3669b4c4761aeb9bbfc0f0120d3ef6",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=20261018"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/d8eb6382d4e99ff9e513a699b14bd9a4a50ac54bbf08ab313f44de3af5c9dfe4.json",
+      "response_sha256": "757426ead1b210db6e8d72b8b5cccfd440158d4e89be2660348d56ca215f1a9c",
+      "retrieved_at": "2026-10-19T07:47:13.624145+00:00",
+      "sha256": "d8eb6382d4e99ff9e513a699b14bd9a4a50ac54bbf08ab313f44de3af5c9dfe4",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=20261019"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/8897946b3581f07489edbbb477f8192cfe3198a29c5e07a78081b72a9278be98.json",
+      "response_sha256": "098a329017397a35ad9c9dbe1e05e6b977aad669ba0ab4f6b5aa6c3d104163a5",
+      "retrieved_at": "2026-10-19T07:47:13.961711+00:00",
+      "sha256": "8897946b3581f07489edbbb477f8192cfe3198a29c5e07a78081b72a9278be98",
+      "source_url": "https://www.nfl.com/news/nfl-week-6-injury-report-player-statuses-for-all-15-games"
+    }
+  ],
+  "verified_at": "2026-10-19T07:47:13.967638+00:00",
+  "week": 6
+}
