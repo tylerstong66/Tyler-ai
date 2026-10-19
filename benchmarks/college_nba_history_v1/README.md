@@ -75,3 +75,17 @@ At the October 19 checkout, the separate policy replays 1,310 training and
 The remaining unmatched observations stay excluded. These are postgame source
 agreements, not historical pregame predictions, accepted training data, schedule
 completeness or betting performance. CI publishes both policy outputs separately.
+
+## Unresolved score disagreement casebook
+
+`python sports_historical_college_disputes.py --league NCAAM_D1 --split validation`
+replays every exact-identity final-score disagreement from the selected source
+split and retains all original normalized observations from both providers,
+source receipt paths, SHA256 hashes and observation times. It does not choose a
+preferred source, correct old scores, or create accepted labels. Missing or
+corrupt evidence fails closed. Other pending identity/time gaps are counted
+separately and are not silently classified as score disagreements. CI exports
+both splits for FBS and D1 as a diagnostic artifact.
+
+The retained March 6, 2026 Belmont–Drake case (NCAA `6592612`, ESPN `401851488`)
+reports 81–100 in the NCAA archive and 79–100 in ESPN. It remains excluded.
