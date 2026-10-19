@@ -14,6 +14,12 @@ def verify(folder):
             or saved.get("fbs_source_week_completeness_verified") is not False
             or saved.get("college_to_espn_identity_map_verified") is not False):
         raise ValueError("Invalid NCAA-owned research receipt")
+    if 'collection_window' in saved:
+        at=ncaa.existing.utc(saved['recorded_at_utc'])
+        window=ncaa.collection_window.verify(saved['collection_window'],at)
+        expected=ncaa.requested_windows(at.date(),window['days_ahead'],window['days_back'])
+        if [(s['league'],s['window'],s['source_url']) for s in saved['snapshots']]!=expected:
+            raise ValueError('NCAA lookback does not match declared bounded source requests')
     from collections import defaultdict
     observed=defaultdict(list)
     for snap in saved["snapshots"]:

@@ -15,9 +15,11 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 import requests
+import sports_source_collection_window as collection_window
 
 ROOT = Path("benchmarks/college_nba_source_v1")
 LIMIT = 500
+LOOKBACK_RECONCILIATION_POLICY = 'STRICT_STAGE_VENUE_PROVIDER_NAMES_V1'
 LEAGUES = {
     "NCAAF_FBS": {"path":"football/college-football", "group":"80",
                   "start":"2026-08-01", "end":"2027-01-31",
@@ -152,7 +154,8 @@ def parse_scoreboard(payload, league):
             "games":records,"result_trust":"ESPN_PROVIDER_ONLY_UNVERIFIED_OFFICIAL"}
 
 
-def reconcile(snapshots):
+def reconcile(snapshots, *, strict_context=False):
+    if type(strict_context) is not bool: raise ValueError('Explicit provider reconciliation mode required')
     """Never choose a different source day by preference or confidence."""
     seen=defaultdict(list)
     for snap in snapshots:
@@ -164,6 +167,7 @@ def reconcile(snapshots):
         baseline=entries[0]["game"]
         keys=("scheduled_start_utc","home_team_id","away_team_id",
               "state","home_score","away_score","provider_completed")
+        if strict_context: keys += ("season_stage","neutral_site","home_name","away_name")
         if any(any(entry["game"][key]!=baseline[key] for key in keys)
                for entry in entries[1:]):
             disputed.append({"league":league,"game_id":game_id,
@@ -175,19 +179,32 @@ def reconcile(snapshots):
     return unique,disputed
 
 
-def capture(fetch, *, now=None, base=Path("."), days_ahead=3):
+def reconcile_for_manifest(manifest, snapshots):
+    if 'collection_window' in manifest:
+        collection_window.verify(manifest['collection_window'],utc(manifest['recorded_at_utc']))
+        if manifest.get('source_reconciliation_policy')!=LOOKBACK_RECONCILIATION_POLICY:
+            raise ValueError('Unknown lookback source reconciliation policy')
+        return reconcile(snapshots,strict_context=True)
+    if 'source_reconciliation_policy' in manifest:
+        raise ValueError('Unexpected context policy in legacy source capture')
+    return reconcile(snapshots)
+
+
+def capture(fetch, *, now=None, base=Path("."), days_ahead=3, days_back=0):
     now=now or datetime.now(timezone.utc)
-    if now.tzinfo is None or not 0<=days_ahead<=7:
+    collection_window.bounds(days_ahead, days_back)
+    if now.tzinfo is None:
         raise ValueError("UTC clock and bounded 0-7 day horizon required")
     base=Path(base)
+    anchor=now.astimezone(timezone.utc).date() if days_back else now.date()
     # Only observed provider evidence, no original model scores/predictions.
     stamp=now.astimezone(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     folder=base/ROOT/"captures"/stamp
     snapshots=[]
     blobs={}
     for league,config in LEAGUES.items():
-        for shift in range(days_ahead+1):
-            day=(now.date()+timedelta(days=shift)).isoformat()
+        for shift in range(-days_back,days_ahead+1):
+            day=(anchor+timedelta(days=shift)).isoformat()
             if not config["start"]<=day<=config["end"]:
                 continue
             url=scoreboard_url(league,day)
@@ -204,7 +221,7 @@ def capture(fetch, *, now=None, base=Path("."), days_ahead=3):
                 "retrieved_at_utc":now.astimezone(timezone.utc).isoformat(),
                 "parsed":parsed})
             blobs[filename]=gzip.compress(raw,mtime=0)
-    accepted,conflicts=reconcile(snapshots)
+    accepted,conflicts=reconcile(snapshots,strict_context=days_back>0)
     if folder.exists():
         raise ValueError("Capture timestamp collision: exclusive append-only snapshots")
     folder.mkdir(parents=True)
@@ -231,6 +248,9 @@ def capture(fetch, *, now=None, base=Path("."), days_ahead=3):
             "Regular/postseason labels come from provider season stage, not a governing-body roster audit.",
         ],
     }
+    if days_back:
+        report["collection_window"]=collection_window.policy(now, days_ahead, days_back)
+        report["source_reconciliation_policy"]=LOOKBACK_RECONCILIATION_POLICY
     (folder/"manifest.json").write_bytes(canonical(report))
     return report
 
@@ -239,12 +259,13 @@ def main():
     import argparse
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--days-ahead",type=int,default=3)
+    parser.add_argument("--days-back",type=int,default=0)
     args=parser.parse_args()
     def fetch(url):
         reply=requests.get(url,timeout=20,headers={"User-Agent":"TylerAI-Research-Only/1.0"})
         reply.raise_for_status()
         return reply.content
-    out=capture(fetch,days_ahead=args.days_ahead)
+    out=capture(fetch,days_ahead=args.days_ahead,days_back=args.days_back)
     print(json.dumps({"capture_at":out["recorded_at_utc"],
                       "snapshots":len(out["snapshots"]),
                       "observed_undisputed":len(out["undisputed_provider_games"]),

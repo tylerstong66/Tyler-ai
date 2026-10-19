@@ -1,0 +1,44 @@
+name: Bounded overnight NCAA and NBA source observation checks
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - sports_source_collection_window.py
+      - test_sports_source_lookback.py
+      - sports_expansion_observer.py
+      - sports_expansion_audit.py
+      - sports_ncaa_official_source.py
+      - sports_ncaa_owned_receipts.py
+      - sports_ncaa_espn_identity.py
+      - .github/workflows/college_nba_source_observation.yml
+      - .github/workflows/source_lookback_checks.yml
+  push:
+    branches: [main]
+    paths:
+      - sports_source_collection_window.py
+      - test_sports_source_lookback.py
+      - sports_expansion_observer.py
+      - sports_expansion_audit.py
+      - sports_ncaa_official_source.py
+      - sports_ncaa_owned_receipts.py
+      - sports_ncaa_espn_identity.py
+      - .github/workflows/college_nba_source_observation.yml
+      - .github/workflows/source_lookback_checks.yml
+permissions:
+  contents: read
+jobs:
+  source-window:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install requests==2.32.5
+      - name: Test overnight final evidence, source ambiguity and legacy replay
+        run: python -m unittest -v test_sports_source_lookback test_sports_expansion_observer test_sports_expansion_audit test_sports_ncaa_official_source test_sports_ncaa_owned_receipts test_sports_fbs_pregame_features test_sports_ncaa_espn_identity test_sports_nba_pregame_features
+      - name: Replay original frozen feature cohorts without new records
+        run: |
+          python sports_fbs_pregame_features.py
+          python sports_nba_pregame_features.py --audit-only
