@@ -1,5 +1,28 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-20)
 
+## October 20 continuation — expose real MLB final-source conflicts
+
+Verified failing workflow 39394816672, job 118534804118: all 37 safeguards
+passed; strict final collection then rejected official game state/time/identity.
+A separate bounded read-only audit now preflights originals and retains new
+official source bytes in a CI diagnostic artifact before that strict step.
+The settlement rejection rule is unchanged. Seven new adversarial tests and
+all 25 focused audit/settlement tests pass locally.
+
+Actual local observation at 13:38:20–13:38:38Z read four unique games for sixteen
+pending hitter records. All four archived original bodies replayed against
+their SHA256 receipts. Six game 849817 records conflict only on scheduled start:
+saved October 17 00:00Z versus current October 18 21:08Z (+162,480 seconds).
+Teams match those hitter records. Ten other records match game/team/start only;
+no batting results, outcomes or scores were enrolled. The artifact explicitly
+cannot attest original pregame availability. Existing issue #98 concerns an
+earlier independent-cohort schedule difference and is not resolved by this.
+
+Next: verify CI and preserve the unresolved source discrepancy without editing
+original forecasts. Final collector remains blocked by the exact-start rule;
+do not represent its valid rejection as a repaired settlement or model result.
+NO_BET remains true; no deployment or monitor changes.
+
 ## October 20 continuation — target-season NBA Stats access diagnostic
 
 PR #180 merged at 657ff356819d7499c261bee6045420c2effb6ba0 after all CI

@@ -2,6 +2,29 @@
 
 This workflow gives a genuine pregame frozen research forecast a separately recorded final outcome **after official MLB final state**. The previously committed prediction file is immutable and never replaced.
 
+Before strict settlement, `sports_mlb_final_source_audit.py --observe` runs a
+separate read-only diagnostic. It preflights the complete bounded sealed
+inventory, observes up to twelve unique past-scheduled-start pending games,
+and reports original game/team/start claims alongside the current official
+claims and signed start difference. Future games, budget deferrals and network
+failures are explicit. Repeated player records share one observation per game.
+The artifact `mlb-pending-final-source-audit` retains the report plus exact
+original official response bodies and digests for 30 days, before the strict
+settlement step runs. Those new observations do not certify historical source
+availability. Identity agreement alone does not validate batting counts or
+authorize a settlement. Malformed inputs still fail closed; no original files,
+settlement rules, model gates or cohort eligibility are changed.
+
+The October 20 13:38 UTC local observation replayed four original source bodies
+for sixteen pending player records. Six game 849817 records had matching teams
+but an official scheduled start of October 18 21:08 UTC, versus their saved
+October 17 00:00 UTC (+162,480 seconds). Ten other records matched current
+game/team/start identities only. The mismatch explains the recurring strict
+settlement rejection; it does not establish that a schedule repair or outcome
+enrollment is permissible. The settlement workflow deliberately remains red
+on such conflicts and preserves the originals. This diagnostic is not a repair
+of the underlying source discrepancy or a performance result.
+
 - Python: \`sports_mlb_prop_settlement_job.py\`
 - Tests: \`test_sports_mlb_prop_settlement_job.py\`
 - GitHub Actions: \`.github/workflows/mlb_hit_shadow_auto_settlement.yml\`
