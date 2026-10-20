@@ -1,8 +1,8 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-10-20T20:35:42.836028+00:00",
-  "capture_count": 68,
+  "as_of_evidence_at": "2026-10-20T23:53:15.741569+00:00",
+  "capture_count": 69,
   "cohort_started_at": "2026-10-11T15:59:30.281973+00:00",
   "completion_note": "Only manifests without an explicit incomplete state are audited; legacy manifests are retained.",
   "decisive_market_paired": 5,
@@ -211,7 +211,7 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "eb791aa4912e60a72c8473c6cb1742ac85465d96e53fabd8788ddc7c63a5a6e8",
+  "input_digest": "9ff4eaf4fff3741977af9bafc417214a8becfa5fa6324cd6c2c7700611a3e94a",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -240,8 +240,8 @@
       "to": "2026-10-13T07:43:07.278901+00:00"
     }
   ],
-  "latest_attempted_capture": "20261020T203539624993Z",
-  "latest_capture": "20261020T203539624993Z",
+  "latest_attempted_capture": "20261020T235313338746Z",
+  "latest_capture": "20261020T235313338746Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
@@ -254,7 +254,7 @@
   ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": true,
-  "latest_official_schedule_observed_at": "2026-10-20T20:35:42.773797+00:00",
+  "latest_official_schedule_observed_at": "2026-10-20T23:53:15.675704+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [
     {
@@ -355,7 +355,7 @@
   "official_daily_conflicted_capture_count": 14,
   "pending": 3,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-10-20T20:35:42.836028+00:00",
+    "as_of_evidence_at": "2026-10-20T23:53:15.741569+00:00",
     "games": [
       {
         "away": "Cleveland Guardians",
@@ -647,6 +647,11 @@
     },
     {
       "capture": "20261020T203539624993Z",
+      "game_id": "849816",
+      "reason": "Final identity differs from saved forecast"
+    },
+    {
+      "capture": "20261020T235313338746Z",
       "game_id": "849816",
       "reason": "Final identity differs from saved forecast"
     }
