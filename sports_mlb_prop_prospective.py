@@ -21,6 +21,19 @@ EASTERN=ZoneInfo("America/New_York")
 SPORTS_VERSION="mlb_hit_prop_shadow_ledger_v1"
 
 
+class OfficialStartTimeConflictError(ValueError):
+    """A valid final feed has a different start from the immutable forecast.
+
+    This is unresolved source evidence, never authority to rewrite or settle
+    that player-game. Other identity/statistical failures remain fatal.
+    """
+    def __init__(self, frozen_start, official_start, source):
+        self.frozen_start = frozen_start.isoformat()
+        self.official_start = official_start.isoformat()
+        self.source = dict(source)
+        super().__init__("Official final MLB scheduled start differs from frozen forecast.")
+
+
 class MissingOfficialBattingFieldError(ValueError):
     """An absent official final batting count cannot be inferred as zero.
 
@@ -174,14 +187,16 @@ def settle_frozen_hit_props(record, *, reader=None):
     gd=data.get("gameData",{})
     status=gd.get("status",{})
     if (data.get("gamePk")!=pk or status.get("abstractGameState")!="Final" or
-            status.get("detailedState")!="Final" or
-            utc(gd.get("datetime",{}).get("dateTime"))!=event):
+            status.get("detailedState")!="Final"):
         raise ValueError("Official final MLB game state/time/identity not verified.")
     side=core.get("hitter_side")
     other="away" if side=="home" else "home"
     if (gd.get("teams",{}).get(side,{}).get("id")!=core.get("hitter_team_id") or
             gd.get("teams",{}).get(other,{}).get("id")!=core.get("opponent_team_id")):
         raise ValueError("Settled teams do not match frozen event.")
+    official_start=utc(gd.get("datetime",{}).get("dateTime"))
+    if official_start!=event:
+        raise OfficialStartTimeConflictError(event, official_start, source)
     box=data.get("liveData",{}).get("boxscore",{}).get("teams",{}).get(side,{})
     players=box.get("players")
     if not isinstance(players,dict):
