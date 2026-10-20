@@ -56,7 +56,7 @@ def _utc(value):
     return datetime.fromisoformat(value.replace('Z', '+00:00'))
 
 
-def document(raw, *, requested_date, season, observed_at):
+def _document(raw, *, requested_date, season, observed_at, null_override=False):
     """Shared bounded page envelope; no game status acceptance policy."""
     if not isinstance(raw, bytes) or not raw or len(raw) > MAX_BYTES:
         raise ValueError('Missing or oversized NBA games page')
@@ -82,7 +82,8 @@ def document(raw, *, requested_date, season, observed_at):
             raise ValueError('NBA page route/date/locale mismatch')
         page = root['props']['pageProps']
         if (page['hasError'] is not False or page['selectedDate'] != requested_date
-                or page['isDateOverrideActive'] is not True):
+                or (page['isDateOverrideActive'] is not None if null_override
+                    else page['isDateOverrideActive'] is not True)):
             raise ValueError('NBA page date override missing')
         feed = page['gameCardFeed']
         if feed['nextPageToken'] is not None or feed['previousPageToken'] is not None:
@@ -96,13 +97,20 @@ def document(raw, *, requested_date, season, observed_at):
     return day, observed, modules, expected
 
 
-def parse(raw, *, requested_date, season, observed_at):
+def document(raw, *, requested_date, season, observed_at):
+    """Original v1 envelope: the date override must explicitly be true."""
+    return _document(raw, requested_date=requested_date, season=season,
+                     observed_at=observed_at)
+
+
+def _parse(raw, *, requested_date, season, observed_at, document_reader):
+
     """Return complete daily pregame identities, never a full-season schedule.
 
     v1 deliberately rejects live/final/cancelled games until their source shapes
     have separately been inspected. All games in a page must pass together.
     """
-    day, observed, modules, expected = document(raw, requested_date=requested_date,
+    day, observed, modules, expected = document_reader(raw, requested_date=requested_date,
         season=season, observed_at=observed_at)
     try:
         games = []; seen = set(); seen_teams = set()
@@ -156,6 +164,12 @@ def parse(raw, *, requested_date, season, observed_at):
         'receipt_clock_independently_attested': False, 'collector_fallback_enabled': False,
         'feature_collection_enabled': False, 'forecasting_enabled': False,
         'model_training_enabled': False, 'promotion_allowed': False, 'NO_BET': True, 'actual_wagers': 0}
+
+
+def parse(raw, *, requested_date, season, observed_at):
+    """Original v1 parser; preserves the pinned receipt contract."""
+    return _parse(raw, requested_date=requested_date, season=season,
+                  observed_at=observed_at, document_reader=document)
 
 
 def replay_initial(base=Path('.')):
