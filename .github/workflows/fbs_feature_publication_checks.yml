@@ -38,12 +38,26 @@ jobs:
           import hashlib, json
           import sports_fbs_pregame_features as f
           status=f.inspect()
-          saved=json.loads((f.ROOT.parent/'publication_v1/first_cohort.json').read_text())
-          assert status['verified_existing'] >= len(saved['evidence'])
-          for row in saved['evidence']:
+          reports=[json.loads((f.ROOT.parent/'publication_v1'/name).read_text())
+                   for name in ('first_cohort.json', 'second_cohort.json')]
+          evidence=[row for report in reports for row in report['evidence']]
+          assert len({row['espn_game_id'] for row in evidence})==len(evidence)
+          assert status['verified_existing'] >= len(evidence)
+          for row in evidence:
               raw=Path(row['path']).read_bytes()
               assert hashlib.sha256(raw).hexdigest()==row['file_sha256']
               assert json.loads(raw)['record_sha256']==row['record_sha256']
-          print({'retained_files_checked':len(saved['evidence']),
+          print({'retained_files_checked':len(evidence),
                  'fresh_github_server_verification_performed':False})
           PY
+      - name: Freshly replay both cohorts through GitHub's native run and contents APIs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python sports_fbs_feature_publication.py --replay benchmarks/fbs_pregame_reference_features_v1/publication_v1/first_cohort.json > /tmp/fbs-first-publication-replay.json
+          python sports_fbs_feature_publication.py --replay benchmarks/fbs_pregame_reference_features_v1/publication_v1/second_cohort.json > /tmp/fbs-second-publication-replay.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fbs-feature-publication-native-api-replay
+          path: /tmp/fbs-*-publication-replay.json
+          if-no-files-found: error
