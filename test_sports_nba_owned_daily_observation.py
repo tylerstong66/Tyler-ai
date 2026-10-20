@@ -163,5 +163,13 @@ class DailyObservationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Oversized'):
             daily.fetch_page('https://www.nba.com/games?date=2026-10-21', get=lambda *a, **k: response)
 
+    def test_retained_live_runner_receipt_replays_without_rewriting(self):
+        folder = SOURCE/daily.ROOT/'20261020T114514510380Z'
+        before = {p.name: p.read_bytes() for p in folder.iterdir()}
+        result = daily.replay(SOURCE, folder.name)
+        self.assertIs(result['source_replay_verified'], True)
+        self.assertEqual(result['strict_pregame_correlated'], 11)
+        self.assertEqual(before, {p.name: p.read_bytes() for p in folder.iterdir()})
+
 
 if __name__ == '__main__': unittest.main()
