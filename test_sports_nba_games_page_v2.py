@@ -5,14 +5,15 @@ import unittest
 
 import sports_nba_games_page as v1
 import sports_nba_games_page_v2 as v2
-from test_sports_nba_games_page import GamesPageTests as OriginalTests, NOW
+import test_sports_nba_games_page as fixtures
+from test_sports_nba_games_page import NOW
 
 
 class NullEnvelopeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        OriginalTests.setUpClass()
-        cls.original = OriginalTests.payload
+        fixtures.GamesPageTests.setUpClass()
+        cls.original = fixtures.GamesPageTests.payload
 
     def raw(self, value):
         return (b'<script id="__NEXT_DATA__" type="application/json">'
@@ -30,7 +31,7 @@ class NullEnvelopeTests(unittest.TestCase):
     def test_version_and_native_byte_binding_without_changing_v1(self):
         value = self.payload(); raw = self.raw(value)
         result = self.parse(value)
-        expected = v1.parse(OriginalTests.raw, requested_date='2026-10-20',
+        expected = v1.parse(fixtures.GamesPageTests.raw, requested_date='2026-10-20',
                             season='2026-27', observed_at=NOW)
         self.assertEqual(result['games'], expected['games'])
         import hashlib
@@ -56,7 +57,7 @@ class NullEnvelopeTests(unittest.TestCase):
     def test_all_original_adversarial_cases_use_same_game_validation(self):
         # Run the original corruption cases through the v2 envelope. These are
         # synthetic mutations; they do not certify a native live source.
-        case = OriginalTests()
+        case = fixtures.GamesPageTests()
         case.payload = self.payload()
         case.raw = self.raw(case.payload)
         def parse(value=None, **kwargs):
