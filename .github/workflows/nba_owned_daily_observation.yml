@@ -24,9 +24,16 @@ jobs:
       - run: python -m unittest -v test_sports_nba_owned_daily_observation test_sports_nba_games_page
       - name: Replay every previously retained separate daily source receipt
         run: python sports_nba_owned_daily_observation.py --audit
+      - name: State the scope of pull request validation
+        if: github.event_name == 'pull_request'
+        run: |
+          echo 'PR validation replays frozen v1 receipts; it does not attest live NBA source compatibility.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Live collection remains an explicit manual operation with strict v1 rejection. Native candidate compatibility is reported by the NBA public endpoint diagnostic.' >> "$GITHUB_STEP_SUMMARY"
       - name: Collect a separate next-Eastern-date source receipt without enrolling features
+        if: github.event_name == 'workflow_dispatch'
         run: python sports_nba_owned_daily_observation.py --collect --days-ahead 1 > /tmp/nba-daily-source-observation.json
       - name: Replay the exact new receipt
+        if: github.event_name == 'workflow_dispatch'
         run: |
           python - <<'PY'
           from pathlib import Path

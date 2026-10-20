@@ -2,6 +2,9 @@ name: NBA public endpoint access diagnostic
 on:
   pull_request:
     paths:
+      - sports_nba_games_page.py
+      - sports_nba_games_page_v2.py
+      - test_sports_nba_games_page_v2.py
       - sports_nba_source_access_probe.py
       - test_sports_nba_source_access_probe.py
       - sports_nba_historical_owned.py
@@ -19,7 +22,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install requests==2.32.5
-      - run: python -m unittest -v test_sports_nba_source_access_probe
+      - run: python -m unittest -v test_sports_nba_source_access_probe test_sports_nba_games_page test_sports_nba_games_page_v2
       - name: Observe fixed public NBA endpoint access without enabling a source
         run: python sports_nba_source_access_probe.py --probe --output-dir nba-source-access-probe
       - name: Inspect date-envelope fields of exact opaque daily responses without enabling sources
@@ -64,6 +67,44 @@ jobs:
               rows.append(item)
           print('NBA_OPAQUE_DATE_ENVELOPE_DIAGNOSTIC='+json.dumps(rows, sort_keys=True, allow_nan=False))
           (root/'date-envelope-diagnostic.json').write_text(json.dumps(rows, sort_keys=True, indent=2)+chr(10))
+          PY
+      - name: Evaluate native null-envelope candidate without writing source receipts
+        run: |
+          python - <<'PY'
+          from datetime import datetime
+          from pathlib import Path
+          import hashlib
+          import json
+          from urllib.parse import urlsplit, parse_qs
+          from sports_expansion_audit import bounded_gzip_read
+          import sports_nba_games_page_v2 as candidate
+          root = Path('nba-source-access-probe')
+          report = json.loads((root/'report.json').read_text())
+          observed = datetime.fromisoformat(report['probe_started_at_utc'])
+          rows = []
+          for receipt in report['requests']:
+              if receipt['endpoint'] not in ('official_games_page', 'official_next_games_page'):
+                  continue
+              row = {'endpoint': receipt['endpoint'], 'native_candidate_parse_succeeded': False,
+                     'source_payload_validated': False, 'cross_source_identity_verified': False,
+                     'forecasting_enabled': False, 'model_training_enabled': False,
+                     'promotion_allowed': False, 'NO_BET': True, 'actual_wagers': 0}
+              if receipt['payload_archived']:
+                  raw = bounded_gzip_read((root/receipt['archive_file']).read_bytes(), 8_000_000)
+                  assert len(raw) == receipt['response_body_bytes']
+                  assert hashlib.sha256(raw).hexdigest() == receipt['response_body_sha256']
+                  requested = parse_qs(urlsplit(receipt['url']).query)['date'][0]
+                  year = int(requested[:4]) - (int(requested[5:7]) < 7)
+                  season = str(year)+'-'+str((year+1) % 100).zfill(2)
+                  try:
+                      parsed = candidate.parse(raw, requested_date=requested, season=season,
+                                               observed_at=observed)
+                      row.update(native_candidate_parse_succeeded=True, parser_report=parsed)
+                  except ValueError as error:
+                      row['candidate_rejection'] = str(error)
+              rows.append(row)
+          print('NBA_NULL_ENVELOPE_CANDIDATE='+json.dumps(rows, sort_keys=True, allow_nan=False))
+          (root/'null-envelope-candidate.json').write_text(json.dumps(rows, sort_keys=True, indent=2)+chr(10))
           PY
       - uses: actions/upload-artifact@v4
         if: always()
