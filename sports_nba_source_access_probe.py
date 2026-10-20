@@ -7,7 +7,7 @@ import hashlib
 import json
 
 import requests
-from sports_nba_historical_owned import HEADERS
+from sports_nba_historical_owned import HEADERS, ENDPOINT
 from sports_nba_official_schedule_audit import NBA_URL
 
 MAX_BYTES = 8_000_000
@@ -19,7 +19,9 @@ def endpoints(now):
             ('daily_scoreboard', 'https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json'),
             ('official_games_page', 'https://www.nba.com/games?date='+day.isoformat()),
             ('official_next_games_page', 'https://www.nba.com/games?date='+(day+timedelta(days=1)).isoformat()),
-            ('official_reference_final_page', 'https://www.nba.com/games?date=2026-04-10')]
+            ('official_reference_final_page', 'https://www.nba.com/games?date=2026-04-10'),
+            ('target_stats_season_schedule_2026_27', ENDPOINT+'?LeagueID=00&Season=2026-27'),
+            ('official_all_calendar_schedule_page', 'https://www.nba.com/schedule?cal=all&pd=false&region=1')]
 
 
 def run(output_dir, *, now=None, get=None):

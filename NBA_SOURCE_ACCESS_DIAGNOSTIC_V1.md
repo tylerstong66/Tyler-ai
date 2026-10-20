@@ -5,6 +5,14 @@ collector runner. This separate diagnostic checks that exact endpoint, NBA's
 public daily-scoreboard endpoint and the official NBA games pages for the current
 and next America/New_York dates. A fifth fixed endpoint requests April 10, 2026,
 to inspect the actual completed-game card shape from the previous regular season.
+The sixth fixed endpoint requests the pinned 2026–27 NBA Stats season schedule
+using the same public route as the retained closed-season NBA-owned archives.
+It is explicitly labeled with its target season, does not change existing
+collector URLs or receipt protocols, and cannot enable source validation merely
+by returning HTTP 200. Returned bodies remain opaque diagnostic material.
+The seventh fixed route requests the official all-calendar schedule HTML page
+already linked by the retained NBA page navigation. Its page shell or embedded
+JSON requires separate inspection; HTTP success never certifies game coverage.
 That older response is diagnostic source material, not a current-season result
 or evidence available at any earlier feature freeze. No historical evaluation
 is performed. It uses the same existing NBA request headers, fixed

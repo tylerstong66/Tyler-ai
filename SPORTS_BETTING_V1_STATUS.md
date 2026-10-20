@@ -1,5 +1,45 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-20)
 
+## October 20 continuation — target-season NBA Stats access diagnostic
+
+PR #180 merged at 657ff356819d7499c261bee6045420c2effb6ba0 after all CI
+checks passed. Its post-merge collector 39428873271 completed successfully and
+saved status at 13:17:28Z: ESPN/NCAA collection, crosswalks, FBS/D1 audits and
+the separate NBA daily receipt passed. NBA full-season access still failed;
+new NBA features stayed skipped and independent-final certification is false.
+The retained daily receipt 20261020T131558790491Z replays eleven pregame games.
+
+The bounded diagnostic now also requests the fixed NBA Stats 2026–27 schedule
+route already used for retained closed-season originals. Eight diagnostic tests
+pass, including fixed target season, fixed hosts, bounds, no credentials or
+redirects, and no source/feature/model enablement after HTTP 200. This only
+inspects endpoint availability and archives an opaque body; no collector URL,
+receipt protocol, model or forecast changes. All original evidence is preserved.
+
+Actual diagnostic run 39429708256 at head 1605141a0a82a043323161462a937246e47d56da
+started at 13:21:43Z. Artifact 12266833941's ZIP SHA256
+80bf88b7f311bfb0d6678591017c91b6a08338b4fbfcbf9735bbb1249bc201d1 verified
+after download. The new NBA Stats request ended in ReadTimeout with no complete
+body or archive. Both CDN endpoints returned 403; the three official daily
+pages returned 200 but remain diagnostic responses. No source was enabled.
+
+Next: recheck bounded target-season access when available and inspect any
+complete body before considering a separately versioned schedule receipt.
+Current-season postgame verification still needs real final source bodies;
+the first saved NBA/FBS starts were still future at the last cohort replay.
+No historical fixture can supply prospective finals. NO_BET remains true.
+The diagnostic additionally requests the fixed NBA-owned all-calendar schedule
+HTML route linked in original page navigation. Run 39430650043 at head
+b9322dba534d47e34deacb6525d69d2831493e4b retained its HTTP 200 body in artifact
+12267712354. The ZIP digest
+15168f8bd190fc40e4cb5e8d62aa3406a75ae5954469f060eef4122657525b0f and original
+236,781-byte body digest
+76ccb614d86294657c972331415e30dbabc54e9c0f5bf0eda4f26b2119f97d64 verified.
+The embedded pageProps contain layout, teamName, region and scheduleSettings;
+the complete embedded JSON has no leagueSchedule, gameDates or gameId dataset.
+Its games configuration is CMS presentation settings. It is an HTML shell, not
+a replayable season schedule. No source coverage or freshness gap is repaired.
+
 ## October 20 continuation — protect new source capture destinations
 
 PRs #172–#179 are merged after all of their complete CI checks passed. The
