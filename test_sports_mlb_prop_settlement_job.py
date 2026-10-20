@@ -129,6 +129,78 @@ class SettlementScheduleTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"naming"):
                 settle_ready_records(d,reader=reader)
 
+    def shifted_reader(self, reader, *, change_teams=False, invalid_time=False):
+        original=reader.load
+        def load(path, params=None, api_version="v1"):
+            alternate=path=="game/849811/feed/live"
+            data, source=original("game/849810/feed/live" if alternate else path,
+                                  params, api_version)
+            if alternate:
+                data["gamePk"]=849811
+            elif path=="game/849810/feed/live" and reader.final:
+                data["gameData"]["datetime"]["dateTime"]=(
+                    "not-a-time" if invalid_time else "2026-10-16T00:00:00Z")
+                if change_teams:
+                    data["gameData"]["teams"]["home"]["id"]=114
+            return data, source
+        reader.load=load
+
+    def test_changed_start_is_unresolved_without_grading_or_rewriting(self):
+        with tempfile.TemporaryDirectory() as root:
+            reader, original, path=self.prepare(root)
+            before=path.read_bytes(); reader.now=AFTER; reader.final=True
+            self.shifted_reader(reader)
+            outcome=settle_ready_records(root, reader=reader)
+            self.assertEqual((outcome["settled"], outcome["unresolved"]),(0,1))
+            row=outcome["unresolved_files"][0]
+            self.assertEqual(row["reason"],"OFFICIAL_FINAL_START_DIFFERS_FROM_FROZEN_RETRY")
+            self.assertEqual(row["frozen_start_utc"],original["event_start_utc"])
+            self.assertEqual(row["official_start_utc"],"2026-10-16T00:00:00+00:00")
+            self.assertEqual(row["prediction_digest_sha256"],original["record_digest_sha256"])
+            self.assertFalse((Path(root)/"settlements"/path.name).exists())
+            self.assertEqual(path.read_bytes(),before)
+
+    def test_start_conflict_cannot_starve_an_unrelated_exact_match(self):
+        with tempfile.TemporaryDirectory() as root:
+            reader, original, path=self.prepare(root)
+            core=copy.deepcopy(original); core.pop("record_digest_sha256")
+            core["game_id"]=849811
+            other=Path(root)/"predictions"/"849811_683734.json"
+            write_exclusive_json(other,_seal(core))
+            before={p.name:p.read_bytes() for p in path.parent.glob("*.json")}
+            reader.now=AFTER; reader.final=True; self.shifted_reader(reader)
+            outcome=settle_ready_records(root,reader=reader)
+            self.assertEqual((outcome["settled"],outcome["unresolved"]),(1,1))
+            self.assertFalse((Path(root)/"settlements"/path.name).exists())
+            self.assertEqual(json.loads((Path(root)/"settlements"/other.name).read_text())["status"],
+                             "SETTLED_CONDITIONAL")
+            self.assertEqual(before,{p.name:p.read_bytes() for p in path.parent.glob("*.json")})
+
+    def test_team_conflict_or_malformed_time_is_not_downgraded_to_retry(self):
+        for changes in ({"change_teams":True},{"invalid_time":True}):
+            with self.subTest(changes=changes),tempfile.TemporaryDirectory() as root:
+                reader, original, path=self.prepare(root)
+                reader.now=AFTER; reader.final=True; self.shifted_reader(reader,**changes)
+                with self.assertRaises(ValueError):
+                    settle_ready_records(root,reader=reader)
+                self.assertFalse((Path(root)/"settlements"/path.name).exists())
+
+    def test_start_conflict_is_retryable_only_if_the_source_later_matches(self):
+        with tempfile.TemporaryDirectory() as root:
+            reader, original, path=self.prepare(root)
+            reader.now=AFTER; reader.final=True
+            load=reader.load; self.shifted_reader(reader)
+            first=settle_ready_records(root,reader=reader)
+            self.assertEqual(first["unresolved"],1)
+            reader.load=load
+            second=settle_ready_records(root,reader=reader)
+            self.assertEqual((second["settled"],second["unresolved"]),(1,0))
+            saved=(Path(root)/"settlements"/path.name).read_bytes()
+            again=settle_ready_records(root,reader=reader)
+            self.assertEqual(again["already_settled"],1)
+            self.assertEqual((Path(root)/"settlements"/path.name).read_bytes(),saved)
+            self.assertEqual(json.loads(path.read_text()),original)
+
     def populate(self, root, total):
         reader,record,first=self.prepare(root)
         for i in range(1,total):

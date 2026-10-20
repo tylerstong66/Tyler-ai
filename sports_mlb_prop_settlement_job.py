@@ -9,7 +9,7 @@ from pathlib import Path
 
 from sports_mlb_prop_prospective import (
     _verify, settle_frozen_hit_props, write_exclusive_json,
-    MissingOfficialBattingFieldError,
+    MissingOfficialBattingFieldError, OfficialStartTimeConflictError,
 )
 from sports_mlb_sources import OfficialMlbReader, utc
 
@@ -92,6 +92,19 @@ def settle_ready_records(root=DEFAULT_ROOT, *, reader=None, max_files=100):
             # Independently verifies MLB final source, team/player identity,
             # counts and timestamp against the saved pregame forecast.
             result=settle_frozen_hit_props(record,reader=reader)
+        except OfficialStartTimeConflictError as error:
+            # The direct settlement validator has already rejected this exact
+            # player-game after checking strict final status and both teams.
+            # Preserve its original; retry later without blocking other games.
+            unresolved+=1
+            unresolved_files.append({"game_id":game,"hitter_id":hitter,
+                "field":"scheduledStart",
+                "reason":"OFFICIAL_FINAL_START_DIFFERS_FROM_FROZEN_RETRY",
+                "frozen_start_utc":error.frozen_start,
+                "official_start_utc":error.official_start,
+                "prediction_digest_sha256":record["record_digest_sha256"],
+                "official_final_source":error.source})
+            continue
         except MissingOfficialBattingFieldError as error:
             unresolved+=1
             reason=("OFFICIAL_FINAL_AT_BATS_UNAVAILABLE_RETRY"
@@ -124,7 +137,7 @@ def main():
     report=settle_ready_records(args.root)
     print("MLB_SHADOW_OFFICIAL_SETTLEMENT_REPORT="+json.dumps(report,sort_keys=True))
     if report["unresolved"]:
-        print("::warning::Official final MLB batting count unresolved for "
+        print("::warning::Official final MLB source fields unresolved for "
               +str(report["unresolved"])+" frozen player-games; no labels fabricated.")
 
 

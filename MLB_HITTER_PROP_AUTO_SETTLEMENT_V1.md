@@ -21,9 +21,11 @@ but an official scheduled start of October 18 21:08 UTC, versus their saved
 October 17 00:00 UTC (+162,480 seconds). Ten other records matched current
 game/team/start identities only. The mismatch explains the recurring strict
 settlement rejection; it does not establish that a schedule repair or outcome
-enrollment is permissible. The settlement workflow deliberately remains red
-on such conflicts and preserves the originals. This diagnostic is not a repair
-of the underlying source discrepancy or a performance result.
+enrollment is permissible. The initial workflow deliberately failed
+on such conflicts and preserved the originals. A subsequent narrow typed-start
+repair keeps the conflicting player-game unresolved while allowing unrelated
+exact matches to undergo existing checks. The source discrepancy remains open;
+this diagnostic is not a performance result.
 
 - Python: \`sports_mlb_prop_settlement_job.py\`
 - Tests: \`test_sports_mlb_prop_settlement_job.py\`
@@ -46,13 +48,20 @@ pending, not as settled or official-final unresolved.
 
 It ignores a forecast while its saved scheduled first pitch is still future,
 or while the official status is not Final. A changed official start time or
-game identity is never silently repaired or rewritten. If the official final boxscore lacks a hitter's `atBats`, `hits` or `homeRuns` count, or the entire batting field is absent/null, the collector explicitly reports that player-game and the missing field as unresolved, leaves the prediction unchanged and writes **no** immutable settlement for it. It retries when its bounded window next comes due; if more than 100 unsettled eligible records accumulate, some player-games may take multiple three-hour schedules to be revisited. It never assumes an absent field means zero or silently counts it as a loss. Unexpected non-integer values, inconsistent stat totals, identity conflicts and other malformed official data still fail closed. A code hotfix to the settlement modules also triggers a fresh workflow run.
+game identity is never silently repaired or rewritten. When a strictly final feed
+passes exact game and team identity but its valid scheduled start differs, that
+player-game is explicitly unresolved and receives no label. The report retains
+both starts, the original prediction digest and current official source receipt.
+The bounded batch continues to other exact-match games. A later retry can settle
+it only if the current official source satisfies the original saved start; the
+forecast is never edited. Game/team conflicts and malformed timestamps remain
+fatal rather than being downgraded to retry. If the official final boxscore lacks a hitter's `atBats`, `hits` or `homeRuns` count, or the entire batting field is absent/null, the collector explicitly reports that player-game and the missing field as unresolved, leaves the prediction unchanged and writes **no** immutable settlement for it. It retries when its bounded window next comes due; if more than 100 unsettled eligible records accumulate, some player-games may take multiple three-hour schedules to be revisited. It never assumes an absent field means zero or silently counts it as a loss. Unexpected non-integer values, inconsistent stat totals, game/team identity conflicts and other malformed official data still fail closed. A code hotfix to the settlement modules also triggers a fresh workflow run.
 
 For each final it validates the original SHA256 content digest, official game ID and scheduled start time, team identities and player ID, then reads official final batting counts. If the batter has 0 AB or is absent from the final boxscore, settlement is *ineligible for the conditional hit/HR event scoring*, not a loss. Otherwise it records separate 1+ hit and 1+ HR binary labels and squared Brier errors for the precise frozen probabilities.
 
 The settlement step stages and commits **only new files beneath the settlement directory**, using GitHub's standard workflow token. A subsequent independently guarded step can refresh and commit **only** the mutable read-only `scoreboard.latest.json` if its benchmark changed, so settled outcomes become visible without relying on the next hourly schedule. No prediction files, application modules, wagers, sportsbook accounts, or production Render deployment variables are touched. The hourly publisher remains an independent fallback.
 
-If a final's verified identity or start time differs from the freeze (e.g. reschedule), the job deliberately fails; do not guess or rewrite the original. If GitHub's organization or repository policy blocks workflow-token writes, the collector will report a permission failure, requiring an explicit repo-level decision. Pending runs should **not** be represented as successful final grading.
+If a final's game/team identity differs from the freeze, the job deliberately fails. A valid start-time difference after exact game/team checks leaves that player-game unresolved and retryable, allowing unrelated valid games to complete existing settlement checks; do not guess or rewrite the original. If GitHub's organization or repository policy blocks workflow-token writes, the collector will report a permission failure, requiring an explicit repo-level decision. Pending runs should **not** be represented as successful final grading.
 
 This is **not** a paid betting recommendation system. It does not use sportsbook odds, void/settlement policies, bookmaker line changes, or calibrated unconditional win probabilities. A handful of settled game outcomes would be insufficient to establish performance; accumulate many independent future events across diverse players and games.
 
