@@ -72,7 +72,7 @@ class V2ObservationTests(unittest.TestCase):
         outside = self.base/'relocated'
         folder.rename(outside); folder.symlink_to(outside, target_is_directory=True)
         self.calls.clear()
-        with self.assertRaisesRegex(ValueError, 'Symlink'): self.collect()
+        with self.assertRaisesRegex(ValueError, 'Unexpected NBA daily archive entry'): self.collect()
         self.assertEqual(self.calls, [])
 
     def test_tampered_manifest_and_raw_body_cannot_replay(self):
