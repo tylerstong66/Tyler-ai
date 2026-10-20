@@ -246,11 +246,15 @@ def run(*,base=Path("."),now=None):
     base=Path(base);now=now or datetime.now(timezone.utc)
     if now.tzinfo is None:
         raise ValueError("Aware source audit timestamp required")
+    stamp=now.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
+    archive_path(base/ROOT/'captures'/stamp, directory=True, allow_missing=True)
     espn_files=sorted((base/espn.ROOT/"captures").glob("*/manifest.json"))
     ncaa_files=sorted((base/ncaa.ROOT/"captures").glob("*/manifest.json"))
     if not espn_files or not ncaa_files:
         raise ValueError("Missing NCAA/ESPN independent sources")
-    ef=espn_files[-1]; nf=ncaa_files[-1]
+    ef=archive_path(espn_files[-1]); nf=archive_path(ncaa_files[-1])
+    if max(ef.stat().st_size, nf.stat().st_size) > MAX_BLOB_SIZE:
+        raise ValueError('Oversized college identity source manifest')
     es=json.loads(ef.read_text());ns=json.loads(nf.read_text())
     for src in (es,ns):
         elapsed=now-espn.utc(src["recorded_at_utc"])

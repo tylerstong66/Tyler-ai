@@ -159,6 +159,9 @@ def run(fetch,*,base=Path("."),now=None,days_ahead=3,days_back=0):
     windows=requested_windows(anchor,days_ahead,days_back)
     if not windows:
         raise ValueError("Outside all NCAA seasonal query windows")
+    from sports_expansion_audit import archive_path
+    stamp=now.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
+    archive_path(base/ROOT/'captures'/stamp, directory=True, allow_missing=True)
     snapshots=[]
     blobs={}
     same_game=defaultdict(list)
