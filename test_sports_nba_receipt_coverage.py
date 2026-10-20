@@ -16,7 +16,12 @@ def pregame(day='2026-10-21', nba='0022600085', espn='401909834', tipoff='2026-1
         'promotion_allowed': False, 'source_scope_complete': False,
         'requested_date': day,
         'strict_pregame_correlated': 1, 'withheld': [],
-        'parsed_daily_page': {'requested_date': day, 'daily_game_count': 1},
+        'parsed_daily_page': {
+            'requested_date': day, 'daily_game_count': 1,
+            'games': [{'nba_game_id': nba, 'kind': 'regular',
+                       'home_team_id': 1, 'away_team_id': 2,
+                       'home_tricode': 'HOME', 'away_tricode': 'AWAY',
+                       'tipoff_utc': tipoff}]},
         'matched': [{'nba_official_game_id': nba, 'espn_game_id': espn,
                      'nba_tipoff_utc': tipoff, 'espn_saved_tipoff_utc': tipoff}],
     }
@@ -134,6 +139,65 @@ class CoverageTests(unittest.TestCase):
         self.assertEqual(result['postgame_conflicting_schedule_game_ids'], ['0022600085'])
         self.assertEqual(result['postgame_conflicting_identity_game_ids'], [])
         self.assertIs(result['promotion_allowed'], False)
+
+    def test_cross_phase_matching_is_source_only_never_verified_accuracy(self):
+        pre = pregame()
+        post = postgame(day='2026-10-21', game_ids=('0022600085',))
+        post['parsed_final_page']['games'][0].update(
+            kind='regular', home_team_id=1, away_team_id=2,
+            home_tricode='HOME', away_tricode='AWAY',
+            tipoff_utc='2026-10-21T23:00:00+00:00',
+            nba_home_score=101, nba_away_score=99, nba_status=3)
+        result = self.run_case([pre], [post])
+        self.assertEqual(result['cross_phase_shared_source_games'], 1)
+        self.assertEqual(result['cross_phase_shared_source_game_ids'], ['0022600085'])
+        self.assertEqual(result['cross_phase_source_only_consistent_game_ids'], ['0022600085'])
+        for key in ('cross_phase_conflicting_team_identity_game_ids',
+                    'cross_phase_changed_scheduled_start_game_ids',
+                    'cross_phase_changed_requested_date_game_ids'):
+            self.assertEqual(result[key], [])
+        self.assertTrue(result['cross_phase_source_only_consistency_is_not_verified_result'])
+        self.assertEqual(result['independently_corroborated_final_results'], 0)
+        self.assertFalse(result['prediction_accuracy_computed'])
+
+    def test_cross_phase_identity_start_date_and_repeated_result_conflicts(self):
+        pre = pregame()
+        final = postgame(day='2026-10-21', game_ids=('0022600085',))
+        final['parsed_final_page']['games'][0].update(
+            kind='regular', home_team_id=1, away_team_id=2,
+            home_tricode='HOME', away_tricode='AWAY',
+            tipoff_utc='2026-10-21T23:00:00+00:00',
+            nba_home_score=101, nba_away_score=99, nba_status=3)
+        identity = json.loads(json.dumps(final))
+        identity['parsed_final_page']['games'][0]['home_team_id'] = 3
+        result = self.run_case([pre], [identity])
+        self.assertEqual(result['cross_phase_conflicting_team_identity_game_ids'], ['0022600085'])
+        self.assertEqual(result['cross_phase_source_only_consistent_game_ids'], [])
+        shifted = json.loads(json.dumps(final))
+        shifted['parsed_final_page']['games'][0]['tipoff_utc'] = '2026-10-21T23:30:00+00:00'
+        result = self.run_case([pre], [shifted])
+        self.assertEqual(result['cross_phase_changed_scheduled_start_game_ids'], ['0022600085'])
+        self.assertEqual(result['cross_phase_conflicting_team_identity_game_ids'], [])
+        changed_day = json.loads(json.dumps(final))
+        changed_day['requested_date'] = '2026-10-22'
+        result = self.run_case([pre], [changed_day])
+        self.assertEqual(result['cross_phase_changed_requested_date_game_ids'], ['0022600085'])
+        changed_score = json.loads(json.dumps(final))
+        changed_score['parsed_final_page']['games'][0]['nba_home_score'] = 102
+        result = self.run_case([pre], [final, changed_score])
+        self.assertEqual(result['postgame_conflicting_result_game_ids'], ['0022600085'])
+        self.assertEqual(result['cross_phase_source_only_consistent_game_ids'], [])
+        self.assertEqual(result['independently_corroborated_final_results'], 0)
+
+    def test_cross_phase_raw_page_mismatch_is_fail_closed(self):
+        pre = pregame()
+        pre['parsed_daily_page']['games'][0]['tipoff_utc'] = '2026-10-21T23:01:00+00:00'
+        with self.assertRaisesRegex(ValueError, 'Native game start differs'):
+            self.run_case([pre], [])
+        pre = pregame()
+        pre['parsed_daily_page']['games'][0]['nba_game_id'] = '0022600086'
+        with self.assertRaisesRegex(ValueError, 'Pregame matched IDs disagree'):
+            self.run_case([pre], [])
 
     def test_unsafe_flags_inconsistent_counts_and_duplicate_ids_fail_closed(self):
         altered = pregame(); altered['NO_BET'] = False
