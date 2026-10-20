@@ -1498,3 +1498,21 @@ append and original-byte preservation have been checked with software fixtures.
 Long-run performance requires genuinely pre-event out-of-sample paper records,
 calibration by market/confidence group, CLV, ROI, and uncertainty estimates.
 This software does not claim the model has a profitable betting edge.
+
+## October 20 continuation — current college source archive boundaries
+
+Current NCAA source receipt/crosswalk readers now reject static symlinks in
+all path ancestors and bound regular manifests before decoding. Direct NCAA
+and ESPN college identity replay also requires the expected local archive
+filename; absolute or redirected source references cannot be read first.
+Four regression methods reproduced 13 failures before repair; a fifth checks
+bounded regular manifests. All 48 focused source/final-classifier tests and
+730 integrated sports tests pass on this branch before other pending PRs.
+
+Read-only replay of NCAA capture 20261020T123823802954Z verifies 295 retained
+contests, and crosswalk 20261020T123825411389Z verifies ten strict identity
+matches. Neither grants independent final certification, completeness or model
+eligibility. No original source, feature, prediction or outcome is rewritten.
+Static path checks do not prevent concurrent operating-system mutation. The
+next boundary review is other direct NBA/provider archive filename consumers;
+fitting, forecasting, evaluation, promotion and wagers remain disabled here.

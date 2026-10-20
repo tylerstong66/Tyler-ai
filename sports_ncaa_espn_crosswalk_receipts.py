@@ -7,6 +7,7 @@ import sports_expansion_observer as espn
 import sports_ncaa_official_source as ncaa
 import sports_ncaa_espn_identity as identity
 import sports_ncaa_owned_receipts as ncaa_receipts
+from sports_expansion_audit import archive_path, MAX_BLOB_SIZE
 
 STAMP=re.compile(r"[0-9]{8}T[0-9]{12}Z\Z")
 
@@ -15,7 +16,10 @@ def verify(root,stamp):
         raise ValueError("Invalid college crosswalk capture identifier")
     root=Path(root)
     folder=root/identity.ROOT/"captures"/stamp
-    saved=json.loads((folder/"manifest.json").read_bytes())
+    path=archive_path(folder/'manifest.json')
+    if path.stat().st_size > MAX_BLOB_SIZE:
+        raise ValueError('Oversized college crosswalk receipt')
+    saved=json.loads(path.read_bytes())
     if (saved.get("schema")!="ncaa-espn-strict-college-game-identity-v1"
             or saved.get("NO_BET") is not True or saved.get("actual_wagers")!=0
             or saved.get("promotion_allowed") is not False):
@@ -26,7 +30,10 @@ def verify(root,stamp):
         if not isinstance(linked,str) or not STAMP.fullmatch(linked):
             raise ValueError("Invalid linked source capture identifier")
         source=root/base/"captures"/linked
-        raw=(source/"manifest.json").read_bytes()
+        path=archive_path(source/'manifest.json')
+        if path.stat().st_size > MAX_BLOB_SIZE:
+            raise ValueError('Oversized linked college source receipt')
+        raw=path.read_bytes()
         if hashlib.sha256(raw).hexdigest()!=saved[key+"_manifest_sha256"]:
             raise ValueError("Linked source manifest digest mismatch")
         sources.append((source,json.loads(raw)))

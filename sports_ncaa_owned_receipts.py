@@ -3,11 +3,14 @@ import hashlib
 import json
 from pathlib import Path
 import sports_ncaa_official_source as ncaa
-from sports_expansion_audit import bounded_gzip_read
+from sports_expansion_audit import archive_path, bounded_gzip_read, MAX_BLOB_SIZE
 
 def verify(folder):
-    folder=Path(folder)
-    saved=json.loads((folder/"manifest.json").read_bytes())
+    folder=archive_path(folder, directory=True)
+    path=archive_path(folder/'manifest.json')
+    if path.stat().st_size > MAX_BLOB_SIZE:
+        raise ValueError('Oversized NCAA source manifest')
+    saved=json.loads(path.read_bytes())
     if (saved.get("schema")!="ncaa-owned-2026-source-observations-v1"
             or saved.get("NO_BET") is not True or saved.get("actual_wagers")!=0
             or saved.get("official_final_scoring_enabled") is not False
@@ -29,7 +32,10 @@ def verify(folder):
         filename=league+"_"+snap["window"]+".json.gz"
         if snap["source_file"]!=filename or "/" in filename or ".." in filename:
             raise ValueError("Invalid NCAA source archive filename")
-        raw=bounded_gzip_read((folder/filename).read_bytes(),limit=ncaa.MAX_BYTES)
+        path=archive_path(folder/filename)
+        if path.stat().st_size > MAX_BLOB_SIZE:
+            raise ValueError('Oversized compressed NCAA source archive')
+        raw=bounded_gzip_read(path.read_bytes(),limit=ncaa.MAX_BYTES)
         if hashlib.sha256(raw).hexdigest()!=snap["source_sha256"]:
             raise ValueError("NCAA source digest mismatch")
         games=ncaa.official_scoreboard(raw,league)
