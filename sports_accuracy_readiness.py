@@ -119,9 +119,9 @@ def snapshot(base=Path('.')):
     return {'version': VERSION, 'NO_BET': True, 'actual_wagers': 0,
             'primary_prospective': leagues, 'nhl_challenger_overlap': nhl_shadow,
             'mlb_hitter_conditional_props': mlb_hitter,
-            'NBA': 'no verified prospective scored predictions',
-            'NCAA_FBS': 'no verified prospective scored predictions',
-            'NCAA_D1_men': 'no verified prospective scored predictions',
+            'NBA': 'outside current audited winner-pick cohorts',
+            'NCAA_FBS': 'outside current audited winner-pick cohorts',
+            'NCAA_D1_men': 'outside current audited winner-pick cohorts',
             'combined_all_sports_win_rate': None, 'ROI': None, 'limitations': CAUTION}
 
 
@@ -138,12 +138,13 @@ def render(data):
     lines += ['', '## Experimental NHL challenger (OVERLAPS NHL ABOVE)', '',
               f"Enrolled {shadow['enrolled']}, scored {shadow['scored']}, pending {shadow['pending']}. "
               f"Same {shadow['candidate']['games']} priced games: challenger {shadow['candidate']['correct_picks']} correct "
-              f"({shadow['candidate']['accuracy']:.1%}); market {shadow['market']['accuracy']:.1%}.",
+              f"({shadow['candidate']['accuracy']:.1%}); market {shadow['market']['accuracy']:.1%}." if shadow['candidate']['games'] else
+              'No independently settled NHL challenger games are available.',
               '', '## Conditional MLB player props (NOT winner picks)', '']
     hitter = data['mlb_hitter_conditional_props']
     lines.append(f"Recorded {hitter['player_games_recorded']} player-games, scored {hitter['player_games_scored']} "
                  f"across {hitter['independent_scored_games']} official games; no bookmaker-price comparison.")
-    lines += ['', 'NBA, NCAA football and NCAA men\'s basketball: prospective pick accuracy unavailable.',
+    lines += ['', 'NBA, NCAA football and NCAA men\'s basketball: not included in these validated winner-pick cohorts.',
               '', '**No valid combined sports accuracy or ROI can be calculated.**', '',
               data['limitations'], '']
     return '\n'.join(lines)
