@@ -63,7 +63,7 @@ jobs:
                       item['envelope_error_type'] = type(error).__name__
               rows.append(item)
           print('NBA_OPAQUE_DATE_ENVELOPE_DIAGNOSTIC='+json.dumps(rows, sort_keys=True, allow_nan=False))
-          (root/'date-envelope-diagnostic.json').write_text(json.dumps(rows, sort_keys=True, indent=2)+'\\n')
+          (root/'date-envelope-diagnostic.json').write_text(json.dumps(rows, sort_keys=True, indent=2)+chr(10))
           PY
       - uses: actions/upload-artifact@v4
         if: always()
