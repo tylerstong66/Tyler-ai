@@ -1,4 +1,4 @@
-"""Strict offline parsing of NBA-owned daily pregame HTML; no collector fallback."""
+"""Shared NBA daily page envelope and strict pregame parser; no collector fallback."""
 from datetime import date, datetime, timezone
 from html.parser import HTMLParser
 import hashlib
@@ -56,12 +56,8 @@ def _utc(value):
     return datetime.fromisoformat(value.replace('Z', '+00:00'))
 
 
-def parse(raw, *, requested_date, season, observed_at):
-    """Return complete daily pregame identities, never a full-season schedule.
-
-    v1 deliberately rejects live/final/cancelled games until their source shapes
-    have separately been inspected. All games in a page must pass together.
-    """
+def document(raw, *, requested_date, season, observed_at):
+    """Shared bounded page envelope; no game status acceptance policy."""
     if not isinstance(raw, bytes) or not raw or len(raw) > MAX_BYTES:
         raise ValueError('Missing or oversized NBA games page')
     if (not isinstance(requested_date, str)
@@ -95,6 +91,20 @@ def parse(raw, *, requested_date, season, observed_at):
         expected = page['allGamesInCurrentYear'][str(day.year)][requested_date]
         if type(expected) is not int or not 0 <= expected <= 30 or not isinstance(modules, list):
             raise ValueError('Invalid NBA daily calendar count')
+    except (KeyError, TypeError, UnicodeError, AttributeError, RecursionError) as error:
+        raise ValueError("Malformed NBA daily source shape") from error
+    return day, observed, modules, expected
+
+
+def parse(raw, *, requested_date, season, observed_at):
+    """Return complete daily pregame identities, never a full-season schedule.
+
+    v1 deliberately rejects live/final/cancelled games until their source shapes
+    have separately been inspected. All games in a page must pass together.
+    """
+    day, observed, modules, expected = document(raw, requested_date=requested_date,
+        season=season, observed_at=observed_at)
+    try:
         games = []; seen = set(); seen_teams = set()
         for module in modules:
             if module['moduleType'] != 'list' or not isinstance(module['cards'], list):

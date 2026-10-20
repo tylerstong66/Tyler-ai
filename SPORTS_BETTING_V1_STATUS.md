@@ -1,5 +1,35 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-20)
 
+## October 20 continuation — offline NBA regulation-final page parser
+
+The original April 10 NBA-owned page from diagnostic run 39420119470 was
+downloaded and verified against GitHub artifact 12263667020's ZIP digest and
+the report's exact body size/SHA256 before implementation. The separate offline
+parser replays 15 regulation finals. IDs, teams, starts, statuses and scores
+match the separately retained NBA-owned 2025–26 season response; this is
+same-origin corroboration, not independent ESPN final verification.
+
+Eleven new tests cover original-byte replay, historical observation timing,
+game/team identity, status and period totals, completeness, chronology,
+unsupported lifecycle shapes and archive tampering. All 42 focused page/daily
+tests and 734 integrated sports tests pass. The pregame parser keeps its
+original status rules and shares only document envelope validation. The new
+read-only CI replay retains its diagnostic output separately. See
+NBA_DAILY_FINAL_PAGE_V1.md.
+
+No current-season final collector or grading pipeline is connected. Overtime,
+postseason and mixed-status pages remain rejected pending real shape inspection.
+The fixture's observation clock is October 20, never an earlier pregame freeze.
+Next: retain genuine current-season postgame source receipts and reconcile
+strict identities against ESPN, while keeping fitting and forecasting disabled.
+Archive path repair PR #173 merged at e205ca0842a74bb53b362029b448b5714fee9c50
+after all checks passed, including the complete historical replay workflow.
+Its post-merge source run 39423783405 records successful ESPN/NCAA collection,
+replay and FBS/D1 checks at 2026-10-20T12:39:17Z. The separate NBA daily receipt
+20261020T123822346914Z replays 11 pregame identities. Full-season NBA acquisition
+still failed and new NBA features were skipped; official-final certification
+remains false. This verifies collector compatibility, not new model readiness.
+
 ## October 20 continuation — archive path integrity
 
 Adversarial fixtures reproduced static directory/ancestor symlink acceptance in
