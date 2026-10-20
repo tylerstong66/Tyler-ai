@@ -61,6 +61,32 @@ class ReviewTests(unittest.TestCase):
         self.assertEqual(full['accuracy'], 0)
         self.assertAlmostEqual(full['log_loss'], -math.log(.1))
 
+    def test_market_probability_replayed_from_original_paired_moneylines(self):
+        # An otherwise valid frozen forecast/result pair must not be able to
+        # misstate the probability implied by its own saved bookmaker quotes.
+        for case in ('valid', 'changed_probability', 'missing_side', 'invalid_odds', 'bool_odds'):
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                pred, result = self.add_game(root, market=.6)
+                pred['market'].update(home_moneyline=-150, away_moneyline=150)
+                if case == 'changed_probability':
+                    pred['market']['conditional_home_probability'] = .61
+                elif case == 'missing_side':
+                    del pred['market']['away_moneyline']
+                elif case == 'invalid_odds':
+                    pred['market']['away_moneyline'] = -99
+                elif case == 'bool_odds':
+                    pred['market']['home_moneyline'] = True
+                pred['sha256'] = r.digest({key: value for key, value in pred.items() if key != 'sha256'})
+                result['prediction_sha256'] = pred['sha256']
+                r.write(root/'predictions/1.json', pred)
+                r.write(root/'results/1.json', result)
+                if case == 'valid':
+                    self.assertEqual(self.review(root)['paired_market']['market']['games'], 1)
+                else:
+                    with self.assertRaisesRegex(r.IntegrityError, 'market moneylines|market probability'):
+                        self.review(root)
+
     def test_unpriced_forecasts_count_in_full_sample_only(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
