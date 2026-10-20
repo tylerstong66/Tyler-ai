@@ -1,5 +1,25 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-20)
 
+## October 20 continuation — archive path integrity
+
+Adversarial fixtures reproduced static directory/ancestor symlink acceptance in
+the ESPN capture auditor, direct NBA daily replay/collection and MLB original
+response retention/replay. These paths now reject symlinks in every ancestor
+before archive access, including dangling archive roots. ESPN manifest and blob
+reads additionally require bounded regular files. Five new regression methods
+exercise ten previously accepted cases; 32 focused tests and all 723 integrated
+sports tests pass. Original benchmark evidence is unchanged. This is a static
+working-tree check, not descriptor-based protection against concurrent filesystem
+mutation; other archive readers still need a separate scope review.
+
+PR #172 was reviewed and merged at ea8a55ee8ca8b7ce9535133d016b410435f7021e
+after its 13 PR workflows passed. It only adds a fixed previous-season completed
+NBA games-page diagnostic endpoint; it does not establish independent finals.
+Next: inspect its archived actual response before designing any final parser,
+and extend archive path safeguards to other readers where tests justify it.
+Forecasting, fitting, historical evaluation, promotion and wagers remain disabled
+for the expansion cohorts. NO_BET remains true; no Render changes were made.
+
 ## October 20 continuation — NBA-owned daily page evidence
 
 PRs #164, #165 and #166 merged the D1 collector, UTC freeze correction and

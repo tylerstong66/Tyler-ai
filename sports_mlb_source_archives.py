@@ -7,7 +7,7 @@ import json
 import re
 import subprocess
 
-from sports_expansion_audit import bounded_gzip_read
+from sports_expansion_audit import archive_path, bounded_gzip_read
 
 MAX_BYTES = 3_000_000
 MAX_COMPRESSED = 3_500_000
@@ -35,7 +35,7 @@ def _decode(blob, filename):
 
 
 def audit_directory(root):
-    root = Path(root)
+    root = archive_path(root, directory=True, allow_missing=True)
     files = list(root.iterdir()) if root.exists() else []
     for path in files:
         if path.is_symlink() or not path.is_file() or path.stat().st_size > MAX_COMPRESSED:
@@ -51,7 +51,8 @@ def retain(root, raw, expected_canonical_sha256):
     if not isinstance(data, dict) or canonical_digest(data) != expected_canonical_sha256:
         raise ValueError('MLB response JSON differs from original reader normalization')
     digest = hashlib.sha256(raw).hexdigest(); filename = digest + '.json.gz'
-    root = Path(root); root.mkdir(parents=True, exist_ok=True)
+    root = archive_path(root, directory=True, allow_missing=True)
+    root.mkdir(parents=True, exist_ok=True)
     path = root / filename
     try:
         with path.open('xb') as stream:
@@ -76,7 +77,7 @@ def verify(root, evidence):
     uri = urlparse(evidence['source_url'])
     if uri.scheme != 'https' or uri.netloc != 'statsapi.mlb.com' or not uri.path.startswith('/api/'):
         raise ValueError('Unexpected MLB source archive origin')
-    path = Path(root) / filename
+    path = archive_path(Path(root) / filename)
     if path.is_symlink() or not path.is_file() or path.stat().st_size > MAX_COMPRESSED:
         raise ValueError('Missing or oversized MLB original response archive')
     _, data = _decode(path.read_bytes(), filename)
