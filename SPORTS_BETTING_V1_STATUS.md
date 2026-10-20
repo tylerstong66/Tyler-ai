@@ -1,5 +1,37 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-20)
 
+## October 20 session checkpoint — source integrity and NBA reference finals
+
+PRs #172–#178 are merged after their complete CI checks passed. #173, #175,
+#176 and #177 close reproduced static symlink, ancestor-directory and source
+filename redirects across MLB, ESPN, NCAA and NBA archive readers. #174 adds
+the separate regulation-final NBA daily parser; #178 replays 15 historical
+NBA-page/ESPN agreements with actual October observation clocks. GitHub artifact
+12265303431 at run 39425842961 matched its ZIP SHA256 and the exact local report.
+These are historical reference checks, not current-season final certification.
+
+A final provider entry-point repair validates sport, split, canonical date and
+an explicitly supplied aware observation cutoff before any archive access.
+Two adversarial methods reproduced nine scope failures and two invalid-clock
+errors before repair. All 29 focused and 754 integrated sports tests pass on
+current main plus that repair; its PR still requires full GitHub CI before
+merge. The original 2,292-file seal and 628-file extension seal still verify.
+Frozen forecasts, features and source bytes are unchanged by these repairs.
+
+Post-merge source run 39426321967 at #177's fbc2db7 records successful source
+replay, FBS/D1 checks and separate NBA daily collection at 12:58:37Z. Independent
+full-season NBA acquisition still fails, new NBA features remain skipped and
+official-final certification is false. MLB issue #98 and legacy original-source
+gaps remain unresolved; joint cohort comparison is disabled. Static path checks
+are not descriptor-based protection against concurrent OS mutation.
+
+Next: retain actual current-season NBA postgame bodies with their real receipt
+clocks and inspect supported/unsupported lifecycle shapes before wiring a
+separate result-source capture. Overtime, postseason and mixed-status daily
+pages remain unsupported. Keep model fitting, new expansion forecasts, grading,
+historical evaluation, promotion and wagers disabled until prerequisites pass.
+NO_BET remains true. No Render deployment or monitor duplication was performed.
+
 ## October 20 continuation — historical NBA page/ESPN reference agreement
 
 PR #174 merged at 3d19049d3e308e31c4600648a95aa758ba367fec after all 15
