@@ -189,10 +189,14 @@ def run(fetch,*,base=Path("."),now=None,quarantine_future_cup_slots=False):
         raise ValueError("UTC clock required")
     if type(quarantine_future_cup_slots) is not bool:
         raise ValueError('Explicit NBA source-slot policy required')
+    stamp=now.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
+    archive_path(base/ROOT/'captures'/stamp, directory=True, allow_missing=True)
     captures=sorted((base/obs.ROOT/"captures").glob("*/manifest.json"))
     if not captures:
         raise ValueError("No archived NBA ESPN capture available")
-    last=captures[-1]
+    last=archive_path(captures[-1])
+    if last.stat().st_size > MAX_BLOB_SIZE:
+        raise ValueError('Oversized NBA linked provider manifest')
     manifest=json.loads(last.read_text())
     if not any(x["league"]=="NBA" for x in manifest["snapshots"]):
         raise ValueError("Latest expansion capture has no NBA source")

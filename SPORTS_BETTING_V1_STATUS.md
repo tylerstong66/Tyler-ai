@@ -1,5 +1,34 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-20)
 
+## October 20 continuation — protect new source capture destinations
+
+PRs #172–#179 are merged after all of their complete CI checks passed. The
+latest scope repair #179 merged at 3f98e0a75df15542c28ba1f7d4cc20c2a4c6105f
+after 13 workflows passed. The following writer-boundary repair rejects static
+symlinks in ESPN, NCAA, NBA schedule and college-crosswalk destination paths
+before source reads/fetches or archive creation. NBA/college entry points also
+check bounded regular linked manifests before decoding.
+
+A twelve-scenario adversarial matrix covers redirected capture roots,
+ancestors and dangling links, asserting no network request and unchanged
+outside-directory bytes. All 35 focused and 755 integrated sports tests pass
+with current main. Existing valid capture/replay tests remain green and both
+original historical seals still replay 2,920 files unchanged. These guards
+remain static checks, not concurrent filesystem-race protection.
+
+Existing NFL/NHL/MLB original forecast/result hash, identity and chronology
+checks passed read-only: respectively 27/27, 68/57 and 10/7 retained records
+at this checkpoint. They are integrity counts, not performance claims or new
+forecasts. The historical NBA page/ESPN diagnostic still verifies 15 reference
+final agreements, with zero outcome enrollment and no current-season claim.
+
+Next: obtain actual current-season postgame NBA bodies at their real receipt
+clock and inspect lifecycle shapes before connecting a separate result-source
+collector. Full-season NBA acquisition, unsupported overtime/postseason/mixed
+pages and MLB legacy-source gaps remain blockers. Fitting, new expansion
+forecasts, historical evaluation, grading, promotion and wagering stay disabled;
+NO_BET is true. No Render changes or new monitoring automation were made.
+
 ## October 20 session checkpoint — source integrity and NBA reference finals
 
 PRs #172–#178 are merged after their complete CI checks passed. #173, #175,
@@ -14,8 +43,8 @@ A final provider entry-point repair validates sport, split, canonical date and
 an explicitly supplied aware observation cutoff before any archive access.
 Two adversarial methods reproduced nine scope failures and two invalid-clock
 errors before repair. All 29 focused and 754 integrated sports tests pass on
-current main plus that repair; its PR still requires full GitHub CI before
-merge. The original 2,292-file seal and 628-file extension seal still verify.
+current main plus that repair; #179 subsequently merged after all 13 GitHub
+workflows passed. The original 2,292-file seal and 628-file extension seal still verify.
 Frozen forecasts, features and source bytes are unchanged by these repairs.
 
 Post-merge source run 39426321967 at #177's fbc2db7 records successful source
