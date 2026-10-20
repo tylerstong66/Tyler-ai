@@ -41,8 +41,8 @@ The native frozen-feature lifecycle now replays original feature/source
 bytes and historical seals, recent native receipts and independent latest
 ESPN responses. It requires frozen identities, both teams/orientation,
 regular-season scope, unique exact current tipoffs, agreeing final scores,
-and source observations after original/current saved starts, freeze and the
-NBA-reported actual end. It identifies the single requested daily scope and
+and source observations after original/current saved starts and freeze,
+at or after the NBA-reported actual end. It identifies the single requested daily scope and
 out-of-scope games explicitly; missing games never imply cancellation.
 The source workflow's live native lifecycle audit succeeded. It grades no
 predictions, enrolls no outcomes and backfills no features. Offline integrated
