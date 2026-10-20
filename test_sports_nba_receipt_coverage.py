@@ -216,6 +216,33 @@ class CoverageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'replay count'):
             self.run_case([], [postgame()], post_ok=False)
 
+    def test_whole_season_receipt_limit_stays_bounded(self):
+        self.assertGreaterEqual(coverage.MAX_RECEIPTS, 3 * 240)
+        self.assertLessEqual(coverage.MAX_RECEIPTS, 2_000)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for i in range(3):
+                folder = root/coverage.pregame.ROOT/f'20261020T{i:012d}Z'
+                folder.mkdir(parents=True)
+                (folder/'manifest.json').write_text(json.dumps(pregame()))
+            with patch.object(coverage, 'MAX_RECEIPTS', 2), patch.object(
+                    coverage.pregame, 'replay_all') as replay:
+                with self.assertRaisesRegex(ValueError, 'Unbounded native NBA receipt inventory'):
+                    coverage.audit(root)
+                replay.assert_not_called()
+
+    def test_oversized_receipt_rejected_before_original_source_replay(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = root/coverage.pregame.ROOT/'20261020T000000000000Z'/'manifest.json'
+            path.parent.mkdir(parents=True)
+            path.write_text(json.dumps(pregame()))
+            with patch.object(coverage, 'MAX_MANIFEST_BYTES', 128), patch.object(
+                    coverage.pregame, 'replay_all') as replay:
+                with self.assertRaisesRegex(ValueError, 'Oversized native NBA receipt'):
+                    coverage.audit(root)
+                replay.assert_not_called()
+
     def test_actual_saved_v2_archive_replays_read_only(self):
         # Run end to end against retained real bytes in CI, without network
         # or new settlement files. Absence of saved dates remains a valid zero.
