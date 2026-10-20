@@ -12,13 +12,13 @@ FIXTURE_ROOT = Path('benchmarks/nba_games_page_v1/reference_final_probe')
 FIXTURE_MANIFEST_SHA256 = 'd0f4d911c440607b450b52eb5e07e489034661fab83c73355027b01e52a81c3d'
 
 
-def parse(raw, *, requested_date, season, observed_at):
+def _parse(raw, *, requested_date, season, observed_at, document_reader):
     """Accept only the inspected complete regular-season regulation-final shape.
 
     Overtime, mixed live/pregame, postponed and postseason pages fail closed.
     Reported actual times are consistency checks, not independent attestations.
     """
-    day, observed, modules, expected = page.document(raw, requested_date=requested_date,
+    day, observed, modules, expected = document_reader(raw, requested_date=requested_date,
         season=season, observed_at=observed_at)
     games = []; seen = set(); seen_teams = set()
     try:
@@ -84,6 +84,12 @@ def parse(raw, *, requested_date, season, observed_at):
         'settlement_enabled': False, 'historical_evaluation_enabled': False,
         'feature_collection_enabled': False, 'forecasting_enabled': False,
         'model_training_enabled': False, 'promotion_allowed': False, 'NO_BET': True, 'actual_wagers': 0}
+
+
+def parse(raw, *, requested_date, season, observed_at):
+    """Original v1 final reader, including its strict true-envelope contract."""
+    return _parse(raw, requested_date=requested_date, season=season,
+                  observed_at=observed_at, document_reader=page.document)
 
 
 def replay_reference(base=Path('.')):
