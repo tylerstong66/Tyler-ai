@@ -39,3 +39,18 @@ forecasting, fitting, grading, promotion and wagering remain disabled here.
 Next: design separate current-season postgame capture and exact identity
 reconciliation only after relevant live payloads and source clocks are retained.
 Unsupported lifecycle shapes need real source inspection before acceptance.
+
+## Separate historical cross-source fixture diagnostic
+
+`python sports_nba_final_page_reference.py` compares the parsed NBA page with
+the existing sealed April 10 ESPN raw archive. The original 2,292-file content
+seal and historical receipt replay must pass first. ESPN opponent tricodes and
+IDs are read from the original response, then the existing strict final
+classifier selects identities before comparing scores. All 15 historical
+fixtures agree. Score or team disagreement remains pending/quarantined.
+
+The original ESPN observation is October 18, 2026; the NBA page diagnostic is
+October 20. Agreement is available only at the later clock. This is a read-only
+reference-fixture diagnostic, not new outcome enrollment, current-season final
+verification, evidence available at historical pregame freeze, prediction
+grading or model evaluation. It writes no benchmark dataset or feature record.

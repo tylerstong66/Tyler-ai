@@ -1,5 +1,28 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-20)
 
+## October 20 continuation — historical NBA page/ESPN reference agreement
+
+PR #174 merged at 3d19049d3e308e31c4600648a95aa758ba367fec after all 15
+workflows passed and a local current-main integration passed 738 sports tests.
+The separate read-only reference diagnostic now joins its pinned original
+April 10 page with the already sealed ESPN April 10 response. All 15 finals
+agree under the existing identity-first classifier. The ESPN raw/receipt
+must replay under the original 2,292-file content seal before comparison.
+
+The two observations were recorded October 18 and October 20, respectively;
+agreement is available only at the later October clock. Five new tests cover
+original cross-source replay, invalid/future observation clocks, seal changes,
+score conflicts and identity mismatches. All 29 focused and 743 integrated
+sports tests pass on this branch, before pending current-college and NBA
+filename changes. The diagnostic enrolls zero outcomes and writes no dataset,
+feature or prediction; its CI artifact is explicitly a historical fixture.
+Current-season finals, prospective accuracy, fitting, grading, forecasting and
+promotion remain unverified or disabled. NO_BET remains true.
+
+Next: inspect and retain current-season postgame NBA pages using actual receipt
+clocks, then design separate result-source capture without altering original
+features. Overtime/postseason/mixed-status shapes still require real inspection.
+
 ## October 20 continuation — offline NBA regulation-final page parser
 
 The original April 10 NBA-owned page from diagnostic run 39420119470 was
