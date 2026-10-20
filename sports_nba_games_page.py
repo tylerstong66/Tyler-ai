@@ -112,12 +112,15 @@ def parse(raw, *, requested_date, season, observed_at):
                         or type(game['gameState']) is not int or game['gameState'] != 1
                         or type(game['period']) is not int or game['period'] != 0
                         or game['gameSubtype'] != '' or game['ifNecessary'] is not False
-                        or game.get('actualStartTimeUTC') is not None
-                        or game.get('actualEndTimeUTC') is not None):
+                        or game['actualStartTimeUTC'] is not None
+                        or game['actualEndTimeUTC'] is not None):
                     raise ValueError('NBA page game is not supported scheduled pregame')
                 tip = _utc(game['gameTimeUtc'])
                 if tip <= observed or tip.astimezone(EASTERN).date() != day:
                     raise ValueError('NBA pregame time/date disagrees with observation')
+                expected_text = tip.astimezone(EASTERN).strftime('%I:%M %p').lstrip('0').lower()+' ET'
+                if game['gameStatusText'] != expected_text:
+                    raise ValueError('NBA pregame status text disagrees with saved start')
                 sides = {}
                 for side in ('home', 'away'):
                     team = game[side+'Team']; tid = team['teamId']; tri = team['teamTricode']

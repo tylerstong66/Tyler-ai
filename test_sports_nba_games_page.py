@@ -94,6 +94,7 @@ class GamesPageTests(unittest.TestCase):
             (g+['gameStatus'], True), (g+['gameStatus'], 2), (g+['gameStatus'], 3),
             (g+['gameState'], 2), (g+['period'], 1), (g+['ifNecessary'], True),
             (g+['gameSubtype'], 'Postponed'), (g+['actualStartTimeUTC'], '2026-10-20T19:00:00Z'),
+            (g+['gameStatusText'], 'Postponed'), (g+['gameStatusText'], 'TBD'),
             (g+['actualEndTimeUTC'], '2026-10-20T22:00:00Z'),
             (g+['gameTimeUtc'], '2026-10-20T19:00:00'),
             (g+['gameTimeUtc'], '2026-10-21T19:00:00Z')]
