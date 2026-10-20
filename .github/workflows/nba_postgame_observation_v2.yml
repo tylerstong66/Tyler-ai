@@ -1,0 +1,44 @@
+name: NBA native null-envelope recent postgame receipt checks
+on:
+  pull_request:
+    paths:
+      - sports_nba_postgame_observation.py
+      - sports_nba_postgame_observation_v2.py
+      - test_sports_nba_postgame_observation_v2.py
+      - sports_nba_final_games_page_v2.py
+      - benchmarks/nba_postgame_daily_v2/**
+      - .github/workflows/nba_postgame_observation_v2.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install requests==2.32.5
+      - run: python -m unittest -v test_sports_nba_postgame_observation test_sports_nba_postgame_observation_v2 test_sports_nba_final_games_page_v2
+      - name: Replay both original source protocols
+        run: |
+          python sports_nba_postgame_observation.py --audit
+          python sports_nba_postgame_observation_v2.py --audit
+      - name: Capture recent native bytes with actual receipt clocks and no grading
+        run: python sports_nba_postgame_observation_v2.py --collect --days-back 1 > nba-native-v2-postgame.json
+      - name: Replay exact raw bytes and canonical native receipt
+        run: python sports_nba_postgame_observation_v2.py --audit > nba-native-v2-postgame-replay.json
+      - name: Require unchanged tracked inputs
+        run: git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nba-native-v2-postgame-observation
+          path: |
+            benchmarks/nba_postgame_daily_v2/captures/
+            nba-native-v2-postgame.json
+            nba-native-v2-postgame-replay.json
+          if-no-files-found: error
+          retention-days: 30

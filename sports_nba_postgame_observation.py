@@ -1,5 +1,6 @@
 """Separate bounded recent-date NBA page captures; no result enrollment or grading."""
 from datetime import datetime, timedelta, timezone
+from dataclasses import dataclass
 import gzip
 import hashlib
 import json
@@ -16,13 +17,24 @@ ROOT = Path('benchmarks/nba_postgame_daily_v1/captures')
 SCHEMA = 'tyler-nba-recent-postgame-source-observation-v1'
 
 
+@dataclass(frozen=True)
+class _ReceiptProtocol:
+    root: Path
+    schema: str
+    replay_schema: str
+    parser: object
+
+
+_V1 = _ReceiptProtocol(ROOT, SCHEMA, 'tyler-nba-postgame-source-replay-v1', final.parse)
+
+
 def _clock(value):
     if not isinstance(value, datetime) or value.tzinfo is None or value.utcoffset() is None:
         raise ValueError('Aware NBA postgame clock required')
     return value.astimezone(timezone.utc)
 
 
-def _build(raw, *, started, received, days_back):
+def _build(raw, *, started, received, days_back, _protocol=_V1):
     started = _clock(started); received = _clock(received)
     if (type(days_back) is not int or not 0 <= days_back <= 3
             or not started <= received <= started+timedelta(minutes=5)):
@@ -33,14 +45,14 @@ def _build(raw, *, started, received, days_back):
     year = day.year if day.month >= 7 else day.year-1
     season = f'{year}-{(year+1)%100:02d}'
     try:
-        parsed = final.parse(raw, requested_date=day.isoformat(), season=season, observed_at=received)
+        parsed = _protocol.parser(raw, requested_date=day.isoformat(), season=season, observed_at=received)
         status = ('SUPPORTED_REGULATION_FINAL_PAGE_SOURCE_ONLY' if parsed['daily_game_count'] else
                   'EMPTY_DAY_NO_FINAL_EVIDENCE')
     except ValueError:
         # Preserve opaque originals for separate source-shape inspection. No
         # partial finals may escape a page rejected by the strict parser.
         parsed = None; status = 'UNSUPPORTED_OR_NOT_COMPLETE_FINAL_PAGE'
-    return {'schema': SCHEMA, 'collection_started_at_utc': started.isoformat(),
+    return {'schema': _protocol.schema, 'collection_started_at_utc': started.isoformat(),
         'recorded_at_utc': received.isoformat(), 'requested_days_back': days_back,
         'requested_date': day.isoformat(), 'season': season,
         'source_url': 'https://www.nba.com/games?date='+day.isoformat(),
@@ -57,11 +69,11 @@ def _build(raw, *, started, received, days_back):
         'promotion_allowed': False, 'NO_BET': True, 'actual_wagers': 0}
 
 
-def replay(base, stamp, *, now=None):
+def replay(base, stamp, *, now=None, _protocol=_V1):
     if not isinstance(stamp, str) or not re.fullmatch(r'\d{8}T\d{12}Z', stamp):
         raise ValueError('Invalid NBA postgame receipt identifier')
     now = _clock(now or datetime.now(timezone.utc))
-    folder = archive_path(Path(base)/ROOT/stamp, directory=True)
+    folder = archive_path(Path(base)/_protocol.root/stamp, directory=True)
     if {p.name for p in folder.iterdir()} != {'manifest.json', 'nba_games.html.gz'}:
         raise ValueError('Unexpected NBA postgame capture files')
     paths = [archive_path(folder/name) for name in ('manifest.json', 'nba_games.html.gz')]
@@ -73,10 +85,10 @@ def replay(base, stamp, *, now=None):
     if received > now or received.strftime('%Y%m%dT%H%M%S%fZ') != stamp:
         raise ValueError('NBA postgame receipt clock/folder disagreement')
     raw = bounded_gzip_read(paths[1].read_bytes(), page.MAX_BYTES)
-    expected = _build(raw, started=started, received=received, days_back=manifest['requested_days_back'])
+    expected = _build(raw, started=started, received=received, days_back=manifest['requested_days_back'], _protocol=_protocol)
     if original != canonical(expected):
         raise ValueError('NBA postgame receipt differs from original source replay')
-    return {'schema': 'tyler-nba-postgame-source-replay-v1', 'capture': stamp,
+    return {'schema': _protocol.replay_schema, 'capture': stamp,
         'source_bytes_replayed': True, 'recorded_at_utc': received.isoformat(),
         'page_status': expected['page_status'],
         'supported_final_game_count': expected['supported_final_game_count'],
@@ -86,34 +98,34 @@ def replay(base, stamp, *, now=None):
         'NO_BET': True, 'actual_wagers': 0}
 
 
-def replay_all(base=Path('.'), *, now=None):
-    root = archive_path(Path(base)/ROOT, directory=True, allow_missing=True)
+def replay_all(base=Path('.'), *, now=None, _protocol=_V1):
+    root = archive_path(Path(base)/_protocol.root, directory=True, allow_missing=True)
     folders = sorted(root.iterdir()) if root.exists() else []
     if len(folders) > 5000:
         raise ValueError('Unbounded NBA postgame capture inventory')
-    reports = [replay(base, p.name, now=now) for p in folders]
+    reports = [replay(base, p.name, now=now, _protocol=_protocol) for p in folders]
     return {'receipts_replayed': len(reports), 'reports': reports, 'outcomes_enrolled': 0,
             'settlement_enabled': False, 'forecasting_enabled': False, 'NO_BET': True, 'actual_wagers': 0}
 
 
-def collect(base=Path('.'), *, days_back=1, fetch=None, clock=None):
+def collect(base=Path('.'), *, days_back=1, fetch=None, clock=None, _protocol=_V1):
     if type(days_back) is not int or not 0 <= days_back <= 3:
         raise ValueError('NBA postgame lookback must be zero through three days')
     clock = clock or (lambda: datetime.now(timezone.utc))
     started = _clock(clock())
-    replay_all(base, now=started) # Validate destination ancestors and all retained evidence first.
+    replay_all(base, now=started, _protocol=_protocol) # Validate destination ancestors and all retained evidence first.
     day = started.astimezone(page.EASTERN).date()-timedelta(days=days_back)
     raw = (fetch or fetch_page)('https://www.nba.com/games?date='+day.isoformat())
     received = _clock(clock()) # Capture only after the entire response returned.
-    manifest = _build(raw, started=started, received=received, days_back=days_back)
+    manifest = _build(raw, started=started, received=received, days_back=days_back, _protocol=_protocol)
     stamp = received.strftime('%Y%m%dT%H%M%S%fZ')
-    folder = archive_path(Path(base)/ROOT/stamp, directory=True, allow_missing=True)
+    folder = archive_path(Path(base)/_protocol.root/stamp, directory=True, allow_missing=True)
     folder.mkdir(parents=True, exist_ok=False)
     with (folder/'nba_games.html.gz').open('xb') as stream:
         stream.write(gzip.compress(raw, mtime=0))
     with (folder/'manifest.json').open('xb') as stream:
         stream.write(canonical(manifest))
-    replay(base, stamp, now=received)
+    replay(base, stamp, now=received, _protocol=_protocol)
     return manifest
 
 
