@@ -6,6 +6,8 @@ on:
       - '.github/workflows/mlb_hit_shadow_auto_settlement.yml'
       - 'sports_mlb_prop_prospective.py'
       - 'sports_mlb_prop_settlement_job.py'
+      - 'sports_mlb_final_source_audit.py'
+      - 'test_sports_mlb_final_source_audit.py'
       - 'test_sports_mlb_prop_prospective.py'
       - 'test_sports_mlb_prop_settlement_job.py'
   schedule:
@@ -29,7 +31,16 @@ jobs:
           python-version: '3.12'
       - run: pip install -r requirements.txt
       - name: Verify settlement remains separate and non-wagering
-        run: python -m unittest -v test_sports_mlb_prop_prospective test_sports_mlb_prop_settlement_job test_sports_mlb_prop_scoreboard_feed test_sports_mlb_prop_shadow_scoreboard
+        run: python -m unittest -v test_sports_mlb_prop_prospective test_sports_mlb_prop_settlement_job test_sports_mlb_prop_scoreboard_feed test_sports_mlb_prop_shadow_scoreboard test_sports_mlb_final_source_audit
+      - name: Retain read-only pending final-source identity evidence before strict settlement
+        run: python sports_mlb_final_source_audit.py --observe --output-dir mlb-final-source-audit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mlb-pending-final-source-audit
+          path: mlb-final-source-audit/
+          if-no-files-found: warn
+          retention-days: 30
       - name: Read public official MLB finals and create new settlement files only
         run: python sports_mlb_prop_settlement_job.py --root benchmarks/mlb_hitter_props_shadow_v1
       - name: Summarize frozen player-games, pending finals and model diagnostic

@@ -9,6 +9,7 @@ on:
       - sports_benchmark_review.py
       - benchmarks/nfl_efficiency_v2/**
       - benchmarks/nfl_independent_v1/**
+      - benchmarks/nfl_calibration_development_v1/**
       - .github/workflows/nfl_calibration_development.yml
   push:
     branches: [main]
@@ -41,6 +42,8 @@ jobs:
           r = json.loads(Path('nfl-calibration-development.json').read_text())
           assert r['NO_BET'] and r['actual_wagers'] == 0 and not r['promotion_allowed']
           assert r['prospective_predictions'] == 0 and r['forecast_changes'] == 0
+          retained = json.loads(Path('benchmarks/nfl_calibration_development_v1/DEVELOPMENT_RESULT.json').read_text())
+          assert r == retained['report'], 'Fixed calibration development report changed'
           print('NFL_CALIBRATION_DEVELOPMENT_REPORT='+json.dumps(r, sort_keys=True))
           PY
           git diff --exit-code
