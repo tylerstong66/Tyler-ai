@@ -1,0 +1,50 @@
+name: NBA separate daily source observation
+on:
+  pull_request:
+    paths:
+      - sports_nba_owned_daily_observation.py
+      - test_sports_nba_owned_daily_observation.py
+      - sports_nba_games_page.py
+      - sports_nba_official_schedule_audit.py
+      - sports_expansion_audit.py
+      - benchmarks/nba_owned_daily_v1/**
+      - .github/workflows/nba_owned_daily_observation.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install requests==2.32.5
+      - run: python -m unittest -v test_sports_nba_owned_daily_observation test_sports_nba_games_page
+      - name: Replay every previously retained separate daily source receipt
+        run: python sports_nba_owned_daily_observation.py --audit
+      - name: Collect a separate next-Eastern-date source receipt without enrolling features
+        run: python sports_nba_owned_daily_observation.py --collect --days-ahead 1 > /tmp/nba-daily-source-observation.json
+      - name: Replay the exact new receipt
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          import sports_nba_owned_daily_observation as daily
+          record = json.loads(Path('/tmp/nba-daily-source-observation.json').read_text())
+          stamp = daily.espn.utc(record['recorded_at_utc']).strftime('%Y%m%dT%H%M%S%fZ')
+          result = daily.replay(Path('.'), stamp)
+          Path('/tmp/nba-daily-source-replay.json').write_text(json.dumps(result, indent=2)+'\n')
+          print(json.dumps(result, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nba-separate-daily-source-observation
+          path: |
+            benchmarks/nba_owned_daily_v1/captures/
+            /tmp/nba-daily-source-observation.json
+            /tmp/nba-daily-source-replay.json
+          if-no-files-found: error
+          retention-days: 30
