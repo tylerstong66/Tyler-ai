@@ -20,7 +20,8 @@ def endpoints(now):
             ('official_games_page', 'https://www.nba.com/games?date='+day.isoformat()),
             ('official_next_games_page', 'https://www.nba.com/games?date='+(day+timedelta(days=1)).isoformat()),
             ('official_reference_final_page', 'https://www.nba.com/games?date=2026-04-10'),
-            ('target_stats_season_schedule_2026_27', ENDPOINT+'?LeagueID=00&Season=2026-27')]
+            ('target_stats_season_schedule_2026_27', ENDPOINT+'?LeagueID=00&Season=2026-27'),
+            ('official_all_calendar_schedule_page', 'https://www.nba.com/schedule?cal=all&pd=false&region=1')]
 
 
 def run(output_dir, *, now=None, get=None):

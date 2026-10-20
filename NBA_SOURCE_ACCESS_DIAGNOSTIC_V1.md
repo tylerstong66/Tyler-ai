@@ -10,6 +10,9 @@ using the same public route as the retained closed-season NBA-owned archives.
 It is explicitly labeled with its target season, does not change existing
 collector URLs or receipt protocols, and cannot enable source validation merely
 by returning HTTP 200. Returned bodies remain opaque diagnostic material.
+The seventh fixed route requests the official all-calendar schedule HTML page
+already linked by the retained NBA page navigation. Its page shell or embedded
+JSON requires separate inspection; HTTP success never certifies game coverage.
 That older response is diagnostic source material, not a current-season result
 or evidence available at any earlier feature freeze. No historical evaluation
 is performed. It uses the same existing NBA request headers, fixed

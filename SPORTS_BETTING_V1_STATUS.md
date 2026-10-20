@@ -28,6 +28,10 @@ complete body before considering a separately versioned schedule receipt.
 Current-season postgame verification still needs real final source bodies;
 the first saved NBA/FBS starts were still future at the last cohort replay.
 No historical fixture can supply prospective finals. NO_BET remains true.
+The diagnostic additionally requests the fixed NBA-owned all-calendar schedule
+HTML route linked in original page navigation. Its rendered public page exposes
+controls but no game rows; inspect the original embedded data before making any
+coverage claim. It retains the same bounded, opaque, no-trust request policy.
 
 ## October 20 continuation — protect new source capture destinations
 
