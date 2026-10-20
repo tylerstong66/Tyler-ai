@@ -4,6 +4,7 @@ import hashlib
 import json
 import tempfile
 import unittest
+from unittest.mock import patch
 from datetime import datetime,timezone
 from pathlib import Path
 
@@ -31,6 +32,25 @@ def payload():
 
 
 class HistoricalCaptureTests(unittest.TestCase):
+    def test_direct_receipt_scope_rejects_before_any_archive_access(self):
+        invalid = [('NBA/..', 'train', '2024-10-22'), ('NFL', 'train', '2024-10-22'),
+                   ('NBA', '../train', '2024-10-22'), ('NBA', 'test', '2024-10-22'),
+                   ('NBA', 'train', '../2024-10-22'), ('NBA', 'train', '/2024-10-22'),
+                   ('NBA', 'train', '20241022'), ('NBA', 'train', '2024-02-30'),
+                   ('NBA', 'train', None)]
+        for sport, split, day in invalid:
+            with self.subTest(sport=sport, split=split, day=day), patch.object(h, 'archive_path') as access:
+                with self.assertRaisesRegex(ValueError, 'scope'):
+                    h.verify_existing('.', sport, split, day, as_of=CLOCK)
+                access.assert_not_called()
+
+    def test_direct_receipt_observation_cutoff_requires_aware_clock(self):
+        for clock in (CLOCK.replace(tzinfo=None), CLOCK.isoformat()):
+            with self.subTest(clock=clock), patch.object(h, 'archive_path') as access:
+                with self.assertRaisesRegex(ValueError, 'Aware'):
+                    h.verify_existing('.', 'NBA', 'train', '2024-10-22', as_of=clock)
+                access.assert_not_called()
+
     def test_full_historical_dates_explicit_two_nonoverlapping_seasons(self):
         dates=h.dates_by_league()
         self.assertEqual(set(dates),{"NBA","NCAAF_FBS","NCAAM_D1"})

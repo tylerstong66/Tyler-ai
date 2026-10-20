@@ -51,6 +51,16 @@ def dates_by_league():
 
 
 def verify_existing(base, sport, split, day, *, as_of=None):
+    if (sport not in ORDER or split not in ('train', 'validation')
+            or not isinstance(day, str)):
+        raise ValueError('Invalid historical provider receipt scope')
+    try:
+        if date.fromisoformat(day).isoformat() != day:
+            raise ValueError('Noncanonical date')
+    except ValueError as error:
+        raise ValueError('Invalid historical provider receipt date scope') from error
+    if as_of is not None and (not isinstance(as_of, datetime) or as_of.tzinfo is None):
+        raise ValueError('Aware historical provider receipt cutoff required')
     prefix=Path(base)/ROOT/"sources"/sport/split
     artifact=prefix/(day+".json.gz")
     receipt=prefix/(day+".receipt.json")
