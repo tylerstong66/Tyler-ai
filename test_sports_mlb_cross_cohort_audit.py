@@ -84,6 +84,28 @@ class CrossCohortTests(unittest.TestCase):
             self.assertEqual(before, [p.read_bytes() for p in (tp, hp)])
             self.assertFalse(report['prediction_scores_combined']); self.assertTrue(report['NO_BET'])
 
+    def test_single_official_game_review_keeps_original_source_gaps(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td); tp, hp = seed(root)
+            original = (tp.read_bytes(), hp.read_bytes())
+            report = audit.build(root)
+            self.assertEqual(report['unique_games_with_saved_start_drift'], 1)
+            self.assertEqual(len(report['game_level_source_evidence_review']), 1)
+            group = report['game_level_source_evidence_review'][0]
+            self.assertEqual(group['game_id'], 849817)
+            self.assertEqual(group['distinct_hitter_forecasts'], 1)
+            self.assertEqual(group['hitter_minus_team_start_minutes'], [120.0])
+            self.assertIn('TEAM_REDUCED_SNAPSHOTS_DO_NOT_REPLAY_ORIGINAL_RESPONSES',
+                          group['source_and_publication_gaps'])
+            self.assertIn('INDEPENDENT_PUBLICATION_TIMES_NOT_ATTESTED',
+                          group['source_and_publication_gaps'])
+            self.assertFalse(group['all_hitter_original_responses_replayed'])
+            self.assertFalse(group['team_original_response_bytes_replayed'])
+            self.assertFalse(group['joint_accuracy_comparison_allowed'])
+            self.assertEqual((tp.read_bytes(), hp.read_bytes()), original)
+            self.assertIs(report['NO_BET'], True)
+            self.assertEqual(report['actual_wagers'], 0)
+
     def test_zero_drift_still_does_not_merge_independent_cohorts(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td); seed(root, hitter_start=TEAM_START)
