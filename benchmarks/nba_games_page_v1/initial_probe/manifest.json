@@ -1,0 +1,49 @@
+{
+  "NO_BET": true,
+  "actual_wagers": 0,
+  "artifact_created_at_utc": "2026-10-20T11:29:36Z",
+  "artifact_id": 12262075268,
+  "artifact_zip_sha256": "d11d888966de94c963a0cbb65764fa66917670f9460e291c928005e5b2b58ac9",
+  "forecasting_enabled": false,
+  "probe_started_at_utc": "2026-10-20T11:29:34.339098+00:00",
+  "receipt_clock_independently_attested": false,
+  "repository": "tylerstong66/Tyler-ai",
+  "responses": [
+    {
+      "archive_file": "official_games_page_0415aa7d15044b4e2677e86d0881d407cd6e619e7d65d37ddf72cfe3f0bcc0a1.response.gz",
+      "endpoint": "official_games_page",
+      "error_type": null,
+      "http_status": 200,
+      "json_object_keys": [],
+      "json_top_level_type": "NON_JSON",
+      "nba_next_data_marker_present": true,
+      "payload_archived": true,
+      "payload_complete": true,
+      "repository_archive_file": "official_games_page.html.gz",
+      "response_body_bytes": 326107,
+      "response_body_sha256": "0415aa7d15044b4e2677e86d0881d407cd6e619e7d65d37ddf72cfe3f0bcc0a1",
+      "source_payload_validated": false,
+      "url": "https://www.nba.com/games?date=2026-10-20"
+    },
+    {
+      "archive_file": "official_next_games_page_5c292444140907aa07ee52585aeccc15aed8da2de7985354acd8b4cf7046eb6b.response.gz",
+      "endpoint": "official_next_games_page",
+      "error_type": null,
+      "http_status": 200,
+      "json_object_keys": [],
+      "json_top_level_type": "NON_JSON",
+      "nba_next_data_marker_present": true,
+      "payload_archived": true,
+      "payload_complete": true,
+      "repository_archive_file": "official_next_games_page.html.gz",
+      "response_body_bytes": 391156,
+      "response_body_sha256": "5c292444140907aa07ee52585aeccc15aed8da2de7985354acd8b4cf7046eb6b",
+      "source_payload_validated": false,
+      "url": "https://www.nba.com/games?date=2026-10-21"
+    }
+  ],
+  "schema": "tyler-nba-games-page-probe-archive-v1",
+  "source_commit": "72e77afb81ea504c6ec7b49fadc1c3eca7db9425",
+  "source_origin_independently_attested": false,
+  "workflow_run_id": 39415304518
+}

@@ -1,0 +1,30 @@
+name: NBA owned daily page replay checks
+on:
+  pull_request:
+    paths:
+      - sports_nba_games_page.py
+      - test_sports_nba_games_page.py
+      - sports_nba_schedule_slots.py
+      - sports_expansion_audit.py
+      - benchmarks/nba_games_page_v1/**
+      - .github/workflows/nba_games_page_checks.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install requests==2.32.5
+      - run: python -m unittest -v test_sports_nba_games_page
+      - name: Replay original archived pages without collecting or enrolling
+        run: python sports_nba_games_page.py > /tmp/nba-games-page-replay.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nba-owned-daily-page-replay
+          path: /tmp/nba-games-page-replay.json
+          if-no-files-found: error
