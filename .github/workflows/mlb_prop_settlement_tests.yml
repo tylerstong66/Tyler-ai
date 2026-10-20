@@ -9,6 +9,9 @@ on:
   pull_request:
     branches: [main]
     paths:
+      - sports_mlb_final_source_audit.py
+      - test_sports_mlb_final_source_audit.py
+      - .github/workflows/mlb_hit_shadow_auto_settlement.yml
       - sports_mlb_prop_settlement_job.py
       - test_sports_mlb_prop_settlement_job.py
       - .github/workflows/mlb_prop_settlement_tests.yml
@@ -24,4 +27,4 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r requirements.txt
-      - run: python -m unittest -v test_sports_mlb_prop_settlement_job
+      - run: python -m unittest -v test_sports_mlb_prop_settlement_job test_sports_mlb_prop_prospective test_sports_mlb_final_source_audit
