@@ -32,11 +32,16 @@ jobs:
           python sports_accuracy_readiness.py --json > accuracy-readiness-verification.json
           python sports_mlb_prop_shadow_scoreboard.py
           python sports_nba_postgame_observation.py --audit
+          python sports_nba_owned_daily_observation_v2.py --audit
+          python sports_nba_postgame_observation_v2.py --audit
+          python sports_nba_native_feature_cohort.py > nba-native-feature-cohort-verification.json
       - name: Require unchanged tracked research evidence
         run: git diff --exit-code
       - uses: actions/upload-artifact@v4
         with:
           name: integrated-sports-readiness-replay
-          path: accuracy-readiness-verification.json
+          path: |
+            accuracy-readiness-verification.json
+            nba-native-feature-cohort-verification.json
           if-no-files-found: error
           retention-days: 30
