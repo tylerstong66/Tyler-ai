@@ -191,9 +191,42 @@ def build(base=Path('.')):
                 'unresolved': ['TEAM_REDUCED_SNAPSHOTS_DO_NOT_REPLAY_ORIGINAL_RESPONSES'] + (
                     [] if hitter_proof['all_original_responses_replayed'] else ['HITTER_LEGACY_SOURCE_BYTES_UNAVAILABLE']) +
                     ['INDEPENDENT_PUBLICATION_TIMES_NOT_ATTESTED']})
+    # A game-level review index prevents six player forecasts referring to
+    # one changed game start from being misreported as six independent
+    # schedule disputes. This does not repair original source-byte gaps.
+    grouped = defaultdict(list)
+    for comparison in comparisons:
+        grouped[comparison['game_id']].append(comparison)
+    evidence_review = []
+    for game in sorted(grouped):
+        rows = grouped[game]
+        original, original_proof, _ = teams[game]
+        evidence_review.append({
+            'game_id': game,
+            'team_original_record_sha256': original_proof['record_digest_sha256'],
+            'team_frozen_at_utc': original_proof['frozen_at_utc'],
+            'team_saved_start_utc': original_proof['saved_start_utc'],
+            'distinct_hitter_forecasts': len(rows),
+            'hitter_original_record_sha256': sorted(
+                item['hitter_cohort']['record_digest_sha256'] for item in rows),
+            'hitter_saved_starts_utc': sorted(set(
+                item['hitter_cohort']['saved_start_utc'] for item in rows)),
+            'hitter_minus_team_start_minutes': sorted(set(
+                item['hitter_minus_team_saved_start_minutes'] for item in rows)),
+            'all_hitter_original_responses_replayed': all(
+                item['hitter_cohort']['all_original_responses_replayed'] for item in rows),
+            'team_original_response_bytes_replayed': original_proof['original_response_bytes_replayed'],
+            'source_and_publication_gaps': sorted(set(
+                reason for item in rows for reason in item['unresolved'])),
+            'joint_accuracy_comparison_allowed': False,
+            'no_forecast_reconstruction': True,
+        })
     return {'schema': 'tyler-mlb-independent-cohort-schedule-audit-v1',
             'overlapping_official_games': len(set(teams) & set(hitters)), 'player_game_comparisons': len(comparisons),
             'saved_start_drift_comparisons': sum(r['saved_start_differs'] for r in comparisons),
+            'unique_games_with_saved_start_drift': sum(
+                any(item['saved_start_differs'] for item in grouped[game]) for game in grouped),
+            'game_level_source_evidence_review': evidence_review,
             'comparisons': comparisons, 'original_records_modified': False,
             'joint_performance_comparison_enabled': False, 'prediction_scores_combined': False,
             'new_forecasts_created': 0, 'forecasting_enabled': False, 'model_training_enabled': False,
