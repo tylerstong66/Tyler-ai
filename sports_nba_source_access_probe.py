@@ -1,5 +1,5 @@
 """Bounded diagnostics for fixed public NBA endpoints; never trusted source evidence."""
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 import gzip
@@ -14,10 +14,11 @@ MAX_BYTES = 8_000_000
 
 
 def endpoints(now):
-    day = now.astimezone(ZoneInfo('America/New_York')).date().isoformat()
+    day = now.astimezone(ZoneInfo('America/New_York')).date()
     return [('season_schedule', NBA_URL),
             ('daily_scoreboard', 'https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json'),
-            ('official_games_page', 'https://www.nba.com/games?date='+day)]
+            ('official_games_page', 'https://www.nba.com/games?date='+day.isoformat()),
+            ('official_next_games_page', 'https://www.nba.com/games?date='+(day+timedelta(days=1)).isoformat())]
 
 
 def run(output_dir, *, now=None, get=None):
