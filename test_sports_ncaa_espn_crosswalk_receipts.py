@@ -9,6 +9,19 @@ import sports_ncaa_espn_crosswalk_receipts as receipts
 from test_sports_ncaa_espn_identity import AT,CollegeIdentityTests
 
 class CrosswalkReceiptTests(unittest.TestCase):
+    def test_crosswalk_and_linked_source_redirects_reject(self):
+        for kind in ('crosswalk_folder', 'crosswalk_manifest', 'ancestor', 'ncaa_folder', 'espn_folder'):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as td:
+                root = Path(td); stamp = self.seed(root)
+                folder = root/identity.ROOT/'captures'/stamp
+                target = {'crosswalk_folder': folder, 'crosswalk_manifest': folder/'manifest.json',
+                          'ancestor': root/'benchmarks',
+                          'ncaa_folder': next((root/identity.ncaa.ROOT/'captures').iterdir()),
+                          'espn_folder': next((root/identity.espn.ROOT/'captures').iterdir())}[kind]
+                outside = root/'relocated'; target.rename(outside)
+                target.symlink_to(outside, target_is_directory=outside.is_dir())
+                with self.assertRaisesRegex(ValueError, 'Symlink'): receipts.verify(root, stamp)
+
     def seed(self,root):
         CollegeIdentityTests().seed(root)
         identity.run(base=root,now=AT+timedelta(minutes=10))

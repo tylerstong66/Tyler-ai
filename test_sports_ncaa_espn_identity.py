@@ -43,6 +43,32 @@ def espn_game(start=KICKOFF,home="Tulsa",away="Rice",completed=False):
 
 
 class CollegeIdentityTests(unittest.TestCase):
+    def test_direct_identity_replay_rejects_linked_archive_files(self):
+        for kind in ('ncaa', 'espn'):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as td:
+                root = Path(td); self.seed(root)
+                module = ncaa if kind == 'ncaa' else espn
+                folder = next((root/module.ROOT/'captures').iterdir())
+                manifest = json.loads((folder/'manifest.json').read_bytes())
+                target = next(folder.glob('NCAAF_FBS_*.json.gz')); outside = root/'relocated'
+                target.rename(outside); target.symlink_to(outside)
+                verify = identity.verify_ncaa if kind == 'ncaa' else identity.verify_espn
+                with self.assertRaisesRegex(ValueError, 'Symlink'): verify(folder, manifest)
+
+    def test_direct_identity_replay_rejects_absolute_archive_reference(self):
+        for kind in ('ncaa', 'espn'):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as td:
+                root = Path(td); self.seed(root)
+                module = ncaa if kind == 'ncaa' else espn
+                folder = next((root/module.ROOT/'captures').iterdir())
+                manifest = json.loads((folder/'manifest.json').read_bytes())
+                snap = next(s for s in manifest['snapshots'] if s['league'] == 'NCAAF_FBS')
+                key = 'source_file' if kind == 'ncaa' else 'compressed_file'
+                outside = root/'outside.json.gz'; (folder/snap[key]).rename(outside)
+                snap[key] = str(outside)
+                verify = identity.verify_ncaa if kind == 'ncaa' else identity.verify_espn
+                with self.assertRaisesRegex(ValueError, 'filename'): verify(folder, manifest)
+
     def seed(self,root,ncaa_when=KICKOFF_EPOCH,espn_when=KICKOFF,
              ncaa_final=False,espn_final=False):
         def f_ncaa(url):

@@ -15,7 +15,7 @@ from datetime import datetime,timezone,timedelta
 from pathlib import Path
 
 import sports_expansion_observer as espn
-from sports_expansion_audit import bounded_gzip_read
+from sports_expansion_audit import archive_path, bounded_gzip_read, MAX_BLOB_SIZE
 import sports_ncaa_official_source as ncaa
 
 ROOT=espn.ROOT/"college_identity"
@@ -78,6 +78,7 @@ def official_school_name(sport,school):
 
 
 def verify_ncaa(folder, manifest):
+    folder=archive_path(folder, directory=True)
     if (manifest.get("schema")!="ncaa-owned-2026-source-observations-v1"
             or manifest.get("official_final_scoring_enabled") is not False
             or manifest.get("forecasting_enabled") is not False
@@ -88,7 +89,10 @@ def verify_ncaa(folder, manifest):
         league=snap["league"]
         if league not in ncaa.SPORTS:
             raise ValueError("Unexpected NCAA sport in original archive")
-        compressed=folder/snap["source_file"]
+        filename=league+'_'+snap['window']+'.json.gz'
+        if snap['source_file'] != filename or '/' in filename or '..' in filename:
+            raise ValueError('Invalid NCAA identity archive filename')
+        compressed=archive_path(folder/filename)
         if not compressed.is_file() or compressed.stat().st_size>ncaa.MAX_BYTES+1_000_000:
             raise ValueError("Missing NCAA archived source")
         raw=bounded_gzip_read(compressed.read_bytes(),limit=ncaa.MAX_BYTES)
@@ -115,6 +119,7 @@ def verify_ncaa(folder, manifest):
 
 
 def verify_espn(folder,manifest):
+    folder=archive_path(folder, directory=True)
     if (manifest.get("schema")!="tyler-college-nba-provider-observation-v1"
             or manifest.get("source_trust")!="ESPN_ONLY_NOT_INDEPENDENT_OFFICIAL_VERIFICATION"
             or manifest.get("NO_BET") is not True
@@ -126,9 +131,12 @@ def verify_espn(folder,manifest):
         sport=snap["league"]
         if sport not in ncaa.SPORTS:
             continue
-        path=folder/snap["compressed_file"]
-        if not path.is_file():
-            raise ValueError("Missing saved ESPN college source file")
+        filename=sport+'_'+snap['day']+'.json.gz'
+        if snap['compressed_file'] != filename or '/' in filename or '..' in filename:
+            raise ValueError('Invalid ESPN college identity archive filename')
+        path=archive_path(folder/filename)
+        if path.stat().st_size > MAX_BLOB_SIZE:
+            raise ValueError('Oversized saved ESPN college source file')
         raw=bounded_gzip_read(path.read_bytes())
         if hashlib.sha256(raw).hexdigest()!=snap["original_response_sha256"]:
             raise ValueError("ESPN college source raw digest mismatch")

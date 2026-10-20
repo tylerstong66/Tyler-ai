@@ -10,6 +10,26 @@ import sports_ncaa_owned_receipts as receipts
 from test_sports_ncaa_official_source import contest,raw
 
 class NcaaReceiptReplayTests(unittest.TestCase):
+    def test_static_symlink_components_rejected(self):
+        for kind in ('folder', 'ancestor', 'manifest', 'blob'):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as td:
+                root = Path(td); folder = self.seed(root)
+                target = {'folder': folder, 'ancestor': root/'benchmarks',
+                          'manifest': folder/'manifest.json',
+                          'blob': next(folder.glob('*.json.gz'))}[kind]
+                outside = root/'relocated'; target.rename(outside)
+                target.symlink_to(outside, target_is_directory=outside.is_dir())
+                with self.assertRaisesRegex(ValueError, 'Symlink'): receipts.verify(folder)
+
+    def test_manifest_must_be_bounded_regular_file_before_decoding(self):
+        for kind in ('directory', 'oversized'):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as td:
+                folder = self.seed(Path(td)); target = folder/'manifest.json'; target.unlink()
+                if kind == 'directory': target.mkdir()
+                else:
+                    with target.open('wb') as stream: stream.truncate(8_500_001)
+                with self.assertRaises(ValueError): receipts.verify(folder)
+
     def seed(self,root):
         ncaa.run(lambda _:raw(contest()),base=root,
                  now=datetime(2026,10,17,12,tzinfo=timezone.utc),days_ahead=0)
