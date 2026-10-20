@@ -21,6 +21,8 @@ on:
       - benchmarks/nba_pregame_features_v1/protocol.json
       - sports_nba_schedule_slots.py
       - sports_nba_games_page.py
+      - sports_nba_native_feature_cohort.py
+      - test_sports_nba_native_feature_cohort.py
       - sports_nba_postgame_observation.py
       - sports_nba_postgame_observation_v2.py
       - test_sports_nba_postgame_observation_v2.py
@@ -96,7 +98,7 @@ jobs:
         run: python -m pip install requests==2.32.5
       - name: Check separate NBA daily source replay and isolation
         run: |
-          python -m unittest -v test_sports_nba_owned_daily_observation test_sports_nba_games_page test_sports_nba_owned_daily_observation_v2 test_sports_nba_games_page_v2 test_sports_nba_postgame_observation test_sports_nba_postgame_observation_v2 test_sports_nba_final_games_page_v2
+          python -m unittest -v test_sports_nba_owned_daily_observation test_sports_nba_games_page test_sports_nba_owned_daily_observation_v2 test_sports_nba_games_page_v2 test_sports_nba_postgame_observation test_sports_nba_postgame_observation_v2 test_sports_nba_final_games_page_v2 test_sports_nba_native_feature_cohort
           python sports_nba_owned_daily_observation.py --audit
           python sports_nba_owned_daily_observation_v2.py --audit
           python sports_nba_postgame_observation.py --audit
@@ -180,6 +182,17 @@ jobs:
             nba-postgame-v2-source-replay.json
             benchmarks/nba_postgame_daily_v2/captures/${{ steps.nba_postgame_v2.outputs.capture }}/
           if-no-files-found: error
+          retention-days: 30
+      - name: Inspect original frozen NBA features against recent native source and independent ESPN
+        id: nba_native_cohort_v2
+        if: steps.nba_postgame_v2.outcome == 'success'
+        continue-on-error: true
+        run: python sports_nba_native_feature_cohort.py > nba-native-feature-cohort.json
+      - uses: actions/upload-artifact@v4
+        if: steps.nba_native_cohort_v2.outcome == 'success'
+        with:
+          name: nba-native-daily-frozen-feature-lifecycle
+          path: nba-native-feature-cohort.json
           retention-days: 30
       - name: Compare NBA CDN schedule to archived ESPN season games
         id: nba_source
@@ -306,6 +319,7 @@ jobs:
           NBA_DAILY_PREGAME_SOURCE: ${{ steps.nba_daily_source.outcome }}
           NBA_DAILY_PREGAME_SOURCE_V2: ${{ steps.nba_daily_source_v2.outcome }}
           NBA_POSTGAME_NATIVE_SOURCE_V2: ${{ steps.nba_postgame_v2.outcome }}
+          NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2: ${{ steps.nba_native_cohort_v2.outcome }}
           NCAA_OWNED_SOURCE: ${{ steps.ncaa_source.outcome }}
           NCAA_ESPN_CROSSWALK: ${{ steps.college_identity.outcome }}
           NCAA_FINAL_RECEIPTS: ${{ steps.college_finals.outcome }}
@@ -323,7 +337,7 @@ jobs:
           from datetime import datetime, timezone
           from pathlib import Path
           outcomes = {name: os.environ[name] for name in (
-              'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE', 'NBA_DAILY_PREGAME_SOURCE', 'NBA_DAILY_PREGAME_SOURCE_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V2',
+              'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE', 'NBA_DAILY_PREGAME_SOURCE', 'NBA_DAILY_PREGAME_SOURCE_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V2', 'NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2',
               'NCAA_OWNED_SOURCE', 'NCAA_ESPN_CROSSWALK', 'NCAA_FINAL_RECEIPTS', 'NCAA_RESULT_DATASET', 'NBA_FINAL_REPLAY', 'NBA_FEATURE_OBSERVATIONS', 'NBA_FEATURE_COHORT_AUDIT', 'FBS_FEATURE_OBSERVATIONS', 'FBS_FEATURE_COHORT_AUDIT', 'D1_FEATURE_OBSERVATIONS', 'D1_FEATURE_COHORT_AUDIT')}
           postgame = (json.loads(Path('nba-postgame-v2-source-observation.json').read_text())
                       if outcomes['NBA_POSTGAME_NATIVE_SOURCE_V2'] == 'success' else {})
@@ -343,6 +357,7 @@ jobs:
               'nba_postgame_v2_page_status': postgame.get('page_status'),
               'nba_postgame_v2_supported_final_game_count': postgame.get('supported_final_game_count'),
               'nba_postgame_capture_does_not_certify_independent_finals': True,
+              'native_daily_frozen_feature_lifecycle_checked': outcomes['NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2'] == 'success',
               'nba_daily_v2_source_scope': 'ONE_REQUESTED_EASTERN_DATE_ONLY',
               'nba_daily_source_does_not_enable_feature_collection': True,
               'green_workflow_certifies_all_sources': False,
