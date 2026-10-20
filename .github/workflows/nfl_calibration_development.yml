@@ -1,0 +1,53 @@
+name: NFL chronological recalibration development
+on:
+  pull_request:
+    paths:
+      - sports_nfl_calibration_development.py
+      - test_sports_nfl_calibration_development.py
+      - sports_efficiency_candidate.py
+      - sports_historical_benchmark.py
+      - sports_benchmark_review.py
+      - benchmarks/nfl_efficiency_v2/**
+      - benchmarks/nfl_independent_v1/**
+      - .github/workflows/nfl_calibration_development.yml
+  push:
+    branches: [main]
+    paths:
+      - sports_nfl_calibration_development.py
+      - test_sports_nfl_calibration_development.py
+      - .github/workflows/nfl_calibration_development.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install requests==2.32.5
+      - name: Verify chronological fitting isolation and unchanged prospective inputs
+        run: python -m unittest -v test_sports_nfl_calibration_development test_sports_efficiency_candidate test_sports_historical_benchmark
+      - name: Reconstruct fixed development experiment from pinned retrospective sources only
+        run: python sports_nfl_calibration_development.py > nfl-calibration-development.json
+      - name: Expose descriptive results and require unchanged tracked inputs
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          r = json.loads(Path('nfl-calibration-development.json').read_text())
+          assert r['NO_BET'] and r['actual_wagers'] == 0 and not r['promotion_allowed']
+          assert r['prospective_predictions'] == 0 and r['forecast_changes'] == 0
+          print('NFL_CALIBRATION_DEVELOPMENT_REPORT='+json.dumps(r, sort_keys=True))
+          PY
+          git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nfl-chronological-calibration-development
+          path: nfl-calibration-development.json
+          if-no-files-found: error
+          retention-days: 30
