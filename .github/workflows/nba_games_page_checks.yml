@@ -6,6 +6,8 @@ on:
       - test_sports_nba_games_page.py
       - sports_nba_final_games_page.py
       - test_sports_nba_final_games_page.py
+      - sports_nba_final_page_reference.py
+      - test_sports_nba_final_page_reference.py
       - sports_nba_schedule_slots.py
       - sports_expansion_audit.py
       - benchmarks/nba_games_page_v1/**
@@ -22,7 +24,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install requests==2.32.5
-      - run: python -m unittest -v test_sports_nba_games_page test_sports_nba_final_games_page
+      - run: python -m unittest -v test_sports_nba_games_page test_sports_nba_final_games_page test_sports_nba_final_page_reference
       - name: Replay original archived pages without collecting or enrolling
         run: python sports_nba_games_page.py > /tmp/nba-games-page-replay.json
       - uses: actions/upload-artifact@v4
@@ -36,4 +38,11 @@ jobs:
         with:
           name: nba-owned-reference-final-page-replay
           path: /tmp/nba-final-games-page-replay.json
+          if-no-files-found: error
+      - name: Compare sealed historical reference sources without enrolling outcomes
+        run: python sports_nba_final_page_reference.py > /tmp/nba-final-page-reference-agreement.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nba-final-page-historical-reference-agreement
+          path: /tmp/nba-final-page-reference-agreement.json
           if-no-files-found: error
