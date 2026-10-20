@@ -18,7 +18,8 @@ def endpoints(now):
     return [('season_schedule', NBA_URL),
             ('daily_scoreboard', 'https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json'),
             ('official_games_page', 'https://www.nba.com/games?date='+day.isoformat()),
-            ('official_next_games_page', 'https://www.nba.com/games?date='+(day+timedelta(days=1)).isoformat())]
+            ('official_next_games_page', 'https://www.nba.com/games?date='+(day+timedelta(days=1)).isoformat()),
+            ('official_reference_final_page', 'https://www.nba.com/games?date=2026-04-10')]
 
 
 def run(output_dir, *, now=None, get=None):
