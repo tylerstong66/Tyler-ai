@@ -27,9 +27,10 @@ class NbaAccessProbeTests(unittest.TestCase):
         def get(url, **kwargs): calls.append((url, kwargs)); return response(403)
         with tempfile.TemporaryDirectory() as td, patch.dict(os.environ, {'GITHUB_TOKEN': 'never-forward-this'}):
             report = probe.run(Path(td)/'probe', now=NOW, get=get)
-        self.assertEqual(len(calls), 4)
+        self.assertEqual(len(calls), 5)
         self.assertTrue(calls[2][0].endswith('?date=2026-10-19'))
         self.assertTrue(calls[3][0].endswith('?date=2026-10-20'))
+        self.assertEqual(calls[4][0], 'https://www.nba.com/games?date=2026-04-10')
         for url, options in calls:
             self.assertIn(url.split('/')[2], ('cdn.nba.com', 'www.nba.com'))
             self.assertIs(options['allow_redirects'], False)
@@ -40,10 +41,10 @@ class NbaAccessProbeTests(unittest.TestCase):
         self.assertFalse(report['source_payload_validated'])
 
     def test_forbidden_and_redirected_responses_are_not_archived_or_followed(self):
-        replies = iter([response(403), response(302), response(200, [b'{"games":[]}']), response(403)])
+        replies = iter([response(403), response(302), response(200, [b'{"games":[]}']), response(403), response(403)])
         with tempfile.TemporaryDirectory() as td:
             output = Path(td)/'probe'; report = probe.run(output, now=NOW, get=lambda *a, **k: next(replies))
-            self.assertEqual([r['http_status'] for r in report['requests']], [403, 302, 200, 403])
+            self.assertEqual([r['http_status'] for r in report['requests']], [403, 302, 200, 403, 403])
             files = list(output.glob('*.response.gz')); self.assertEqual(len(files), 1)
             self.assertEqual(gzip.decompress(files[0].read_bytes()), b'{"games":[]}')
             self.assertFalse(report['independent_nba_schedule_verified'])

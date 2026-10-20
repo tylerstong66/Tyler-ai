@@ -3,7 +3,11 @@
 The existing independent NBA season schedule fetch returns HTTP 403 from the
 collector runner. This separate diagnostic checks that exact endpoint, NBA's
 public daily-scoreboard endpoint and the official NBA games pages for the current
-and next America/New_York dates. It uses the same existing NBA request headers, fixed
+and next America/New_York dates. A fifth fixed endpoint requests April 10, 2026,
+to inspect the actual completed-game card shape from the previous regular season.
+That older response is diagnostic source material, not a current-season result
+or evidence available at any earlier feature freeze. No historical evaluation
+is performed. It uses the same existing NBA request headers, fixed
 timeouts, bounded streaming and no redirects. No credentials are sent.
 
 ```
