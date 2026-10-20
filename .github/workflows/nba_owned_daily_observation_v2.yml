@@ -1,0 +1,60 @@
+name: NBA native null-envelope prospective source receipts
+on:
+  pull_request:
+    paths:
+      - sports_nba_owned_daily_observation_v2.py
+      - test_sports_nba_owned_daily_observation_v2.py
+      - sports_nba_owned_daily_observation.py
+      - sports_nba_games_page_v2.py
+      - sports_nba_games_page.py
+      - benchmarks/nba_owned_daily_v2/**
+      - .github/workflows/nba_owned_daily_observation_v2.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-receipts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install requests==2.32.5
+      - name: Verify isolated protocols and append-only receipt validation
+        run: python -m unittest -v test_sports_nba_owned_daily_observation test_sports_nba_owned_daily_observation_v2 test_sports_nba_games_page_v2
+      - name: Replay retained v1 and v2 native source receipts
+        run: |
+          python sports_nba_owned_daily_observation.py --audit
+          python sports_nba_owned_daily_observation_v2.py --audit
+      - name: Capture next Eastern date under actual request and response clocks
+        run: python sports_nba_owned_daily_observation_v2.py --collect --days-ahead 1 > nba-native-v2-receipt.json
+      - name: Replay and export exact public-source receipt for reviewed retention
+        run: |
+          python sports_nba_owned_daily_observation_v2.py --audit
+          python - <<'PY'
+          import base64
+          import json
+          from pathlib import Path
+          import sports_nba_owned_daily_observation_v2 as v2
+          receipt = json.loads(Path('nba-native-v2-receipt.json').read_text())
+          import sports_expansion_observer as espn
+          stamp = espn.utc(receipt['recorded_at_utc']).strftime('%Y%m%dT%H%M%S%fZ')
+          folder = v2.ROOT/stamp
+          print('NBA_NATIVE_V2_RECEIPT_EXPORT='+json.dumps({
+              'capture': stamp, 'manifest_content': (folder/'manifest.json').read_text(),
+              'gzip_base64': base64.b64encode((folder/'nba_games.html.gz').read_bytes()).decode('ascii')
+          }, sort_keys=True))
+          PY
+      - name: Require unchanged tracked evidence
+        run: git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nba-native-v2-source-receipts
+          path: |
+            benchmarks/nba_owned_daily_v2/captures/
+            nba-native-v2-receipt.json
+          if-no-files-found: error
+          retention-days: 30

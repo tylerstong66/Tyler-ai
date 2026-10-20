@@ -1,5 +1,6 @@
 """Separate prospective NBA daily source receipts; no feature or forecast writes."""
 from datetime import datetime, timedelta, timezone
+from dataclasses import dataclass
 import gzip
 import hashlib
 import json
@@ -17,6 +18,20 @@ ROOT = Path('benchmarks/nba_owned_daily_v1/captures')
 SCHEMA = 'tyler-nba-owned-daily-prospective-observation-v1'
 MAX_AGE = timedelta(hours=12)
 STAMP = r'\d{8}T\d{12}Z'
+
+
+@dataclass(frozen=True)
+class _ReceiptProtocol:
+    root: Path
+    schema: str
+    replay_schema: str
+    audit_schema: str
+    parser: object
+    require_exact_complete_date: bool = False
+
+
+_V1 = _ReceiptProtocol(ROOT, SCHEMA, 'tyler-nba-owned-daily-replay-v1',
+                       'tyler-nba-owned-daily-archive-audit-v1', page.parse)
 
 
 def fetch_page(url, *, get=None):
@@ -49,7 +64,8 @@ def _provider(base, stamp):
     return raw, manifest, nba.espn_games(manifest, path.parent)
 
 
-def _build(raw, provider_raw, provider, *, started, received, day, season, stamp, offset):
+def _build(raw, provider_raw, provider, *, started, received, day, season, stamp, offset,
+           _protocol=_V1):
     started = _clock(started); received = _clock(received)
     if (type(offset) is not int or not 0 <= offset <= 3 or received < started
             or received-started > timedelta(minutes=5)
@@ -58,7 +74,7 @@ def _build(raw, provider_raw, provider, *, started, received, day, season, stamp
     em = json.loads(provider_raw); et = espn.utc(em['recorded_at_utc'])
     if not et <= started <= received or received-et > MAX_AGE:
         raise ValueError('NBA daily linked provider is stale or future')
-    parsed = page.parse(raw, requested_date=day, season=season, observed_at=received)
+    parsed = _protocol.parser(raw, requested_date=day, season=season, observed_at=received)
     selected = {key: value for key, value in provider.items()
                 if espn.utc(value['scheduled_start_utc']).astimezone(page.EASTERN).date().isoformat() == day}
     report = nba.compare(parsed['games'], selected)
@@ -68,12 +84,20 @@ def _build(raw, provider_raw, provider, *, started, received, day, season, stamp
         key = row['nba_official_game_id']; uses[key] = uses.get(key, 0)+1
     for row in report['matched']:
         e = selected[row['espn_game_id']]
-        if (uses[row['nba_official_game_id']] != 1 or e['season_stage'] != 2
+        if (uses[row['nba_official_game_id']] != 1
+                or (_protocol.require_exact_complete_date and row['start_offset_minutes'] != 0)
+                or e['season_stage'] != 2
                 or e['provider_completed'] is not False or e['state'] != 'pre'
                 or received >= espn.utc(e['scheduled_start_utc'])):
             withheld.append({**row, 'reason': 'NOT_UNIQUE_CORROBORATED_PREGAME'})
         else: matched.append(row)
-    return {'schema': SCHEMA, 'collection_started_at_utc': started.isoformat(),
+    if _protocol.require_exact_complete_date:
+        official_ids = {game['nba_game_id'] for game in parsed['games']}
+        covered = {row['nba_official_game_id'] for row in matched}
+        if (not official_ids or withheld or covered != official_ids
+                or len(matched) != len(selected)):
+            raise ValueError('NBA v2 requires a complete nonempty exact pregame cross-source match')
+    return {'schema': _protocol.schema, 'collection_started_at_utc': started.isoformat(),
         'recorded_at_utc': received.isoformat(), 'requested_date': day,
         'requested_days_ahead': offset, 'season': season,
         'nba_source_url': 'https://www.nba.com/games?date='+day,
@@ -90,11 +114,11 @@ def _build(raw, provider_raw, provider, *, started, received, day, season, stamp
         'model_training_enabled': False, 'promotion_allowed': False, 'NO_BET': True, 'actual_wagers': 0}
 
 
-def replay(base, stamp, *, now=None):
+def replay(base, stamp, *, now=None, _protocol=_V1):
     base = Path(base); now = _clock(now or datetime.now(timezone.utc))
     if not isinstance(stamp, str) or not re.fullmatch(STAMP, stamp):
         raise ValueError('Invalid NBA daily receipt identifier')
-    folder = audit.archive_path(base/ROOT/stamp, directory=True)
+    folder = audit.archive_path(base/_protocol.root/stamp, directory=True)
     if {p.name for p in folder.iterdir()} != {'manifest.json', 'nba_games.html.gz'}:
         raise ValueError('Unexpected NBA daily archive file')
     for name in ('manifest.json', 'nba_games.html.gz'):
@@ -110,23 +134,23 @@ def replay(base, stamp, *, now=None):
     expected = _build(raw, provider_raw, provider,
         started=espn.utc(saved['collection_started_at_utc']), received=received,
         day=saved['requested_date'], season=saved['season'], stamp=saved['espn_capture'],
-        offset=saved['requested_days_ahead'])
+        offset=saved['requested_days_ahead'], _protocol=_protocol)
     if original != espn.canonical(expected):
         raise ValueError('NBA daily receipt differs from exact source replay')
-    return {'schema': 'tyler-nba-owned-daily-replay-v1', 'capture': stamp,
+    return {'schema': _protocol.replay_schema, 'capture': stamp,
         'source_replay_verified': True, 'strict_pregame_correlated': expected['strict_pregame_correlated'],
         'current_source_age_hours': (now-received).total_seconds()/3600,
         'source_currently_fresh': now-received <= MAX_AGE,
         'feature_collection_enabled': False, 'forecasting_enabled': False, 'NO_BET': True, 'actual_wagers': 0}
 
 
-def collect(base=Path('.'), *, days_ahead=1, fetch=None, clock=None):
+def collect(base=Path('.'), *, days_ahead=1, fetch=None, clock=None, _protocol=_V1):
     base = Path(base)
     if type(days_ahead) is not int or not 0 <= days_ahead <= 3:
         raise ValueError('NBA daily days-ahead must be an integer from zero through three')
     clock = clock or (lambda: datetime.now(timezone.utc))
     started = _clock(clock())
-    replay_all(base, now=started)
+    replay_all(base, now=started, _protocol=_protocol)
     latest = sorted((base/espn.ROOT/'captures').glob('*/manifest.json'))
     if not latest: raise ValueError('No retained ESPN capture for NBA daily source')
     stamp = latest[-1].parent.name
@@ -140,28 +164,28 @@ def collect(base=Path('.'), *, days_ahead=1, fetch=None, clock=None):
     raw = (fetch or fetch_page)('https://www.nba.com/games?date='+day)
     received = _clock(clock()) # Read after the complete body has returned.
     manifest = _build(raw, provider_raw, provider, started=started, received=received,
-                      day=day, season=season, stamp=stamp, offset=days_ahead)
-    capture = received.strftime('%Y%m%dT%H%M%S%fZ'); dest = base/ROOT/capture
+                      day=day, season=season, stamp=stamp, offset=days_ahead, _protocol=_protocol)
+    capture = received.strftime('%Y%m%dT%H%M%S%fZ'); dest = base/_protocol.root/capture
     # Validate everything before creating an append-only destination.
     dest.mkdir(parents=True, exist_ok=False)
     with (dest/'nba_games.html.gz').open('xb') as stream:
         stream.write(gzip.compress(raw, mtime=0))
     with (dest/'manifest.json').open('xb') as stream:
         stream.write(espn.canonical(manifest))
-    replay(base, capture, now=received)
+    replay(base, capture, now=received, _protocol=_protocol)
     return manifest
 
 
-def replay_all(base=Path('.'), *, now=None):
-    base = Path(base); now = _clock(now or datetime.now(timezone.utc)); root = base/ROOT
+def replay_all(base=Path('.'), *, now=None, _protocol=_V1):
+    base = Path(base); now = _clock(now or datetime.now(timezone.utc)); root = base/_protocol.root
     audit.archive_path(root, directory=True, allow_missing=True)
     reports = []
     if root.exists():
         if root.is_symlink() or not root.is_dir(): raise ValueError('Invalid NBA daily archive root')
         for folder in sorted(root.iterdir()):
             if folder.is_symlink() or not folder.is_dir(): raise ValueError('Unexpected NBA daily archive entry')
-            reports.append(replay(base, folder.name, now=now))
-    return {'schema': 'tyler-nba-owned-daily-archive-audit-v1', 'receipts_replayed': len(reports),
+            reports.append(replay(base, folder.name, now=now, _protocol=_protocol))
+    return {'schema': _protocol.audit_schema, 'receipts_replayed': len(reports),
         'reports': reports, 'feature_collection_enabled': False, 'forecasting_enabled': False,
         'NO_BET': True, 'actual_wagers': 0}
 
