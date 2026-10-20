@@ -16,10 +16,18 @@ redirects, and no source/feature/model enablement after HTTP 200. This only
 inspects endpoint availability and archives an opaque body; no collector URL,
 receipt protocol, model or forecast changes. All original evidence is preserved.
 
-Next: inspect this diagnostic's actual returned body and server artifact digest.
-Only a successfully replayed source shape can justify a separately versioned
-schedule receipt. Current-season postgame verification still needs real final
-source bodies; no historical fixture can supply them. NO_BET remains true.
+Actual diagnostic run 39429708256 at head 1605141a0a82a043323161462a937246e47d56da
+started at 13:21:43Z. Artifact 12266833941's ZIP SHA256
+80bf88b7f311bfb0d6678591017c91b6a08338b4fbfcbf9735bbb1249bc201d1 verified
+after download. The new NBA Stats request ended in ReadTimeout with no complete
+body or archive. Both CDN endpoints returned 403; the three official daily
+pages returned 200 but remain diagnostic responses. No source was enabled.
+
+Next: recheck bounded target-season access when available and inspect any
+complete body before considering a separately versioned schedule receipt.
+Current-season postgame verification still needs real final source bodies;
+the first saved NBA/FBS starts were still future at the last cohort replay.
+No historical fixture can supply prospective finals. NO_BET remains true.
 
 ## October 20 continuation — protect new source capture destinations
 
