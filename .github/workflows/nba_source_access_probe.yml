@@ -22,6 +22,49 @@ jobs:
       - run: python -m unittest -v test_sports_nba_source_access_probe
       - name: Observe fixed public NBA endpoint access without enabling a source
         run: python sports_nba_source_access_probe.py --probe --output-dir nba-source-access-probe
+      - name: Inspect date-envelope fields of exact opaque daily responses without enabling sources
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          import json
+          from sports_expansion_audit import bounded_gzip_read
+          import sports_nba_games_page as page
+          root = Path('nba-source-access-probe')
+          report = json.loads((root/'report.json').read_text())
+          assert report['NO_BET'] and not report['source_payload_validated']
+          rows = []
+          for receipt in report['requests']:
+              if 'games_page' not in receipt['endpoint'] and receipt['endpoint'] != 'official_reference_final_page':
+                  continue
+              item = {'endpoint': receipt['endpoint'], 'requested_url': receipt['url'],
+                      'payload_archived': receipt['payload_archived'],
+                      'source_payload_validated': False, 'forecasting_enabled': False}
+              if receipt['payload_archived']:
+                  raw = bounded_gzip_read((root/receipt['archive_file']).read_bytes(), page.MAX_BYTES)
+                  assert len(raw) == receipt['response_body_bytes']
+                  assert hashlib.sha256(raw).hexdigest() == receipt['response_body_sha256']
+                  item['original_body_sha256'] = receipt['response_body_sha256']
+                  try:
+                      parser = page._NextData()
+                      parser.feed(raw.decode('utf-8')); parser.close()
+                      if parser.matches != 1 or not parser.closed or parser.active:
+                          raise ValueError('Unsupported data envelope')
+                      data = json.loads(''.join(parser.parts), object_pairs_hook=page._object,
+                                        parse_constant=page._reject_constant)
+                      props = data['props']['pageProps']
+                      item.update(page=data.get('page'), query=data.get('query'),
+                                  selectedDate=props.get('selectedDate'),
+                                  isDateOverrideActive=props.get('isDateOverrideActive'),
+                                  hasError=props.get('hasError'),
+                                  isFallback=data.get('isFallback'),
+                                  page_prop_keys=sorted(props))
+                  except (ValueError, KeyError, TypeError, AttributeError, UnicodeError) as error:
+                      item['envelope_error_type'] = type(error).__name__
+              rows.append(item)
+          print('NBA_OPAQUE_DATE_ENVELOPE_DIAGNOSTIC='+json.dumps(rows, sort_keys=True, allow_nan=False))
+          (root/'date-envelope-diagnostic.json').write_text(json.dumps(rows, sort_keys=True, indent=2)+chr(10))
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
