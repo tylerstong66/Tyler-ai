@@ -61,6 +61,9 @@ def audit(base=Path('.')):
 
     by_day = defaultdict(lambda: {'captures': 0, 'observations': 0, 'game_ids': set()})
     game_claims = defaultdict(set)
+    # Keep original team identity and scheduled-start claims for a separate
+    # pregame-versus-postgame source comparison. These are not predictions.
+    pregame_native_claims = defaultdict(set)
     pregame_observations = 0
     for stamp, digest, source in starts:
         if source.get('schema') != pregame.PROTOCOL.schema:
@@ -74,6 +77,13 @@ def audit(base=Path('.')):
                 parsed['requested_date'] != source['requested_date']):
             raise ValueError('Incomplete or inconsistent native pregame receipt')
         day = source['requested_date']
+        native_games = parsed.get('games')
+        if (not isinstance(native_games, list) or len(native_games) != len(rows)
+                or len({g['nba_game_id'] for g in native_games}) != len(rows)
+                or {g['nba_game_id'] for g in native_games}
+                   != {r['nba_official_game_id'] for r in rows}):
+            raise ValueError('Pregame matched IDs disagree with replayed native page')
+        native_by_id = {g['nba_game_id']: g for g in native_games}
         seen = set()
         for row in rows:
             game = row['nba_official_game_id']
@@ -82,7 +92,14 @@ def audit(base=Path('.')):
                     not isinstance(provider, str) or not provider.isdigit() or game in seen):
                 raise ValueError('Invalid or repeated game within one pregame receipt')
             seen.add(game)
+            native = native_by_id[game]
+            if native['tipoff_utc'] != row['nba_tipoff_utc']:
+                raise ValueError('Native game start differs from matched source claim')
             game_claims[game].add((day, provider, row['nba_tipoff_utc'], row['espn_saved_tipoff_utc']))
+            pregame_native_claims[game].add((
+                native['home_team_id'], native['away_team_id'],
+                native['home_tricode'], native['away_tricode'], native['kind'],
+                native['tipoff_utc'], day))
             by_day[day]['game_ids'].add(game)
         by_day[day]['captures'] += 1
         by_day[day]['observations'] += len(rows)
@@ -138,6 +155,29 @@ def audit(base=Path('.')):
     unique_pregame = len(game_claims)
     unique_post = len(set.union(*(row['game_ids'] for row in post_days.values()))
                       if post_days else set())
+    # A shared NBA game ID is only a source-level observation. Compare exact
+    # identities and starts without automatically resolving schedule revisions
+    # or asserting independently corroborated outcomes.
+    shared = sorted(set(pregame_native_claims) & set(post_claims))
+    cross_identity_conflicts = sorted(
+        game for game in shared
+        if {row[:5] for row in pregame_native_claims[game]}
+           != post_claims[game]['identity'])
+    cross_start_drifts = sorted(
+        game for game in shared
+        if {row[5] for row in pregame_native_claims[game]}
+           != {row[0] for row in post_claims[game]['schedule']})
+    cross_date_drifts = sorted(
+        game for game in shared
+        if {row[6] for row in pregame_native_claims[game]}
+           != post_claims[game]['dates'])
+    unresolved = (set(identity_conflicts) | set(cross_identity_conflicts) |
+                  set(cross_start_drifts) | set(cross_date_drifts) |
+                  {game for game in shared if
+                   len(post_claims[game]['identity']) != 1 or
+                   len(post_claims[game]['schedule']) != 1 or
+                   len(post_claims[game]['result']) != 1 or
+                   len(post_claims[game]['dates']) != 1})
     return {'schema': VERSION, 'NO_BET': True, 'actual_wagers': 0,
             'pregame_receipts_replayed': len(starts),
             'pregame_distinct_game_ids': unique_pregame,
@@ -157,6 +197,13 @@ def audit(base=Path('.')):
                 if len(claim['schedule']) > 1 or len(claim['dates']) > 1),
             'postgame_conflicting_result_game_ids': sorted(
                 game for game, claim in post_claims.items() if len(claim['result']) > 1),
+            'cross_phase_shared_source_game_ids': shared,
+            'cross_phase_shared_source_games': len(shared),
+            'cross_phase_conflicting_team_identity_game_ids': cross_identity_conflicts,
+            'cross_phase_changed_scheduled_start_game_ids': cross_start_drifts,
+            'cross_phase_changed_requested_date_game_ids': cross_date_drifts,
+            'cross_phase_source_only_consistent_game_ids': sorted(set(shared) - unresolved),
+            'cross_phase_source_only_consistency_is_not_verified_result': True,
             'prospective_winner_predictions_enrolled_by_this_audit': 0,
             'independently_corroborated_final_results': 0,
             'prediction_accuracy_computed': False, 'forecasting_enabled': False,
@@ -165,6 +212,7 @@ def audit(base=Path('.')):
             'limitation': 'Retained native v2 receipt dates only. Repeated observations are not new games. '
                           'Reported conflicts require source review, never automatic forecast edits. '
                           'Disagreeing repeated final-source claims are flagged without resolution or enrollment. '
+                          'Cross-phase matching is source-only; schedule drift is flagged, not adjudicated. '
                           'Postgame page claims are not independently verified finals. '
                           'No model selection, retrospective grade, promotion or wagers.'}
 
