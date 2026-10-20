@@ -39,7 +39,8 @@ def _manifests(base, root):
                 or obj.get('forecasting_enabled') is not False
                 or obj.get('model_training_enabled') is not False
                 or obj.get('promotion_allowed') is not False
-                or obj.get('source_scope_complete') is not False):
+                or (obj.get('source_scope_complete') is not False if root == pregame.ROOT
+                    else obj.get('source_scope_complete', False) is not False)):
             raise ValueError('Unsafe or malformed native NBA receipt')
         output.append((child.name, hashlib.sha256(raw).hexdigest(), obj))
     return output
