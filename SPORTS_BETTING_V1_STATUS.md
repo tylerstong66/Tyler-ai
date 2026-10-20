@@ -29,9 +29,16 @@ Current-season postgame verification still needs real final source bodies;
 the first saved NBA/FBS starts were still future at the last cohort replay.
 No historical fixture can supply prospective finals. NO_BET remains true.
 The diagnostic additionally requests the fixed NBA-owned all-calendar schedule
-HTML route linked in original page navigation. Its rendered public page exposes
-controls but no game rows; inspect the original embedded data before making any
-coverage claim. It retains the same bounded, opaque, no-trust request policy.
+HTML route linked in original page navigation. Run 39430650043 at head
+b9322dba534d47e34deacb6525d69d2831493e4b retained its HTTP 200 body in artifact
+12267712354. The ZIP digest
+15168f8bd190fc40e4cb5e8d62aa3406a75ae5954469f060eef4122657525b0f and original
+236,781-byte body digest
+76ccb614d86294657c972331415e30dbabc54e9c0f5bf0eda4f26b2119f97d64 verified.
+The embedded pageProps contain layout, teamName, region and scheduleSettings;
+the complete embedded JSON has no leagueSchedule, gameDates or gameId dataset.
+Its games configuration is CMS presentation settings. It is an HTML shell, not
+a replayable season schedule. No source coverage or freshness gap is repaired.
 
 ## October 20 continuation — protect new source capture destinations
 
