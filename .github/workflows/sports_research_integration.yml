@@ -31,6 +31,7 @@ jobs:
         run: |
           python sports_accuracy_readiness.py --json > accuracy-readiness-verification.json
           python sports_mlb_prop_shadow_scoreboard.py
+          python sports_mlb_cross_cohort_audit.py > mlb-independent-cohort-evidence-verification.json
           python sports_nba_postgame_observation.py --audit
           python sports_nba_owned_daily_observation_v2.py --audit
           python sports_nba_postgame_observation_v2.py --audit
@@ -58,5 +59,6 @@ jobs:
             accuracy-readiness-verification.json
             nba-native-feature-cohort-verification.json
             nba-native-receipt-coverage-verification.json
+            mlb-independent-cohort-evidence-verification.json
           if-no-files-found: error
           retention-days: 30
