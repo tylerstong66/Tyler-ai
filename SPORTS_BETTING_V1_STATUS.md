@@ -1,5 +1,26 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-20)
 
+## October 20 continuation — target-season NBA Stats access diagnostic
+
+PR #180 merged at 657ff356819d7499c261bee6045420c2effb6ba0 after all CI
+checks passed. Its post-merge collector 39428873271 completed successfully and
+saved status at 13:17:28Z: ESPN/NCAA collection, crosswalks, FBS/D1 audits and
+the separate NBA daily receipt passed. NBA full-season access still failed;
+new NBA features stayed skipped and independent-final certification is false.
+The retained daily receipt 20261020T131558790491Z replays eleven pregame games.
+
+The bounded diagnostic now also requests the fixed NBA Stats 2026–27 schedule
+route already used for retained closed-season originals. Eight diagnostic tests
+pass, including fixed target season, fixed hosts, bounds, no credentials or
+redirects, and no source/feature/model enablement after HTTP 200. This only
+inspects endpoint availability and archives an opaque body; no collector URL,
+receipt protocol, model or forecast changes. All original evidence is preserved.
+
+Next: inspect this diagnostic's actual returned body and server artifact digest.
+Only a successfully replayed source shape can justify a separately versioned
+schedule receipt. Current-season postgame verification still needs real final
+source bodies; no historical fixture can supply them. NO_BET remains true.
+
 ## October 20 continuation — protect new source capture destinations
 
 PRs #172–#179 are merged after all of their complete CI checks passed. The
