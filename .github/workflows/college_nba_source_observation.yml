@@ -23,6 +23,8 @@ on:
       - sports_nba_games_page.py
       - sports_nba_native_feature_cohort.py
       - test_sports_nba_native_feature_cohort.py
+      - sports_nba_receipt_coverage.py
+      - test_sports_nba_receipt_coverage.py
       - sports_nba_postgame_observation.py
       - sports_nba_postgame_observation_v2.py
       - test_sports_nba_postgame_observation_v2.py
@@ -183,6 +185,21 @@ jobs:
             benchmarks/nba_postgame_daily_v2/captures/${{ steps.nba_postgame_v2.outputs.capture }}/
           if-no-files-found: error
           retention-days: 30
+      - name: Replay and audit distinct native NBA source games across pregame and postgame receipts
+        id: nba_cross_phase_coverage
+        if: steps.audit.outcome == 'success'
+        continue-on-error: true
+        run: |
+          python -m unittest -q test_sports_nba_receipt_coverage
+          python sports_nba_receipt_coverage.py --json > nba-native-cross-phase-coverage.json
+      - name: Attach cross-phase game identity, schedule and source-claim drift audit
+        if: steps.nba_cross_phase_coverage.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nba-native-cross-phase-source-coverage
+          path: nba-native-cross-phase-coverage.json
+          if-no-files-found: error
+          retention-days: 30
       - name: Inspect original frozen NBA features against recent native source and independent ESPN
         id: nba_native_cohort_v2
         if: steps.nba_postgame_v2.outcome == 'success'
@@ -320,6 +337,7 @@ jobs:
           NBA_DAILY_PREGAME_SOURCE_V2: ${{ steps.nba_daily_source_v2.outcome }}
           NBA_POSTGAME_NATIVE_SOURCE_V2: ${{ steps.nba_postgame_v2.outcome }}
           NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2: ${{ steps.nba_native_cohort_v2.outcome }}
+          NBA_CROSS_PHASE_SOURCE_COVERAGE: ${{ steps.nba_cross_phase_coverage.outcome }}
           NCAA_OWNED_SOURCE: ${{ steps.ncaa_source.outcome }}
           NCAA_ESPN_CROSSWALK: ${{ steps.college_identity.outcome }}
           NCAA_FINAL_RECEIPTS: ${{ steps.college_finals.outcome }}
@@ -337,7 +355,7 @@ jobs:
           from datetime import datetime, timezone
           from pathlib import Path
           outcomes = {name: os.environ[name] for name in (
-              'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE', 'NBA_DAILY_PREGAME_SOURCE', 'NBA_DAILY_PREGAME_SOURCE_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V2', 'NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2',
+              'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE', 'NBA_DAILY_PREGAME_SOURCE', 'NBA_DAILY_PREGAME_SOURCE_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V2', 'NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2', 'NBA_CROSS_PHASE_SOURCE_COVERAGE',
               'NCAA_OWNED_SOURCE', 'NCAA_ESPN_CROSSWALK', 'NCAA_FINAL_RECEIPTS', 'NCAA_RESULT_DATASET', 'NBA_FINAL_REPLAY', 'NBA_FEATURE_OBSERVATIONS', 'NBA_FEATURE_COHORT_AUDIT', 'FBS_FEATURE_OBSERVATIONS', 'FBS_FEATURE_COHORT_AUDIT', 'D1_FEATURE_OBSERVATIONS', 'D1_FEATURE_COHORT_AUDIT')}
           postgame = (json.loads(Path('nba-postgame-v2-source-observation.json').read_text())
                       if outcomes['NBA_POSTGAME_NATIVE_SOURCE_V2'] == 'success' else {})
@@ -358,6 +376,8 @@ jobs:
               'nba_postgame_v2_supported_final_game_count': postgame.get('supported_final_game_count'),
               'nba_postgame_capture_does_not_certify_independent_finals': True,
               'native_daily_frozen_feature_lifecycle_checked': outcomes['NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2'] == 'success',
+              'native_cross_phase_source_coverage_checked': outcomes['NBA_CROSS_PHASE_SOURCE_COVERAGE'] == 'success',
+              'native_cross_phase_coverage_not_result_settlement': True,
               'nba_daily_v2_source_scope': 'ONE_REQUESTED_EASTERN_DATE_ONLY',
               'nba_daily_source_does_not_enable_feature_collection': True,
               'green_workflow_certifies_all_sources': False,
