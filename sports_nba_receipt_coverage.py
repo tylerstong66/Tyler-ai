@@ -15,7 +15,10 @@ import sports_nba_postgame_observation_v2 as postgame
 from sports_expansion_audit import archive_path, MAX_BLOB_SIZE
 
 VERSION = 'nba-distinct-native-v2-receipt-coverage-v1'
-MAX_RECEIPTS = 256
+# A three-times-daily source collector needs room for a complete season,
+# but replay must remain bounded before loading/decompressing source archives.
+MAX_RECEIPTS = 1024
+MAX_MANIFEST_BYTES = 512_000
 
 
 def _manifests(base, root):
@@ -30,7 +33,7 @@ def _manifests(base, root):
     for child in children:
         archive_path(child, directory=True)
         file = archive_path(child / 'manifest.json')
-        if file.stat().st_size > MAX_BLOB_SIZE:
+        if file.stat().st_size > MAX_MANIFEST_BYTES:
             raise ValueError('Oversized native NBA receipt')
         raw = file.read_bytes()
         obj = json.loads(raw)
@@ -49,10 +52,12 @@ def _manifests(base, root):
 def audit(base=Path('.')):
     """Replay original archived pages, then count game identities by source day."""
     base = Path(base)
-    before = pregame.replay_all(base)
-    after = postgame.replay_all(base)
+    # Bound BOTH archive inventories before expensive original-body replays.
+    # Source contents only count as evidence after the strict replay succeeds.
     starts = _manifests(base, pregame.ROOT)
     finals = _manifests(base, postgame.ROOT)
+    before = pregame.replay_all(base)
+    after = postgame.replay_all(base)
     if (before['receipts_replayed'] != len(starts) or
             after['receipts_replayed'] != len(finals) or
             any(row.get('source_replay_verified') is not True for row in before['reports']) or
