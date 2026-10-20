@@ -1,4 +1,31 @@
-# Sports Betting Analyst v1 — verified handoff (2026-10-19)
+# Sports Betting Analyst v1 — verified handoff (2026-10-20)
+
+## October 20 continuation — NBA-owned daily page evidence
+
+PRs #164, #165 and #166 merged the D1 collector, UTC freeze correction and
+shared college lifecycle reader. The 2026-10-20T10:01:14.881192Z source status
+reports successful ESPN/NCAA/FBS/D1 collection and lifecycle checks, while the
+NBA CDN schedule request still fails and new NBA feature collection is skipped.
+
+The separate read-only access diagnostic found an accessible NBA-owned source:
+the official games pages for October 20 and 21. Diagnostic run 39415304518 at
+commit 72e77afb81ea504c6ec7b49fadc1c3eca7db9425 archived both original HTML bodies.
+The downloaded artifact ZIP matched GitHub's SHA256 digest, and the two original
+body sizes/hashes matched the archived probe report before parser development.
+
+The new offline parser accepts 3 games for October 20 and 11 for October 21.
+All 14 game IDs, home/away tricodes, statuses and scheduled UTC starts exactly
+match the earlier archived owned season schedule. A read-only reconciliation
+against ESPN capture 20261020T095948145364Z matches those same 14 games; the other
+14 ESPN games remain outside these two pages' corroborated coverage.
+
+Thirteen focused tests cover original source replay, identity/season/date and
+chronology rejection, duplicates, incomplete pages, corrupted archives, pinned
+manifest changes and decompression limits. This is an offline source parser,
+not a live collector fallback. Initial source replay uses its saved clock and
+explicitly reports that it is not a fresh observation. No actual-start/final,
+receipt-clock, full-season, forecast or model claims follow from HTTP 200.
+See NBA_OWNED_DAILY_PAGE_V1.md. NO_BET remains true and actual wagers zero.
 
 ## October 19 continuation — D1 lifecycle and shared college result checks
 
