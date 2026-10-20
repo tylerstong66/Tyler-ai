@@ -4,12 +4,14 @@ on:
     paths:
       - 'sports_*.py'
       - 'test_sports*.py'
+      - 'benchmarks/**'
       - '.github/workflows/sports_research_integration.yml'
   push:
     branches: [main]
     paths:
       - 'sports_*.py'
       - 'test_sports*.py'
+      - 'benchmarks/**'
       - '.github/workflows/sports_research_integration.yml'
 permissions:
   contents: read
@@ -25,5 +27,16 @@ jobs:
       - run: python -m pip install -r requirements.txt
       - name: Run the integrated sports test suite without collecting data
         run: python -m unittest discover -v -p 'test_sports*.py'
+      - name: Replay actual saved cohort readiness and MLB hitter results without collection
+        run: |
+          python sports_accuracy_readiness.py --json > accuracy-readiness-verification.json
+          python sports_mlb_prop_shadow_scoreboard.py
+          python sports_nba_postgame_observation.py --audit
       - name: Require unchanged tracked research evidence
         run: git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        with:
+          name: integrated-sports-readiness-replay
+          path: accuracy-readiness-verification.json
+          if-no-files-found: error
+          retention-days: 30

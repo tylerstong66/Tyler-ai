@@ -1,5 +1,76 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-20)
 
+## October 20 continuation — completed outstanding PRs and verified live MLB repair
+
+Recovered actual main at 69b194ebb182fd1c8b5119d138ada4df8d1d2dab, beyond the
+supplied checkpoint. Merged #182 (d050a70), #183 (66206f4), #186 (b222748)
+and #187 (b7e5d6d), after respectively 13, 14, 15 and 18 complete green
+PR workflows. Combined integration run 39469755005 passed all 795 sports
+tests with unchanged tracked inputs. Post-merge run 39470850246 independently
+passed all 795 tests. No model promotion or live application changes were made.
+
+MLB final-collection run 39470850241 succeeded after 48 focused tests. It added
+four separate immutable result files in 1a41ffdd3503a3d07ad5a43b5f84ee67cbef4644:
+three eligible conditional results and one zero-at-bat ineligible result.
+A following commit 554304b9a93c45e93df1c084ae5682c941132e04 changed only the
+read-only scoreboard. All original forecasts are unchanged. Of sixteen
+attempted pending player records, twelve remain unresolved: six valid start
+conflicts and six missing atBats. Nothing missing or conflicting was labeled.
+The published total is 25 frozen player-games, 11 eligible scored, two
+ineligible and twelve pending across four distinct official game IDs; player
+counts are not independent games. No betting edge, calibrated model, market
+odds or independent publication attestation is claimed.
+
+The narrow start-conflict exception arises only after strict final status,
+exact game ID and both teams pass. Direct settlement still rejects that
+player-game. The batch retains both starts and original/source digests, then
+allows unrelated exact-match games through existing checks. Malformed
+timestamps/statistics and game/team conflicts remain fatal. No schedule,
+forecast, original receipt or source availability is backfilled. Existing MLB
+legacy original-source gaps and independent-cohort issue #98 remain open.
+
+NFL experiment #186 uses 1,280 base-training games (2014–2018), 784 calibration
+games (2019–2021; 781 decisive), and 815 evaluation games (2022–2024; 813
+decisive across 54 season/week blocks). It excludes 2025 and live 2026.
+The retained report reproduces exactly in CI. Accuracy rose 62.48% to 65.81%,
+but conditional Brier worsened 0.449518 to 0.450904 and log loss worsened
+0.640491 to 0.642486. Paired proper-loss intervals include zero: no adoption
+is supported. This is post-hoc retrospective development with separated
+parameter-fitting roles, not a fresh confirmatory test or prospective gain.
+The live NFL v1/v2 models and original 27-game cohort are untouched.
+
+The NHL challenger snapshot at 17:09 UTC has 31 enrolled, 20 scored and eleven
+future games, with no missed started saved eligible primary forecasts. Its
+pinned recipe, weights and first-100 enrollment rule are unchanged. No early
+tuning, replacement of slow results, checkpoint creation or promotion occurred.
+The existing hourly collector last verified healthy at run 39463131272 remains
+the forward collection path; no new monitoring automation was created.
+
+#183 adds separate bounded postgame-source receipts. Its actual October 19
+page observed October 20 13:44 UTC is empty, supplying zero final evidence.
+Latest source run 39470572052 at 17:59 UTC retains NCAA/provider evidence and
+reports NBA full-season HTTP 403 plus a daily date-envelope rejection. Fresh
+diagnostic #188, run 39471327873/job 118795846053, verifies exact daily body
+counts/SHA256 before inspecting their embedded JSON: requested and selected
+dates match and error/fallback flags are false, but isDateOverrideActive is now
+explicit null rather than the retained accepted true. Original bodies are
+retained in artifact 12287212268. This finding does not relax the existing
+source contract, certify a schedule or enable a source. Artifact ZIP metadata
+was read, not independently downloaded in the unavailable local runtime.
+
+NBA/FBS/D1 expansion forecasting, fitting, grading and promotion remain disabled
+until their actual source, identity, chronology and evidence prerequisites pass.
+NO_BET=true, actual wagers zero. Next: inspect real new finals at actual clocks,
+resolve the changed NBA envelope through a separately reviewed source contract,
+and preserve original features. Existing early or retrospective results cannot
+supply a fresh prospective evaluation.
+
+The local execution environment is unavailable; all new validation here ran in
+read-only GitHub CI, with exact main/branch integration and post-merge checks.
+The integrated workflow now covers benchmark edits as well as code and replays
+actual saved readiness, MLB hitter results and postgame receipts without source
+collection or tracked-input changes.
+
 ## October 20 continuation — expose real MLB final-source conflicts
 
 Verified failing workflow 39394816672, job 118534804118: all 37 safeguards
