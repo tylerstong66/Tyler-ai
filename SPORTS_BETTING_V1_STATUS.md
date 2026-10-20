@@ -30,6 +30,14 @@ Original content seals replay 2,292 original and 628 extension input files;
 all 42 FBS weeks, 312 D1 days and two NBA seasons still verify without byte
 changes. This remains a static check, not concurrent filesystem race protection.
 
+PR #175 merged at 838cfc1c7d2ffe6d898cd87f33b12ec6ec45fcba after all 15
+workflows passed. A subsequent direct NBA provider boundary check reproduced
+seven cases accepting an absolute/traversing/wrong-day archive reference or
+noncanonical date. The reader now requires a valid canonical calendar date
+and exactly NBA_<date>.json.gz before access. All 22 focused and 729 integrated
+sports tests pass on this branch, before the separate final-page and current
+college changes. No original source bytes or identity rules were rewritten.
+
 ## October 20 continuation — NBA-owned daily page evidence
 
 PRs #164, #165 and #166 merged the D1 collector, UTC freeze correction and
