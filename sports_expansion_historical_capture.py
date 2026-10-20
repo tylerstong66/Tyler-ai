@@ -13,7 +13,7 @@ from pathlib import Path
 
 import requests
 import sports_expansion_observer as observer
-from sports_expansion_audit import bounded_gzip_read, MAX_BLOB_SIZE
+from sports_expansion_audit import archive_path, bounded_gzip_read, MAX_BLOB_SIZE
 
 ROOT=Path("benchmarks/college_nba_history_v1")
 # Explicit complete-date REQUEST windows, not a declaration that every event
@@ -54,10 +54,14 @@ def verify_existing(base, sport, split, day, *, as_of=None):
     prefix=Path(base)/ROOT/"sources"/sport/split
     artifact=prefix/(day+".json.gz")
     receipt=prefix/(day+".receipt.json")
+    archive_path(artifact, allow_missing=True)
+    archive_path(receipt, allow_missing=True)
     if not artifact.exists() and not receipt.exists():
         return False
     if not artifact.exists() or not receipt.exists():
         raise ValueError("Historical source missing one sealed archive component")
+    if receipt.stat().st_size > MAX_BLOB_SIZE:
+        raise ValueError('Oversized historical provider receipt')
     r=json.loads(receipt.read_text())
     if as_of is not None and (observer.utc(r["recorded_at_utc"]) > as_of.astimezone(timezone.utc)):
         raise ValueError("Saved historical receipt has future observation timestamp")

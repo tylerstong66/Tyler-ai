@@ -9,7 +9,7 @@ import json
 import sports_expansion_historical_capture as history
 import sports_expansion_observer as source
 import sports_nba_official_schedule_audit as nba
-from sports_expansion_audit import bounded_gzip_read, MAX_BLOB_SIZE
+from sports_expansion_audit import archive_path, bounded_gzip_read, MAX_BLOB_SIZE
 
 ROOT = history.ROOT/'nba_owned'
 YEARS = {'train':2024,'validation':2025}
@@ -58,11 +58,15 @@ def verify(base,split,*,now=None):
         raise ValueError('Aware NBA historical audit clock required')
     folder=Path(base)/ROOT/split
     blob=folder/(selected+'.json.gz');path=folder/(selected+'.receipt.json')
+    archive_path(blob, allow_missing=True)
+    archive_path(path, allow_missing=True)
     if not blob.exists() and not path.exists(): return None
     if not blob.exists() or not path.exists():
         raise ValueError('Missing NBA historical original source component')
     if blob.is_symlink() or path.is_symlink() or not blob.is_file() or not path.is_file():
         raise ValueError('NBA historical receipt must be a regular file')
+    if path.stat().st_size > MAX_BLOB_SIZE:
+        raise ValueError('Oversized NBA historical receipt')
     saved=json.loads(path.read_bytes())
     if (saved.get('schema')!='tyler-nba-owned-historical-season-v1'
             or saved.get('league')!='NBA' or saved.get('split')!=split

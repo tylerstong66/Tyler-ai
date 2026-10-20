@@ -20,6 +20,16 @@ and extend archive path safeguards to other readers where tests justify it.
 Forecasting, fitting, historical evaluation, promotion and wagers remain disabled
 for the expansion cohorts. NO_BET remains true; no Render changes were made.
 
+Archive repair PR #173 merged at e205ca0842a74bb53b362029b448b5714fee9c50
+after all CI checks passed. A follow-on repair applies its static path guard
+to historical ESPN/FBS/D1/NBA receipts and current NBA schedule/linked ESPN
+reads. Three regression methods reproduced 25 failures before the repair; a
+fourth checks bounded regular receipts. All 35 focused tests and 727 integrated
+sports tests pass on this branch (before the separate final-page parser).
+Original content seals replay 2,292 original and 628 extension input files;
+all 42 FBS weeks, 312 D1 days and two NBA seasons still verify without byte
+changes. This remains a static check, not concurrent filesystem race protection.
+
 ## October 20 continuation — NBA-owned daily page evidence
 
 PRs #164, #165 and #166 merged the D1 collector, UTC freeze correction and
