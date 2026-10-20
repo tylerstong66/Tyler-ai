@@ -91,6 +91,50 @@ class CoverageTests(unittest.TestCase):
         self.assertIs(out['not_proof_of_complete_schedule'], True)
         self.assertEqual(out['independently_corroborated_final_results'], 0)
 
+    def test_postgame_same_game_conflicting_scores_are_flagged_not_graded(self):
+        a = postgame(day='2026-10-21', game_ids=('0022600085',))
+        a['parsed_final_page']['games'][0].update(
+            kind='regular', home_team_id=1, away_team_id=2,
+            tipoff_utc='2026-10-21T23:00:00+00:00',
+            nba_home_score=101, nba_away_score=99, nba_status=3)
+        b = json.loads(json.dumps(a))
+        same = self.run_case([], [a, b])
+        self.assertEqual(same['postgame_source_game_claims'], 2)
+        self.assertEqual(same['postgame_distinct_game_ids'], 1)
+        self.assertEqual(same['postgame_repeat_claims_not_new_games'], 1)
+        for key in ('postgame_conflicting_identity_game_ids',
+                    'postgame_conflicting_schedule_game_ids',
+                    'postgame_conflicting_result_game_ids'):
+            self.assertEqual(same[key], [])
+        b['parsed_final_page']['games'][0]['nba_home_score'] = 102
+        scored = self.run_case([], [a, b])
+        self.assertEqual(scored['postgame_conflicting_result_game_ids'], ['0022600085'])
+        self.assertEqual(scored['postgame_conflicting_schedule_game_ids'], [])
+        self.assertFalse(scored['prediction_accuracy_computed'])
+        self.assertEqual(scored['independently_corroborated_final_results'], 0)
+
+    def test_postgame_team_start_and_source_date_conflicts_are_separate(self):
+        a = postgame(day='2026-10-21', game_ids=('0022600085',))
+        a['parsed_final_page']['games'][0].update(
+            kind='regular', home_team_id=1, away_team_id=2,
+            tipoff_utc='2026-10-21T23:00:00+00:00',
+            nba_home_score=101, nba_away_score=99, nba_status=3)
+        identity = json.loads(json.dumps(a))
+        identity['parsed_final_page']['games'][0]['home_team_id'] = 3
+        result = self.run_case([], [a, identity])
+        self.assertEqual(result['postgame_conflicting_identity_game_ids'], ['0022600085'])
+        self.assertEqual(result['postgame_conflicting_result_game_ids'], [])
+        shifted = json.loads(json.dumps(a))
+        shifted['parsed_final_page']['games'][0]['tipoff_utc'] = '2026-10-21T23:30:00+00:00'
+        result = self.run_case([], [a, shifted])
+        self.assertEqual(result['postgame_conflicting_schedule_game_ids'], ['0022600085'])
+        different_date = json.loads(json.dumps(a))
+        different_date['requested_date'] = '2026-10-22'
+        result = self.run_case([], [a, different_date])
+        self.assertEqual(result['postgame_conflicting_schedule_game_ids'], ['0022600085'])
+        self.assertEqual(result['postgame_conflicting_identity_game_ids'], [])
+        self.assertIs(result['promotion_allowed'], False)
+
     def test_unsafe_flags_inconsistent_counts_and_duplicate_ids_fail_closed(self):
         altered = pregame(); altered['NO_BET'] = False
         with self.assertRaisesRegex(ValueError, 'Unsafe'):

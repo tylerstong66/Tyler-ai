@@ -90,6 +90,10 @@ def audit(base=Path('.')):
 
     post_days = defaultdict(lambda: {'captures': 0, 'supported_final_page_game_claims': 0, 'game_ids': set(), 'empty_or_unsupported': 0})
     postgame_observations = 0
+    # Repeated postgame captures are observations of source claims, not
+    # separate outcomes. Record contradictory original page claims for review
+    # instead of silently choosing the last or most favorable score.
+    post_claims = defaultdict(lambda: {'identity': set(), 'schedule': set(), 'result': set(), 'dates': set()})
     for stamp, digest, source in finals:
         if source.get('schema') != postgame.PROTOCOL.schema:
             raise ValueError('Unexpected native NBA postgame schema')
@@ -102,6 +106,16 @@ def audit(base=Path('.')):
             raise ValueError('Inconsistent native postgame source counts')
         if len({g['nba_game_id'] for g in games}) != len(games):
             raise ValueError('Repeated native NBA postgame game ID')
+        for game in games:
+            claim = post_claims[game['nba_game_id']]
+            claim['identity'].add(tuple(game.get(field) for field in (
+                'home_team_id', 'away_team_id', 'home_tricode', 'away_tricode', 'kind')))
+            claim['schedule'].add(tuple(game.get(field) for field in (
+                'tipoff_utc', 'source_reported_actual_start_utc',
+                'source_reported_actual_end_utc')))
+            claim['result'].add(tuple(game.get(field) for field in (
+                'nba_home_score', 'nba_away_score', 'nba_status')))
+            claim['dates'].add(day)
         post_days[day]['captures'] += 1
         post_days[day]['supported_final_page_game_claims'] += len(games)
         post_days[day]['game_ids'].update(g['nba_game_id'] for g in games)
@@ -134,7 +148,15 @@ def audit(base=Path('.')):
             'postgame_receipts_replayed': len(finals),
             'postgame_source_game_claims': postgame_observations,
             'postgame_distinct_game_ids': unique_post,
+            'postgame_repeat_claims_not_new_games': postgame_observations - unique_post,
             'postgame_days': pack(post_days, 'supported_final_page_game_claims'),
+            'postgame_conflicting_identity_game_ids': sorted(
+                game for game, claim in post_claims.items() if len(claim['identity']) > 1),
+            'postgame_conflicting_schedule_game_ids': sorted(
+                game for game, claim in post_claims.items()
+                if len(claim['schedule']) > 1 or len(claim['dates']) > 1),
+            'postgame_conflicting_result_game_ids': sorted(
+                game for game, claim in post_claims.items() if len(claim['result']) > 1),
             'prospective_winner_predictions_enrolled_by_this_audit': 0,
             'independently_corroborated_final_results': 0,
             'prediction_accuracy_computed': False, 'forecasting_enabled': False,
@@ -142,6 +164,7 @@ def audit(base=Path('.')):
             'not_proof_of_complete_schedule': True,
             'limitation': 'Retained native v2 receipt dates only. Repeated observations are not new games. '
                           'Reported conflicts require source review, never automatic forecast edits. '
+                          'Disagreeing repeated final-source claims are flagged without resolution or enrollment. '
                           'Postgame page claims are not independently verified finals. '
                           'No model selection, retrospective grade, promotion or wagers.'}
 
