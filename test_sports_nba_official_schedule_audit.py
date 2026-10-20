@@ -47,6 +47,32 @@ def espn_event():
 
 
 class NbaOfficialCorroborationTests(unittest.TestCase):
+    def test_direct_provider_replay_rejects_unbound_archive_filename(self):
+        for kind in ('absolute', 'traversal', 'other_day'):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as td:
+                root = Path(td); self.espn_root(root)
+                folder = next((root/observer.ROOT/'captures').iterdir())
+                manifest = json.loads((folder/'manifest.json').read_bytes())
+                snap = next(s for s in manifest['snapshots'] if s['league'] == 'NBA' and s['day'] == '2026-10-20')
+                original = folder/snap['compressed_file']
+                if kind == 'other_day':
+                    target = folder/'NBA_2026-10-21.json.gz'; declared = target.name
+                else:
+                    target = folder.parent/'outside.json.gz'
+                    declared = str(target) if kind == 'absolute' else '../outside.json.gz'
+                target.write_bytes(original.read_bytes()); snap['compressed_file'] = declared
+                with self.assertRaisesRegex(ValueError, 'filename'): nba.espn_games(manifest, folder)
+
+    def test_direct_provider_replay_rejects_noncanonical_calendar_day(self):
+        for day in ('2026-1-01', '2026-02-30', '../2026-10-20', None):
+            with self.subTest(day=day), tempfile.TemporaryDirectory() as td:
+                root = Path(td); self.espn_root(root)
+                folder = next((root/observer.ROOT/'captures').iterdir())
+                manifest = json.loads((folder/'manifest.json').read_bytes())
+                snap = next(s for s in manifest['snapshots'] if s['league'] == 'NBA')
+                snap['day'] = day
+                with self.assertRaises(ValueError): nba.espn_games(manifest, folder)
+
     def espn_root(self,path):
         def fetch(url):
             data={"events":[],"count":0}

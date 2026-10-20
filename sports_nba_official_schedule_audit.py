@@ -10,7 +10,7 @@ import hashlib
 import json
 import re
 from collections import defaultdict
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import requests
@@ -98,6 +98,12 @@ def espn_games(manifest, capture_folder):
     for snap in manifest["snapshots"]:
         if snap["league"]!="NBA":
             continue
+        day = snap.get('day')
+        if not isinstance(day, str) or not re.fullmatch(r'20\d{2}-\d{2}-\d{2}', day):
+            raise ValueError('Invalid NBA provider archive day')
+        date.fromisoformat(day)
+        if snap.get('compressed_file') != 'NBA_'+day+'.json.gz':
+            raise ValueError('Invalid NBA provider archive filename')
         blob = archive_path(capture_folder/snap["compressed_file"])
         if blob.stat().st_size > MAX_BLOB_SIZE:
             raise ValueError('Oversized linked ESPN NBA archive')
