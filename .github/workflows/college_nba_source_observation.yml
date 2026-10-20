@@ -73,6 +73,14 @@ jobs:
     timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Serialized runs may have an older event SHA than the preceding
+          # publisher's new status commit. Start from current main so snapshots
+          # are not based on stale rolling status files.
+          ref: main
+      - name: Record the actual checked-out source revision
+        id: source_revision
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -224,6 +232,7 @@ jobs:
       - name: Report independent source verification outcomes
         if: always()
         env:
+          CHECKED_OUT_SOURCE_SHA: ${{ steps.source_revision.outputs.sha }}
           ESPN_OBSERVATION: ${{ steps.observation.outcome }}
           ESPN_REPLAY_AUDIT: ${{ steps.audit.outcome }}
           NBA_SCHEDULE_SOURCE: ${{ steps.nba_source.outcome }}
@@ -252,7 +261,8 @@ jobs:
               'recorded_at_utc': datetime.now(timezone.utc).isoformat(),
               'workflow_run_id': int(os.environ['GITHUB_RUN_ID']),
               'workflow_run_url': 'https://github.com/' + os.environ['GITHUB_REPOSITORY'] + '/actions/runs/' + os.environ['GITHUB_RUN_ID'],
-              'source_head_sha': os.environ['GITHUB_SHA'],
+              'source_head_sha': os.environ['CHECKED_OUT_SOURCE_SHA'],
+              'trigger_head_sha': os.environ['GITHUB_SHA'],
               'partial_source_availability': any(outcomes[name] != 'success' for name in (
                   'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE', 'NCAA_OWNED_SOURCE')),
               'new_nba_feature_collection_succeeded': outcomes['NBA_FEATURE_OBSERVATIONS'] == 'success',
