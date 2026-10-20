@@ -41,7 +41,16 @@ orphaned/incomplete capture also blocks new collection until investigated;
 it is never silently reused or overwritten.
 
 The read-only PR/manual workflow captures and replays a new next-day source
-receipt as an artifact. It does not publish captures to main, run on a schedule,
-replace the existing CDN collector, create feature observations, change old
-records, grade results, generate forecasts, train models or promote a model.
-That integration requires a later change. NO_BET remains true; wagers are zero.
+receipt as an artifact. Its first live run 39417176214 captured October 21 at
+2026-10-20T11:45:14.510380Z and reconciled 11 pregame games. Both original files
+from artifact 12261683691 are retained exactly. The downloaded ZIP digest was
+verified before bounded extraction, followed by successful local source replay.
+
+The main college/NBA source workflow now runs this separate observer after its
+ESPN audit and publishes daily archives only after collection and replay both
+succeed. It exposes a distinct NBA_DAILY_PREGAME_SOURCE outcome. The existing
+CDN schedule outcome and NBA feature gate retain their own meaning; a successful
+daily page neither repairs the full-season feed nor enables feature enrollment.
+Other source failures do not become successful through the daily-page result.
+No old records, grades, forecasts, training or model promotions are changed.
+NO_BET remains true; wagers are zero.

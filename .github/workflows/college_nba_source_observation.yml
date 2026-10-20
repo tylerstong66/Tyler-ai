@@ -20,6 +20,10 @@ on:
       - test_sports_nba_pregame_features.py
       - benchmarks/nba_pregame_features_v1/protocol.json
       - sports_nba_schedule_slots.py
+      - sports_nba_games_page.py
+      - sports_nba_owned_daily_observation.py
+      - test_sports_nba_owned_daily_observation.py
+      - test_sports_nba_games_page.py
       - test_sports_nba_schedule_slots.py
       - sports_source_collection_window.py
       - test_sports_source_lookback.py
@@ -74,6 +78,10 @@ jobs:
           python-version: '3.12'
       - name: Install pinned transport
         run: python -m pip install requests==2.32.5
+      - name: Check separate NBA daily source replay and isolation
+        run: |
+          python -m unittest -v test_sports_nba_owned_daily_observation test_sports_nba_games_page
+          python sports_nba_owned_daily_observation.py --audit
       - name: Check game-source parser and forecast isolation
         run: python -m unittest -v test_sports_d1_feature_cohort test_sports_d1_pregame_features test_sports_fbs_feature_cohort test_sports_source_lookback test_sports_fbs_pregame_features test_sports_nba_feature_cohort test_sports_nba_pregame_features test_sports_nba_schedule_slots test_sports_expansion_observer test_sports_expansion_audit test_sports_nba_official_schedule_audit test_sports_ncaa_official_source test_sports_ncaa_espn_identity test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_nba_receipts test_sports_nba_schedule_receipts test_sports_ncaa_owned_receipts test_sports_ncaa_espn_crosswalk_receipts test_sports_college_dual_source_finals test_sports_college_final_receipts test_sports_college_result_dataset test_sports_nba_final_receipts test_sports_college_d1_receipts
       - name: Retain timestamped source-only college and NBA snapshots
@@ -82,6 +90,22 @@ jobs:
       - name: Verify every archived response SHA256 and replay game evidence
         id: audit
         run: python sports_expansion_audit.py
+      - name: Retain a separate next-day NBA-owned pregame source without feature enrollment
+        id: nba_daily_source
+        if: steps.audit.outcome == 'success'
+        continue-on-error: true
+        run: |
+          python sports_nba_owned_daily_observation.py --collect --days-ahead 1 > nba-daily-source-observation.json
+          python sports_nba_owned_daily_observation.py --audit > nba-daily-source-archive-audit.json
+      - name: Attach separate NBA daily source evidence
+        if: steps.nba_daily_source.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nba-separate-daily-pregame-source
+          path: |
+            nba-daily-source-observation.json
+            nba-daily-source-archive-audit.json
+          retention-days: 30
       - name: Compare NBA CDN schedule to archived ESPN season games
         id: nba_source
         continue-on-error: true
@@ -203,6 +227,7 @@ jobs:
           ESPN_OBSERVATION: ${{ steps.observation.outcome }}
           ESPN_REPLAY_AUDIT: ${{ steps.audit.outcome }}
           NBA_SCHEDULE_SOURCE: ${{ steps.nba_source.outcome }}
+          NBA_DAILY_PREGAME_SOURCE: ${{ steps.nba_daily_source.outcome }}
           NCAA_OWNED_SOURCE: ${{ steps.ncaa_source.outcome }}
           NCAA_ESPN_CROSSWALK: ${{ steps.college_identity.outcome }}
           NCAA_FINAL_RECEIPTS: ${{ steps.college_finals.outcome }}
@@ -220,7 +245,7 @@ jobs:
           from datetime import datetime, timezone
           from pathlib import Path
           outcomes = {name: os.environ[name] for name in (
-              'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE',
+              'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE', 'NBA_DAILY_PREGAME_SOURCE',
               'NCAA_OWNED_SOURCE', 'NCAA_ESPN_CROSSWALK', 'NCAA_FINAL_RECEIPTS', 'NCAA_RESULT_DATASET', 'NBA_FINAL_REPLAY', 'NBA_FEATURE_OBSERVATIONS', 'NBA_FEATURE_COHORT_AUDIT', 'FBS_FEATURE_OBSERVATIONS', 'FBS_FEATURE_COHORT_AUDIT', 'D1_FEATURE_OBSERVATIONS', 'D1_FEATURE_COHORT_AUDIT')}
           receipt = {
               'schema': 'tyler-independent-source-workflow-status-v2',
@@ -231,6 +256,8 @@ jobs:
               'partial_source_availability': any(outcomes[name] != 'success' for name in (
                   'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE', 'NCAA_OWNED_SOURCE')),
               'new_nba_feature_collection_succeeded': outcomes['NBA_FEATURE_OBSERVATIONS'] == 'success',
+              'new_separate_nba_daily_source_collection_succeeded': outcomes['NBA_DAILY_PREGAME_SOURCE'] == 'success',
+              'nba_daily_source_does_not_enable_feature_collection': True,
               'green_workflow_certifies_all_sources': False,
               'step_outcomes': outcomes,
               'independent_nba_schedule_checked': outcomes['NBA_SCHEDULE_SOURCE'] == 'success',
@@ -262,6 +289,11 @@ jobs:
         if: ${{ steps.observation.outcome == 'success' && steps.audit.outcome == 'success' }}
         run: |
           git add benchmarks/college_nba_source_v1/captures benchmarks/college_nba_source_v1/COVERAGE.latest.json benchmarks/college_nba_source_v1/WORKFLOW_STATUS.latest.json
+          if [ "${{ steps.nba_daily_source.outcome }}" = "success" ]; then
+            git add benchmarks/nba_owned_daily_v1/captures
+          else
+            echo '::warning::Separate NBA daily source unavailable; do not publish unvalidated daily captures'
+          fi
           if [ "${{ steps.nba_source.outcome }}" = "success" ]; then
             git add benchmarks/college_nba_source_v1/nba_official
           else
