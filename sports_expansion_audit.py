@@ -13,6 +13,23 @@ MAX_CAPTURES = 3000
 MAX_BLOB_SIZE = 8_500_000
 
 
+def archive_path(path, *, directory=False, allow_missing=False):
+    """Reject static symlinks at every path component before archive access.
+
+    Do not resolve first: that would erase the symlink evidence. This is a
+    working-tree integrity check, not protection against concurrent OS mutation.
+    """
+    path = Path(path).absolute()
+    for component in (*reversed(path.parents), path):
+        if component.is_symlink():
+            raise ValueError('Symlink in source archive path')
+    if not path.exists() and allow_missing:
+        return path
+    if not (path.is_dir() if directory else path.is_file()):
+        raise ValueError('Missing or nonregular source archive path')
+    return path
+
+
 def bounded_gzip_read(blob, limit=8_000_000):
     """Reject decompression bombs before allocating beyond the source size limit."""
     output = bytearray()
@@ -31,7 +48,9 @@ def bounded_gzip_read(blob, limit=8_000_000):
 
 def audit_capture(file):
     """Replay one closed source capture with all original audit safeguards."""
-    file = Path(file)
+    file = archive_path(file)
+    if file.stat().st_size > MAX_BLOB_SIZE:
+        raise ValueError('Oversized source manifest')
     manifest=json.loads(file.read_text())
     recorded=source.utc(manifest["recorded_at_utc"])
     expected=recorded.strftime("%Y%m%dT%H%M%S%fZ")
@@ -70,7 +89,7 @@ def audit_capture(file):
         if snap["compressed_file"]!=filename or filename in expected_names:
             raise ValueError("Source blob name collision or identity mismatch")
         expected_names.add(filename)
-        blob=file.parent/filename
+        blob=archive_path(file.parent/filename)
         if not blob.exists() or blob.stat().st_size>MAX_BLOB_SIZE:
             raise ValueError("Missing or oversized retained source archive")
         raw=bounded_gzip_read(blob.read_bytes())
@@ -92,7 +111,8 @@ def audit_capture(file):
 
 def audit(base=Path(".")):
     root=Path(base)/source.ROOT
-    manifests=sorted((root/"captures").glob("*/manifest.json"))
+    captures=archive_path(root/"captures", directory=True, allow_missing=True)
+    manifests=sorted(captures.glob("*/manifest.json"))
     if not manifests or len(manifests)>MAX_CAPTURES:
         raise ValueError("Missing or unexpectedly many expansion source captures")
     leagues=defaultdict(lambda:{"captures":0,"snapshot_days":0,"provider_games_observed":0,

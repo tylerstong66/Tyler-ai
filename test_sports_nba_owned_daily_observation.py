@@ -60,6 +60,20 @@ class DailyObservationTests(unittest.TestCase):
         with self.assertRaises(FileExistsError): self.collect(started=same_time, received=same_time)
         self.assertEqual(before, {p.name: p.read_bytes() for p in folder.iterdir()})
 
+    def test_direct_replay_rejects_directory_symlinks(self):
+        self.collect(); folder = next((self.base/daily.ROOT).iterdir()); stamp = folder.name
+        outside = self.base/'relocated'; folder.rename(outside)
+        folder.symlink_to(outside, target_is_directory=True)
+        with self.assertRaisesRegex(ValueError, 'Symlink'):
+            daily.replay(self.base, stamp, now=START+timedelta(seconds=2))
+
+    def test_linked_archive_ancestor_blocks_collection_before_http(self):
+        ancestor = self.base/'benchmarks'; outside = self.base/'relocated'
+        ancestor.rename(outside); ancestor.symlink_to(outside, target_is_directory=True)
+        with self.assertRaisesRegex(ValueError, 'Symlink'): self.collect()
+        self.assertEqual(self.calls, [])
+        self.assertFalse((self.base/daily.ROOT).exists())
+
     def test_incomplete_existing_receipt_blocks_http(self):
         root = self.base/daily.ROOT/'20261020T110000000000Z'
         root.mkdir(parents=True); (root/'nba_games.html.gz').write_bytes(b'incomplete')

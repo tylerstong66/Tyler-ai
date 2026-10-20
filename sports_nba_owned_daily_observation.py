@@ -94,7 +94,7 @@ def replay(base, stamp, *, now=None):
     base = Path(base); now = _clock(now or datetime.now(timezone.utc))
     if not isinstance(stamp, str) or not re.fullmatch(STAMP, stamp):
         raise ValueError('Invalid NBA daily receipt identifier')
-    folder = base/ROOT/stamp
+    folder = audit.archive_path(base/ROOT/stamp, directory=True)
     if {p.name for p in folder.iterdir()} != {'manifest.json', 'nba_games.html.gz'}:
         raise ValueError('Unexpected NBA daily archive file')
     for name in ('manifest.json', 'nba_games.html.gz'):
@@ -154,6 +154,7 @@ def collect(base=Path('.'), *, days_ahead=1, fetch=None, clock=None):
 
 def replay_all(base=Path('.'), *, now=None):
     base = Path(base); now = _clock(now or datetime.now(timezone.utc)); root = base/ROOT
+    audit.archive_path(root, directory=True, allow_missing=True)
     reports = []
     if root.exists():
         if root.is_symlink() or not root.is_dir(): raise ValueError('Invalid NBA daily archive root')

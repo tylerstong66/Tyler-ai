@@ -116,6 +116,20 @@ class SourceArchiveAuditTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"Missing or unexpectedly many"):
                 audit.audit(Path(directory))
 
+    def test_symlinked_capture_components_and_files_rejected(self):
+        for target_kind in ('root', 'captures', 'capture', 'manifest', 'blob'):
+            with self.subTest(target=target_kind), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory); capture = self.build(root)
+                target = {'root': root/obs.ROOT, 'captures': capture.parent,
+                          'capture': capture, 'manifest': capture/'manifest.json',
+                          'blob': capture/'NBA_2026-10-17.json.gz'}[target_kind]
+                outside = root/'relocated'; target.rename(outside)
+                target.symlink_to(outside, target_is_directory=outside.is_dir())
+                with self.assertRaisesRegex(ValueError, 'Symlink'):
+                    audit.audit_capture(capture/'manifest.json')
+                with self.assertRaisesRegex(ValueError, 'Symlink'):
+                    audit.audit(root)
+
 
 if __name__=="__main__":
     unittest.main()

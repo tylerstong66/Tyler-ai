@@ -16,6 +16,32 @@ NOW = datetime(2026, 10, 18, 12, tzinfo=timezone.utc)
 
 
 class MlbSourceArchiveTests(unittest.TestCase):
+    def test_symlinked_archive_root_or_ancestor_rejects_reads_and_writes(self):
+        for nested in (False, True):
+            with self.subTest(nested=nested), tempfile.TemporaryDirectory() as td:
+                base = Path(td); outside = base/'outside'; outside.mkdir()
+                evidence = archive.retain(outside, RAW, archive.canonical_digest(json.loads(RAW)))
+                evidence.update(source_url='https://statsapi.mlb.com/api/v1/schedule',
+                                response_sha256=archive.canonical_digest(json.loads(RAW)))
+                link = base/'link'; link.symlink_to(outside, target_is_directory=True)
+                root = link
+                if nested:
+                    child = outside/'child'; child.mkdir()
+                    for p in outside.glob('*.gz'):
+                        (child/p.name).write_bytes(p.read_bytes())
+                    root = link/'child'
+                before = {p.relative_to(outside): p.read_bytes() for p in outside.rglob('*') if p.is_file()}
+                for operation in (lambda: archive.audit_directory(root),
+                                  lambda: archive.verify(root, evidence),
+                                  lambda: archive.retain(root, b'{"new":true}', archive.canonical_digest({'new': True}))):
+                    with self.assertRaisesRegex(ValueError, 'Symlink'): operation()
+                self.assertEqual(before, {p.relative_to(outside): p.read_bytes() for p in outside.rglob('*') if p.is_file()})
+
+    def test_dangling_archive_directory_symlink_is_not_empty(self):
+        with tempfile.TemporaryDirectory() as td:
+            link = Path(td)/'archive'; link.symlink_to(Path(td)/'absent', target_is_directory=True)
+            with self.assertRaisesRegex(ValueError, 'Symlink'): archive.audit_directory(link)
+
     def test_reader_retains_original_utf8_response_and_replays_existing_digest(self):
         with tempfile.TemporaryDirectory() as td:
             def get(url, **kwargs):
