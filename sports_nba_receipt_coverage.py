@@ -55,7 +55,7 @@ def audit(base=Path('.')):
     if (before['receipts_replayed'] != len(starts) or
             after['receipts_replayed'] != len(finals) or
             any(row.get('source_replay_verified') is not True for row in before['reports']) or
-            any(row.get('source_replay_verified') is not True for row in after['reports'])):
+            any(row.get('source_bytes_replayed') is not True for row in after['reports'])):
         raise ValueError('Archived native NBA source replay count disagrees with inventory')
 
     by_day = defaultdict(lambda: {'captures': 0, 'observations': 0, 'game_ids': set()})
