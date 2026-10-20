@@ -108,7 +108,21 @@ def load_rows(root, sport, models):
         for model in models:
             distribution(pred[model], ('home', 'away', 'tie') if sport == 'NFL' else ('home', 'away'))
         if pred.get('market') is not None:
-            probability(pred['market']['conditional_home_probability'])
+            quote = pred['market']
+            probability(quote['conditional_home_probability'])
+            # A complete archived quote carries both original American moneylines.
+            # Check its claimed no-vig probability again at read time; a matching
+            # content hash alone cannot certify the arithmetic of a saved quote.
+            # Probability-only legacy/synthetic records retain their old behavior.
+            if 'home_moneyline' in quote or 'away_moneyline' in quote:
+                from sports_market_evidence import market as from_moneylines
+                try:
+                    recomputed = from_moneylines(quote)['conditional_home_probability']
+                except (KeyError, TypeError, ValueError) as error:
+                    raise IntegrityError('Incomplete or invalid paired market moneylines') from error
+                if not math.isclose(quote['conditional_home_probability'], recomputed,
+                                    rel_tol=0, abs_tol=1e-12):
+                    raise IntegrityError('Saved market probability disagrees with paired moneylines')
             if utc(pred['market_observed_at']) > utc(pred['generated_at']):
                 raise IntegrityError('Market probability observed after forecast generation')
         predictions[pred['game_id']] = pred
