@@ -12,7 +12,7 @@ from pathlib import Path
 
 import sports_nba_owned_daily_observation_v2 as pregame
 import sports_nba_postgame_observation_v2 as postgame
-from sports_expansion_audit import archive_path, MAX_BLOB_SIZE
+from sports_expansion_audit import archive_path
 
 VERSION = 'nba-distinct-native-v2-receipt-coverage-v1'
 # A three-times-daily source collector needs room for a complete season,
