@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import sports_nba_official_schedule_audit as nba
 import sports_expansion_observer as espn
-from sports_expansion_audit import bounded_gzip_read,MAX_BLOB_SIZE
+from sports_expansion_audit import archive_path,bounded_gzip_read,MAX_BLOB_SIZE
 
 def read_official_games(raw,saved):
     if saved.get('schema')=='nba-espn-independent-schedule-corroboration-v2':
@@ -25,6 +25,10 @@ def verify(root, stamp):
     if not isinstance(stamp,str) or not re.fullmatch(r"[0-9]{8}T[0-9]{12}Z",stamp):
         raise ValueError("Invalid NBA capture identifier")
     folder=Path(root)/nba.ROOT/"captures"/stamp
+    for name in ('manifest.json', 'nba_schedule.json.gz'):
+        path = archive_path(folder/name)
+        if path.stat().st_size > MAX_BLOB_SIZE:
+            raise ValueError('Oversized NBA schedule receipt component')
     saved=json.loads((folder/"manifest.json").read_bytes())
     if (saved.get("schema") not in ("nba-espn-independent-schedule-corroboration-v1",
                                     "nba-espn-independent-schedule-corroboration-v2")
@@ -53,6 +57,9 @@ def verify(root, stamp):
     if not isinstance(linked,str) or not re.fullmatch(r"[0-9]{8}T[0-9]{12}Z",linked):
         raise ValueError("Invalid linked ESPN capture")
     espn_folder=Path(root)/espn.ROOT/"captures"/linked
+    path = archive_path(espn_folder/'manifest.json')
+    if path.stat().st_size > MAX_BLOB_SIZE:
+        raise ValueError('Oversized linked ESPN receipt')
     original=(espn_folder/"manifest.json").read_bytes()
     if hashlib.sha256(original).hexdigest()!=saved["espn_manifest_sha256"]:
         raise ValueError("Linked ESPN manifest digest mismatch")

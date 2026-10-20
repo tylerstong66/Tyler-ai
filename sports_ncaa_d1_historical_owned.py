@@ -9,7 +9,7 @@ import sports_ncaa_official_source as ncaa
 import sports_ncaa_historical_owned as common
 import sports_expansion_historical_capture as history
 import sports_expansion_observer as source
-from sports_expansion_audit import bounded_gzip_read, MAX_BLOB_SIZE
+from sports_expansion_audit import archive_path, bounded_gzip_read, MAX_BLOB_SIZE
 
 ROOT = history.ROOT / 'ncaa_owned' / 'NCAAM_D1'
 YEARS = dict(common.YEARS)
@@ -82,10 +82,14 @@ def verify(base, split, day, *, now=None):
         raise ValueError('Aware NCAA D1 audit clock required')
     folder = Path(base) / ROOT / split
     blob = folder / (day + '.json.gz'); path = folder / (day + '.receipt.json')
+    archive_path(blob, allow_missing=True)
+    archive_path(path, allow_missing=True)
     if not blob.exists() and not path.exists():
         return None
     if not blob.exists() or not path.exists():
         raise ValueError('Missing NCAA D1 sealed source component')
+    if path.stat().st_size > MAX_BLOB_SIZE:
+        raise ValueError('Oversized NCAA D1 historical receipt')
     saved = json.loads(path.read_bytes())
     if (saved.get('schema') not in ('tyler-ncaa-owned-d1-history-day-v1',
                                          'tyler-ncaa-owned-d1-history-day-v2')
