@@ -106,6 +106,73 @@ jobs:
           print('NBA_NULL_ENVELOPE_CANDIDATE='+json.dumps(rows, sort_keys=True, allow_nan=False))
           (root/'null-envelope-candidate.json').write_text(json.dumps(rows, sort_keys=True, indent=2)+chr(10))
           PY
+      - name: Cross-check candidate identities against audited retained ESPN bodies
+        run: |
+          python - <<'PY'
+          from datetime import datetime, timezone
+          from pathlib import Path
+          import hashlib
+          import json
+          import sports_nba_owned_daily_observation as daily
+          import sports_nba_official_schedule_audit as nba
+          root = Path('nba-source-access-probe')
+          candidates = json.loads((root/'null-envelope-candidate.json').read_text())
+          captures = sorted((daily.espn.ROOT/'captures').glob('*/manifest.json'))
+          output = {'schema': 'tyler-nba-null-envelope-retained-provider-diagnostic-v1',
+                    'source_receipts_written': 0, 'forecasting_enabled': False,
+                    'model_training_enabled': False, 'promotion_allowed': False,
+                    'NO_BET': True, 'actual_wagers': 0, 'pages': []}
+          if not captures:
+              output['provider_status'] = 'NO_RETAINED_PROVIDER_CAPTURE'
+          else:
+              stamp = captures[-1].parent.name
+              provider_raw, manifest, provider = daily._provider(Path('.'), stamp)
+              provider_clock = daily.espn.utc(manifest['recorded_at_utc'])
+              output.update(provider_capture=stamp,
+                            provider_manifest_sha256=hashlib.sha256(provider_raw).hexdigest())
+              for candidate in candidates:
+                  if not candidate['native_candidate_parse_succeeded']:
+                      continue
+                  parsed = candidate['parser_report']
+                  observed = daily.espn.utc(parsed['observed_at_utc'])
+                  row = {'requested_date': parsed['requested_date'],
+                         'native_body_sha256': parsed['original_body_sha256'],
+                         'provider_is_prior_and_within_12_hours':
+                             provider_clock <= observed and observed-provider_clock <= daily.MAX_AGE,
+                         'forecasting_enabled': False, 'source_origin_independently_attested': False}
+                  if row['provider_is_prior_and_within_12_hours']:
+                      selected = {key: game for key, game in provider.items()
+                                  if daily.espn.utc(game['scheduled_start_utc']).astimezone(daily.page.EASTERN).date().isoformat()
+                                     == parsed['requested_date']}
+                      report = nba.compare(parsed['games'], selected)
+                      counts = {}
+                      for match in report['matched']:
+                          key = match['nba_official_game_id']
+                          counts[key] = counts.get(key, 0)+1
+                      accepted = []
+                      withheld = list(report['unverified'])
+                      for match in report['matched']:
+                          game = selected[match['espn_game_id']]
+                          if (counts[match['nba_official_game_id']] == 1
+                                  and match['start_offset_minutes'] == 0
+                                  and game['season_stage'] == 2
+                                  and game['provider_completed'] is False and game['state'] == 'pre'
+                                  and observed < daily.espn.utc(game['scheduled_start_utc'])):
+                              accepted.append(match)
+                          else:
+                              withheld.append({**match, 'reason': 'NOT_EXACT_UNIQUE_FUTURE_PREGAME'})
+                      covered = {match['nba_official_game_id'] for match in accepted}
+                      uncovered = sorted(game['nba_game_id'] for game in parsed['games']
+                                         if game['nba_game_id'] not in covered)
+                      row.update(exact_unique_pregame_matches=accepted, withheld=withheld,
+                                 official_ids_without_exact_provider_match=uncovered,
+                                 native_game_count=len(parsed['games']), provider_game_count=len(selected),
+                                 complete_date_identity_agreement=bool(parsed['games']) and not uncovered
+                                     and not withheld and len(accepted) == len(selected))
+                  output['pages'].append(row)
+          print('NBA_NULL_ENVELOPE_PROVIDER_CHECK='+json.dumps(output, sort_keys=True, allow_nan=False))
+          (root/'null-envelope-provider-check.json').write_text(json.dumps(output, sort_keys=True, indent=2)+chr(10))
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
