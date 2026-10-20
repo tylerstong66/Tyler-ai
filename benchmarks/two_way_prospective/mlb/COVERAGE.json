@@ -1,8 +1,8 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-10-20T00:20:44.757799+00:00",
-  "capture_count": 63,
+  "as_of_evidence_at": "2026-10-20T06:01:42.759131+00:00",
+  "capture_count": 64,
   "cohort_started_at": "2026-10-11T15:59:30.281973+00:00",
   "completion_note": "Only manifests without an explicit incomplete state are audited; legacy manifests are retained.",
   "decisive_market_paired": 5,
@@ -143,7 +143,7 @@
       "pregame_schedule_observations_in_window": 7,
       "recorded_at": null,
       "started_by_as_of": true,
-      "status": "unverified_or_not_normally_scheduled"
+      "status": "missed_despite_pregame_schedule_observation"
     },
     {
       "away": "Tampa Bay Rays",
@@ -211,7 +211,7 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "4f844db6d1b2999b2c6521591efdf8b85c8c3cf5017bb5cff977c9d97f8f5982",
+  "input_digest": "691a8d5c7875081172594dc9afc8642e327b2d5dcf3ec7d1a1f0da0cc496b468",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -240,8 +240,8 @@
       "to": "2026-10-13T07:43:07.278901+00:00"
     }
   ],
-  "latest_attempted_capture": "20261020T002042303505Z",
-  "latest_capture": "20261020T002042303505Z",
+  "latest_attempted_capture": "20261020T060139608876Z",
+  "latest_capture": "20261020T060139608876Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
@@ -250,22 +250,11 @@
     {
       "decision": "already_enrolled",
       "game_id": "849816"
-    },
-    {
-      "checked_at": "2026-10-20T00:20:44.760894+00:00",
-      "decision": "already_started",
-      "game_id": "849815"
-    },
-    {
-      "checked_at": "2026-10-20T00:20:44.760924+00:00",
-      "decision": "excluded",
-      "game_id": "849814",
-      "reason": "Exact official/ESPN matchup and kickoff match required"
     }
   ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": true,
-  "latest_official_schedule_observed_at": "2026-10-20T00:20:44.658892+00:00",
+  "latest_official_schedule_observed_at": "2026-10-20T06:01:42.702770+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [
     {
@@ -341,11 +330,32 @@
     }
   ],
   "minimum_forecast_lead_hours": 7.97023246888889,
-  "observed_missing_started_games": [],
+  "observed_missing_started_games": [
+    {
+      "away": "Cleveland Guardians",
+      "exclusion_reasons": [
+        "Exact official/ESPN matchup and kickoff match required"
+      ],
+      "first_observed_in_window": "2026-10-19T01:20:25.392021+00:00",
+      "game_id": "849815",
+      "home": "Tampa Bay Rays",
+      "kickoff": "2026-10-20T00:08:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-10-20T00:20:44.760894+00:00",
+        "decision": "already_started",
+        "game_id": "849815"
+      },
+      "lead_hours": null,
+      "pregame_schedule_observations_in_window": 7,
+      "recorded_at": null,
+      "started_by_as_of": true,
+      "status": "missed_despite_pregame_schedule_observation"
+    }
+  ],
   "official_daily_conflicted_capture_count": 14,
   "pending": 3,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-10-20T00:20:44.757799+00:00",
+    "as_of_evidence_at": "2026-10-20T06:01:42.759131+00:00",
     "games": [
       {
         "away": "Cleveland Guardians",
@@ -612,6 +622,11 @@
     },
     {
       "capture": "20261020T002042303505Z",
+      "game_id": "849816",
+      "reason": "Final identity differs from saved forecast"
+    },
+    {
+      "capture": "20261020T060139608876Z",
       "game_id": "849816",
       "reason": "Final identity differs from saved forecast"
     }
