@@ -1,5 +1,87 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-20)
 
+## October 20 continuation — native NBA evidence and automatic source lifecycle
+
+Merged #190–#197 after their relevant PR checks passed. Code checkpoint
+`e9c2c6ede0a9fd37cc77efcaeb89e4a5d5e5fcf5` passed all **830 sports tests**
+again in post-merge integration run 39483552863. Native v1 receipts,
+historical seals and original frozen features remain replayable; none were
+rewritten to satisfy the changed public page format.
+
+NBA now has separate native v2 pregame and recent postgame receipt schemas
+and archive roots. V2 requires an explicitly present null date-override field;
+v1 still requires true. Both retain bounded original HTML/JSON, exact
+route/query/selected-date, complete-page, identity, time and status checks.
+The unknown UI flag is never rewritten or represented as an attested active
+override. Native pregame collection requires complete nonempty one-to-one
+ESPN agreement with exact teams and UTC tipoffs, all still pregame at the
+actual complete-response clock.
+
+The first native pregame receipt `20261020T185058198304Z` retains all eleven
+October 21 games and their original bytes. The existing scheduled source
+workflow has since independently collected, replayed and published further
+observations of that same eleven-game date. Latest verified source run
+[39483553018](https://github.com/tylerstong66/Tyler-ai/actions/runs/39483553018),
+job 118838043528, published `b18ce9dea0aa93fd7c46ccc414153f3ae0963963`.
+Its native pregame receipt `20261020T192725676135Z` matches all eleven fresh
+ESPN games with no withheld records. Repeated observations are not additional
+independent games or forecasts.
+
+The previous-Eastern-date native postgame page is explicitly
+`EMPTY_DAY_NO_FINAL_EVIDENCE`, with **zero** supported finals. The newly
+fetched April 10 reference separately demonstrated fifteen regulation-final
+cards under the native format; it remains historical shape evidence collected
+in October, never prospective results or historical pregame availability.
+Mixed/live, overtime, postseason and incomplete pages retain opaque original
+bytes and zero accepted final games. Any unsupported card withholds the
+whole page. Actual bounded request/response clocks and recent-date limits
+prevent backdating old pages into current postgame receipts.
+
+The native frozen-feature lifecycle now replays original feature/source
+bytes and historical seals, recent native receipts and independent latest
+ESPN responses. It requires frozen identities, both teams/orientation,
+regular-season scope, unique exact current tipoffs, agreeing final scores,
+and source observations after original/current saved starts and freeze,
+at or after the NBA-reported actual end. It identifies the single requested daily scope and
+out-of-scope games explicitly; missing games never imply cancellation.
+The source workflow's live native lifecycle audit succeeded. It grades no
+predictions, enrolls no outcomes and backfills no features. Offline integrated
+CI replays the same saved sources and view with unchanged tracked inputs.
+
+A real post-merge publication failure in run 39478799323 was traced to a
+queued run checking out its older event SHA even though publication was
+already serialized. #194 starts collectors from current main and records
+both actual checked-out and trigger revisions. Fresh runs 39480725231,
+39481081648, 39482886349 and 39483553018 subsequently published successfully.
+Unavailable v1 and full-season NBA endpoints remain explicit failures.
+Native daily success does not certify full-season coverage or enable the
+existing NBA feature collector. The existing schedule is unchanged.
+
+NHL's latest retained checkpoint is still **31 enrolled, 20 scored, 11
+pending**, as of 17:09:07Z. The first hundred-game cohort is collecting.
+The pinned challenger, weights, enrollment horizon and checkpoint protocol
+are unchanged; no early-result tuning or promotion was performed.
+
+The NFL calibration experiment remains a retained negative result: its
+higher classification accuracy did not improve proper probability losses.
+No calibrator was adopted and no inspected data is relabeled as an untouched
+holdout. Further improvement requires independently evaluated evidence.
+
+MLB's latest published snapshot remains **25 frozen player-games, 11 eligible
+scored, two ineligible, twelve unresolved**, across four distinct game IDs.
+The last validated settlement attempt retained six source-start conflicts
+and six missing atBats. No forecast, original start or legacy original-source
+gap was repaired by reconstruction. Missing/conflicting records remain
+ungraded while unrelated exact-match settlements can proceed.
+
+Next work is to inspect genuinely later NBA two-source finals against the
+frozen feature cohort, continue the unchanged NHL first-100 evaluation,
+independently evaluate any further NFL changes, and resolve MLB gaps only
+from authentic source evidence. NCAA FBS/D1 work remains source/feature
+research with training, evaluation, forecasting and promotion gates closed.
+
+**NO_BET=true; actual wagers zero; model promotion disabled.**
+
 ## October 20 continuation — completed outstanding PRs and verified live MLB repair
 
 Recovered actual main at 69b194ebb182fd1c8b5119d138ada4df8d1d2dab, beyond the
