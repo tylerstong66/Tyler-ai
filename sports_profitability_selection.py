@@ -6,6 +6,7 @@ never independent evidence that an original sportsbook quote was executable.
 """
 import json
 import math
+from datetime import timedelta
 from pathlib import Path
 
 from sports_profitability_v1 import (
@@ -40,6 +41,9 @@ def make_receipt(prediction, entry_quote, archive_root, recorded_at):
             and utc(entry_quote["recorded_at"]) <= clock
             and clock < utc(prediction["kickoff"])):
         raise ValueError("Original paper selection must be recorded before kickoff")
+    if (clock - utc(prediction["recorded_at"]) > timedelta(minutes=5)
+            or clock - utc(entry_quote["observed_at"]) > timedelta(minutes=10)):
+        raise ValueError("Paper selection receipt is too delayed after original forecast/quote")
     details = compute_decision(prediction, prices)
     record = {
         **{key: prediction[key] for key in (
@@ -68,6 +72,11 @@ def verify_receipt(receipt, prediction, entry_quote, prices):
         raise ValueError("Paper decision was not frozen before kickoff")
     if utc(entry_quote["recorded_at"]) > utc(receipt["recorded_at"]):
         raise ValueError("Paper decision precedes original price")
+    if (utc(receipt["recorded_at"]) - utc(prediction["recorded_at"])
+            > timedelta(minutes=5) or
+            utc(receipt["recorded_at"]) - utc(entry_quote["observed_at"])
+            > timedelta(minutes=10)):
+        raise ValueError("Paper selection receipt is stale relative to saved forecast/price")
     expected = compute_decision(prediction, prices)
     if (receipt.get("paper_selection_side") != expected["paper_selection_side"]
             or isinstance(receipt.get("paper_stake_units"), bool)
