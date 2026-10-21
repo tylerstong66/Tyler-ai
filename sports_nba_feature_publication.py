@@ -13,8 +13,9 @@ from sports_github_server_evidence import API, REPOSITORY, fetch_json
 WORKFLOW = '.github/workflows/college_final_receipts.yml'
 
 
-def _attest(records, raw_files, run_id, now, fetch):
-    run = server.run_observation(run_id, now=now, workflow=WORKFLOW,
+def _attest(records, raw_files, run_id, now, fetch, *, root=features.ROOT,
+            workflow=WORKFLOW, schema='tyler-nba-feature-github-server-observation-v1'):
+    run = server.run_observation(run_id, now=now, workflow=workflow,
                                  events=('pull_request', 'push'), fetch=fetch)
     sha = run['head_sha']; observed = source.utc(run['server_created_at_utc'])
     evidence = []
@@ -26,16 +27,16 @@ def _attest(records, raw_files, run_id, now, fetch):
         start = min(source.utc(record[k]) for k in ('nba_saved_start_utc', 'espn_saved_start_utc'))
         if not source.utc(record['frozen_at_utc']) <= observed < start:
             raise ValueError('GitHub observation not between feature freeze and both saved starts')
-        path = (features.ROOT / (game_id + '.json')).as_posix()
+        path = (root / (game_id + '.json')).as_posix()
         raw = raw_files[game_id]
         blob = server.verify_blob(path, raw, sha, fetch=fetch)
         evidence.append({'nba_game_id': game_id, 'path': path, 'git_blob_sha1': blob,
                          'file_sha256': hashlib.sha256(raw).hexdigest(),
                          'frozen_at_utc': record['frozen_at_utc'],
                          'earliest_saved_start_utc': start.isoformat()})
-    return {'schema': 'tyler-nba-feature-github-server-observation-v1',
+    return {'schema': schema,
             'repository': REPOSITORY, 'run_id': run_id, 'head_sha': sha,
-            'workflow_path': WORKFLOW, 'event': run['event'],
+            'workflow_path': workflow, 'event': run['event'],
             'github_server_created_at_utc': run['server_created_at_utc'],
             'checked_at_utc': now.isoformat(), 'feature_observations_verified': len(evidence),
             'evidence': evidence,
