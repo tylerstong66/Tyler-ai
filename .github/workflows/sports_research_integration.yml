@@ -35,6 +35,7 @@ jobs:
           python sports_nba_postgame_observation.py --audit
           python sports_nba_owned_daily_observation_v2.py --audit
           python sports_nba_postgame_observation_v2.py --audit
+          python sports_nba_final_games_page_v3.py --capture 20261021T100537057931Z > nba-native-final-break-status-diagnostic.json
           python sports_nba_native_feature_cohort.py > nba-native-feature-cohort-verification.json
           python sports_nba_receipt_coverage.py --json > nba-native-receipt-coverage-verification.json
           python - <<'PY'
@@ -60,5 +61,6 @@ jobs:
             nba-native-feature-cohort-verification.json
             nba-native-receipt-coverage-verification.json
             mlb-independent-cohort-evidence-verification.json
+            nba-native-final-break-status-diagnostic.json
           if-no-files-found: error
           retention-days: 30
