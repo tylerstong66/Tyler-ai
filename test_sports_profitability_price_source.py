@@ -64,7 +64,8 @@ class ArchivedNhlOddsTests(unittest.TestCase):
         self.assertEqual(quote["prices"], {"home": -110, "away": 110})
         self.assertEqual(quote["market"], p.MARKET)
         self.assertEqual(quote["line"], None)
-        self.assertEqual(quote["provider_updated_at"], "2026-10-23T17:59:00Z")
+        self.assertEqual(quote["aggregator_market_last_seen_at"], "2026-10-23T17:59:00Z")
+        self.assertIsNone(quote["provider_updated_at"])
         self.assertEqual(quote["recorded_at"], self.archive_time)
         self.assertFalse(quote["available_to_paper"])
         self.assertFalse(quote["last_pre_start_offering_verified"])
@@ -78,6 +79,19 @@ class ArchivedNhlOddsTests(unittest.TestCase):
                  "generated_at": "2026-10-23T18:02:00Z"}
         with self.assertRaisesRegex(ValueError, "offering not verified"):
             p.check_quote(quote, paper, self.root, "entry")
+
+    def test_even_relabelled_aggregator_quote_cannot_become_proven_bookmaker_quote(self):
+        quote = self.observe()
+        quote["available_to_paper"] = True
+        quote.pop("sha256")
+        quote["sha256"] = p.hash_record(quote)
+        pred = {"game_id": quote["game_id"], "event_id": quote["event_id"],
+                "home": quote["home"], "away": quote["away"],
+                "kickoff": quote["kickoff"],
+                "entry_quote_sha256": quote["sha256"],
+                "generated_at": "2026-10-23T18:02:00Z"}
+        with self.assertRaisesRegex(ValueError, "UTC timestamp string required"):
+            p.check_quote(quote, pred, self.root, "entry")
 
     def test_missing_market_last_update_rejected_even_when_book_has_timestamp(self):
         events = copy.deepcopy(self.events)
