@@ -233,11 +233,11 @@ def interval(rows):
             "draws": 1000, "status": "descriptive_block_bootstrap_only"}
 
 
-def evaluate(predictions, entry_quotes, settlements, closing_quotes=(), archive_root="."):
+def evaluate(predictions, entry_quotes, settlements, closing_quotes=(), archive_root=".", selection_receipts=()):
     """Pure readback. NO network, forecast changes, model updates or bets."""
-    quote_by_id, final_by_id, close_by_id = {}, {}, {}
+    quote_by_id, final_by_id, close_by_id, selection_by_id = {}, {}, {}, {}
     for entries, dest in ((entry_quotes, quote_by_id), (settlements, final_by_id),
-                          (closing_quotes, close_by_id)):
+                          (closing_quotes, close_by_id), (selection_receipts, selection_by_id)):
         for item in entries:
             verify_record(item)
             game = item["game_id"]
@@ -249,6 +249,7 @@ def evaluate(predictions, entry_quotes, settlements, closing_quotes=(), archive_
     selected = 0
     pending = 0
     unpriced = 0
+    unsealed_selection = 0
     no_selection = 0
     prior_activation = 0
     clv = []
@@ -268,10 +269,15 @@ def evaluate(predictions, entry_quotes, settlements, closing_quotes=(), archive_
             unpriced += 1
             continue
         prices = check_quote(quote, pred, archive_root, "entry")
+        receipt = selection_by_id.get(game)
+        if receipt is None:
+            unsealed_selection += 1
+            continue
+        from sports_profitability_selection import verify_receipt
+        fixed = verify_receipt(receipt, pred, quote, prices)
         p = pred["probabilities"]
-        ev = {side: p[side] * decimal_odds(prices[side]) - 1 for side in p}
-        side = max(("home", "away"), key=lambda s: (ev[s], s == "home"))
-        is_selected = ev[side] >= MIN_EV
+        side = fixed["paper_selection_side"]
+        is_selected = side is not None
         if is_selected:
             selected += 1
         else:
@@ -306,6 +312,7 @@ def evaluate(predictions, entry_quotes, settlements, closing_quotes=(), archive_
     return {"policy": "future-only-nhl-fixed-unit-v1", "activation_utc": ACTIVATION,
             "forecast_count": len(seen), "excluded_pre_activation": prior_activation,
             "unpriced_or_missing_original_quote": unpriced,
+            "missing_pre_event_selection_receipt": unsealed_selection,
             "qualified_priced_forecasts": selected + no_selection,
             "no_paper_selection": no_selection, "paper_selections": selected,
             "paper_pending": pending, "paper_settled": n,
@@ -320,4 +327,4 @@ def evaluate(predictions, entry_quotes, settlements, closing_quotes=(), archive_
             "binary_log_loss": sum(-math.log(g["p_home"] if g["home_won"] else 1 - g["p_home"]) for g in graded) / len(graded) if graded else None,
             "calibration_bins": bins, "NO_BET": True, "actual_wagers": 0,
             "model_promotion_allowed": False, "profitability_proven": False,
-            "limitation": "Synthetic/offline arithmetic only until original source, independent final, sportsbook offering and GitHub-server chronology are separately verified; no retroactive availability, executed wagers or proven betting edge."}
+            "limitation": "Synthetic/offline arithmetic only until independently verified source, independent finals, sportsbook offering and GitHub-server chronology exist. An original pre-event immutable selection receipt is mandatory; local timestamps alone do not prove publication. No retroactive availability, executed wagers or proven betting edge."}
