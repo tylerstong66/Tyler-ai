@@ -1,5 +1,5 @@
 from copy import deepcopy
-from datetime import timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 import base64
 import hashlib
@@ -80,6 +80,37 @@ class FbsPublicationTests(unittest.TestCase):
         saved['record_sha256'] = publication.features.digest(saved['record'])
         path.write_bytes(publication.features.source.canonical(saved))
         with self.assertRaisesRegex(ValueError, 'original source replay'): self.build()
+
+    def test_retained_remaining_cohort_bytes_and_chronology_without_fresh_server_claim(self):
+        base = Path(__file__).parent
+        root = base/publication.features.ROOT.parent/'publication_v1'
+        raw = (root/'remaining_cohort_20261021.json').read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(),
+                         '72ee38cea6e57bdf3125d77901e3f2f1bb821165140ba369a6f0bbb3bfe43616')
+        report = json.loads(raw)
+        first = json.loads((root/'first_cohort.json').read_bytes())
+        self.assertEqual(report['run_id'], 39594047657)
+        self.assertEqual(report['head_sha'], 'f68aaf3ba2183a5a3688b1008b12dfb8407f20ac')
+        self.assertEqual(report['feature_observations_verified'], 45)
+        self.assertTrue(report['saved_report_requires_fresh_api_replay'])
+        self.assertTrue(report['not_a_prediction']); self.assertFalse(report['forecasting_enabled'])
+        observed = datetime.fromisoformat(report['server_created_at_utc'].replace('Z', '+00:00'))
+        ids = set()
+        for evidence in report['evidence']:
+            path = base/publication.features.ROOT/(evidence['espn_game_id']+'.json')
+            original = path.read_bytes(); record = json.loads(original)['record']
+            self.assertEqual(evidence['path'], path.relative_to(base).as_posix())
+            self.assertEqual(evidence['file_sha256'], hashlib.sha256(original).hexdigest())
+            self.assertEqual(evidence['git_blob_sha1'], hashlib.sha1(
+                b'blob '+str(len(original)).encode()+b'\0'+original).hexdigest())
+            self.assertEqual(evidence['record_sha256'], publication.features.digest(record))
+            self.assertLessEqual(datetime.fromisoformat(record['frozen_at_utc']), observed)
+            for key in ('ncaa_saved_start_utc', 'espn_saved_start_utc'):
+                self.assertEqual(evidence[key], record[key])
+                self.assertLess(observed, datetime.fromisoformat(record[key]))
+            ids.add(evidence['espn_game_id'])
+        self.assertEqual(len(ids), 45)
+        self.assertEqual(len(ids | {r['espn_game_id'] for r in first['evidence']}), 48)
 
 
 if __name__ == '__main__': unittest.main()
