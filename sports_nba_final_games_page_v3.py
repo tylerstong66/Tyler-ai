@@ -1,6 +1,7 @@
 """Read-only diagnostic for native regulation finals with explicit Final break status.
 
-No collector uses this parser. Existing v1/v2 receipts retain their contracts.
+Only the separate opt-in v3 source recorder uses this parser. No result
+or prediction collector uses it; existing v1/v2 receipts retain their contracts.
 """
 from datetime import datetime, timezone
 import hashlib
