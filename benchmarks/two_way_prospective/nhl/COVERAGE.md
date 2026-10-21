@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-20T23:53:13.231006+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-21T04:48:37.992397+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 70 / 57 / 13 |
-| Started games in retained official schedules / enrolled | 62 / 62 |
+| Recorded / settled / pending | 70 / 67 / 3 |
+| Started games in retained official schedules / enrolled | 68 / 68 |
 | Observed missing started games | 0 |
 | Enrollment-time priced forecasts | 70 / 70 |
-| Settled with enrollment prices / decisive market-paired | 57 / 57 |
+| Settled with enrollment prices / decisive market-paired | 67 / 67 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,16 +23,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-20T23:53:13.231006+00:00. Ready: 8 / 8 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-21T04:48:37.992397+00:00. Ready: 2 / 2 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020146 | WPG at STL | True | False | True | None |
-| 2026020147 | BOS at DAL | True | False | True | None |
-| 2026020148 | MIN at EDM | True | False | True | None |
-| 2026020149 | DET at SEA | True | False | True | None |
-| 2026020150 | CAR at VAN | True | False | True | None |
-| 2026020151 | TBL at VGK | True | False | True | None |
 | 2026020152 | PHI at BUF | True | False | True | None |
 | 2026020153 | FLA at OTT | True | False | True | None |
 
@@ -115,7 +109,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 71. Latest: `20261020T235311908776Z`.
+Audited capture manifests: 72. Latest: `20261021T044837032153Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
