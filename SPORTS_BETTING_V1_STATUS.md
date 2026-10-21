@@ -1,4 +1,74 @@
-# Sports Betting Analyst v1 — verified handoff (2026-10-20)
+# Sports Betting Analyst v1 — verified handoff (2026-10-21)
+
+## October 21 continuation — recovered main, native final diagnostics and negative NFL result
+
+Recovered actual main at `c3d897a91238251cd568b2283783b2b8711ccd02`, including
+chat-mode PRs #198–#203. Then merged #204, #205, #206 and #207 after their
+applicable checks passed. These changes retain original feature, forecast and
+receipt contracts. NO_BET=true, actual wagers zero, model promotion disabled.
+
+The NHL challenger checkpoint advanced to **33 enrolled, 31 scored, two
+pending** at 10:09:06 UTC. The first-100 cohort remains incomplete, with no
+missed started forecasts among the eligible saved source forecasts. Four
+game-date blocks do not meet its five-block uncertainty gate. Weights,
+enrollment horizon and checkpoint rules remain unchanged; early results were
+not used to tune the challenger or authorize promotion.
+
+The native October 20 NBA final page retained on October 21 was rejected
+because all three cards report `gameBreakStatus: "Final"`, while the existing
+v2 reader requires an empty value. #204 adds an isolated v3 diagnostic for
+that exact inspected shape. It replays the original v2 receipt and source
+bytes with the original response clock; the canonical receipt remains
+unsupported. Existing collectors and the scheduled v2 lifecycle are unchanged.
+
+#205 separately compares that v3 diagnostic against pinned independent ESPN
+originals and original frozen features. Two games have source-agreement
+observations. Game `0022600003` remains quarantined: NBA's current saved
+start is 01:30 UTC while ESPN's moved to 01:50; both original frozen starts
+were 01:30. Matching scores cannot bypass the exact-start gate. These are
+feature observations, not predictions or enrolled outcomes. Sixteen original
+NBA features remain intact; the existing v2 lifecycle still accepts zero
+finals from this page. Full-season acquisition remains unavailable, and native
+daily availability does not silently enable old feature enrollment.
+
+#206 fixes repeated official MLB requests within a settlement invocation.
+Status and per-hitter validation now share one original response per game,
+using isolated copies and expiring the cache before the next run. Successful
+post-merge live run 39594567023 used **four official game responses for twelve
+player-game checks**, with zero new settlements and all twelve unresolved
+records preserved. Six have original/current start conflicts and six lack
+explicit official at-bats. The ledger remains 25 frozen player-games across
+four game IDs: eleven eligible scored, two ineligible and twelve unresolved.
+No missing count was inferred and no forecast or legacy source gap rewritten.
+
+#207 retains a separate annual NFL calibration development recipe and its
+negative result. Each 2022–2024 year uses only prior seasons for independent
+base/calibrator fitting. On 813 decisive games, calibrated Brier worsened
+from 0.4487592 to 0.4516064 and log loss from 0.6398104 to 0.6430794; both
+paired descriptive intervals include zero. Dedicated GitHub run 39594197538
+exactly matched the actual local report, and the final head requires full
+semantic replay of the retained result. This retrospective experiment excludes
+2025/live 2026 and is not an untouched holdout. Neither this recipe nor the
+earlier fixed-fit negative calibrator is adopted. Existing prospective NFL
+records remain 27 settled, including one tie, with no supported market edge.
+
+Current college replay has **48 frozen FBS feature records**, three later
+source-agreement observations and 45 pending; D1 has zero feature records.
+The existing publication auditor additionally verified the 45 still-future
+FBS files against exact original bytes at GitHub head
+`f68aaf3ba2183a5a3688b1008b12dfb8407f20ac`, server-observed in run 39594047657
+at 11:43:19 UTC, before both sources' starts. The separate saved recipe
+overlaps two of the earlier five-file recipe, covering this 48-record
+checkpoint. The three already-started games rely on the earlier proof;
+the later server observation never retroactively attests them. Saved recipes
+require fresh API replay; offline digest checks do not certify a fresh query.
+
+Next development must preserve those distinctions: genuine later source
+observations, frozen pre-event features versus predictions, exact identities
+and starts, independently evaluated parameters, and unchanged originals.
+NBA/FBS/D1 training, historical evaluation, forecasting and promotion remain
+disabled. No retrospective diagnostic or favorable classification accuracy
+authorizes wagers or model promotion.
 
 ## October 20 continuation — native NBA evidence and automatic source lifecycle
 
