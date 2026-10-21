@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 
 import sports_profitability_v1 as p
+import sports_profitability_selection as selection
 
 
 def seal(value):
@@ -68,6 +69,8 @@ class ProfitabilityContractTests(unittest.TestCase):
                           "source_prediction_sha256": self.original["sha256"],
                           "source_prediction_archive": self.original_archive,
                           "NO_BET": True, "actual_wagers": 0})
+        self.selection = selection.make_receipt(self.pred, self.entry_quote,
+            self.root, "2026-10-23T18:04:00Z")
         self.result = seal({**self.identity, "prediction_sha256": self.pred["sha256"],
                             "independent_final_verified": True, "outcome": "home",
                             "scores": {"home": 3, "away": 2},
@@ -95,11 +98,14 @@ class ProfitabilityContractTests(unittest.TestCase):
             "last_pre_start_offering_verified": verified,
             "NO_BET": True, "actual_wagers": 0})
 
-    def evaluate(self, predictions=None, quotes=None, results=None, closing=None):
+    def evaluate(self, predictions=None, quotes=None, results=None, closing=None,
+                 selections=None):
         return p.evaluate([self.pred] if predictions is None else predictions,
                           [self.entry_quote] if quotes is None else quotes,
                           [self.result] if results is None else results,
-                          [self.close_quote] if closing is None else closing, self.root)
+                          [self.close_quote] if closing is None else closing,
+                          self.root,
+                          [self.selection] if selections is None else selections)
 
     def test_positive_paper_unit_and_comparable_clv_without_real_wagers(self):
         report = self.evaluate()
@@ -115,6 +121,42 @@ class ProfitabilityContractTests(unittest.TestCase):
         self.assertTrue(report["NO_BET"])
         self.assertEqual(report["actual_wagers"], 0)
         self.assertFalse(report["profitability_proven"])
+
+    def test_unsealed_hindsight_selection_never_counts_toward_return(self):
+        report = self.evaluate(selections=[])
+        self.assertEqual(report["missing_pre_event_selection_receipt"], 1)
+        self.assertEqual(report["paper_selections"], 0)
+        self.assertEqual(report["paper_settled"], 0)
+        self.assertIsNone(report["paper_roi"])
+
+    def test_paper_selection_receipt_is_exclusive_and_not_wager(self):
+        self.assertTrue(self.selection["NO_BET"])
+        self.assertEqual(self.selection["actual_wagers"], 0)
+        self.assertEqual(self.selection["paper_selection_side"], "home")
+        self.assertEqual(self.selection["paper_stake_units"], 1)
+        path = self.root / "paper_selections" / "2026020999.json"
+        selection.persist_exclusive(path, self.selection)
+        original = path.read_bytes()
+        with self.assertRaises(FileExistsError):
+            selection.persist_exclusive(path, self.selection)
+        self.assertEqual(path.read_bytes(), original)
+
+    def test_rehashed_wrong_side_or_stake_cannot_rewrite_frozen_decision(self):
+        for changes in ({"paper_selection_side": "away"},
+                        {"paper_stake_units": 2},
+                        {"maximum_model_expected_unit_return": 1.5},
+                        {"recorded_at": "2026-10-25T01:00:00Z"}):
+            with self.subTest(changes=changes):
+                receipt = copy.deepcopy(self.selection)
+                receipt.update(changes)
+                seal(receipt)
+                with self.assertRaises(ValueError):
+                    self.evaluate(selections=[receipt])
+
+    def test_refuse_retrospective_receipt_creation_after_kickoff(self):
+        with self.assertRaisesRegex(ValueError, "before kickoff"):
+            selection.make_receipt(self.pred, self.entry_quote, self.root,
+                                   "2026-10-25T01:00:00Z")
 
     def test_missing_quote_does_not_recreate_historical_offer(self):
         report = self.evaluate(quotes=[], closing=[])
@@ -141,7 +183,10 @@ class ProfitabilityContractTests(unittest.TestCase):
         result = copy.deepcopy(self.result)
         result["prediction_sha256"] = pred["sha256"]
         seal(result)
-        report = self.evaluate(predictions=[pred], quotes=[quote], results=[result], closing=[])
+        receipt = selection.make_receipt(pred, quote, self.root,
+            "2026-10-23T18:04:00Z")
+        report = self.evaluate(predictions=[pred], quotes=[quote], results=[result],
+                               closing=[], selections=[receipt])
         self.assertEqual(report["no_paper_selection"], 1)
         self.assertEqual(report["paper_selections"], 0)
         self.assertEqual(report["graded_probability_forecasts"], 1)
