@@ -18,6 +18,11 @@ on:
       - test_sports_nba_feature_cohort.py
       - sports_nba_pregame_features.py
       - test_sports_nba_pregame_features.py
+      - sports_nba_native_pregame_features.py
+      - test_sports_nba_native_pregame_features.py
+      - sports_nba_native_feature_publication.py
+      - test_sports_nba_native_feature_publication.py
+      - benchmarks/nba_native_pregame_features_v2/protocol.json
       - benchmarks/nba_pregame_features_v1/protocol.json
       - sports_nba_schedule_slots.py
       - sports_nba_games_page.py
@@ -105,6 +110,8 @@ jobs:
           python sports_nba_owned_daily_observation_v2.py --audit
           python sports_nba_postgame_observation.py --audit
           python sports_nba_postgame_observation_v2.py --audit
+          python -m unittest -v test_sports_nba_native_pregame_features test_sports_nba_native_feature_publication
+          python sports_nba_native_pregame_features.py --audit
       - name: Check game-source parser and forecast isolation
         run: python -m unittest -v test_sports_d1_feature_cohort test_sports_d1_pregame_features test_sports_fbs_feature_cohort test_sports_source_lookback test_sports_fbs_pregame_features test_sports_nba_feature_cohort test_sports_nba_pregame_features test_sports_nba_schedule_slots test_sports_expansion_observer test_sports_expansion_audit test_sports_nba_official_schedule_audit test_sports_ncaa_official_source test_sports_ncaa_espn_identity test_sports_college_nba_chronology test_sports_college_nba_eligibility test_sports_college_nba_receipts test_sports_nba_schedule_receipts test_sports_ncaa_owned_receipts test_sports_ncaa_espn_crosswalk_receipts test_sports_college_dual_source_finals test_sports_college_final_receipts test_sports_college_result_dataset test_sports_nba_final_receipts test_sports_college_d1_receipts
       - name: Retain timestamped source-only college and NBA snapshots
@@ -155,6 +162,31 @@ jobs:
             nba-daily-v2-source-observation.json
             nba-daily-v2-source-archive-audit.json
             benchmarks/nba_owned_daily_v2/captures/${{ steps.nba_daily_source_v2.outputs.capture }}/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Freeze separate native daily NBA reference features without predictions
+        id: nba_native_features_v2
+        if: steps.nba_daily_source_v2.outcome == 'success'
+        continue-on-error: true
+        run: |
+          python sports_nba_native_pregame_features.py --collect > nba-native-feature-observation-v2.json
+          python sports_nba_native_pregame_features.py --audit > nba-native-feature-audit-v2.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('nba-native-feature-observation-v2.json').read_text())
+          print('NBA_NATIVE_DAILY_FEATURE_COLLECTION='+json.dumps(report, sort_keys=True))
+          PY
+      - name: Attach separate native feature protocol, original records and replay
+        if: steps.nba_native_features_v2.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nba-native-daily-pregame-features-v2
+          path: |
+            nba-native-feature-observation-v2.json
+            nba-native-feature-audit-v2.json
+            benchmarks/nba_native_pregame_features_v2/protocol.json
+            benchmarks/nba_native_pregame_features_v2/records/
           if-no-files-found: error
           retention-days: 30
       - name: Retain previous-Eastern-date native postgame bytes without outcome enrollment
@@ -335,6 +367,7 @@ jobs:
           NBA_SCHEDULE_SOURCE: ${{ steps.nba_source.outcome }}
           NBA_DAILY_PREGAME_SOURCE: ${{ steps.nba_daily_source.outcome }}
           NBA_DAILY_PREGAME_SOURCE_V2: ${{ steps.nba_daily_source_v2.outcome }}
+          NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2: ${{ steps.nba_native_features_v2.outcome }}
           NBA_POSTGAME_NATIVE_SOURCE_V2: ${{ steps.nba_postgame_v2.outcome }}
           NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2: ${{ steps.nba_native_cohort_v2.outcome }}
           NBA_CROSS_PHASE_SOURCE_COVERAGE: ${{ steps.nba_cross_phase_coverage.outcome }}
@@ -355,10 +388,19 @@ jobs:
           from datetime import datetime, timezone
           from pathlib import Path
           outcomes = {name: os.environ[name] for name in (
-              'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE', 'NBA_DAILY_PREGAME_SOURCE', 'NBA_DAILY_PREGAME_SOURCE_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V2', 'NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2', 'NBA_CROSS_PHASE_SOURCE_COVERAGE',
+              'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE', 'NBA_DAILY_PREGAME_SOURCE', 'NBA_DAILY_PREGAME_SOURCE_V2', 'NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V2', 'NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2', 'NBA_CROSS_PHASE_SOURCE_COVERAGE',
               'NCAA_OWNED_SOURCE', 'NCAA_ESPN_CROSSWALK', 'NCAA_FINAL_RECEIPTS', 'NCAA_RESULT_DATASET', 'NBA_FINAL_REPLAY', 'NBA_FEATURE_OBSERVATIONS', 'NBA_FEATURE_COHORT_AUDIT', 'FBS_FEATURE_OBSERVATIONS', 'FBS_FEATURE_COHORT_AUDIT', 'D1_FEATURE_OBSERVATIONS', 'D1_FEATURE_COHORT_AUDIT')}
           postgame = (json.loads(Path('nba-postgame-v2-source-observation.json').read_text())
                       if outcomes['NBA_POSTGAME_NATIVE_SOURCE_V2'] == 'success' else {})
+          native_features = (json.loads(Path('nba-native-feature-observation-v2.json').read_text())
+                             if outcomes['NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2'] == 'success' else {})
+          native_feature_audit = (json.loads(Path('nba-native-feature-audit-v2.json').read_text())
+                                  if outcomes['NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2'] == 'success' else {})
+          for report in (native_features, native_feature_audit):
+              if report:
+                  assert report['NO_BET'] is True and type(report['actual_wagers']) is int and report['actual_wagers'] == 0
+                  assert report['not_a_prediction'] is True
+                  assert all(report[key] is False for key in ('forecasting_enabled', 'model_training_enabled', 'historical_evaluation_enabled', 'promotion_allowed'))
           receipt = {
               'schema': 'tyler-independent-source-workflow-status-v2',
               'recorded_at_utc': datetime.now(timezone.utc).isoformat(),
@@ -371,6 +413,14 @@ jobs:
               'new_nba_feature_collection_succeeded': outcomes['NBA_FEATURE_OBSERVATIONS'] == 'success',
               'new_separate_nba_daily_source_collection_succeeded': outcomes['NBA_DAILY_PREGAME_SOURCE'] == 'success',
               'new_separate_nba_daily_v2_source_collection_succeeded': outcomes['NBA_DAILY_PREGAME_SOURCE_V2'] == 'success',
+              'native_daily_feature_collection_checked': outcomes['NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2'] == 'success',
+              'native_daily_new_feature_observations': native_features.get('new_feature_observations'),
+              'native_daily_verified_feature_observations': native_feature_audit.get('verified_feature_observations'),
+              'native_daily_feature_source_capture': native_features.get('source_capture'),
+              'native_daily_feature_targets_withheld': len(native_features['not_enrolled']) if native_features else None,
+              'native_daily_features_require_separate_protocol': True,
+              'native_daily_original_v1_feature_gate_unchanged': True,
+              'native_daily_cross_version_feature_counts_must_not_be_pooled': True,
               'new_separate_nba_postgame_v2_capture_succeeded': outcomes['NBA_POSTGAME_NATIVE_SOURCE_V2'] == 'success',
               'nba_postgame_v2_page_status': postgame.get('page_status'),
               'nba_postgame_v2_supported_final_game_count': postgame.get('supported_final_game_count'),
@@ -420,6 +470,13 @@ jobs:
             git add benchmarks/nba_owned_daily_v2/captures
           else
             echo '::warning::Native NBA v2 daily source unavailable; no v2 capture publication'
+          fi
+          if [ "${{ steps.nba_native_features_v2.outcome }}" = "success" ]; then
+            if [ -d benchmarks/nba_native_pregame_features_v2/records ]; then
+              git add benchmarks/nba_native_pregame_features_v2/records
+            fi
+          else
+            echo '::warning::Separate native NBA feature protocol did not succeed; no native feature publication'
           fi
           if [ "${{ steps.nba_postgame_v2.outcome }}" = "success" ]; then
             git add benchmarks/nba_postgame_daily_v2/captures
