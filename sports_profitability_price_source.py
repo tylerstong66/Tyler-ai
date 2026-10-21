@@ -103,7 +103,8 @@ def observe(original_root, source, official, archived_at):
             "home": by_name[official["home_name"]],
             "away": by_name[official["away_name"]]},
         "observed_at": source["retrieved_at"],
-        "provider_updated_at": market["last_update"],
+        "aggregator_market_last_seen_at": market["last_update"],
+        "provider_updated_at": None,  # Aggregator metadata is NOT a sportsbook timestamp
         "recorded_at": archived_at, "source_snapshot": source,
         "available_to_paper": False, "last_pre_start_offering_verified": False,
         "unverified_reason": (
