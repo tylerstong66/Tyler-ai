@@ -51,7 +51,7 @@ class ProfitabilityContractTests(unittest.TestCase):
                 "sha256": hashlib.sha256(content).hexdigest(), "retrieved_at": at}
 
     def quote(self, source, phase, published, recorded, prices, verified=False):
-        return seal({**self.identity if hasattr(self, "identity") else {
+        return seal({**{
             "game_id": "2026020999", "event_id": "401899999", "home": "PHI", "away": "BOS",
             "kickoff": "2026-10-24T19:00:00Z"},
             "source_snapshot": source, "book_id": p.BOOK, "market": p.MARKET,
