@@ -42,3 +42,23 @@ visibility, source-origin truth, actual kickoff, current team strength or model
 quality. Prior-season roster/coach changes and current-season form remain
 unmodeled. No forecast, fitting, evaluation, promotion, runtime model activation
 or wagering behavior changes. NO_BET remains true and wagers remain zero.
+
+On October 21, the same auditor separately verified the remaining 45 future
+feature records against GitHub run 39594047657, created at 11:43:19 UTC on
+immutable head `f68aaf3ba2183a5a3688b1008b12dfb8407f20ac`. Every original
+freeze preceded that server observation, which preceded both sources' saved
+starts; the earliest of these games starts October 22 at 23:00 UTC. Connected
+GitHub evidence traversed the immutable tree to regular-file entries and fetched
+each original file as base64 bytes. No parsed document was treated as REST
+file metadata. The existing auditor verified exact Git/SHA-256 hashes and
+decoded bytes after replaying original source and historical dependencies.
+
+The new recipe is
+`benchmarks/fbs_pregame_reference_features_v1/publication_v1/remaining_cohort_20261021.json`.
+Use the same CLI `--replay` option for a fresh GitHub API recheck. It verifies
+45 records, overlapping two in the original five-record recipe; their union
+covers the 48 feature records present at this checkpoint. The three games
+whose saved starts had already passed are covered only by the earlier recipe;
+this later observation does not retroactively attest them. These remain
+features, not predictions. Offline CI checks retained bytes, individual
+chronology and scope, without claiming a fresh GitHub server query.
