@@ -4,6 +4,8 @@ on:
     paths:
       - sports_nfl_calibration_development.py
       - test_sports_nfl_calibration_development.py
+      - sports_nfl_rolling_calibration.py
+      - test_sports_nfl_rolling_calibration.py
       - sports_efficiency_candidate.py
       - sports_historical_benchmark.py
       - sports_benchmark_review.py
@@ -16,6 +18,8 @@ on:
     paths:
       - sports_nfl_calibration_development.py
       - test_sports_nfl_calibration_development.py
+      - sports_nfl_rolling_calibration.py
+      - test_sports_nfl_rolling_calibration.py
       - .github/workflows/nfl_calibration_development.yml
   workflow_dispatch:
 permissions:
@@ -31,9 +35,21 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install requests==2.32.5
       - name: Verify chronological fitting isolation and unchanged prospective inputs
-        run: python -m unittest -v test_sports_nfl_calibration_development test_sports_efficiency_candidate test_sports_historical_benchmark
+        run: python -m unittest -v test_sports_nfl_calibration_development test_sports_nfl_rolling_calibration test_sports_efficiency_candidate test_sports_historical_benchmark
       - name: Reconstruct fixed development experiment from pinned retrospective sources only
         run: python sports_nfl_calibration_development.py > nfl-calibration-development.json
+      - name: Evaluate separately frozen annual calibration development without live inputs
+        run: |
+          python sports_nfl_rolling_calibration.py > nfl-annual-calibration-development.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('nfl-annual-calibration-development.json').read_text())
+          assert r['NO_BET'] and r['actual_wagers'] == 0 and not r['promotion_allowed']
+          assert not r['fresh_confirmatory_holdout'] and r['forecast_changes'] == 0
+          assert r['prospective_predictions'] == 0
+          print('NFL_ANNUAL_CALIBRATION_DEVELOPMENT_REPORT='+json.dumps(r, sort_keys=True))
+          PY
       - name: Expose descriptive results and require unchanged tracked inputs
         run: |
           python - <<'PY'
@@ -51,6 +67,8 @@ jobs:
         if: always()
         with:
           name: nfl-chronological-calibration-development
-          path: nfl-calibration-development.json
+          path: |
+            nfl-calibration-development.json
+            nfl-annual-calibration-development.json
           if-no-files-found: error
           retention-days: 30
