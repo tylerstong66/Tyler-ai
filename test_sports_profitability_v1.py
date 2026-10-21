@@ -9,6 +9,7 @@ import sports_profitability_v1 as p
 
 
 def seal(value):
+    value.pop("sha256", None)
     value["sha256"] = p.hash_record(value)
     return value
 
