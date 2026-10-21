@@ -1,6 +1,8 @@
 """Synthetic only: never contributes to prospective evidence or a wagering record."""
 import copy
 import hashlib
+import json
+import math
 import tempfile
 import unittest
 from pathlib import Path
@@ -31,11 +33,26 @@ class ProfitabilityContractTests(unittest.TestCase):
                          "kickoff": "2026-10-24T19:00:00Z"}
         self.entry_quote = self.quote(self.entry, "entry", "2026-10-23T17:59:00Z",
                                       "2026-10-23T18:01:00Z", {"home": -110, "away": 110})
+        feature = (math.log(.60 / .40) - p.MODEL_WEIGHTS[0]) / p.MODEL_WEIGHTS[1]
+        self.original = seal({**self.identity, "sport": "NHL",
+                              "generated_at": "2026-10-23T18:02:00Z",
+                              "recorded_at": "2026-10-23T18:02:10Z",
+                              "model_sha256": p.MODEL_SHA,
+                              "features": [1, feature],
+                              "model": {"home": .60, "away": .40},
+                              "NO_BET": True, "actual_wagers": 0})
+        original_path = "benchmarks/two_way_prospective/nhl/predictions/2026020999.json"
+        original_bytes = (json.dumps(self.original, sort_keys=True, indent=2) + "\n").encode()
+        self.original_archive = self.source(original_path, original_bytes,
+            "https://github.com/tylerstong66/Tyler-ai/blob/main/" + original_path,
+            "2026-10-23T18:02:30Z")
         self.pred = seal({**self.identity, "generated_at": "2026-10-23T18:02:00Z",
                           "recorded_at": "2026-10-23T18:03:00Z",
                           "model_sha256": p.MODEL_SHA,
                           "probabilities": {"home": .60, "away": .40},
                           "entry_quote_sha256": self.entry_quote["sha256"],
+                          "source_prediction_sha256": self.original["sha256"],
+                          "source_prediction_archive": self.original_archive,
                           "NO_BET": True, "actual_wagers": 0})
         self.result = seal({**self.identity, "prediction_sha256": self.pred["sha256"],
                             "independent_final_verified": True, "outcome": "home",
@@ -47,6 +64,7 @@ class ProfitabilityContractTests(unittest.TestCase):
                                       verified=True)
 
     def source(self, path, content, url, at):
+        (self.root / path).parent.mkdir(parents=True, exist_ok=True)
         (self.root / path).write_bytes(content)
         return {"path": path, "source_url": url,
                 "sha256": hashlib.sha256(content).hexdigest(), "retrieved_at": at}
@@ -99,17 +117,54 @@ class ProfitabilityContractTests(unittest.TestCase):
         self.assertEqual(report["paper_selections"], 0)
 
     def test_low_edge_no_selection_still_scores_probability(self):
+        quote = copy.deepcopy(self.entry_quote)
+        quote["prices"] = {"home": -200, "away": 110}
+        seal(quote)
         pred = copy.deepcopy(self.pred)
-        pred["probabilities"] = {"home": 0.52, "away": 0.48}
+        pred["entry_quote_sha256"] = quote["sha256"]
         seal(pred)
         result = copy.deepcopy(self.result)
         result["prediction_sha256"] = pred["sha256"]
         seal(result)
-        report = self.evaluate(predictions=[pred], results=[result], closing=[])
+        report = self.evaluate(predictions=[pred], quotes=[quote], results=[result], closing=[])
         self.assertEqual(report["no_paper_selection"], 1)
         self.assertEqual(report["paper_selections"], 0)
         self.assertEqual(report["graded_probability_forecasts"], 1)
         self.assertIsNone(report["paper_roi"])
+
+    def test_cannot_claim_different_probabilities_under_frozen_model_sha(self):
+        altered = copy.deepcopy(self.pred)
+        altered["probabilities"] = {"home": .75, "away": .25}
+        seal(altered)
+        with self.assertRaisesRegex(ValueError, "replay/paper probability mismatch"):
+            self.evaluate(predictions=[altered], closing=[])
+
+    def test_original_frozen_forecast_model_fingerprint_and_archive_must_match(self):
+        altered = copy.deepcopy(self.pred)
+        altered["source_prediction_sha256"] = "f" * 64
+        seal(altered)
+        with self.assertRaisesRegex(ValueError, "digest linkage"):
+            self.evaluate(predictions=[altered], closing=[])
+        original_path = self.root / self.original_archive["path"]
+        original_path.write_bytes(original_path.read_bytes() + b" ")
+        with self.assertRaisesRegex(ValueError, "original source bytes|SHA-256"):
+            self.evaluate(closing=[])
+
+    def test_original_model_features_cannot_be_faked_even_if_rehashed(self):
+        bad_original = copy.deepcopy(self.original)
+        bad_original["features"][1] += 1
+        seal(bad_original)
+        path = self.original_archive["path"]
+        contents = (json.dumps(bad_original, sort_keys=True, indent=2) + "\n").encode()
+        (self.root / path).write_bytes(contents)
+        updated_source = copy.deepcopy(self.original_archive)
+        updated_source["sha256"] = hashlib.sha256(contents).hexdigest()
+        pred = copy.deepcopy(self.pred)
+        pred["source_prediction_sha256"] = bad_original["sha256"]
+        pred["source_prediction_archive"] = updated_source
+        seal(pred)
+        with self.assertRaisesRegex(ValueError, "replay/paper probability mismatch"):
+            self.evaluate(predictions=[pred], closing=[])
 
     def test_tampering_and_past_start_are_rejected(self):
         wrong = copy.deepcopy(self.entry_quote)

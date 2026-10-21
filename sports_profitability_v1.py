@@ -15,6 +15,7 @@ from urllib.parse import urlsplit
 
 ACTIVATION = "2026-10-23T00:00:00Z"
 MODEL_SHA = "3ea760cc52051c9c094ffe33a9a2580256bbf7ab806f580babf7d217c039df3f"
+MODEL_WEIGHTS = (0.08981297050934907, 0.4061517553742856)  # Frozen baseline model.json
 BOOK = "draftkings"
 MARKET = "nhl_full_game_moneyline_including_overtime_shootout"
 MIN_EV = 0.05
@@ -99,6 +100,55 @@ def check_prediction(prediction):
         raise ValueError("Forecast is not prior to original start")
     if not isinstance(prediction.get("entry_quote_sha256"), str):
         raise ValueError("Frozen original price fingerprint missing")
+
+
+
+def verify_original_prediction(pred, root):
+    """Tie the paper forecast to exact archived NHL baseline bytes and replay weights.
+
+    This does not certify that GitHub or the odds publisher had the data at the
+    claimed timestamp: separately retained server-attested receipts are required.
+    """
+    source = pred.get("source_prediction_archive")
+    if not isinstance(source, dict):
+        raise ValueError("Archived original frozen prediction required")
+    expected_path = ("benchmarks/two_way_prospective/nhl/predictions/"
+                     + str(pred["game_id"]) + ".json")
+    if source.get("path") != expected_path:
+        raise ValueError("Original forecast must use pinned NHL baseline archive path")
+    verify_original(source, root)
+    original = json.loads((Path(root) / expected_path).read_bytes())
+    verify_record(original)
+    same_event(pred, original)
+    if original.get("sport") != "NHL" or original.get("model_sha256") != MODEL_SHA:
+        raise ValueError("Original baseline NHL model identity mismatch")
+    if original["sha256"] != pred.get("source_prediction_sha256"):
+        raise ValueError("Original frozen prediction digest linkage mismatch")
+    if (original.get("generated_at") != pred["generated_at"]
+            or utc(original["recorded_at"]) > utc(pred["recorded_at"])
+            or utc(original["recorded_at"]) < utc(ACTIVATION)
+            or utc(source["retrieved_at"]) < utc(original["recorded_at"])
+            or utc(source["retrieved_at"]) > utc(pred["recorded_at"])):
+        raise ValueError("Original frozen forecast/archive chronology mismatch")
+    x = original.get("features")
+    if not isinstance(x, list) or len(x) != 2 or x[0] != 1 or (
+            isinstance(x[0], bool) or isinstance(x[1], bool) or
+            not isinstance(x[1], (int, float)) or
+            not math.isfinite(x[1]) or abs(x[1]) > 50):
+        raise ValueError("Original frozen NHL Elo features invalid")
+    z = MODEL_WEIGHTS[0] + MODEL_WEIGHTS[1] * x[1]
+    replayed_home = 1 / (1 + math.exp(-z))
+    src = original.get("model")
+    if not isinstance(src, dict) or set(src) != {"home", "away"}:
+        raise ValueError("Original NHL model outputs missing")
+    for side, expected in (("home", replayed_home), ("away", 1 - replayed_home)):
+        if not isinstance(src[side], (int, float)) or isinstance(src[side], bool) or (
+                not math.isfinite(src[side]) or
+                not math.isclose(src[side], expected, rel_tol=0, abs_tol=1e-12) or
+                not math.isclose(pred["probabilities"][side], src[side],
+                                 rel_tol=0, abs_tol=1e-12)):
+            raise ValueError("Frozen source model replay/paper probability mismatch")
+    return True
 
 
 def check_quote(quote, pred, root, phase):
@@ -210,6 +260,7 @@ def evaluate(predictions, entry_quotes, settlements, closing_quotes=(), archive_
         if utc(pred["recorded_at"]) < utc(ACTIVATION):
             prior_activation += 1
             continue
+        verify_original_prediction(pred, archive_root)
         quote = quote_by_id.get(game)
         if quote is None:
             unpriced += 1
