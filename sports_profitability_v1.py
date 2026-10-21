@@ -210,6 +210,8 @@ def check_result(result, pred, root):
         hosts.add(urlsplit(source["source_url"]).hostname)
     if len(hosts) != 2:
         raise ValueError("Two genuinely distinct final-source hosts required")
+    from sports_profitability_nhl_finals import verify_final_sources
+    verify_final_sources(pred, result, evidence, root)
     return True
 
 

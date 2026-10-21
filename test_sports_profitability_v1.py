@@ -25,10 +25,24 @@ class ProfitabilityContractTests(unittest.TestCase):
                                  "2026-10-23T18:00:00Z")
         self.closing = self.source("closing.json", b'{"synthetic":"closing"}', "https://example.com/closing",
                                    "2026-10-24T18:58:00Z")
-        self.final1 = self.source("official.json", b'{"synthetic":"final1"}', "https://api-web.nhle.com/official",
-                                  "2026-10-25T02:00:00Z")
-        self.final2 = self.source("independent.json", b'{"synthetic":"final2"}', "https://site.api.espn.com/independent",
-                                  "2026-10-25T02:01:00Z")
+        self.official_final = {"id": 2026020999, "gameType": 2,
+            "gameState": "OFF", "gameScheduleState": "OK",
+            "startTimeUTC": "2026-10-24T19:00:00Z",
+            "homeTeam": {"id": 22, "abbrev": "PHI", "score": 3},
+            "awayTeam": {"id": 6, "abbrev": "BOS", "score": 2}}
+        self.espn_final = {"events": [{
+            "id": "401899999", "date": "2026-10-24T19:00:00Z",
+            "status": {"type": {"state": "post", "completed": True}},
+            "competitions": [{"competitors": [
+                {"homeAway": "home", "team": {"abbreviation": "PHI"}, "score": "3"},
+                {"homeAway": "away", "team": {"abbreviation": "BOS"}, "score": "2"}
+            ]}]}]}
+        self.final1 = self.source("official.json", json.dumps(self.official_final).encode(),
+            "https://api-web.nhle.com/v1/gamecenter/2026020999/landing",
+            "2026-10-25T02:00:00Z")
+        self.final2 = self.source("independent.json", json.dumps(self.espn_final).encode(),
+            "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261024",
+            "2026-10-25T02:01:00Z")
         self.identity = {"game_id": "2026020999", "event_id": "401899999", "home": "PHI", "away": "BOS",
                          "kickoff": "2026-10-24T19:00:00Z"}
         self.entry_quote = self.quote(self.entry, "entry", "2026-10-23T17:59:00Z",
@@ -56,6 +70,7 @@ class ProfitabilityContractTests(unittest.TestCase):
                           "NO_BET": True, "actual_wagers": 0})
         self.result = seal({**self.identity, "prediction_sha256": self.pred["sha256"],
                             "independent_final_verified": True, "outcome": "home",
+                            "scores": {"home": 3, "away": 2},
                             "verified_at": "2026-10-25T02:02:00Z",
                             "final_sources": [self.final1, self.final2],
                             "NO_BET": True, "actual_wagers": 0})
@@ -214,6 +229,64 @@ class ProfitabilityContractTests(unittest.TestCase):
         seal(bad)
         with self.assertRaisesRegex(ValueError, "identity"):
             self.evaluate(results=[bad], closing=[])
+
+    def test_reject_final_winner_mislabel_even_with_valid_saved_hash(self):
+        modified = copy.deepcopy(self.result)
+        modified["outcome"] = "away"
+        seal(modified)
+        with self.assertRaisesRegex(ValueError, "winner"):
+            self.evaluate(results=[modified], closing=[])
+
+    def test_reject_false_reported_scores_even_when_result_rehashed(self):
+        modified = copy.deepcopy(self.result)
+        modified["scores"]["home"] = 4
+        seal(modified)
+        with self.assertRaisesRegex(ValueError, "scores"):
+            self.evaluate(results=[modified], closing=[])
+
+    def test_reject_independent_espn_score_disagreement_even_with_matching_hash(self):
+        data = copy.deepcopy(self.espn_final)
+        data["events"][0]["competitions"][0]["competitors"][0]["score"] = "4"
+        raw = json.dumps(data).encode()
+        (self.root / "independent.json").write_bytes(raw)
+        edited = copy.deepcopy(self.result)
+        edited["final_sources"][1]["sha256"] = hashlib.sha256(raw).hexdigest()
+        seal(edited)
+        with self.assertRaisesRegex(ValueError, "disagree"):
+            self.evaluate(results=[edited], closing=[])
+
+    def test_reject_espn_start_or_opponent_mismatch_not_rewritten_from_result(self):
+        for key, value in (("date", "2026-10-24T19:01:00Z"),
+                           ("team", "TOR")):
+            with self.subTest(key=key):
+                data = copy.deepcopy(self.espn_final)
+                if key == "date":
+                    data["events"][0]["date"] = value
+                else:
+                    data["events"][0]["competitions"][0]["competitors"][1]["team"]["abbreviation"] = value
+                raw = json.dumps(data).encode()
+                (self.root / "independent.json").write_bytes(raw)
+                edited = copy.deepcopy(self.result)
+                edited["final_sources"][1]["sha256"] = hashlib.sha256(raw).hexdigest()
+                seal(edited)
+                with self.assertRaises(ValueError):
+                    self.evaluate(results=[edited], closing=[])
+
+    def test_reject_unrelated_final_bytes_from_correct_source_hosts(self):
+        raw = json.dumps({"events": []}).encode()
+        (self.root / "independent.json").write_bytes(raw)
+        changed = copy.deepcopy(self.result)
+        changed["final_sources"][1]["sha256"] = hashlib.sha256(raw).hexdigest()
+        seal(changed)
+        with self.assertRaisesRegex(ValueError, "Exactly one pinned ESPN"):
+            self.evaluate(results=[changed], closing=[])
+
+    def test_reject_final_source_recorded_before_original_event_started(self):
+        altered = copy.deepcopy(self.result)
+        altered["final_sources"][0]["retrieved_at"] = "2026-10-24T18:59:00Z"
+        seal(altered)
+        with self.assertRaisesRegex(ValueError, "obtained after kickoff"):
+            self.evaluate(results=[altered], closing=[])
 
     def test_original_archive_bytes_required(self):
         (self.root / "entry.json").write_bytes(b"tampered")
