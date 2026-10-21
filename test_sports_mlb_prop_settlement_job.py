@@ -7,6 +7,7 @@ import unittest
 from pathlib import Path
 
 from sports_mlb_prop_settlement_job import settle_ready_records
+from sports_mlb_prop_settlement_job import _BatchFinalReader
 from sports_mlb_prop_prospective import freeze_pregame_hit_props, write_exclusive_json, _seal
 from test_sports_mlb_prop_prospective import OfficialReader, AFTER
 
@@ -36,6 +37,55 @@ class SettlementScheduleTests(unittest.TestCase):
             report=settle_ready_records(d,reader=reader)
             self.assertEqual((report["pending"],report["settled"]),(1,0))
             self.assertEqual(json.loads(path.read_text()),original)
+
+    def test_one_official_snapshot_is_shared_by_status_check_and_same_game_hitters(self):
+        with tempfile.TemporaryDirectory() as folder:
+            reader, record, first = self.populate(folder, 2)
+            reader.now = AFTER; reader.final = True
+            calls = []
+            load = reader.load
+            def changing_load(path, params=None, api_version='v1'):
+                calls.append(path)
+                data, source = load(path, params, api_version)
+                # A later request would revise this final box score. The batch
+                # must use one original response consistently, not mix polls.
+                if len(calls) > 1:
+                    data['liveData']['boxscore']['teams']['away']['players']['ID683734']['stats']['batting']['hits'] = 0
+                return data, source
+            reader.load = changing_load
+            before = {p.name: p.read_bytes() for p in first.parent.glob('*.json')}
+            report = settle_ready_records(folder, reader=reader)
+            self.assertEqual(calls, ['game/849810/feed/live'])
+            self.assertEqual(report['attempted_official_checks'], 2)
+            self.assertEqual(report['official_game_source_fetches'], 1)
+            settled = json.loads((Path(folder)/'settlements'/first.name).read_text())
+            self.assertEqual(settled['final_official_batting_stats']['hits'], 1)
+            self.assertEqual(before, {p.name: p.read_bytes() for p in first.parent.glob('*.json')})
+
+    def test_source_cache_expires_between_runs_and_pending_is_not_reused(self):
+        with tempfile.TemporaryDirectory() as folder:
+            reader, record, first = self.prepare(folder)
+            reader.now = AFTER
+            first_run = settle_ready_records(folder, reader=reader)
+            self.assertEqual(first_run['pending'], 1)
+            reader.final = True
+            second = settle_ready_records(folder, reader=reader)
+            self.assertEqual((second['settled'], second['official_game_source_fetches']), (1, 1))
+            reader.audit.clear()
+            third = settle_ready_records(folder, reader=reader)
+            self.assertEqual((third['already_settled'], third['official_game_source_fetches']), (1, 0))
+            self.assertEqual(reader.audit, [])
+
+    def test_returned_payload_or_receipt_mutation_cannot_change_shared_original(self):
+        reader = OfficialReader(); reader.now = AFTER; reader.final = True
+        batch = _BatchFinalReader(reader)
+        data, source = batch.load('game/849810/feed/live', api_version='v1.1')
+        data['gameData']['status']['abstractGameState'] = 'Preview'
+        source['response_sha256'] = 'modified'
+        again, receipt = batch.load('game/849810/feed/live', api_version='v1.1')
+        self.assertEqual(again['gameData']['status']['abstractGameState'], 'Final')
+        self.assertEqual(receipt['response_sha256'], 'synthetic')
+        self.assertEqual(len(reader.audit), 1)
 
     def test_verified_final_creates_separate_settlement_and_is_idempotent(self):
         with tempfile.TemporaryDirectory() as d:
@@ -171,6 +221,7 @@ class SettlementScheduleTests(unittest.TestCase):
             reader.now=AFTER; reader.final=True; self.shifted_reader(reader)
             outcome=settle_ready_records(root,reader=reader)
             self.assertEqual((outcome["settled"],outcome["unresolved"]),(1,1))
+            self.assertEqual(outcome['official_game_source_fetches'], 2)
             self.assertFalse((Path(root)/"settlements"/path.name).exists())
             self.assertEqual(json.loads((Path(root)/"settlements"/other.name).read_text())["status"],
                              "SETTLED_CONDITIONAL")
