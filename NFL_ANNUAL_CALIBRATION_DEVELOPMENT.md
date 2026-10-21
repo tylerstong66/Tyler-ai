@@ -40,3 +40,19 @@ remain assumptions; historical market prices are untimestamped references.
 Even favorable losses cannot authorize promotion, model selection or wagering.
 Any production candidate needs a separate frozen forward protocol and new
 prospective games. NO_BET=true, actual wagers zero, promotion disabled.
+
+The first actual run evaluated 815 games (813 decisive) across 54 season/week
+blocks. Annual calibration worsened decisive Brier from 0.4487592 to 0.4516064
+and log loss from 0.6398104 to 0.6430794. The paired Brier difference was
++0.0028472 (descriptive 95% interval -0.0017360 to +0.0071023); log-loss
+difference +0.0032691 (-0.0022139 to +0.0083523). Classification accuracy rose
+only from 63.96% to 64.45%. This provides no adoption support.
+
+The complete retained report is in
+`benchmarks/nfl_annual_calibration_development_v1/DEVELOPMENT_RESULT.json`.
+Its local replay exactly matched the actual JSON emitted by successful GitHub
+run 39594197538, job 119202341722, for recipe commit
+`07dcbd2b4392b54c15079d4812b9ca6aa1f18427`. Tests and dedicated CI require
+semantic equality with that full result. The fixed recipe remains unchanged
+after this negative result; neither earlier experiment nor prospective ledger
+is rewritten.

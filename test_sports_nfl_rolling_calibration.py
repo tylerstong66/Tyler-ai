@@ -1,5 +1,6 @@
 """Synthetic annual fitting isolation; never fit on the live NFL cohort."""
 import copy
+import json
 from dataclasses import replace
 from pathlib import Path
 import tempfile
@@ -21,6 +22,16 @@ def rows():
 
 
 class AnnualCalibrationTests(unittest.TestCase):
+    def test_retained_actual_report_replays_exactly_and_does_not_support_adoption(self):
+        retained = json.loads((Path(__file__).parent/
+            'benchmarks/nfl_annual_calibration_development_v1/DEVELOPMENT_RESULT.json').read_text())
+        report = rolling.run(Path(__file__).parent)
+        self.assertEqual(report, retained['report'])
+        self.assertEqual(retained['decision'], 'NO_ADOPTION_SUPPORTED_BY_PROPER_LOSSES')
+        for loss in ('brier', 'log_loss'):
+            self.assertGreater(report['paired_calibrated_minus_uncalibrated']['mean'][loss], 0)
+        self.assertFalse(report['promotion_allowed'])
+
     def test_each_year_has_disjoint_prior_only_fitting_roles(self):
         for year in (2022, 2023, 2024):
             train, fit, evaluation = rolling.roles(rows(), year)

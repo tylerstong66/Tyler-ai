@@ -12,6 +12,7 @@ on:
       - benchmarks/nfl_efficiency_v2/**
       - benchmarks/nfl_independent_v1/**
       - benchmarks/nfl_calibration_development_v1/**
+      - benchmarks/nfl_annual_calibration_development_v1/**
       - .github/workflows/nfl_calibration_development.yml
   push:
     branches: [main]
@@ -48,6 +49,8 @@ jobs:
           assert r['NO_BET'] and r['actual_wagers'] == 0 and not r['promotion_allowed']
           assert not r['fresh_confirmatory_holdout'] and r['forecast_changes'] == 0
           assert r['prospective_predictions'] == 0
+          retained = json.loads(Path('benchmarks/nfl_annual_calibration_development_v1/DEVELOPMENT_RESULT.json').read_text())
+          assert r == retained['report'], 'Fixed annual calibration development report changed'
           print('NFL_ANNUAL_CALIBRATION_DEVELOPMENT_REPORT='+json.dumps(r, sort_keys=True))
           PY
       - name: Expose descriptive results and require unchanged tracked inputs
