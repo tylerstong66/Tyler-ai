@@ -65,7 +65,7 @@
     "completion_note": "Manifest completion alone does not imply absence of per-game errors.",
     "errors": [],
     "excluded": [],
-    "latest_manifest": "benchmarks/two_way_prospective/nhl/captures/20261021T192126627325Z/manifest.json",
+    "latest_manifest": "benchmarks/two_way_prospective/nhl/captures/20261021T232004107494Z/manifest.json",
     "newer_saved_collection_failure": null,
     "optional_availability_errors": []
   },
@@ -182,10 +182,10 @@
     }
   },
   "first_100_checkpoint": {
-    "additional_forecasts_needed": 30,
-    "pending_selected": 2,
+    "additional_forecasts_needed": 25,
+    "pending_selected": 7,
     "promotion_allowed": false,
-    "selected_forecasts": 70,
+    "selected_forecasts": 75,
     "selection_rule": "First 100 by recorded_at in UTC, then game_id; never by outcome, price or settlement order.",
     "settled_selected": 68,
     "status": "collecting_forecasts",
@@ -194,7 +194,7 @@
   },
   "full_outcome_calibration": null,
   "input_integrity": "verified",
-  "input_sha256": "19dad3bae1293d6ff9ec4ddd618eb7bd9c1c75653799f5a9c06af78abebb352d",
+  "input_sha256": "c78f2d930bc6c770567f79390282ce4c0139b8bc732e1b25de49f390c731f95f",
   "latest_result_verified_at": "2026-10-21T10:09:03.373760+00:00",
   "limitation": "Experimental descriptive results. NFL uncertainty uses season/week blocks; NHL/MLB use Eastern game-date blocks. Blocks can still be dependent. Intervals require at least five blocks and are unavailable below that; five blocks or 100 settled games does not establish a betting edge. Repeated monitoring intervals are not sequential significance tests. No model promotion, forecast changes, wagers, or profits are inferred.",
   "paired_differences": {
@@ -421,9 +421,9 @@
       }
     }
   },
-  "pending": 2,
+  "pending": 7,
   "probability_policy": "Saved pregame probabilities only; NFL binary metrics condition on no tie.",
-  "recorded": 70,
+  "recorded": 75,
   "report_version": "prospective-review-v2",
   "review_due": false,
   "review_milestone": 100,
