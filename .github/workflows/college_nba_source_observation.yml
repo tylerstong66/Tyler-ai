@@ -32,6 +32,8 @@ on:
       - test_sports_nba_receipt_coverage.py
       - sports_nba_postgame_observation.py
       - sports_nba_postgame_observation_v2.py
+      - sports_nba_postgame_observation_v3.py
+      - test_sports_nba_postgame_observation_v3.py
       - test_sports_nba_postgame_observation_v2.py
       - sports_nba_final_games_page_v2.py
       - sports_nba_owned_daily_observation_v2.py
@@ -110,6 +112,8 @@ jobs:
           python sports_nba_owned_daily_observation_v2.py --audit
           python sports_nba_postgame_observation.py --audit
           python sports_nba_postgame_observation_v2.py --audit
+          python -m unittest -q test_sports_nba_postgame_observation_v3
+          python sports_nba_postgame_observation_v3.py --audit
           python -m unittest -v test_sports_nba_native_pregame_features test_sports_nba_native_feature_publication
           python sports_nba_native_pregame_features.py --audit
       - name: Check game-source parser and forecast isolation
@@ -215,6 +219,41 @@ jobs:
             nba-postgame-v2-source-observation.json
             nba-postgame-v2-source-replay.json
             benchmarks/nba_postgame_daily_v2/captures/${{ steps.nba_postgame_v2.outputs.capture }}/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Retain separate Final-break v3 original NBA postgame bytes without grading
+        id: nba_postgame_v3
+        if: steps.audit.outcome == 'success'
+        continue-on-error: true
+        run: |
+          python sports_nba_postgame_observation_v3.py --collect --days-back 1 > nba-postgame-v3-source-observation.json
+          python sports_nba_postgame_observation_v3.py --audit > nba-postgame-v3-source-replay.json
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from sports_expansion_observer import utc
+          receipt = json.loads(Path('nba-postgame-v3-source-observation.json').read_text())
+          assert receipt['NO_BET'] is True and type(receipt['actual_wagers']) is int and receipt['actual_wagers'] == 0
+          assert type(receipt['supported_final_game_count']) is int
+          assert receipt['outcomes_enrolled'] == 0
+          assert all(receipt[key] is False for key in (
+              'independent_final_agreement_verified', 'official_final_results_verified',
+              'settlement_enabled', 'forecasting_enabled', 'historical_evaluation_enabled',
+              'model_training_enabled', 'promotion_allowed', 'feature_backfill_allowed'))
+          stamp = utc(receipt['recorded_at_utc']).strftime('%Y%m%dT%H%M%S%fZ')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('capture='+stamp+chr(10))
+          PY
+      - name: Attach independent Final-break v3 source receipt and original bytes
+        if: steps.nba_postgame_v3.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nba-native-v3-postgame-source
+          path: |
+            nba-postgame-v3-source-observation.json
+            nba-postgame-v3-source-replay.json
+            benchmarks/nba_postgame_daily_v3/captures/${{ steps.nba_postgame_v3.outputs.capture }}/
           if-no-files-found: error
           retention-days: 30
       - name: Replay and audit distinct native NBA source games across pregame and postgame receipts
@@ -369,6 +408,7 @@ jobs:
           NBA_DAILY_PREGAME_SOURCE_V2: ${{ steps.nba_daily_source_v2.outcome }}
           NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2: ${{ steps.nba_native_features_v2.outcome }}
           NBA_POSTGAME_NATIVE_SOURCE_V2: ${{ steps.nba_postgame_v2.outcome }}
+          NBA_POSTGAME_NATIVE_SOURCE_V3: ${{ steps.nba_postgame_v3.outcome }}
           NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2: ${{ steps.nba_native_cohort_v2.outcome }}
           NBA_CROSS_PHASE_SOURCE_COVERAGE: ${{ steps.nba_cross_phase_coverage.outcome }}
           NCAA_OWNED_SOURCE: ${{ steps.ncaa_source.outcome }}
@@ -388,10 +428,12 @@ jobs:
           from datetime import datetime, timezone
           from pathlib import Path
           outcomes = {name: os.environ[name] for name in (
-              'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE', 'NBA_DAILY_PREGAME_SOURCE', 'NBA_DAILY_PREGAME_SOURCE_V2', 'NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V2', 'NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2', 'NBA_CROSS_PHASE_SOURCE_COVERAGE',
+              'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE', 'NBA_DAILY_PREGAME_SOURCE', 'NBA_DAILY_PREGAME_SOURCE_V2', 'NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V3', 'NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2', 'NBA_CROSS_PHASE_SOURCE_COVERAGE',
               'NCAA_OWNED_SOURCE', 'NCAA_ESPN_CROSSWALK', 'NCAA_FINAL_RECEIPTS', 'NCAA_RESULT_DATASET', 'NBA_FINAL_REPLAY', 'NBA_FEATURE_OBSERVATIONS', 'NBA_FEATURE_COHORT_AUDIT', 'FBS_FEATURE_OBSERVATIONS', 'FBS_FEATURE_COHORT_AUDIT', 'D1_FEATURE_OBSERVATIONS', 'D1_FEATURE_COHORT_AUDIT')}
           postgame = (json.loads(Path('nba-postgame-v2-source-observation.json').read_text())
                       if outcomes['NBA_POSTGAME_NATIVE_SOURCE_V2'] == 'success' else {})
+          postgame_v3 = (json.loads(Path('nba-postgame-v3-source-observation.json').read_text())
+                         if outcomes['NBA_POSTGAME_NATIVE_SOURCE_V3'] == 'success' else {})
           native_features = (json.loads(Path('nba-native-feature-observation-v2.json').read_text())
                              if outcomes['NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2'] == 'success' else {})
           native_feature_audit = (json.loads(Path('nba-native-feature-audit-v2.json').read_text())
@@ -424,6 +466,11 @@ jobs:
               'new_separate_nba_postgame_v2_capture_succeeded': outcomes['NBA_POSTGAME_NATIVE_SOURCE_V2'] == 'success',
               'nba_postgame_v2_page_status': postgame.get('page_status'),
               'nba_postgame_v2_supported_final_game_count': postgame.get('supported_final_game_count'),
+              'new_separate_nba_postgame_v3_capture_succeeded': outcomes['NBA_POSTGAME_NATIVE_SOURCE_V3'] == 'success',
+              'nba_postgame_v3_page_status': postgame_v3.get('page_status'),
+              'nba_postgame_v3_supported_final_game_count': postgame_v3.get('supported_final_game_count'),
+              'nba_postgame_v3_independent_final_agreement_verified': False,
+              'nba_postgame_v3_original_v1_v2_receipts_unchanged': True,
               'nba_postgame_capture_does_not_certify_independent_finals': True,
               'native_daily_frozen_feature_lifecycle_checked': outcomes['NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2'] == 'success',
               'native_cross_phase_source_coverage_checked': outcomes['NBA_CROSS_PHASE_SOURCE_COVERAGE'] == 'success',
@@ -482,6 +529,11 @@ jobs:
             git add benchmarks/nba_postgame_daily_v2/captures
           else
             echo '::warning::Native NBA postgame capture unavailable; no postgame receipt publication'
+          fi
+          if [ "${{ steps.nba_postgame_v3.outcome }}" = "success" ]; then
+            git add benchmarks/nba_postgame_daily_v3/captures
+          else
+            echo '::warning::Separate Final-break NBA source unavailable; do not publish unverified v3 capture'
           fi
           if [ "${{ steps.nba_source.outcome }}" = "success" ]; then
             git add benchmarks/college_nba_source_v1/nba_official
