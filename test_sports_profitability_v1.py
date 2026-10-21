@@ -99,7 +99,7 @@ class ProfitabilityContractTests(unittest.TestCase):
 
     def test_low_edge_no_selection_still_scores_probability(self):
         pred = copy.deepcopy(self.pred)
-        pred["probabilities"] = {"home": 0.5, "away": 0.5}
+        pred["probabilities"] = {"home": 0.52, "away": 0.48}
         seal(pred)
         result = copy.deepcopy(self.result)
         result["prediction_sha256"] = pred["sha256"]
