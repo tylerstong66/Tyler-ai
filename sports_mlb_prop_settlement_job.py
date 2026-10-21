@@ -4,8 +4,10 @@ Writes only *new* settlement records. It never edits or refreshes pregame
 predictions, betting records, sportsbook odds or deployed Tyler services.
 """
 import argparse
+import copy
 import json
 from pathlib import Path
+import re
 
 from sports_mlb_prop_prospective import (
     _verify, settle_frozen_hit_props, write_exclusive_json,
@@ -14,6 +16,28 @@ from sports_mlb_prop_prospective import (
 from sports_mlb_sources import OfficialMlbReader, utc
 
 DEFAULT_ROOT="benchmarks/mlb_hitter_props_shadow_v1"
+
+
+class _BatchFinalReader:
+    """One original game response per run, isolated from caller mutation.
+
+    This cache never survives a settlement invocation. A pending or incomplete
+    final is fetched again on the next run, with its new original receipt.
+    """
+    def __init__(self, reader):
+        self.reader = reader
+        self.responses = {}
+
+    def clock(self):
+        return self.reader.clock()
+
+    def load(self, path, params=None, api_version='v1'):
+        if (not isinstance(path, str) or not re.fullmatch(r'game/[1-9][0-9]*/feed/live', path)
+                or params not in (None, {}) or api_version != 'v1.1'):
+            raise ValueError('Batch settlement only reads fixed official game feeds')
+        if path not in self.responses:
+            self.responses[path] = copy.deepcopy(self.reader.load(path, api_version='v1.1'))
+        return copy.deepcopy(self.responses[path])
 
 
 def settle_ready_records(root=DEFAULT_ROOT, *, reader=None, max_files=100):
@@ -33,6 +57,7 @@ def settle_ready_records(root=DEFAULT_ROOT, *, reader=None, max_files=100):
         return {"discovered":0,"settled":0,"pending":0,"unresolved":0,
                 "already_settled":0,"files":[],"unresolved_files":[],
                 "eligible_unsettled":0,"attempted_official_checks":0,
+                "official_game_source_fetches":0,
                 "deferred_due_to_batch_cap":0,"batch_window":None,
                 "batch_window_count":0}
     reader=reader or OfficialMlbReader()
@@ -80,8 +105,9 @@ def settle_ready_records(root=DEFAULT_ROOT, *, reader=None, max_files=100):
     unresolved_files=[]
     done=0
     files=[]
+    batch_reader = _BatchFinalReader(reader)
     for kickoff,game,hitter,path,record,target in selected:
-        official,_=reader.load("game/"+str(game)+"/feed/live",api_version="v1.1")
+        official,_=batch_reader.load("game/"+str(game)+"/feed/live",api_version="v1.1")
         status=official.get("gameData",{}).get("status",{})
         if official.get("gamePk")!=game:
             raise ValueError("Official live MLB result gamePk mismatches frozen file.")
@@ -91,7 +117,7 @@ def settle_ready_records(root=DEFAULT_ROOT, *, reader=None, max_files=100):
         try:
             # Independently verifies MLB final source, team/player identity,
             # counts and timestamp against the saved pregame forecast.
-            result=settle_frozen_hit_props(record,reader=reader)
+            result=settle_frozen_hit_props(record,reader=batch_reader)
         except OfficialStartTimeConflictError as error:
             # The direct settlement validator has already rejected this exact
             # player-game after checking strict final status and both teams.
@@ -124,6 +150,7 @@ def settle_ready_records(root=DEFAULT_ROOT, *, reader=None, max_files=100):
         "already_settled":existing,"files":files,
         "eligible_unsettled":len(candidates),
         "attempted_official_checks":len(selected),
+        "official_game_source_fetches":len(batch_reader.responses),
         "deferred_due_to_batch_cap":deferred,
         "batch_window":window,"batch_window_count":window_count,
         "only_separate_result_files_written":True,"wagers":0,
