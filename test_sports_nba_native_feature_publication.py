@@ -1,9 +1,10 @@
 """Synthetic server responses never attest actual native feature publication."""
 import base64
 import copy
-from datetime import timedelta
+from datetime import datetime, timedelta
 import hashlib
 import json
+from pathlib import Path
 import unittest
 
 import sports_nba_native_feature_publication as publication
@@ -72,6 +73,31 @@ class NativePublicationTests(unittest.TestCase):
     def test_missing_duplicate_or_foreign_cohort_ids_are_not_attested(self):
         for ids in ([], ['0022600001']*2, ['0022699999']):
             with self.assertRaises(ValueError): self.build(cohort_ids=ids)
+
+    def test_retained_actual_first_cohort_checks_bytes_without_fresh_server_claim(self):
+        base = Path(publication.__file__).parent
+        path = base/publication.features.ROOT.parent/'publication_v2/first_cohort.json'
+        raw = path.read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(),
+                         '5d1ef22f87e72af8d08daa4b2478d0547e54faa510a0d799865b97239887b030')
+        report = json.loads(raw)
+        self.assertEqual(report['run_id'], 39597562795)
+        self.assertEqual(report['head_sha'], 'dd05e2e1a1f0a6b9d6cede5474e908e46cd6fa42')
+        self.assertEqual(report['feature_observations_verified'], 2)
+        self.assertEqual(report['feature_protocol_sha256'], publication.features.PROTOCOL_SHA256)
+        self.assertTrue(report['saved_report_requires_fresh_api_replay'])
+        self.assertTrue(report['not_a_prediction']); self.assertFalse(report['forecasting_enabled'])
+        observed = datetime.fromisoformat(report['github_server_created_at_utc'].replace('Z', '+00:00'))
+        for evidence in report['evidence']:
+            path = base/publication.features.ROOT/(evidence['nba_game_id']+'.json')
+            original = path.read_bytes(); row = json.loads(original)['record']
+            self.assertEqual(evidence['path'], path.relative_to(base).as_posix())
+            self.assertEqual(evidence['file_sha256'], hashlib.sha256(original).hexdigest())
+            self.assertEqual(evidence['git_blob_sha1'], hashlib.sha1(
+                b'blob '+str(len(original)).encode()+b'\0'+original).hexdigest())
+            self.assertLessEqual(datetime.fromisoformat(row['frozen_at_utc']), observed)
+            for key in ('nba_saved_start_utc', 'espn_saved_start_utc'):
+                self.assertLess(observed, datetime.fromisoformat(row[key]))
 
 
 if __name__ == '__main__': unittest.main()
