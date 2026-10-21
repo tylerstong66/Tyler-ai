@@ -89,7 +89,9 @@ def _record(snapshot, matched, reference, freeze):
             at = source.utc(row['corroboration_available_at_utc'])
             latest = max(source.utc(row[k]) for k in ('nba_scheduled_start_utc', 'espn_scheduled_start_utc'))
             if at > freeze or latest >= freeze: continue
-            if not re.fullmatch(r'00225\d{5}', row['nba_game_id']):
+            # The sealed v1 reference policy includes corroborated regular
+            # season AND playoff results; only the target must be regular.
+            if not re.fullmatch(r'00[24]25\d{5}', row['nba_game_id']):
                 raise ValueError('Native NBA feature reference crossed fixed prior season')
             eligible.append((latest, row['nba_game_id'], row))
         selected = sorted(eligible)[-PROTOCOL['reference_games_per_team']:]

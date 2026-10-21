@@ -105,7 +105,7 @@ class NativeFeatureTests(unittest.TestCase):
 
     def test_nonunique_changed_teams_times_status_or_scope_fail(self):
         matched = self.snapshot['manifest']['matched'][0]
-        for kind in ('duplicate', 'team', 'start', 'status', 'bool_status', 'completed', 'scope'):
+        for kind in ('duplicate', 'team', 'start', 'status', 'bool_status', 'completed', 'scope', 'target_playoffs'):
             snap = copy.deepcopy(self.snapshot)
             n = snap['official'][matched['nba_official_game_id']]; e = snap['provider'][matched['espn_game_id']]
             if kind == 'duplicate': snap['manifest']['matched'].append(copy.deepcopy(matched))
@@ -114,9 +114,19 @@ class NativeFeatureTests(unittest.TestCase):
             elif kind == 'status': n['nba_status'] = 2
             elif kind == 'bool_status': n['nba_status'] = True
             elif kind == 'completed': e['provider_completed'] = True
+            elif kind == 'target_playoffs': n['kind'] = 'playoffs'
             else: e['season_stage'] = 1
             with self.subTest(kind=kind), self.assertRaises(ValueError):
                 features._record(snap, matched, self.reference, self.now)
+
+    def test_sealed_prior_season_playoffs_are_valid_reference_results_for_regular_targets(self):
+        self.reference['corroborated_research_only'][0]['nba_game_id'] = '0042500000'
+        report = self.collect()
+        self.assertEqual(report['new_feature_observations'], 3)
+        rows = [json.loads(p.read_bytes())['record'] for p in (self.base/features.ROOT).glob('*.json')]
+        self.assertTrue(any(r['source_row']['nba_game_id'] == '0042500000'
+            for row in rows for side in ('home', 'away')
+            for r in row['reference_features'][side]['reference_source_rows']))
 
     def test_late_missing_wrong_season_or_duplicate_reference_never_creates_partial_records(self):
         original = copy.deepcopy(self.reference)

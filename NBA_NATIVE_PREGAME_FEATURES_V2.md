@@ -17,14 +17,16 @@ HTTP requests: it audits retained original sources and historical references.
 Every new record requires a complete one-to-one, regular-season, pregame daily
 receipt with exact team identities and UTC starts, from the existing native v2
 source protocol. The linked ESPN manifest must have its original exact digest.
-Both complete-response clocks must precede freeze and both saved starts, and
+Both complete-response clocks must be at or before freeze and before both saved starts, and
 both sources must be at most twelve hours old. Freeze is sampled after dependency
 audit, inside a bounded five-minute local audit/creation interval. Started,
 stale or insufficient-reference targets remain unrecorded; unknown source state
 or inconsistent inputs fail. There is no fallback to an older source receipt.
 
 Historical references use the unchanged sealed v1 reference definition: the
-last ten exactly corroborated 2025–26 games per team available at freeze.
+last ten exactly corroborated 2025–26 games per team available at freeze,
+including regular-season and playoff references under that sealed policy.
+Only new target games must be regular season.
 Original historical source seals, row identities and receipt chronology are
 replayed. Missing or later results cannot enter a feature. Mean points for,
 against and margin, time since the latest prior scheduled start and all original
