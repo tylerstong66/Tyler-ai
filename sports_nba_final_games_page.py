@@ -12,7 +12,7 @@ FIXTURE_ROOT = Path('benchmarks/nba_games_page_v1/reference_final_probe')
 FIXTURE_MANIFEST_SHA256 = 'd0f4d911c440607b450b52eb5e07e489034661fab83c73355027b01e52a81c3d'
 
 
-def _parse(raw, *, requested_date, season, observed_at, document_reader):
+def _parse(raw, *, requested_date, season, observed_at, document_reader, break_status=''):
     """Accept only the inspected complete regular-season regulation-final shape.
 
     Overtime, mixed live/pregame, postponed and postseason pages fail closed.
@@ -38,7 +38,7 @@ def _parse(raw, *, requested_date, season, observed_at, document_reader):
                         or type(game['gameState']) is not int or game['gameState'] != 3
                         or type(game['period']) is not int or game['period'] != 4
                         or game['gameStatusText'] != 'Final' or game['gameClock'] != 'PT00M00.00S'
-                        or game['gameBreakStatus'] != '' or game['gameSubtype'] != ''
+                        or game['gameBreakStatus'] != break_status or game['gameSubtype'] != ''
                         or game['ifNecessary'] is not False):
                     raise ValueError('Unsupported NBA regulation-final status')
                 tip = page._utc(game['gameTimeUtc'])
