@@ -14,7 +14,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 ACTIVATION = "2026-10-23T00:00:00Z"
-MODEL_SHA = "3ea760cc52051c9c094ffe33a9a2580256bbf7ab806f580babf7d217c039df3f"
+MODEL_SHA = "3ea760cc52051c9c094ffe33a9a2580256bb2881ef0bc375fe78ee027b85bef1"
 MODEL_WEIGHTS = (0.08981297050934907, 0.4061517553742856)  # Frozen baseline model.json
 BOOK = "draftkings"
 MARKET = "nhl_full_game_moneyline_including_overtime_shootout"
