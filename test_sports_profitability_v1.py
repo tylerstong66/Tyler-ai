@@ -153,6 +153,16 @@ class ProfitabilityContractTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     self.evaluate(selections=[receipt])
 
+    def test_stale_pre_event_paper_selection_receipts_are_rejected(self):
+        with self.assertRaisesRegex(ValueError, "too delayed"):
+            selection.make_receipt(self.pred, self.entry_quote, self.root,
+                                   "2026-10-23T18:15:00Z")
+        altered = copy.deepcopy(self.selection)
+        altered["recorded_at"] = "2026-10-23T18:15:00Z"
+        seal(altered)
+        with self.assertRaisesRegex(ValueError, "stale"):
+            self.evaluate(selections=[altered])
+
     def test_refuse_retrospective_receipt_creation_after_kickoff(self):
         with self.assertRaisesRegex(ValueError, "before kickoff"):
             selection.make_receipt(self.pred, self.entry_quote, self.root,
