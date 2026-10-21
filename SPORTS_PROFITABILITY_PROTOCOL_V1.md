@@ -1,0 +1,32 @@
+# Prospective profitability evaluation v1 — frozen pre-enrollment policy
+
+## Audit of existing implementation (main 14c5ce5, 2026-10-21)
+
+- sports_betting.py: generic paper analysis, append-only in-app ledger, unit return and optional same-line closing-price comparison. Caller-supplied evidence is explicitly not independently verified.
+- sports_paper_trial.py / sports_paper_dashboard.py: on-demand NFL/NHL/MLB frozen predictions, original ESPN-displayed moneylines and quote follow-ups, settlement, descriptive hypothetical ROI, paired Brier and calibration. ESPN's "close" key is NOT a verified closing quote; publisher price age is unknown, bookmaker execution unverified, reports bounded to recent records.
+- sports_market_evidence.py: paired moneylines and separately hashed follow-up observations for unpriced NFL forecasts, before kickoff. No verified closing line or profit authorization.
+- sports_prospective_test.py / sports_two_way_test.py / sports_benchmark_review.py: hash-checked original prospective forecasts/results, market and model proper scores, block uncertainty and fixed first-100 checkpoints. Deliberately no staking or ROI in these cohorts; most saved market observations lack reliable quote-age evidence.
+- NHL challenger shadow: distinct fixed NHL candidate evaluation, first 100 unchanged; cannot select parameters from early results.
+- MLB hitter shadow and NBA/NCAA feature receipts are not sportsbook tickets and cannot enter a paper-moneyline return sample.
+
+Nothing here supports an observed executable price, verified matched close, profitable strategy, actual bet, or backfilled historical availability. Do not alter existing cohorts to fill gaps.
+
+## Frozen policy for a NEW future-only cohort
+
+Activation: **2026-10-23T00:00:00Z**. This policy must merge to main before collecting eligible forecasts. Observations before activation or publication are excluded, never retrospectively included. The new cohort is NOT the NHL challenger's existing first-100 checkpoint.
+
+Eligible universe: every NHL full-game, including OT/shootout, two-way moneyline with a verified pre-start original DraftKings sportsbook pair. Exactly one original pre-event forecast per NHL official game ID using the already frozen nhl-mlb-independent-team-elo-v1 baseline, model SHA 3ea760cc52051c9c094ffe33a9a2580256bbf7ab806f580babf7d217c039df3f; no prospective NHL candidate or later retraining allowed. Missing provider quote age, unpublished original bytes, unproved sportsbook offering, changed start, line mismatch, market mismatch or missing two-sided odds means NOT eligible. Maintain the denominator of excluded/withheld games.
+
+Predictions and quoted prices require their own immutable source/archive fingerprints, sportsbook ID, exact event/teams/start, exact market, line (null for this moneyline), selection-specific American prices, source retrieval time, provider-published update time and record time. Quotes must precede forecast generation, both must precede event start; at most five minutes from quote retrieval to forecast generation and no more than ten minutes of verified provider quote age. Never infer that ESPN's "close" slot identifies an actual near-kickoff offering. Independent GitHub server receipts must attest publication chronology for live reporting; local record timestamps and SHA-256 alone do NOT establish real historical availability.
+
+**Selection rule fixed before future results:** calculate expected unit return p_home*(decimal_home-1)-(1-p_home), and equivalent away value, using frozen original probabilities and verified original price pair. Select higher EV (home on exact tie) ONLY if EV >= +0.05 per unit risked; else NO PAPER SELECTION. One selection per game, flat one-unit paper stake, no compounding, Kelly sizing, parlays or outcome-based omissions. The +5% model-estimated EV threshold is a design choice, NOT a proven edge. Zero real wager amount, NO_BET=true, no promotion.
+
+Settlements must link original forecast hashes, official game ID, teams, exact original start and verified final-source receipts. Missing or contradictory originals remain pending/quarantined. For selected eligible games: win net decimal_odds - 1, loss -1; paper ROI = total net units / total selected-and-settled stake units; separately disclose pending selections and eligibility exclusions. No tie/push in defined NHL market. Show eligibility coverage, selected/settled/pending counts, wins/losses, Brier, log loss and predeclared calibration bins for all matched finalized forecasts, even no-selection games.
+
+**Closing-line comparison:** separately retain genuinely later, sportsbook-specific, pre-start closing quotes from SAME sportsbook, event, selected side, full-game/OT/SO market and identical line. Require verified evidence that this is provider's LAST pre-start offering, not an arbitrary later poll or a "close" JSON field. CLV = 100 x (implied probability at certified close minus implied probability at frozen entry) for selected side. Without verified last offering, CLV stays null. Never substitute different books or handicaps.
+
+Uncertainty by game-date block: no 95% paper-ROI block-bootstrap interval until 30 settled selections AND five distinct NHL game dates. Use deterministic seed 1729 and 1000 resamples. Even a positive interval is descriptive, not proof of a stable edge. Commercialization requires later independent evaluation, actual price availability, practical limits/slippage/fees, multiple-testing controls, and user authorization. Keep NO_BET and model promotion disabled.
+
+## Implementation boundaries
+
+sports_profitability_v1.py is a side-effect-free evaluator for NEW input contracts. It checks payload integrity, archived-original SHA-256, identities, chronology, sportsbook/market comparability, predeclared selection, settlement and CLV arithmetic. It does NOT retrieve independent odds, independently certify feed truth, or manufacture source snapshots. A verified source adapter and server-observed publication receipts remain requirements before publishing actual prospective returns. With no qualifying verified new inputs, report null ROI and null CLV. Synthetic test fixtures are not research outcomes. Existing predictions/prices/NHL challenger/historical results are never rewritten.
