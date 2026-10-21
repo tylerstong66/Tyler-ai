@@ -1,0 +1,71 @@
+name: Manual NHL unqualified source archive — NO BET
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: research-nhl-provider-original-archive
+  cancel-in-progress: false
+
+jobs:
+  capture-unqualified-odds:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout current main, never the triggering stale SHA
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned research HTTP dependency
+        run: python -m pip install requests==2.32.5
+      - name: Collect raw future NHL bookmaker feed without claims of executability
+        env:
+          THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
+        run: python sports_profitability_capture.py --capture
+      - name: Verify captured source, read-only tests and zero real wagers
+        run: |
+          python -m unittest -v test_sports_profitability_capture
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+          root=Path('benchmarks/nhl_price_source_observations_v1')
+          captures=list((root/'captures').glob('*.json'))
+          assert len(captures)>=1
+          for manifest_path in captures:
+              manifest=json.loads(manifest_path.read_bytes())
+              original=Path(manifest['original_path'])
+              assert original.is_file()
+              assert hashlib.sha256(original.read_bytes()).hexdigest()==manifest['raw_entity_body_sha256']
+              assert manifest['NO_BET'] is True and manifest['actual_wagers']==0
+              assert manifest['qualified_for_paper_roi'] is False
+              assert manifest['sportsbook_offer_executability_verified'] is False
+          print('RAW_NHL_ORIGINALS_VERIFIED_UNQUALIFIED='+str(len(captures)))
+          PY
+      - name: Publish original bytes and observation manifest to current main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add benchmarks/nhl_price_source_observations_v1
+          if git diff --cached --quiet; then
+            echo "No novel source bytes or manifests"
+          else
+            git commit -m "Publish original unqualified NHL sportsbook feed observation [NO BET]"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Retain source artifact even if publication is interrupted
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nhl-original-unqualified-research-${{ github.run_id }}
+          path: benchmarks/nhl_price_source_observations_v1/
+          if-no-files-found: ignore
+          retention-days: 30
