@@ -602,6 +602,9 @@ def direct_memory_save(message):
     )
 
 def tavily_search(query):
+    # Search APIs accept a query, not an entire agent task specification.
+    from research_requests import search_query
+    query = search_query(query)
     if not TAVILY_API_KEY:
         raise RuntimeError('TAVILY_API_KEY is not configured')
 
@@ -725,6 +728,18 @@ def reason_with_context(
     research_context='',
 ):
     feedback = feedback_context()
+    from research_requests import is_sports_research
+    sports_research = is_sports_research(message)
+
+    if sports_research and research_context.startswith('Live research failed:'):
+        from dependency_observability import classify_error
+        category = classify_error(research_context)
+        return (
+            f'Live sports research could not be completed ({category}). '
+            'Current schedule, injuries, weather and FanDuel prices were not verified. '
+            'No complete parlay, payout or evidence-supported value claim is available. '
+            'The original request was retained; research must succeed before presenting current picks.'
+        )
 
     prompt = (
         f'USER REQUEST:\n{message}\n\n'
@@ -738,6 +753,17 @@ def reason_with_context(
         'If useful, end with exactly one line beginning with '
         '"RECOMMENDATION:".'
     )
+
+    if sports_research:
+        prompt += (
+            '\nProvide evidence-based sports research and hypothetical selections where supported. '
+            'This is analysis only; never execute wagers. Cite supplied source URLs and distinguish '
+            'observations, estimates, missing data and calculations. A search summary is not verified '
+            'FanDuel odds or complete matchup coverage. Do not invent odds, injuries, simulations, '
+            'calibration or a full slate from incomplete sources. Explain concrete data gaps and '
+            'provide the supported portion of the analysis. Do not claim all research phases were '
+            'completed unless the supplied evidence supports that claim.'
+        )
 
     return groq(
         [
@@ -753,7 +779,7 @@ def reason_with_context(
                 'content': prompt,
             },
         ],
-        tokens=1100,
+        tokens=6500 if sports_research else 1100,
         temperature=0.2,
     )
 
@@ -778,7 +804,7 @@ def run_agent(message):
                 + '\n'
                 + '\n'.join(
                     (
-                        item.get('content', '')
+                        f"Source: {item.get('title', '')} {item.get('url', '')}\n{item.get('content', '')}"
                         for item in research.get('sources', [])
                     )
                 )

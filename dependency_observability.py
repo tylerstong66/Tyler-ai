@@ -75,6 +75,8 @@ def classify_error(error):
         return 'model_access'
     if 'not configured' in text or 'required' in text:
         return 'configuration'
+    if 'query is too long' in text or 'max query length' in text:
+        return 'invalid_request'
     if '500' in text or '502' in text or '503' in text or '504' in text or 'unavailable' in text:
         return 'unavailable'
     return 'other'
