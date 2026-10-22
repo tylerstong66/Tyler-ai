@@ -762,7 +762,11 @@ def reason_with_context(
             'FanDuel odds or complete matchup coverage. Do not invent odds, injuries, simulations, '
             'calibration or a full slate from incomplete sources. Explain concrete data gaps and '
             'provide the supported portion of the analysis. Do not claim all research phases were '
-            'completed unless the supplied evidence supports that claim.'
+            'completed unless the supplied evidence supports that claim. '
+            'Missing search evidence does not establish that a schedule has not been released, '
+            'that games do not exist, or that a service is unavailable. Say the retrieved evidence '
+            'did not verify the requested information. Assign a week number only when a cited '
+            'source explicitly matches the requested dates and season.'
         )
 
     return groq(
@@ -771,7 +775,9 @@ def reason_with_context(
                 'role': 'system',
                 'content': (
                     'You are Tyler AI, the user\'s personal autonomous AI assistant. '
-                    'Be practical, concise, and action-oriented.'
+                    'Be practical, concise, and action-oriented. '
+                    f'Current server date and time (UTC): {now_iso()}. '
+                    'Use this clock, not a training-data cutoff, to interpret current and future dates.'
                 ),
             },
             {

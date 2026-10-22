@@ -43,6 +43,8 @@ class ResearchRequestTests(unittest.TestCase):
         content = model.call_args.args[0][1]['content']
         self.assertIn(LONG_REQUEST, content)
         self.assertIn(source['url'], content)
+        self.assertIn('Missing search evidence does not establish', content)
+        self.assertIn('Current server date and time (UTC)', model.call_args.args[0][0]['content'])
         self.assertIn('research_web', result['used_tools'])
         self.assertGreater(model.call_args.kwargs['tokens'], 1100)
 
