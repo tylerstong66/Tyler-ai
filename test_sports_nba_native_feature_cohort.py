@@ -89,5 +89,18 @@ class NativeCohortTests(unittest.TestCase):
         self.assertIs(report['forecasting_enabled'], False)
         self.assertEqual(report['outcomes_enrolled'], 0)
 
+    def test_both_sources_agreeing_on_rescheduled_start_cannot_attach_frozen_result(self):
+        before = deepcopy(self.records)
+        for minutes in (-60, 1, 60):
+            with self.subTest(minutes=minutes):
+                moved = (fixtures.START+timedelta(minutes=minutes)).isoformat()
+                self.case.nba['tipoff_utc'] = self.case.espn['scheduled_start_utc'] = moved
+                report = self.build()
+                self.assertEqual(report['corroborated_result_observations'], 0)
+                self.assertEqual(report['rows'][0]['reason'], 'CURRENT_START_DIFFERS_FROM_FROZEN_START')
+                self.assertTrue(report['rows'][0]['identity_quarantined'])
+                self.assertIsNone(report['rows'][0]['result_observation'])
+        self.assertEqual(self.records, before)
+
 
 if __name__ == '__main__': unittest.main()

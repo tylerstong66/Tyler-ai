@@ -58,6 +58,10 @@ def classify(records, original_snapshots, current, dataset, *, now, features, le
                     or features.identity.name(e[side+'_name']) != features.identity.name(frozen['reference_features'][side]['provider_team_name'])
                     for side in ('home', 'away')))):
             row.update(reason='LATEST_SOURCE_IDENTITY_DIFFERS_FROM_ORIGINAL', identity_quarantined=True)
+        elif ((n is not None and datetime.fromtimestamp(
+                int(n['source_start_time_epoch']), timezone.utc) != starts[0])
+              or (e is not None and features.source.utc(e['scheduled_start_utc']) != starts[1])):
+            row.update(reason='CURRENT_START_DIFFERS_FROM_FROZEN_START', identity_quarantined=True)
         elif game_id in quarantined:
             row.update(reason='RESULT_DATASET_QUARANTINED', identity_quarantined=True,
                        result_quarantine_reasons=quarantined[game_id])
@@ -73,7 +77,9 @@ def classify(records, original_snapshots, current, dataset, *, now, features, le
                 at = [features.source.utc(final[k]) for k in ('ncaa_source_observed_at_utc', 'espn_source_observed_at_utc')]
                 final_starts = [features.source.utc(final[k]) for k in ('scheduled_start_utc', 'ncaa_scheduled_start_utc')]
                 if max(at) > now: raise ValueError(f'Future-dated {label} result observation')
-                if (final.get('result_observation_chronology_verified') is not True
+                if final_starts != [starts[1], starts[0]]:
+                    row.update(reason='RESULT_START_DIFFERS_FROM_FROZEN_START', identity_quarantined=True)
+                elif (final.get('result_observation_chronology_verified') is not True
                         or min(at) <= max(freeze, *starts, *final_starts)):
                     row['reason'] = 'FINAL_NOT_OBSERVED_AFTER_ORIGINAL_AND_REPORTED_STARTS'
                 else:

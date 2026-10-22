@@ -2,6 +2,7 @@
 from datetime import datetime, timezone
 import hashlib
 import json
+import re
 from pathlib import Path
 
 import sports_nba_feature_cohort as cohort
@@ -61,17 +62,23 @@ def classify(records, manifest, provider, *, provider_observed_at, now):
     return result
 
 
-def build(base=Path('.'), *, now=None):
+def build(base=Path('.'), *, now=None, _post=post, _capture=None, _provider_capture=None):
+    post = _post  # Version-pinned reader; v1/v2 defaults retain their own receipt contract.
     base = Path(base); now = now or datetime.now(timezone.utc)
     if not isinstance(now, datetime) or now.tzinfo is None:
         raise ValueError('Aware native NBA cohort clock required')
     now = now.astimezone(timezone.utc)
+    for stamp in (_capture, _provider_capture):
+        if stamp is not None and (not isinstance(stamp, str) or
+                not re.fullmatch(r'\d{8}T\d{12}Z', stamp)):
+            raise ValueError('Invalid pinned native cohort source capture')
     # Replay all original feature bytes, source receipts and both historical
     # seals; no daily source can replace a frozen record's original dependency.
     snapshots = {}
     records = cohort.features._existing(base, now, cohort.features._reference(base, now), snapshots)
     post.replay_all(base, now=now)
-    folders = sorted((base/post.ROOT).glob('*/manifest.json'))
+    folders = ([archive_path(base/post.ROOT/_capture/'manifest.json')] if _capture else
+               sorted((base/post.ROOT).glob('*/manifest.json')))
     if not folders:
         return {'schema': 'tyler-nba-native-daily-frozen-feature-lifecycle-v2',
             'source_status': 'NO_RETAINED_NATIVE_POSTGAME_RECEIPT',
@@ -87,7 +94,9 @@ def build(base=Path('.'), *, now=None):
     if path.read_bytes() != raw:
         raise ValueError('Native postgame manifest changed during cohort audit')
     manifest = json.loads(raw)
-    providers = sorted((base/cohort.source.ROOT/'captures').glob('*/manifest.json'))
+    providers = ([archive_path(base/cohort.source.ROOT/'captures'/_provider_capture/'manifest.json')]
+                 if _provider_capture else
+                 sorted((base/cohort.source.ROOT/'captures').glob('*/manifest.json')))
     if not providers: raise ValueError('Missing independently retained NBA provider source')
     provider_manifest, provider, provider_hash = cohort._provider(base, providers[-1], now)
     result = classify(records, manifest, provider,
@@ -97,6 +106,9 @@ def build(base=Path('.'), *, now=None):
         'native_manifest_sha256': hashlib.sha256(raw).hexdigest(),
         'provider_capture': providers[-1].parent.name,
         'provider_manifest_sha256': provider_hash,
+        'provider_original_response_sha256': sorted(
+            row['original_response_sha256'] for row in provider_manifest['snapshots']
+            if row['league'] == 'NBA'),
         'provider_independent_of_native_postgame_receipt': True}
     return result
 

@@ -85,11 +85,14 @@ class CohortTests(unittest.TestCase):
         self.final(); self.nba_at = self.espn_at = START - timedelta(seconds=1)
         self.assertEqual(self.build()['corroborated_result_observations'], 0)
 
-    def test_original_and_latest_start_drifts_are_retained_with_final(self):
+    def test_original_and_latest_start_drifts_are_retained_and_quarantined(self):
         self.final()
         self.nba['tipoff_utc'] = self.espn['scheduled_start_utc'] = (START + timedelta(hours=2)).isoformat()
         result = self.build(); row = result['rows'][0]
-        self.assertEqual(result['corroborated_result_observations'], 1)
+        self.assertEqual(result['corroborated_result_observations'], 0)
+        self.assertTrue(row['identity_quarantined'])
+        self.assertEqual(row['reason'], 'CURRENT_START_DIFFERS_FROM_FROZEN_START')
+        self.assertIsNone(row['result_observation'])
         self.assertEqual(result['schedule_drift_observed'], 1)
         self.assertEqual(row['nba_saved_start_drift_minutes'], 120)
         self.assertEqual(row['original_nba_saved_start_utc'], START.isoformat())
@@ -99,7 +102,7 @@ class CohortTests(unittest.TestCase):
         self.nba['tipoff_utc'] = self.espn['scheduled_start_utc'] = (START-timedelta(hours=4)).isoformat()
         self.nba_at = self.espn_at = START-timedelta(hours=1)
         row = self.build()['rows'][0]
-        self.assertEqual(row['reason'], 'FINAL_NOT_OBSERVED_AFTER_ORIGINAL_AND_LATEST_STARTS')
+        self.assertEqual(row['reason'], 'CURRENT_START_DIFFERS_FROM_FROZEN_START')
         self.assertIsNone(row['result_observation'])
 
     def test_frozen_team_id_or_orientation_change_cannot_attach_final(self):

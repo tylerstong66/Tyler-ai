@@ -1,4 +1,32 @@
-# Sports Betting Analyst v1 — verified handoff (2026-10-21)
+# Sports Betting Analyst v1 — verified handoff (2026-10-22)
+
+## October 22 continuation — strict frozen starts across three expansion cohorts
+
+Adversarial cases demonstrated that NBA, FBS and D1 source-observation audits
+could attach agreeing finals after both reported starts moved away from the
+original frozen starts. The common NBA and separate college source readers now
+quarantine that drift without changing features or source receipts. FBS and D1
+also reject a retained final's changed start when the latest game is absent;
+absence never repairs a rescheduled result's original identity. Matching scores
+and matching later sources cannot authorize a changed original start.
+
+The separate `sports_nba_v3_feature_cohort.py` read-only audit consumes canonical
+v3 receipts and independently retained ESPN originals, with optional pinned
+capture IDs. It does not reinterpret v1/v2 receipts. Existing source collection
+and integrated CI retain a distinct audit artifact and expose its own success or
+failure independently from successful raw collection. The source workflow's
+status script was executed under both successful and failed comparison cases.
+
+On the saved October 22 v3 capture `20261022T100814250706Z`, the new audit
+compares sixteen original frozen features: eleven source-agreement observations,
+five outside the requested October 21 daily scope, zero enrolled outcomes or
+graded forecasts. The separately pinned October 21 v3 page still corroborates
+two observations and quarantines game `0022600003` for its exact-start conflict.
+These are replayed original source claims, not new games, independent origin
+attestation, profitability, or permission to train or forecast. 53 focused source
+lifecycle tests and 971 integrated sports tests pass, including three NBA rescheduling cases and college
+current-source/result-source drift cases. Original records remain unchanged;
+all forecast, historical evaluation, promotion and wager gates stay disabled.
 
 ## October 22 continuation — NHL odds adversarial validation
 
@@ -14,7 +42,7 @@ requires integer coverage denominators and validates every retained event row.
 The profitability gate now rejects The Odds API source observations regardless
 of forged availability/publication/timestamp flags and recomputed record hashes.
 Both entry ROI and closing CLV validation use this gate; no promotion is enabled.
-81 focused profitability tests and the full saved-source CI replay pass. Static
+81 focused profitability tests, 962 integrated sports tests and the full saved-source CI replay pass. Static
 path checks do not protect against concurrent operating-system mutation. Hashes
 and local clocks still do not independently attest publication or bookmaker
 execution. No live odds request, paid-service activation, frozen-evidence rewrite,
