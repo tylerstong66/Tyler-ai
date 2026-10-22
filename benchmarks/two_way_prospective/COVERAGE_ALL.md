@@ -5,7 +5,7 @@
 | Cohort | Saved | Settled | Market-paired | Observed missing started games | Upcoming ready / observed | Report |
 |---|---:|---:|---:|---:|---|---|
 | NFL | 28 | 27 | 26 | 0 | 1 / 1 (ready_as_of_snapshot) | [Audit](../nfl_prospective_v2/COVERAGE.md) |
-| NHL | 82 | 70 | 70 | 0 | 12 / 12 (ready_as_of_snapshot) | [Audit](nhl/COVERAGE.md) |
+| NHL | 82 | 70 | 70 | 0 | 7 / 7 (ready_as_of_snapshot) | [Audit](nhl/COVERAGE.md) |
 | MLB | 10 | 7 | 5 | 2 | 0 / 0 (no_upcoming_games_observed) | [Audit](mlb/COVERAGE.md) |
 
 Upcoming checks cover the next 24 hours as of each report's retained evidence timestamp; they do not certify live source availability or wagering readiness.
