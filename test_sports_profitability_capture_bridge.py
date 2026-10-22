@@ -1,5 +1,6 @@
 """Synthetic end-to-end provenance bridge: zero network, zero wagers, zero ROI."""
 import copy
+import hashlib
 import json
 import tempfile
 import unittest
@@ -63,6 +64,82 @@ class ArchivedOriginalInteroperabilityTests(unittest.TestCase):
         return bridge.parse_archived_capture(
             self.repo, self.manifest_path,
             self.official if official is None else official)
+
+    def verified_pregame_sources(self):
+        official = {"gameWeek": [{"games": [{
+            "id": 2026020999, "gameType": 2,
+            "gameState": "FUT", "gameScheduleState": "OK",
+            "startTimeUTC": self.official["kickoff"],
+            "homeTeam": {"abbrev": "PHI", "id": 22},
+            "awayTeam": {"abbrev": "BOS", "id": 6},
+            "neutralSite": False,
+        }]}]}
+        espn = {"events": [{
+            "id": "401899999", "date": self.official["kickoff"],
+            "status": {"type": {"state": "pre", "completed": False}},
+            "competitions": [{"neutralSite": False, "competitors": [
+                {"homeAway": "home", "team": {
+                    "abbreviation": "PHI", "displayName": "Philadelphia Flyers"}},
+                {"homeAway": "away", "team": {
+                    "abbreviation": "BOS", "displayName": "Boston Bruins"}},
+            ]}],
+        }]}
+        def saved(filename, record, url, clock):
+            path = self.repo / filename
+            raw = json.dumps(record, sort_keys=True).encode()
+            path.write_bytes(raw)
+            return {"path": filename, "source_url": url,
+                    "sha256": hashlib.sha256(raw).hexdigest(),
+                    "retrieved_at": clock}
+        official_source = saved(
+            "nhl_pregame.json", official,
+            "https://api-web.nhle.com/v1/schedule/2026-10-24",
+            "2026-10-23T17:58:00Z")
+        espn_source = saved(
+            "espn_pregame.json", espn,
+            "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261024",
+            "2026-10-23T17:59:00Z")
+        return official_source, espn_source
+
+    def complete(self, official=None, espn=None, when="2026-10-23T17:59:30Z"):
+        if official is None or espn is None:
+            official, espn = self.verified_pregame_sources()
+        return bridge.parse_with_independent_pregame_sources(
+            self.repo, self.manifest_path, official, espn, "2026020999", when)
+
+    def test_full_original_source_path_is_explicitly_not_profit_eligible(self):
+        self.archive()
+        quote = self.complete()
+        self.assertEqual(quote["prices"]["home"], -110)
+        self.assertEqual(quote["event_id"], "401899999")
+        self.assertTrue(quote["original_pregame_sources_replayed"])
+        self.assertEqual(len(quote["original_official_nhl_source_sha256"]), 64)
+        self.assertEqual(len(quote["original_espn_source_sha256"]), 64)
+        self.assertEqual(len(quote["independent_pregame_crosswalk_sha256"]), 64)
+        self.assertIsNone(quote["provider_updated_at"])
+        for flag in ("available_to_paper", "qualified_for_paper_roi",
+                     "publication_server_attested", "last_pre_start_offering_verified"):
+            self.assertIs(quote[flag], False)
+        self.assertEqual(quote["actual_wagers"], 0)
+        profit.verify_record(quote)
+
+    def test_crosswalk_saved_after_odds_observation_is_not_accepted(self):
+        self.archive()
+        with self.assertRaisesRegex(ValueError, "crosswalk must precede"):
+            self.complete(when="2026-10-23T18:00:30Z")
+
+    def test_changed_official_original_fails_even_when_odds_archive_is_intact(self):
+        self.archive()
+        official, espn = self.verified_pregame_sources()
+        (self.repo / official["path"]).write_bytes(b'{"fake":"new source"}')
+        with self.assertRaisesRegex(ValueError, "SHA-256"):
+            self.complete(official=official, espn=espn)
+
+    def test_bookmaker_team_mismatch_is_rejected_after_independent_crosswalk(self):
+        self.events[0]["home_team"] = "New York Rangers"
+        self.archive()
+        with self.assertRaisesRegex(ValueError, "Exactly one NHL event"):
+            self.complete()
 
     def test_exact_capture_to_parser_bridge_without_false_roi(self):
         result = self.archive()

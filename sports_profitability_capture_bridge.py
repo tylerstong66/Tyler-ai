@@ -104,3 +104,33 @@ def parse_archived_capture(repo_root, manifest_path, official):
     quote["sha256"] = hash_record({k: v for k, v in quote.items() if k != "sha256"})
     verify_record(quote)
     return quote
+
+
+def parse_with_independent_pregame_sources(
+        repo_root, manifest_path, official_nhl_source, espn_source,
+        game_id, crosswalk_recorded_at):
+    """Read-only, end-to-end identity and archived quote verification.
+
+    Calls the original NHL/ESPN source verifier, not a user-entered team map.
+    Crosswalk evidence must have been frozen before the bookmaker feed's
+    observed retrieval time. Result is ALWAYS ineligible for paper ROI.
+    """
+    from sports_profitability_pregame_crosswalk import read_pregame_crosswalk
+
+    identity = read_pregame_crosswalk(
+        repo_root, official_nhl_source, espn_source, game_id,
+        crosswalk_recorded_at)
+    quote = parse_archived_capture(repo_root, manifest_path, identity)
+    if utc(identity["crosswalk_recorded_at"]) > utc(quote["observed_at"]):
+        raise ValueError("Independent pre-event team crosswalk must precede the price observation")
+    quote["independent_pregame_crosswalk_sha256"] = identity["sha256"]
+    quote["original_official_nhl_source_sha256"] = identity["official_source_sha256"]
+    quote["original_espn_source_sha256"] = identity["espn_source_sha256"]
+    quote["original_pregame_sources_replayed"] = True
+    quote["available_to_paper"] = False
+    quote["qualified_for_paper_roi"] = False
+    quote["last_pre_start_offering_verified"] = False
+    quote["publication_server_attested"] = False
+    quote["sha256"] = hash_record({k: v for k, v in quote.items() if k != "sha256"})
+    verify_record(quote)
+    return quote
