@@ -5,10 +5,9 @@ The returned identity is for UNQUALIFIED market-source research only.
 """
 import json
 import re
-from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from sports_profitability_v1 import ACTIVATION, hash_record, utc, verify_original
+from sports_profitability_v1 import ACTIVATION, hash_record, utc, original_bytes
 
 NHL_SCHEDULE = "https://api-web.nhle.com/v1/schedule/"
 ESPN_SCOREBOARD = "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates="
@@ -20,9 +19,7 @@ MAX_ORIGINAL_BYTES = 4_000_000
 def _bytes_json(root, source):
     if not isinstance(source, dict):
         raise ValueError("Original source reference required")
-    verify_original(source, root)
-    path = (Path(root) / source["path"]).resolve()
-    raw = path.read_bytes()
+    raw = original_bytes(source, root)
     if len(raw) > MAX_ORIGINAL_BYTES:
         raise ValueError("Original schedule source exceeds size limit")
     try:

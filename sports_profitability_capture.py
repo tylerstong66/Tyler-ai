@@ -14,6 +14,7 @@ from pathlib import Path
 import requests
 
 from sports_profitability_v1 import utc
+from sports_expansion_audit import archive_path
 
 ENDPOINT = "https://api.the-odds-api.com/v4/sports/icehockey_nhl/odds"
 SAFE_PARAMS = {
@@ -34,6 +35,9 @@ def observe_source(api_key, *, root=ROOT, get=None, clock=None):
     if not isinstance(api_key, str) or not api_key or any(
             char.isspace() for char in api_key):
         raise ValueError("An API key must be configured as a secret")
+    root = Path(root)
+    for folder in (root, root / "originals", root / "captures"):
+        archive_path(folder, directory=True, allow_missing=True)
     get = get or requests.get
     clock = clock or (lambda: datetime.now(timezone.utc))
     requested = {**SAFE_PARAMS, "apiKey": api_key}
@@ -73,10 +77,11 @@ def observe_source(api_key, *, root=ROOT, get=None, clock=None):
         if not isinstance(event.get("bookmakers"), list):
             raise ValueError("Bookmaker observations are not an array")
     digest = hashlib.sha256(raw).hexdigest()
-    root = Path(root)
     original = root / "originals" / (digest + ".json")
     stamp = now.strftime("%Y%m%dT%H%M%S%fZ")
     manifest_path = root / "captures" / (stamp + ".json")
+    archive_path(original, allow_missing=True)
+    archive_path(manifest_path, allow_missing=True)
     original.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     if original.exists():

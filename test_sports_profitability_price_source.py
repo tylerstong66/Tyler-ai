@@ -90,7 +90,7 @@ class ArchivedNhlOddsTests(unittest.TestCase):
                 "kickoff": quote["kickoff"],
                 "entry_quote_sha256": quote["sha256"],
                 "generated_at": "2026-10-23T18:02:00Z"}
-        with self.assertRaisesRegex(ValueError, "UTC timestamp string required"):
+        with self.assertRaisesRegex(ValueError, "Aggregator"):
             p.check_quote(quote, pred, self.root, "entry")
 
     def test_missing_market_last_update_rejected_even_when_book_has_timestamp(self):
@@ -181,6 +181,48 @@ class ArchivedNhlOddsTests(unittest.TestCase):
         src = self.save({"data": self.events})
         with self.assertRaisesRegex(ValueError, "event array"):
             self.observe(source=src)
+
+    def test_forging_all_eligibility_metadata_cannot_qualify_aggregator_source(self):
+        quote = self.observe()
+        quote.update(available_to_paper=True, qualified_for_paper_roi=True,
+                     publication_server_attested=True,
+                     last_pre_start_offering_verified=True,
+                     provider_updated_at=quote["aggregator_market_last_seen_at"])
+        pred = {key: quote[key] for key in ("game_id", "event_id", "home", "away", "kickoff")}
+        pred.update(generated_at="2026-10-23T18:02:00Z",
+                    recorded_at="2026-10-23T17:58:00Z")
+        for phase in ("entry", "verified_closing"):
+            with self.subTest(phase=phase):
+                quote["quote_phase"] = phase
+                if phase != "entry":
+                    quote["kickoff"] = pred["kickoff"] = "2026-10-23T18:03:00Z"
+                quote["sha256"] = p.hash_record({k: v for k, v in quote.items() if k != "sha256"})
+                pred["entry_quote_sha256"] = quote["sha256"]
+                with self.assertRaisesRegex(ValueError, "Aggregator"):
+                    p.check_quote(quote, pred, self.root, phase)
+
+    def test_direct_parser_rejects_redirected_original_and_ancestor(self):
+        for location in ("file", "directory"):
+            with self.subTest(location=location):
+                target = self.root / (self.source["path"] if location == "file" else "evidence")
+                moved = self.root / "redirected"
+                target.rename(moved)
+                target.symlink_to(moved, target_is_directory=moved.is_dir())
+                try:
+                    with self.assertRaisesRegex(ValueError, "Symlink"):
+                        self.observe()
+                finally:
+                    target.unlink()
+                    moved.rename(target)
+
+    def test_large_original_rejected_before_unbounded_read(self):
+        from unittest.mock import patch
+        path = self.root / self.source["path"]
+        with path.open("wb") as stream:
+            stream.truncate(4_000_001)
+        with patch.object(Path, "read_bytes", side_effect=AssertionError("unbounded read")):
+            with self.assertRaisesRegex(ValueError, "Oversized"):
+                self.observe()
 
 
 if __name__ == "__main__":

@@ -12,7 +12,7 @@ from pathlib import Path
 
 from sports_profitability_capture import ENDPOINT, ROOT, SAFE_PARAMS
 from sports_profitability_price_source import ODDS_ENDPOINT, REQUEST, observe
-from sports_profitability_v1 import hash_record, utc, verify_record
+from sports_profitability_v1 import hash_record, utc, verify_record, read_archive_bytes
 
 SOURCE_SCHEMA = "nhl-research-provider-original-v1"
 
@@ -25,17 +25,19 @@ def parse_archived_capture(repo_root, manifest_path, official):
     Local timestamps and hashes never prove GitHub publication or that a
     sportsbook offered an executable bet.
     """
-    root = Path(repo_root).resolve()
-    stored = (root / manifest_path).resolve()
-    captures = (root / ROOT / "captures").resolve()
+    root = Path(repo_root).absolute()
+    supplied = Path(manifest_path)
+    if supplied.is_absolute():
+        try:
+            supplied = supplied.relative_to(root)
+        except ValueError:
+            raise ValueError("Manifest must have the pinned NHL capture path/name") from None
+    stored = root / supplied
+    captures = root / ROOT / "captures"
     if stored.parent != captures or not re.fullmatch(
             r"\d{8}T\d{12}Z\.json", stored.name):
         raise ValueError("Manifest must have the pinned NHL capture path/name")
-    if not stored.is_file():
-        raise ValueError("Original source capture manifest is missing")
-    raw_manifest = stored.read_bytes()
-    if len(raw_manifest) > 100_000:
-        raise ValueError("Unreasonably large source manifest")
+    raw_manifest = read_archive_bytes(root, supplied, 100_000)
     try:
         manifest = json.loads(raw_manifest)
     except (UnicodeError, ValueError):
@@ -72,22 +74,33 @@ def parse_archived_capture(repo_root, manifest_path, official):
     # Filenames are NOT server clocks but must not contradict local capture time.
     if stored.stem != retrieved.strftime("%Y%m%dT%H%M%S%fZ"):
         raise ValueError("Original capture filename disagrees with retrieval time")
-    raw = (root / archive).resolve()
-    if not raw.is_relative_to((root / ROOT / "originals").resolve()) or (
-            not raw.is_file()):
-        raise ValueError("Original NHL bytes absent from pinned archive directory")
-    source_bytes = raw.read_bytes()
+    source_bytes = read_archive_bytes(root, archive, 3_000_000)
     if hashlib.sha256(source_bytes).hexdigest() != digest:
         raise ValueError("Saved original NHL response bytes differ from SHA-256")
     try:
         saved_events = json.loads(source_bytes)
     except (UnicodeError, ValueError):
         raise ValueError("Original source is not valid JSON") from None
-    if not isinstance(saved_events, list) or manifest.get("event_rows_returned") != len(saved_events):
+    counters = ("event_rows_returned", "still_future_events_at_retrieval",
+                "already_started_events_at_retrieval")
+    if any(type(manifest.get(k)) is not int or manifest[k] < 0 for k in counters):
+        raise ValueError("Manifest coverage counts require nonnegative integers")
+    if not isinstance(saved_events, list) or manifest["event_rows_returned"] != len(saved_events):
         raise ValueError("Manifest event count disagrees with original response")
-    count_future = sum(utc(e["commence_time"]) > retrieved for e in saved_events)
-    if (manifest.get("still_future_events_at_retrieval") != count_future or
-            manifest.get("already_started_events_at_retrieval") != len(saved_events) - count_future):
+    ids = set()
+    count_future = 0
+    for event in saved_events:
+        if not isinstance(event, dict) or event.get("sport_key") != "icehockey_nhl":
+            raise ValueError("Odds response mixed or malformed sport rows")
+        identifier = event.get("id")
+        if not isinstance(identifier, str) or not identifier or identifier in ids:
+            raise ValueError("Missing or duplicate event identifier")
+        ids.add(identifier)
+        if not isinstance(event.get("bookmakers"), list):
+            raise ValueError("Bookmaker observations are not an array")
+        count_future += utc(event.get("commence_time")) > retrieved
+    if (manifest["still_future_events_at_retrieval"] != count_future or
+            manifest["already_started_events_at_retrieval"] != len(saved_events) - count_future):
         raise ValueError("Provider event coverage disagrees with preserved bytes")
     source = {
         "path": archive,

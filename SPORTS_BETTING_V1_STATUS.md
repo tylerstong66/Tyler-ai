@@ -1,5 +1,25 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-21)
 
+## October 22 continuation — NHL odds adversarial validation
+
+Recovered main `5c98bdb` and original PR workflow logs: #216 passed 907 sports
+tests, #221 passed 932, and #222 passed 940, with all 13 checks successful on
+each head. Fresh local baseline passed 953 sports tests. Adversarial review
+then reproduced static archive redirects, boolean/float coverage counts, malformed
+source rows and relabelled aggregator prices entering entry/closing validation.
+
+The repair rejects symlinks at capture destinations and every replay ancestor,
+checks bounded regular files before reading, hashes the exact bytes parsed,
+requires integer coverage denominators and validates every retained event row.
+The profitability gate now rejects The Odds API source observations regardless
+of forged availability/publication/timestamp flags and recomputed record hashes.
+Both entry ROI and closing CLV validation use this gate; no promotion is enabled.
+81 focused profitability tests and the full saved-source CI replay pass. Static
+path checks do not protect against concurrent operating-system mutation. Hashes
+and local clocks still do not independently attest publication or bookmaker
+execution. No live odds request, paid-service activation, frozen-evidence rewrite,
+actual wager, model promotion or Render deployment occurred.
+
 ## October 21 continuation — recovered main, native final diagnostics and negative NFL result
 
 Recovered actual main at `c3d897a91238251cd568b2283783b2b8711ccd02`, including

@@ -6,11 +6,10 @@ into a verified offering. No network calls, API key handling, or wagering.
 """
 import json
 from datetime import timedelta
-from pathlib import Path
 from urllib.parse import urlsplit
 
 from sports_profitability_v1 import (
-    BOOK, MARKET, decimal_odds, hash_record, utc, verify_original,
+    BOOK, MARKET, decimal_odds, hash_record, utc, original_bytes,
 )
 
 ODDS_ENDPOINT = "https://api.the-odds-api.com/v4/sports/icehockey_nhl/odds"
@@ -33,7 +32,7 @@ def observe(original_root, source, official, archived_at):
     if (urlsplit(source["source_url"]).query or
             urlsplit(source["source_url"]).fragment):
         raise ValueError("API secrets or query strings must never be archived")
-    verify_original(source, original_root)
+    raw = original_bytes(source, original_root)
     if not isinstance(official, dict) or any(
             not isinstance(official.get(k), str) or not official[k]
             for k in ("game_id", "event_id", "home", "away", "home_name",
@@ -45,7 +44,7 @@ def observe(original_root, source, official, archived_at):
     if not at <= saved < start or saved - at > timedelta(minutes=5):
         raise ValueError("Market observation must be archived before kickoff")
     try:
-        data = json.loads((Path(original_root) / source["path"]).read_bytes())
+        data = json.loads(raw)
     except (ValueError, UnicodeError) as exc:
         raise ValueError("Malformed preserved odds JSON") from exc
     if not isinstance(data, list):

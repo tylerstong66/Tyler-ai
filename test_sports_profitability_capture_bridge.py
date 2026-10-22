@@ -251,6 +251,69 @@ class ArchivedOriginalInteroperabilityTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "pinned NHL capture"):
             bridge.parse_archived_capture(self.repo, outside, self.official)
 
+    def test_reject_symlinks_at_manifest_original_and_directory_ancestors(self):
+        for location in ("manifest", "original", "captures", "originals", "root", "benchmarks"):
+            with self.subTest(location=location):
+                self.archive()
+                original = Path(self.read_manifest()["original_path"])
+                target = {"manifest": self.repo / self.manifest_path,
+                          "original": original,
+                          "captures": self.repo / capture.ROOT / "captures",
+                          "originals": self.repo / capture.ROOT / "originals",
+                          "root": self.repo / capture.ROOT,
+                          "benchmarks": self.repo / "benchmarks"}[location]
+                moved = self.repo / "redirected"
+                target.rename(moved)
+                target.symlink_to(moved, target_is_directory=moved.is_dir())
+                try:
+                    with self.assertRaisesRegex(ValueError, "Symlink"):
+                        self.quote()
+                finally:
+                    target.unlink()
+                    moved.rename(target)
+                    (self.repo / self.manifest_path).unlink()
+
+    def test_manifest_counts_require_nonnegative_integers_not_booleans_or_floats(self):
+        self.archive()
+        base = self.read_manifest()
+        for field in ("event_rows_returned", "still_future_events_at_retrieval",
+                      "already_started_events_at_retrieval"):
+            for value in (True, False, 1.0, 0.0, -1, None):
+                with self.subTest(field=field, value=value):
+                    altered = copy.deepcopy(base)
+                    altered[field] = value
+                    self.replace_manifest(altered)
+                    with self.assertRaises(ValueError):
+                        self.quote()
+        self.replace_manifest(base)
+
+    def test_all_original_event_rows_must_obey_collector_contract(self):
+        self.archive()
+        base = self.read_manifest()
+        for extra in (None, {}, {**self.events[0], "sport_key": "basketball_nba"},
+                      self.events[0]):
+            with self.subTest(extra=extra):
+                raw = json.dumps(self.events + [extra]).encode()
+                digest = hashlib.sha256(raw).hexdigest()
+                path = self.repo / capture.ROOT / "originals" / (digest + ".json")
+                path.write_bytes(raw)
+                altered = {**base, "raw_entity_body_sha256": digest,
+                           "original_path": str(path), "event_rows_returned": 2,
+                           "still_future_events_at_retrieval": 2}
+                self.replace_manifest(altered)
+                with self.assertRaises(ValueError):
+                    self.quote()
+        self.replace_manifest(base)
+
+    def test_oversized_manifest_is_rejected_before_reading_body(self):
+        from unittest.mock import patch
+        self.archive()
+        path = self.repo / self.manifest_path
+        path.write_bytes(b" " * 100_001)
+        with patch.object(Path, "read_bytes", side_effect=AssertionError("unbounded read")):
+            with self.assertRaises(ValueError):
+                self.quote()
+
 
 if __name__ == "__main__":
     unittest.main()
