@@ -798,20 +798,36 @@ def run_agent(message):
 
     if needs_research(message):
         try:
-            research = tavily_search(message)
-            research_context = (
-                research.get('answer', '')
-                + '\n'
-                + '\n'.join(
-                    (
+            from research_requests import search_queries
+            research_parts = []
+            failures = []
+            for query in search_queries(message):
+                try:
+                    research = tavily_search(query)
+                except Exception as exc:
+                    from dependency_observability import classify_error
+                    failures.append(classify_error(exc))
+                    continue
+                sources.extend(research.get('sources', []))
+                research_parts.append(
+                    'Search query: ' + query + '\n'
+                    + research.get('answer', '') + '\n'
+                    + '\n'.join(
                         f"Source: {item.get('title', '')} {item.get('url', '')}\n{item.get('content', '')}"
                         for item in research.get('sources', [])
                     )
                 )
-            ).strip()
-
-            sources = research.get('sources', [])
-            used_tools.append('research_web')
+            research_context = '\n\n'.join(research_parts).strip()
+            if research_parts:
+                research_context = ('Search retrieval time (UTC): ' + now_iso()
+                                    + '\nThese are search excerpts, not an exhaustive source audit.\n'
+                                    + research_context)
+            if failures:
+                prefix = 'Partial research failure: ' if research_parts else 'Live research failed: '
+                research_context += '\n' + prefix + ', '.join(failures)
+                research_context = research_context.strip()
+            if research_parts:
+                used_tools.append('research_web')
 
         except Exception as exc:
             research_context = (

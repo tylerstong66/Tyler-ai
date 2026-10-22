@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 
 import app
 from dependency_observability import classify_error
-from research_requests import search_query
+from research_requests import search_query, search_queries
 
 
 LONG_REQUEST = (
@@ -57,6 +57,28 @@ class ResearchRequestTests(unittest.TestCase):
         with patch.object(app, 'feedback_context', return_value=''), patch.object(app, 'groq', return_value='hello') as model:
             self.assertEqual(app.reason_with_context('Hello'), 'hello')
         self.assertEqual(model.call_args.kwargs['tokens'], 1100)
+
+    def test_nfl_brief_retrieves_distinct_evidence_for_the_requested_dates(self):
+        queries = search_queries(LONG_REQUEST)
+        self.assertEqual(len(queries), 3)
+        for query in queries:
+            self.assertIn('October 22–26, 2026', query)
+            self.assertLess(len(query), 400)
+            self.assertNotIn('Act as', query)
+        self.assertIn('schedule', queries[0])
+        self.assertIn('FanDuel', queries[1])
+        self.assertIn('injury', queries[2])
+
+    def test_partial_retrieval_retains_successes_and_discloses_failure(self):
+        results = [{'answer': 'Official schedule', 'sources': []},
+                   RuntimeError('timeout'), {'answer': 'Limited injuries', 'sources': []}]
+        with patch.object(app, 'tavily_search', side_effect=results), \
+                patch.object(app, 'reason_with_context', return_value='partial') as reason:
+            app.run_agent(LONG_REQUEST)
+        context = reason.call_args.kwargs['research_context']
+        self.assertIn('Official schedule', context)
+        self.assertIn('Partial research failure: timeout', context)
+        self.assertIn('retrieval time (UTC)', context)
 
     def test_1500_in_validation_error_is_not_a_500_outage(self):
         self.assertEqual(classify_error('Query is too long. Max query length is 1500 characters.'), 'invalid_request')
