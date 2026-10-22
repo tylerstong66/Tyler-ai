@@ -14,8 +14,10 @@ from sports_profitability_v1 import (
 )
 
 ODDS_ENDPOINT = "https://api.the-odds-api.com/v4/sports/icehockey_nhl/odds"
-REQUEST = {"sport": "icehockey_nhl", "markets": "h2h",
-           "bookmakers": BOOK, "odds_format": "american"}
+# Match the actual sanitized wire request written by sports_profitability_capture.
+# Sport is pinned in ODDS_ENDPOINT; it is NOT an extra query parameter.
+REQUEST = {"regions": "us", "markets": "h2h",
+           "bookmakers": BOOK, "oddsFormat": "american"}
 
 
 def observe(original_root, source, official, archived_at):
