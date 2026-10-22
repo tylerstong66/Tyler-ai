@@ -1,5 +1,24 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-22)
 
+## October 22 continuation — direct NHL settlement original-byte boundary
+
+NHL archive/qualification repair #225 merged at
+`ee860c9a58e69f49c5771ff3c46600d62c2e58d3` after fourteen successful checks
+and one intentionally skipped check. The exact merge checkout independently
+passed all 81 focused profitability tests. Post-merge integrated run 39826138447
+passed 962 sports tests, the saved-source replay and unchanged-evidence check.
+No production deployment occurred.
+
+Further adversarial review reproduced three direct final-reader failures:
+`verify_final_sources` trusted its caller to check original SHA-256, followed a
+static source symlink, and read an oversized file before bounding it. The final
+reader now obtains its parsed bytes through the same bounded, regular-file,
+no-static-symlink, SHA-256 verifier as the quote and pregame readers. Direct calls
+therefore enforce the original-byte contract independently of parent validation.
+84 focused profitability tests and 974 integrated sports tests pass. This does not certify source origin,
+publication chronology, executable sportsbook availability or an edge; all
+wager, model-promotion and profitability-proof gates remain disabled.
+
 ## October 22 continuation — strict frozen starts across three expansion cohorts
 
 Adversarial cases demonstrated that NBA, FBS and D1 source-observation audits

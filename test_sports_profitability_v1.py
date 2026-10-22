@@ -374,6 +374,31 @@ class ProfitabilityContractTests(unittest.TestCase):
         self.assertIsNotNone(output["ci95"])
         self.assertEqual(output, p.interval(rows))
 
+    def test_direct_final_source_verifier_requires_original_hashes(self):
+        from sports_profitability_nhl_finals import verify_final_sources
+        evidence = copy.deepcopy(self.result['final_sources'])
+        evidence[0]['sha256'] = '0' * 64
+        with self.assertRaisesRegex(ValueError, 'SHA-256'):
+            verify_final_sources(self.pred, self.result, evidence, self.root)
+
+    def test_direct_final_source_verifier_rejects_redirected_original(self):
+        from sports_profitability_nhl_finals import verify_final_sources
+        target = self.root/self.final1['path']
+        moved = self.root/'redirected.json'
+        target.rename(moved); target.symlink_to(moved)
+        with self.assertRaisesRegex(ValueError, 'Symlink'):
+            verify_final_sources(self.pred, self.result, self.result['final_sources'], self.root)
+
+    def test_direct_final_source_verifier_bounds_original_before_opening(self):
+        from sports_profitability_nhl_finals import verify_final_sources
+        from unittest.mock import patch
+        target = self.root/self.final1['path']
+        with target.open('wb') as stream:
+            stream.truncate(4_000_001)
+        with patch.object(Path, 'read_bytes', side_effect=AssertionError('Unbounded read')):
+            with self.assertRaisesRegex(ValueError, 'Oversized'):
+                verify_final_sources(self.pred, self.result, self.result['final_sources'], self.root)
+
 
 if __name__ == "__main__":
     unittest.main()
