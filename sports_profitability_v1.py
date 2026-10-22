@@ -13,6 +13,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit
 
+from sports_expansion_audit import archive_path
+
 ACTIVATION = "2026-10-23T00:00:00Z"
 MODEL_SHA = "3ea760cc52051c9c094ffe33a9a2580256bb2881ef0bc375fe78ee027b85bef1"
 MODEL_WEIGHTS = (0.08981297050934907, 0.4061517553742856)  # Frozen baseline model.json
@@ -47,7 +49,26 @@ def verify_record(data):
     return data
 
 
-def verify_original(source, archive_root):
+def read_archive_bytes(root, path, limit=4_000_000):
+    """Bound regular local evidence and reject static redirects before opening.
+
+    This detects working-tree redirects, not concurrent operating-system mutation.
+    """
+    base = archive_path(root, directory=True)
+    relative = Path(path)
+    if relative.is_absolute() or ".." in relative.parts:
+        raise ValueError("Original source missing or outside archive")
+    stored = archive_path(base / relative)
+    if stored.stat().st_size > limit:
+        raise ValueError("Oversized original source archive")
+    with stored.open("rb") as stream:
+        raw = stream.read(limit + 1)
+    if len(raw) > limit:
+        raise ValueError("Oversized original source archive")
+    return raw
+
+
+def original_bytes(source, archive_root):
     if not isinstance(source, dict):
         raise ValueError("Source snapshot required")
     path = source.get("path")
@@ -58,12 +79,14 @@ def verify_original(source, archive_root):
         raise ValueError("Archived source path and HTTPS URL required")
     if not isinstance(digest, str) or len(digest) != 64:
         raise ValueError("Archived source SHA-256 required")
-    base = Path(archive_root).resolve()
-    resolved = (base / path).resolve()
-    if not resolved.is_relative_to(base) or not resolved.is_file():
-        raise ValueError("Original source missing or outside archive")
-    if hashlib.sha256(resolved.read_bytes()).hexdigest() != digest:
+    raw = read_archive_bytes(archive_root, path)
+    if hashlib.sha256(raw).hexdigest() != digest:
         raise ValueError("Original source bytes do not match archived SHA-256")
+    return raw
+
+
+def verify_original(source, archive_root):
+    original_bytes(source, archive_root)
     return True
 
 
@@ -161,6 +184,8 @@ def check_quote(quote, pred, root, phase):
         raise ValueError("Book/period/market/line/phase mismatch")
     if quote.get("available_to_paper") is not True:
         raise ValueError("Sportsbook offering not verified at capture")
+    if urlsplit(quote["source_snapshot"]["source_url"]).hostname == "api.the-odds-api.com":
+        raise ValueError("Aggregator observations cannot certify sportsbook offering or closing availability")
     prices = quote.get("prices")
     if not isinstance(prices, dict) or set(prices) != {"home", "away"}:
         raise ValueError("Exact same-book opposing moneyline pair required")

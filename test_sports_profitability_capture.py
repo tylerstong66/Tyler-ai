@@ -155,6 +155,31 @@ class NhlPriceArchiveTests(unittest.TestCase):
         self.assertIn("THE_ODDS_API_KEY", workflow)
         self.assertIn("python sports_profitability_capture.py --capture", workflow)
 
+    def test_redirected_capture_destinations_rejected_before_network(self):
+        for location in ("root", "originals", "captures"):
+            with self.subTest(location=location), tempfile.TemporaryDirectory() as td:
+                root = Path(td) / "archive"
+                moved = Path(td) / "redirected"
+                moved.mkdir()
+                target = root if location == "root" else root / location
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.symlink_to(moved, target_is_directory=True)
+                with patch.object(capture.requests, "get", side_effect=AssertionError("network")):
+                    with self.assertRaisesRegex(ValueError, "Symlink"):
+                        capture.observe_source("synthetic-key", root=root)
+                self.assertEqual(list(moved.iterdir()), [])
+
+    def test_redirected_existing_original_is_not_reused(self):
+        output = self.archive()
+        original = self.root / "originals" / (output["original_sha256"] + ".json")
+        moved = self.root / "redirected.json"
+        original.rename(moved)
+        original.symlink_to(moved)
+        self.now = datetime(2026, 10, 23, 19, tzinfo=timezone.utc)
+        with self.assertRaisesRegex(ValueError, "Symlink"):
+            self.archive()
+        self.assertEqual(len(list((self.root / "captures").iterdir())), 1)
+
 
 if __name__ == "__main__":
     unittest.main()
