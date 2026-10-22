@@ -6,11 +6,10 @@ that two arbitrary byte blobs were saved from different hostnames.
 """
 import json
 import re
-from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 from zoneinfo import ZoneInfo
 
-from sports_profitability_v1 import utc
+from sports_profitability_v1 import utc, original_bytes
 
 ALIASES = {"NJ": "NJD", "SJ": "SJS", "TB": "TBL", "LA": "LAK", "UTAH": "UTA"}
 
@@ -24,10 +23,8 @@ def _scores(home, away):
     return {"home": int(home), "away": int(away)}
 
 
-def _read(path, root):
-    raw = (Path(root) / path).read_bytes()
-    if len(raw) > 4_000_000:
-        raise ValueError("NHL final response exceeds replay limit")
+def _read(source, root):
+    raw = original_bytes(source, root)
     try:
         return json.loads(raw)
     except (UnicodeError, ValueError) as exc:
@@ -115,7 +112,7 @@ def verify_final_sources(pred, result, evidence, root):
             if official is not None or link.query or (
                     link.path != "/v1/gamecenter/" + pred["game_id"] + "/landing"):
                 raise ValueError("Pinned official NHL final endpoint/ID required")
-            official = _nhl_official(_read(source["path"], root), pred)
+            official = _nhl_official(_read(source, root), pred)
         elif link.hostname == "site.api.espn.com":
             expected_day = utc(pred["kickoff"]).astimezone(
                 ZoneInfo("America/New_York")).strftime("%Y%m%d")
@@ -123,7 +120,7 @@ def verify_final_sources(pred, result, evidence, root):
                     "/apis/site/v2/sports/hockey/nhl/scoreboard") or (
                     parse_qs(link.query, strict_parsing=True) != {"dates": [expected_day]}):
                 raise ValueError("Pinned original ESPN NHL scoreboard date/route required")
-            espn = _espn(_read(source["path"], root), pred)
+            espn = _espn(_read(source, root), pred)
         else:
             raise ValueError("Unrecognized original NHL final host")
     if official is None or espn is None:
