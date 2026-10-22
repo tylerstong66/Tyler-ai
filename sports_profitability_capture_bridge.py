@@ -61,7 +61,9 @@ def parse_archived_capture(repo_root, manifest_path, official):
     if not isinstance(digest, str) or not re.fullmatch("[0-9a-f]{64}", digest):
         raise ValueError("Source SHA-256 is missing or malformed")
     archive = (ROOT / "originals" / (digest + ".json")).as_posix()
-    if manifest.get("original_path") != archive:
+    # Default workflow stores repo-relative paths. Explicit-root offline tests
+    # store the same pinned archive as an absolute path; neither can escape.
+    if manifest.get("original_path") not in (archive, str(root / archive)):
         raise ValueError("Raw body source is not the original content-addressed file")
     retrieved = utc(manifest.get("retrieved_at"))
     archived = utc(manifest.get("archived_at"))
