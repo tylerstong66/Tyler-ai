@@ -1,6 +1,6 @@
 # Tyler NHL prospective paper test
 
-Recorded: **75** · Settled: **68** · Pending: **7**
+Recorded: **82** · Settled: **70** · Pending: **12**
 
 **NO BET — actual wagers $0.**
 
@@ -8,9 +8,9 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 
 | Model | Paired games | Brier | Log loss | Accuracy |
 |---|---:|---:|---:|---:|
-| model | 68 | 0.4798 | 0.6728 | 61.8% |
-| fixed_elo | 68 | 0.4625 | 0.6547 | 58.8% |
-| market | 68 | 0.4587 | 0.6500 | 57.4% |
+| model | 70 | 0.4812 | 0.6742 | 61.4% |
+| fixed_elo | 70 | 0.4666 | 0.6591 | 58.6% |
+| market | 70 | 0.4640 | 0.6554 | 55.7% |
 
 | Game | Start (Eastern) | Model pick | Win probability |
 |---|---|---|---:|
@@ -89,6 +89,13 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | SJS at OTT | Oct 22 07:00 PM | OTT | 55.1% |
 | ANA at NJD | Oct 22 07:00 PM | NJD | 53.6% |
 | FLA at PIT | Oct 22 07:00 PM | PIT | 50.1% |
+| LAK at NYI | Oct 22 07:30 PM | NYI | 56.0% |
+| VGK at STL | Oct 22 08:00 PM | VGK | 50.8% |
+| WPG at DAL | Oct 22 08:00 PM | DAL | 56.0% |
+| MIN at CGY | Oct 22 09:00 PM | MIN | 52.9% |
+| CAR at EDM | Oct 22 09:00 PM | CAR | 53.1% |
+| UTA at SEA | Oct 22 10:00 PM | UTA | 50.6% |
+| DET at VAN | Oct 22 10:00 PM | DET | 51.6% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
 

@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-21T23:20:03.833619+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-10-22T04:46:59.765486+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 27 / 27 / 0 |
+| Recorded / settled / pending | 28 / 27 / 1 |
 | Started games in retained official schedules / enrolled | 27 / 27 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 27 / 27 |
+| Enrollment-time priced forecasts | 28 / 28 |
 | Settled with enrollment prices / decisive market-paired | 27 / 26 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -25,10 +25,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-21T23:20:03.833619+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
+As of retained evidence: 2026-10-22T04:46:59.765486+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
+| 2026_07_NE_CHI | NE at CHI | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -63,10 +64,11 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026_06_SEA_DEN | SEA at DEN | 2026-10-16T00:15:00+00:00 | enrolled | — |
 | 2026_06_TEN_IND | TEN at IND | 2026-10-18T17:00:00+00:00 | enrolled | — |
 | 2026_06_WAS_SF | WAS at SF | 2026-10-20T00:15:00+00:00 | enrolled | — |
+| 2026_07_NE_CHI | NE at CHI | 2026-10-23T00:15:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 78. Latest: `20261021T232001236029Z`.
+Audited capture manifests: 79. Latest: `20261022T044657720906Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
