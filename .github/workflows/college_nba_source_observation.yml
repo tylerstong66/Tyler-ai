@@ -27,6 +27,8 @@ on:
       - sports_nba_schedule_slots.py
       - sports_nba_games_page.py
       - sports_nba_native_feature_cohort.py
+      - sports_nba_v3_feature_cohort.py
+      - test_sports_nba_v3_feature_cohort.py
       - test_sports_nba_native_feature_cohort.py
       - sports_nba_receipt_coverage.py
       - test_sports_nba_receipt_coverage.py
@@ -282,6 +284,20 @@ jobs:
           name: nba-native-daily-frozen-feature-lifecycle
           path: nba-native-feature-cohort.json
           retention-days: 30
+      - name: Compare separate v3 native final sources and independent ESPN to frozen features
+        id: nba_native_cohort_v3
+        if: steps.nba_postgame_v3.outcome == 'success'
+        continue-on-error: true
+        run: |
+          python -m unittest -q test_sports_nba_v3_feature_cohort
+          python sports_nba_v3_feature_cohort.py > nba-v3-frozen-feature-source-audit.json
+      - uses: actions/upload-artifact@v4
+        if: steps.nba_native_cohort_v3.outcome == 'success'
+        with:
+          name: nba-v3-frozen-feature-source-audit
+          path: nba-v3-frozen-feature-source-audit.json
+          if-no-files-found: error
+          retention-days: 30
       - name: Compare NBA CDN schedule to archived ESPN season games
         id: nba_source
         continue-on-error: true
@@ -409,6 +425,7 @@ jobs:
           NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2: ${{ steps.nba_native_features_v2.outcome }}
           NBA_POSTGAME_NATIVE_SOURCE_V2: ${{ steps.nba_postgame_v2.outcome }}
           NBA_POSTGAME_NATIVE_SOURCE_V3: ${{ steps.nba_postgame_v3.outcome }}
+          NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V3: ${{ steps.nba_native_cohort_v3.outcome }}
           NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2: ${{ steps.nba_native_cohort_v2.outcome }}
           NBA_CROSS_PHASE_SOURCE_COVERAGE: ${{ steps.nba_cross_phase_coverage.outcome }}
           NCAA_OWNED_SOURCE: ${{ steps.ncaa_source.outcome }}
@@ -428,12 +445,14 @@ jobs:
           from datetime import datetime, timezone
           from pathlib import Path
           outcomes = {name: os.environ[name] for name in (
-              'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE', 'NBA_DAILY_PREGAME_SOURCE', 'NBA_DAILY_PREGAME_SOURCE_V2', 'NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V3', 'NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2', 'NBA_CROSS_PHASE_SOURCE_COVERAGE',
+              'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE', 'NBA_DAILY_PREGAME_SOURCE', 'NBA_DAILY_PREGAME_SOURCE_V2', 'NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V3', 'NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V3', 'NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2', 'NBA_CROSS_PHASE_SOURCE_COVERAGE',
               'NCAA_OWNED_SOURCE', 'NCAA_ESPN_CROSSWALK', 'NCAA_FINAL_RECEIPTS', 'NCAA_RESULT_DATASET', 'NBA_FINAL_REPLAY', 'NBA_FEATURE_OBSERVATIONS', 'NBA_FEATURE_COHORT_AUDIT', 'FBS_FEATURE_OBSERVATIONS', 'FBS_FEATURE_COHORT_AUDIT', 'D1_FEATURE_OBSERVATIONS', 'D1_FEATURE_COHORT_AUDIT')}
           postgame = (json.loads(Path('nba-postgame-v2-source-observation.json').read_text())
                       if outcomes['NBA_POSTGAME_NATIVE_SOURCE_V2'] == 'success' else {})
           postgame_v3 = (json.loads(Path('nba-postgame-v3-source-observation.json').read_text())
                          if outcomes['NBA_POSTGAME_NATIVE_SOURCE_V3'] == 'success' else {})
+          native_v3 = (json.loads(Path('nba-v3-frozen-feature-source-audit.json').read_text())
+                       if outcomes['NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V3'] == 'success' else {})
           native_features = (json.loads(Path('nba-native-feature-observation-v2.json').read_text())
                              if outcomes['NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2'] == 'success' else {})
           native_feature_audit = (json.loads(Path('nba-native-feature-audit-v2.json').read_text())
@@ -470,6 +489,10 @@ jobs:
               'nba_postgame_v3_page_status': postgame_v3.get('page_status'),
               'nba_postgame_v3_supported_final_game_count': postgame_v3.get('supported_final_game_count'),
               'nba_postgame_v3_independent_final_agreement_verified': False,
+              'nba_v3_frozen_feature_source_audit_checked': outcomes['NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V3'] == 'success',
+              'nba_v3_corroborated_source_observations': native_v3.get('corroborated_result_observations'),
+              'nba_v3_identity_quarantined': native_v3.get('identity_quarantined'),
+              'nba_v3_outcomes_enrolled': 0,
               'nba_postgame_v3_original_v1_v2_receipts_unchanged': True,
               'nba_postgame_capture_does_not_certify_independent_finals': True,
               'native_daily_frozen_feature_lifecycle_checked': outcomes['NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2'] == 'success',

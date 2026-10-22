@@ -86,7 +86,9 @@ class FbsCohortTests(unittest.TestCase):
         self.current['rows']['espn']['401100001']['scheduled_start_utc'] = later.isoformat()
         for key in ('scheduled_start_utc', 'ncaa_scheduled_start_utc'): self.dataset['rows'][0][key] = later.isoformat()
         report = self.classify(); row = report['rows'][0]
-        self.assertEqual(report['corroborated_result_observations'], 1)
+        self.assertEqual(report['corroborated_result_observations'], 0)
+        self.assertTrue(row['identity_quarantined'])
+        self.assertEqual(row['reason'], 'CURRENT_START_DIFFERS_FROM_FROZEN_START')
         self.assertEqual(row['ncaa_saved_start_drift_minutes'], 60)
         self.assertEqual(row['original_ncaa_saved_start_utc'], START.isoformat())
         self.assertEqual(self.path.read_bytes(), self.before)
@@ -110,6 +112,29 @@ class FbsCohortTests(unittest.TestCase):
                           ('eligible_for_historical_evaluation',True),('independently_certified_official_final',True)]:
             self.final();self.dataset['rows'][0][key]=value
             with self.subTest(key=key,value=value),self.assertRaises(ValueError):self.classify()
+
+    def test_changed_final_start_cannot_attach_even_when_latest_sources_are_absent(self):
+        for minutes in (-60, 1, 60):
+            with self.subTest(minutes=minutes):
+                self.final()
+                self.current['rows']['espn'] = {}; self.current['rows']['ncaa'] = {}
+                for key in ('scheduled_start_utc', 'ncaa_scheduled_start_utc'):
+                    self.dataset['rows'][0][key] = (START+timedelta(minutes=minutes)).isoformat()
+                report = self.classify()
+                self.assertEqual(report['corroborated_result_observations'], 0)
+                self.assertTrue(report['rows'][0]['identity_quarantined'])
+                self.assertEqual(report['rows'][0]['reason'], 'RESULT_START_DIFFERS_FROM_FROZEN_START')
+                self.assertIsNone(report['rows'][0]['result_observation'])
+        self.assertEqual(self.path.read_bytes(), self.before)
+
+    def test_current_source_drift_with_old_agreeing_result_is_quarantined(self):
+        self.final()
+        later = START+timedelta(minutes=1)
+        self.current['rows']['espn']['401100001']['scheduled_start_utc'] = later.isoformat()
+        report = self.classify()
+        self.assertEqual(report['corroborated_result_observations'], 0)
+        self.assertTrue(report['rows'][0]['identity_quarantined'])
+        self.assertEqual(report['rows'][0]['reason'], 'CURRENT_START_DIFFERS_FROM_FROZEN_START')
 
 
 if __name__ == '__main__': unittest.main()

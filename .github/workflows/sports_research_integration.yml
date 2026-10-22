@@ -40,6 +40,7 @@ jobs:
           python sports_nba_final_games_page_v3.py --capture 20261021T100537057931Z > nba-native-final-break-status-diagnostic.json
           python sports_nba_v3_feature_diagnostic.py --capture 20261021T100537057931Z --provider-capture 20261021T100530748795Z > nba-v3-frozen-feature-source-diagnostic.json
           python sports_nba_native_feature_cohort.py > nba-native-feature-cohort-verification.json
+          python sports_nba_v3_feature_cohort.py > nba-v3-frozen-feature-source-audit.json
           python sports_nba_receipt_coverage.py --json > nba-native-receipt-coverage-verification.json
           python - <<'PY'
           import json
@@ -66,6 +67,7 @@ jobs:
             mlb-independent-cohort-evidence-verification.json
             nba-native-final-break-status-diagnostic.json
             nba-v3-frozen-feature-source-diagnostic.json
+            nba-v3-frozen-feature-source-audit.json
             nba-native-pregame-feature-replay.json
           if-no-files-found: error
           retention-days: 30

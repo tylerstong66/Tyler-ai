@@ -69,6 +69,9 @@ def classify(records, official, provider, *, nba_observed_at, espn_observed_at, 
                 reason = 'SOURCE_COMPETITION_DIFFERS_FROM_FROZEN_SCOPE'
             elif n['nba_postponed_status'] not in (None, '', 'N'):
                 reason = 'POSTPONED_OR_UNKNOWN_NBA_STATUS'
+            elif (source.utc(n['tipoff_utc']) != starts[0]
+                  or source.utc(e['scheduled_start_utc']) != starts[1]):
+                reason = 'CURRENT_START_DIFFERS_FROM_FROZEN_START'
             elif matched.get(e['espn_game_id']) != game_id:
                 reason = 'CURRENT_CROSSWALK_NOT_UNIQUE_FROZEN_IDENTITY'
             elif (game_id, e['espn_game_id']) in agreeing:
@@ -85,7 +88,8 @@ def classify(records, official, provider, *, nba_observed_at, espn_observed_at, 
                          else 'AWAITING_SAVED_START_WITHOUT_CORROBORATED_RESULT')
         row['identity_quarantined'] = reason in (
             'SOURCE_IDENTITY_DIFFERS_FROM_FROZEN_TEAMS', 'SOURCE_COMPETITION_DIFFERS_FROM_FROZEN_SCOPE',
-            'CURRENT_CROSSWALK_NOT_UNIQUE_FROZEN_IDENTITY', 'NON_BIJECTIVE_GAME_IDENTITY')
+            'CURRENT_CROSSWALK_NOT_UNIQUE_FROZEN_IDENTITY', 'NON_BIJECTIVE_GAME_IDENTITY',
+            'CURRENT_START_DIFFERS_FROM_FROZEN_START')
         rows.append(row)
     counts = Counter(row['status'] for row in rows)
     ages = {'nba': (now-nt).total_seconds()/3600, 'espn': (now-et).total_seconds()/3600}
