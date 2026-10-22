@@ -85,8 +85,12 @@ def observe_source(api_key, *, root=ROOT, get=None, clock=None):
     else:
         with original.open("xb") as stream:
             stream.write(raw)
+    archived_at = utc(clock().isoformat())
+    if archived_at < now or (archived_at - now).total_seconds() > 300:
+        raise ValueError("Original NHL source archive lag exceeds five minutes")
     manifest = {
         "schema": "nhl-research-provider-original-v1",
+        "archived_at": archived_at.isoformat(),
         "source_url": ENDPOINT,
         "request_parameters": SAFE_PARAMS,
         "retrieved_at": now.isoformat(),
