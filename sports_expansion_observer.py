@@ -196,7 +196,9 @@ def capture(fetch, *, now=None, base=Path("."), days_ahead=3, days_back=0):
     if now.tzinfo is None:
         raise ValueError("UTC clock and bounded 0-7 day horizon required")
     base=Path(base)
-    anchor=now.astimezone(timezone.utc).date() if days_back else now.date()
+    # Every source day is anchored to the UTC clock retained in the receipt.
+    # A caller's local offset must not silently move the ESPN date window.
+    anchor=now.astimezone(timezone.utc).date()
     # Only observed provider evidence, no original model scores/predictions.
     stamp=now.astimezone(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     folder=base/ROOT/"captures"/stamp
