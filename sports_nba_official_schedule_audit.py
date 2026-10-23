@@ -15,7 +15,7 @@ from pathlib import Path
 
 import requests
 import sports_expansion_observer as obs
-from sports_expansion_audit import archive_path, bounded_gzip_read, MAX_BLOB_SIZE
+from sports_expansion_audit import archive_path, bounded_gzip_read, MAX_BLOB_SIZE, audit_capture, strict_json_loads
 
 NBA_URL="https://cdn.nba.com/static/json/staticData/scheduleLeagueV2.json"
 ROOT=obs.ROOT/"nba_official"
@@ -35,7 +35,7 @@ def tricode(value):
 
 def official_games(raw):
     """Parse NBA-controlled current season schedule with fixed identity checks."""
-    payload=json.loads(raw)
+    payload=strict_json_loads(raw)
     groups=payload["leagueSchedule"]["gameDates"]
     if not isinstance(groups,list) or len(groups)<50:
         raise ValueError("NBA schedule payload missing expected season calendar")
@@ -110,7 +110,7 @@ def espn_games(manifest, capture_folder):
         raw=bounded_gzip_read(blob.read_bytes())
         if hashlib.sha256(raw).hexdigest()!=snap["original_response_sha256"]:
             raise ValueError("Archived ESPN NBA response hash disagrees")
-        payload=json.loads(raw)
+        payload=strict_json_loads(raw)
         for event in payload["events"]:
             game_id=str(event["id"])
             if game_id not in eligible or game_id in conflicted:
@@ -197,12 +197,14 @@ def run(fetch,*,base=Path("."),now=None,quarantine_future_cup_slots=False):
     last=archive_path(captures[-1])
     if last.stat().st_size > MAX_BLOB_SIZE:
         raise ValueError('Oversized NBA linked provider manifest')
-    manifest=json.loads(last.read_text())
+    manifest, _, _ = audit_capture(last)
     if not any(x["league"]=="NBA" for x in manifest["snapshots"]):
         raise ValueError("Latest expansion capture has no NBA source")
     raw=fetch(NBA_URL)
     if not isinstance(raw,bytes) or len(raw)>MAX_BYTES:
         raise ValueError("Missing or oversized independent NBA schedule response")
+    # Also validate raw JSON when the opt-in NBA slot parser owns decoding.
+    strict_json_loads(raw)
     if quarantine_future_cup_slots:
         import sports_nba_schedule_slots as slots
         official,quarantined=slots.parse(raw,observed_at=now.isoformat())
@@ -231,7 +233,7 @@ def run(fetch,*,base=Path("."),now=None,quarantine_future_cup_slots=False):
     if quarantine_future_cup_slots:
         saved.update(schema='nba-espn-independent-schedule-corroboration-v2',
                      nba_quarantine_policy=slots.POLICY,
-                     nba_source_season=json.loads(raw)['leagueSchedule']['seasonYear'],
+                     nba_source_season=strict_json_loads(raw)['leagueSchedule']['seasonYear'],
                      quarantined_future_cup_slots=quarantined,
                      nba_known_game_count=len(official),source_scope_complete=False,
                      forecasting_enabled=False,model_training_enabled=False,
