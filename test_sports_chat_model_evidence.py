@@ -36,13 +36,13 @@ class ModelChatEvidenceTests(unittest.TestCase):
                 self.assertEqual(verified_model_selection(item, NOW)["status"], "unavailable")
 
     def test_sports_chat_explicitly_disclaims_model_output(self):
-        with patch.object(app, "feedback_context", return_value=""), \\
+        with patch.object(app, "feedback_context", return_value=""), \
              patch.object(app, "groq", return_value="No verified model predictions") as model:
             app.reason_with_context("Research NBA odds tonight", research_context="Search excerpt")
         self.assertIn(chat_model_status(), model.call_args.args[0][1]["content"])
 
     def test_normal_chat_unaffected(self):
-        with patch.object(app, "feedback_context", return_value=""), \\
+        with patch.object(app, "feedback_context", return_value=""), \
              patch.object(app, "groq", return_value="hello") as model:
             app.reason_with_context("Hello")
         self.assertNotIn("SPORTS MODEL EVIDENCE STATUS", model.call_args.args[0][1]["content"])
