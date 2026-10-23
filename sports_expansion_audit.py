@@ -55,7 +55,10 @@ def strict_json_loads(raw):
                 raise ValueError("Duplicate key in archived source JSON")
             result[key] = value
         return result
-    return json.loads(raw, object_pairs_hook=unique_pairs)
+    def reject_constant(value):
+        raise ValueError("Non-finite JSON constant in archived source: " + value)
+    return json.loads(raw, object_pairs_hook=unique_pairs,
+                      parse_constant=reject_constant)
 
 
 def audit_capture(file):
