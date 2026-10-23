@@ -205,7 +205,7 @@ def capture(fetch, *, now=None, base=Path("."), days_ahead=3, days_back=0):
     stamp=now.astimezone(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     folder=base/ROOT/"captures"/stamp
     # Local import avoids the audit module's source-parser import cycle.
-    from sports_expansion_audit import archive_path
+    from sports_expansion_audit import archive_path, strict_json_loads
     archive_path(folder, directory=True, allow_missing=True)
     snapshots=[]
     blobs={}
@@ -218,7 +218,7 @@ def capture(fetch, *, now=None, base=Path("."), days_ahead=3, days_back=0):
             raw=fetch(url)
             if not isinstance(raw,bytes) or len(raw)>8_000_000:
                 raise ValueError("Invalid or oversized provider response")
-            payload=json.loads(raw)
+            payload=strict_json_loads(raw)
             parsed=parse_scoreboard(payload,league)
             filename=league+"_"+day+".json.gz"
             snapshots.append({
