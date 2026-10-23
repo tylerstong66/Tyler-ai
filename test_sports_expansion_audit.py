@@ -46,6 +46,33 @@ class SourceArchiveAuditTests(unittest.TestCase):
             self.assertTrue(result["no_official_independent_final_claim"])
             self.assertTrue(result["NO_BET"])
 
+    def test_duplicate_manifest_keys_fail_closed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            capture=self.build(root)
+            path=capture/"manifest.json"
+            raw=path.read_text()
+            path.write_text('{"NO_BET":false,' + raw.lstrip()[1:])
+            with self.assertRaises(ValueError):
+                audit.audit_capture(path)
+
+    def test_duplicate_original_json_keys_fail_closed_even_with_updated_hash(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            capture=self.build(root)
+            path=capture/"manifest.json"
+            manifest=json.loads(path.read_text())
+            snap=manifest["snapshots"][0]
+            blob=capture/snap["compressed_file"]
+            raw=gzip.decompress(blob.read_bytes())
+            altered=b'{"count":999,' + raw.lstrip()[1:]
+            self.assertNotEqual(altered,raw)
+            blob.write_bytes(gzip.compress(altered))
+            snap["original_response_sha256"]=hashlib.sha256(altered).hexdigest()
+            path.write_text(json.dumps(manifest))
+            with self.assertRaises(ValueError):
+                audit.audit_capture(path)
+
     def test_original_raw_source_tampering_fails_integrity(self):
         for variation in ("compressed_response","normalized_snapshot","quarantine",
                           "no_bet_flag","untracked_file","receipt_sha"):
