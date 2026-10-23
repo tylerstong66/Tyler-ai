@@ -184,7 +184,10 @@ class FbsFeatureTests(unittest.TestCase):
                 raw = features.source.canonical(saved); manifest_path.write_bytes(raw)
                 crosswalk[which+'_manifest_sha256'] = hashlib.sha256(raw).hexdigest()
                 path.write_bytes(features.source.canonical(crosswalk))
-                with self.assertRaisesRegex(ValueError, 'target season' if kind == 'year' else 'research guards'):
+                expected = ('target season' if kind == 'year' else
+                            'Invalid NCAA-owned research receipt' if kind == 'ncaa_bool'
+                            else 'research guards')
+                with self.assertRaisesRegex(ValueError, expected):
                     features.inspect(base, now=NOW, collect=True)
 
     def test_digest_pinned_protocol_cannot_be_replaced(self):
