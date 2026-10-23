@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-23T15:04:33.401945+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-23T19:13:47.193651+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 84 / 82 / 2 |
+| Recorded / settled / pending | 85 / 82 / 3 |
 | Started games in retained official schedules / enrolled | 82 / 82 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 84 / 84 |
+| Enrollment-time priced forecasts | 85 / 85 |
 | Settled with enrollment prices / decisive market-paired | 82 / 82 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -23,12 +23,13 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-23T15:04:33.401945+00:00. Ready: 2 / 2 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-23T19:13:47.193651+00:00. Ready: 3 / 3 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
 | 2026020166 | MTL at CHI | True | False | True | None |
 | 2026020167 | TBL at COL | True | False | True | None |
+| 2026020168 | ANA at PHI | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -120,10 +121,11 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020165 | DET at VAN | 2026-10-23T02:00:00+00:00 | enrolled | — |
 | 2026020166 | MTL at CHI | 2026-10-24T00:00:00+00:00 | enrolled | — |
 | 2026020167 | TBL at COL | 2026-10-24T01:00:00+00:00 | enrolled | — |
+| 2026020168 | ANA at PHI | 2026-10-24T17:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 84. Latest: `20261023T150431483378Z`.
+Audited capture manifests: 85. Latest: `20261023T191345002051Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
