@@ -95,7 +95,7 @@ def _event(event, payload):
         sides[side]=team
     if set(sides)!=set(("home","away")):
         raise ValueError("Missing opponent")
-    if sides["home"]["team"]["id"]==sides["away"]["team"]["id"]:
+    if str(sides["home"]["team"]["id"])==str(sides["away"]["team"]["id"]):
         raise ValueError("Identical competing teams")
     status=event["status"]["type"]
     state=status.get("state")
