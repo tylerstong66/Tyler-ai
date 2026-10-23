@@ -129,9 +129,16 @@ def audit_capture(file):
 def audit(base=Path(".")):
     root=Path(base)/source.ROOT
     captures=archive_path(root/"captures", directory=True, allow_missing=True)
-    manifests=sorted(captures.glob("*/manifest.json"))
-    if not manifests or len(manifests)>MAX_CAPTURES:
+    if not captures.exists():
         raise ValueError("Missing or unexpectedly many expansion source captures")
+    entries=sorted(captures.iterdir())
+    if not entries or len(entries)>MAX_CAPTURES:
+        raise ValueError("Missing or unexpectedly many expansion source captures")
+    # Do not silently skip a partially written capture or an untracked sibling.
+    manifests=[]
+    for entry in entries:
+        archive_path(entry, directory=True)
+        manifests.append(archive_path(entry/"manifest.json"))
     leagues=defaultdict(lambda:{"captures":0,"snapshot_days":0,"provider_games_observed":0,
                                 "provider_finals_not_independently_verified":0,
                                 "most_recent_capture_utc":None})

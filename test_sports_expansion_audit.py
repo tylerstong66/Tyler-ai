@@ -172,6 +172,24 @@ class SourceArchiveAuditTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'exceeds maximum'):
                 audit.audit(root)
 
+    def test_capture_root_rejects_incomplete_or_untracked_entries(self):
+        for fault in ("untracked_file", "untracked_directory",
+                      "missing_manifest", "untracked_symlink"):
+            with self.subTest(fault=fault), tempfile.TemporaryDirectory() as directory:
+                root=Path(directory)
+                capture=self.build(root)
+                if fault=="untracked_file":
+                    (capture.parent/"stray.txt").write_text("untracked")
+                elif fault=="untracked_directory":
+                    (capture.parent/"unsealed").mkdir()
+                elif fault=="missing_manifest":
+                    (capture/"manifest.json").unlink()
+                elif fault=="untracked_symlink":
+                    (capture.parent/"other_capture").symlink_to(
+                        capture, target_is_directory=True)
+                with self.assertRaises(ValueError):
+                    audit.audit(root)
+
     def test_no_existing_captures_does_not_claim_completeness(self):
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaisesRegex(ValueError,"Missing or unexpectedly many"):
