@@ -15,6 +15,7 @@ from urllib.parse import urlencode
 import requests
 import sports_source_collection_window as collection_window
 import sports_expansion_observer as existing
+from sports_expansion_audit import strict_json_loads
 
 ROOT=existing.ROOT/"ncaa_official"
 ENDPOINT="https://sdataprod.ncaa.com/"
@@ -68,7 +69,7 @@ def _positive_id(value,label):
 def official_scoreboard(raw,sport):
     if sport not in SPORTS:
         raise ValueError("Unknown NCAA league")
-    payload=json.loads(raw)
+    payload=strict_json_loads(raw)
     if payload.get("errors"):
         raise ValueError("NCAA official GraphQL errors are not empty fixtures")
     data=payload.get("data")
