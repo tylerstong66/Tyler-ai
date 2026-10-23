@@ -73,6 +73,23 @@ class SourceArchiveAuditTests(unittest.TestCase):
                 with self.assertRaises((ValueError,KeyError)):
                     audit.audit(root)
 
+    def test_reject_forged_wager_type_or_enabled_league_roster(self):
+        for field, value in (
+            ("actual_wagers", False),
+            ("actual_wagers", 0.0),
+            ("enabled_leagues", ["NBA"]),
+            ("enabled_leagues", list(reversed(obs.LEAGUES))),
+        ):
+            with self.subTest(field=field, value=value), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                capture = self.build(root)
+                path = capture / "manifest.json"
+                saved = json.loads(path.read_text())
+                saved[field] = value
+                path.write_text(json.dumps(saved))
+                with self.assertRaisesRegex(ValueError, "safety or immutable protocol"):
+                    audit.audit_capture(path)
+
     def test_time_and_url_mismatches_fail_closed(self):
         for fault in ("day","url","time","name","file"):
             with self.subTest(fault=fault),tempfile.TemporaryDirectory() as directory:
