@@ -17,6 +17,15 @@ def search_queries(message):
         return [scope + ' official schedule matchups kickoff times',
                 scope + ' FanDuel moneyline game totals anytime touchdown odds',
                 scope + ' injury reports starting quarterbacks EPA offensive defensive efficiency']
+    if is_sports_research(text) and re.search(r'\\bNBA\\b', text, re.I) and re.search(r'\\b(?:tonight|today|games|schedule|selections|picks|recommendations)\\b', text, re.I):
+        dates = list(dict.fromkeys(re.findall(_DATES, text, re.I)))
+        scope = ('NBA ' + ' '.join(dates))[:200].strip()
+        if not dates and re.search(r'\\b(?:tonight|today)\\b', text, re.I):
+            # Caller supplies retrieval timestamp; do not silently assume a date.
+            scope += ' today'
+        return [scope + ' official NBA schedule games start times',
+                scope + ' official NBA injury report expected starting lineups',
+                scope + ' FanDuel basketball moneyline spreads totals current odds']
     return [search_query(text)]
 
 

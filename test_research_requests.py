@@ -71,6 +71,31 @@ class ResearchRequestTests(unittest.TestCase):
         self.assertIn('FanDuel', queries[1])
         self.assertIn('injury', queries[2])
 
+    def test_nba_recommendations_retrieve_distinct_evidence_for_explicit_date(self):
+        request = ('Research tonight NBA games October 23, 2026 and return three '
+                   'hypothetical recommendations with FanDuel odds and injuries')
+        queries = search_queries(request)
+        self.assertEqual(len(queries), 3)
+        self.assertTrue(all('October 23, 2026' in query for query in queries))
+        self.assertIn('official NBA schedule', queries[0])
+        self.assertIn('injury report', queries[1])
+        self.assertIn('FanDuel', queries[2])
+        self.assertTrue(all(len(query) < 400 for query in queries))
+
+    def test_nba_chat_uses_all_research_categories_without_fabricating_model_output(self):
+        message = 'Research NBA games October 23, 2026 and suggest hypothetical picks'
+        searches = [{'answer': 'Schedule evidence', 'sources': []},
+                    {'answer': 'Injury evidence', 'sources': []},
+                    {'answer': 'Odds not independently verified', 'sources': []}]
+        with patch.object(app, 'tavily_search', side_effect=searches) as search, \\
+                patch.object(app, 'reason_with_context', return_value='No verified model picks') as reason:
+            result = app.run_agent(message)
+        self.assertEqual(search.call_count, 3)
+        context = reason.call_args.kwargs['research_context']
+        for evidence in ('Schedule evidence', 'Injury evidence', 'Odds not independently verified'):
+            self.assertIn(evidence, context)
+        self.assertEqual(result['reply'], 'No verified model picks')
+
     def test_partial_retrieval_retains_successes_and_discloses_failure(self):
         results = [{'answer': 'Official schedule', 'sources': []},
                    RuntimeError('timeout'), {'answer': 'Limited injuries', 'sources': []}]
