@@ -1,6 +1,6 @@
 # Tyler MLB prospective paper test
 
-Recorded: **10** · Settled: **7** · Pending: **3**
+Recorded: **11** · Settled: **7** · Pending: **4**
 
 **NO BET — actual wagers $0.**
 
@@ -24,6 +24,7 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | TB at CLE | Oct 16 06:00 PM | CLE | 50.5% |
 | MIL at LAD | Oct 16 09:00 PM | LAD | 50.8% |
 | TB at CLE | Oct 17 08:00 PM | CLE | 51.2% |
+| TB at MIL | Oct 23 08:00 PM | MIL | 57.5% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
 

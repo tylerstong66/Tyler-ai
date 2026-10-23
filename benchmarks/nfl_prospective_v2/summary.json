@@ -4,44 +4,44 @@
   "availability_records": 158,
   "full_three_outcome_metrics": {
     "v1": {
-      "full_brier": 0.5304859336841148,
-      "full_log_loss": 0.8740563168636429
+      "full_brier": 0.5265856877101097,
+      "full_log_loss": 0.8648974227645485
     },
     "v2": {
-      "full_brier": 0.5280663279007577,
-      "full_log_loss": 0.8713509051592545
+      "full_brier": 0.5242591505363795,
+      "full_log_loss": 0.8622953547302092
     }
   },
   "injury_effect_enabled": false,
   "paired_metrics": {
     "market": {
-      "binary_brier": 0.4666847056459483,
-      "conditional_log_loss": 0.6641586007646366,
-      "correct": 0.6153846153846154
+      "binary_brier": 0.46228120820878604,
+      "conditional_log_loss": 0.6595446050056825,
+      "correct": 0.6296296296296297
     },
     "v1": {
-      "binary_brier": 0.49377285394992304,
-      "conditional_log_loss": 0.6880917443934967,
-      "correct": 0.5769230769230769
+      "binary_brier": 0.49107694686174724,
+      "conditional_log_loss": 0.6853459311384568,
+      "correct": 0.5925925925925926
     },
     "v2": {
-      "binary_brier": 0.49123787226798526,
-      "conditional_log_loss": 0.6852822783927857,
-      "correct": 0.6153846153846154
+      "binary_brier": 0.4886427769427278,
+      "conditional_log_loss": 0.6826474902139569,
+      "correct": 0.6296296296296297
     }
   },
-  "paired_priced_decisive_games": 26,
-  "pending": 1,
+  "paired_priced_decisive_games": 27,
+  "pending": 0,
   "recorded": 28,
-  "settled": 27,
+  "settled": 28,
   "state": "collecting",
   "target": 100,
   "week_block_brier_difference": {
     "approximate_95_percent_interval": null,
-    "blocks": 2,
+    "blocks": 3,
     "draws": 0,
     "limitation": "No confidence interval below five season/week blocks; point estimate is descriptive, not a demonstrated edge.",
-    "mean_model_minus_market": 0.02455316662203701,
+    "mean_model_minus_market": 0.026361568733941708,
     "minimum_blocks": 5,
     "seed": 1729,
     "uncertainty_status": "insufficient_blocks"

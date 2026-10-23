@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-22T23:23:05.716709+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
+Evidence through **2026-10-23T04:50:18.092771+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 10 / 7 / 3 |
+| Recorded / settled / pending | 11 / 7 / 4 |
 | Started games in retained official schedules / enrolled | 12 / 10 |
 | Observed missing started games | 2 |
-| Enrollment-time priced forecasts | 7 / 10 |
+| Enrollment-time priced forecasts | 8 / 11 |
 | Settled with enrollment prices / decisive market-paired | 5 / 5 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -30,10 +30,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-22T23:23:05.716709+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
+As of retained evidence: 2026-10-23T04:50:18.092771+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
+| 849805 | Tampa Bay Rays at Milwaukee Brewers | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -41,6 +42,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 | Game | Matchup | Start (UTC) | Decision | Exclusion evidence |
 |---|---|---|---|---|
+| 849805 | Tampa Bay Rays at Milwaukee Brewers | 2026-10-24T00:00:00+00:00 | enrolled | — |
 | 849808 | Milwaukee Brewers at Los Angeles Dodgers | 2026-10-17T01:00:00+00:00 | enrolled | — |
 | 849809 | Los Angeles Dodgers at Milwaukee Brewers | 2026-10-12T00:00:00+00:00 | enrolled | — |
 | 849810 | Milwaukee Brewers at Los Angeles Dodgers | 2026-10-16T00:00:00+00:00 | enrolled | — |
@@ -56,7 +58,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 79. Latest: `20261022T232302089258Z`.
+Audited capture manifests: 80. Latest: `20261023T045014549507Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
