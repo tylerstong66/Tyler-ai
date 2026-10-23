@@ -1,0 +1,67 @@
+{
+  "actual_wager": 0,
+  "condition": "at_least_one_official_at_bat",
+  "conditional_at_bat_probabilities": {
+    "hit": 0.62,
+    "hr": 0.116
+  },
+  "event_start_utc": "2026-10-24T00:00:00+00:00",
+  "frozen_at_utc": "2026-10-23T18:29:12.736751+00:00",
+  "game_id": 849805,
+  "historical_input_sha256": "c99574809210c81b410188856d6b780822cea8c223b496c93f4d4da6151e135c",
+  "hitter_id": 650490,
+  "hitter_name": "Yandy D\u00edaz",
+  "hitter_side": "away",
+  "hitter_team_id": 139,
+  "model": "mlb_hitter_game_frequency_shadow_v1",
+  "model_calibrated": false,
+  "official_historical_at_bat_eligible_games": 303,
+  "official_historical_games_observed": 304,
+  "opponent_team_id": 158,
+  "record_digest_sha256": "133e76560d219ff4c4e0d67b71ab6dd16aeab2b44cb484e13d3cb984226eeb87",
+  "schema": "mlb_hit_prop_shadow_ledger_v1",
+  "source_capture_started_at_utc": "2026-10-23T18:29:12.377392+00:00",
+  "source_receipts": {
+    "active_roster": {
+      "data_through": "2026-10-23T18:29:12.435905+00:00",
+      "original_response_archive_schema": "mlb-original-response-archive-v1",
+      "original_response_sha256": "0d8632b229592e4461abd56a31ef855e3eaf0d8f927fd22089789c32b5c53386",
+      "response_sha256": "dabad11a0872e94bbab1a44936e04e8f268c7a4bd686351f4e8931de983eba82",
+      "retrieved_at": "2026-10-23T18:29:12.435905+00:00",
+      "source_archive_file": "0d8632b229592e4461abd56a31ef855e3eaf0d8f927fd22089789c32b5c53386.json.gz",
+      "source_url": "https://statsapi.mlb.com/api/v1/teams/139/roster?date=2026-10-23&rosterType=active"
+    },
+    "hitter_game_logs": [
+      {
+        "data_through": "2026-10-23T18:29:12.636491+00:00",
+        "original_response_archive_schema": "mlb-original-response-archive-v1",
+        "original_response_sha256": "3e7b0d9a951ebee72467f85f1290d0e9967a82e88b449ca49099b80de4d1da4d",
+        "response_sha256": "dac4df2e0c02ba03d79c46b895467f06c914ad8f342372c5e418830479251856",
+        "retrieved_at": "2026-10-23T18:29:12.636491+00:00",
+        "source_archive_file": "3e7b0d9a951ebee72467f85f1290d0e9967a82e88b449ca49099b80de4d1da4d.json.gz",
+        "source_url": "https://statsapi.mlb.com/api/v1/people/650490/stats?gameType=R&group=hitting&season=2025&stats=gameLog"
+      },
+      {
+        "data_through": "2026-10-23T18:29:12.722749+00:00",
+        "original_response_archive_schema": "mlb-original-response-archive-v1",
+        "original_response_sha256": "574c0d7b668ce34f9c93d5f1bc2f4e6a652536aeff479c5d2a46f6bac2ae68cf",
+        "response_sha256": "eb7e5bec4e9bff704231390c2e14005a175879f301e610c251e13f7f9850f290",
+        "retrieved_at": "2026-10-23T18:29:12.722749+00:00",
+        "source_archive_file": "574c0d7b668ce34f9c93d5f1bc2f4e6a652536aeff479c5d2a46f6bac2ae68cf.json.gz",
+        "source_url": "https://statsapi.mlb.com/api/v1/people/650490/stats?gameType=R&group=hitting&season=2026&stats=gameLog"
+      }
+    ],
+    "pregame_game": {
+      "data_through": "2026-10-23T18:29:12.401793+00:00",
+      "original_response_archive_schema": "mlb-original-response-archive-v1",
+      "original_response_sha256": "34b54da72fea089e83636f94d8aee8208127666a549a6adc4783bcb9ebfe3e62",
+      "response_sha256": "804d1125987140af9d8a85ed8f14f6596082f836982d6fd888576a489e955a52",
+      "retrieved_at": "2026-10-23T18:29:12.401793+00:00",
+      "source_archive_file": "34b54da72fea089e83636f94d8aee8208127666a549a6adc4783bcb9ebfe3e62.json.gz",
+      "source_url": "https://statsapi.mlb.com/api/v1.1/game/849805/feed/live"
+    }
+  },
+  "sportsbook_wager_eligible": false,
+  "status": "IMMUTABLE_PREGAME_SHADOW_NO_BET",
+  "training_game_day_before": "2026-10-23"
+}

@@ -1,0 +1,67 @@
+{
+  "actual_wager": 0,
+  "condition": "at_least_one_official_at_bat",
+  "conditional_at_bat_probabilities": {
+    "hit": 0.59,
+    "hr": 0.116
+  },
+  "event_start_utc": "2026-10-24T00:00:00+00:00",
+  "frozen_at_utc": "2026-10-23T18:29:13.070739+00:00",
+  "game_id": 849805,
+  "historical_input_sha256": "f2b0e088d561ce9a9a60dd1cce5a50d37f44bd4cb7745193760b5da39c81be1d",
+  "hitter_id": 656775,
+  "hitter_name": "Cedric Mullins",
+  "hitter_side": "away",
+  "hitter_team_id": 139,
+  "model": "mlb_hitter_game_frequency_shadow_v1",
+  "model_calibrated": false,
+  "official_historical_at_bat_eligible_games": 263,
+  "official_historical_games_observed": 270,
+  "opponent_team_id": 158,
+  "record_digest_sha256": "af2b78e7086a3bca38dbd6b27260ae735a0f24714bc3fecc009e91703e8a6ce1",
+  "schema": "mlb_hit_prop_shadow_ledger_v1",
+  "source_capture_started_at_utc": "2026-10-23T18:29:12.737360+00:00",
+  "source_receipts": {
+    "active_roster": {
+      "data_through": "2026-10-23T18:29:12.799599+00:00",
+      "original_response_archive_schema": "mlb-original-response-archive-v1",
+      "original_response_sha256": "0d8632b229592e4461abd56a31ef855e3eaf0d8f927fd22089789c32b5c53386",
+      "response_sha256": "dabad11a0872e94bbab1a44936e04e8f268c7a4bd686351f4e8931de983eba82",
+      "retrieved_at": "2026-10-23T18:29:12.799599+00:00",
+      "source_archive_file": "0d8632b229592e4461abd56a31ef855e3eaf0d8f927fd22089789c32b5c53386.json.gz",
+      "source_url": "https://statsapi.mlb.com/api/v1/teams/139/roster?date=2026-10-23&rosterType=active"
+    },
+    "hitter_game_logs": [
+      {
+        "data_through": "2026-10-23T18:29:12.962104+00:00",
+        "original_response_archive_schema": "mlb-original-response-archive-v1",
+        "original_response_sha256": "7f00c2d77cd9381fd69902d3276d803c3ef6b5b73ebec535b912063e248e548f",
+        "response_sha256": "e027f0954db4c37812c90c3d0b6798add76731cd067d8b7c1a2e59986b070635",
+        "retrieved_at": "2026-10-23T18:29:12.962104+00:00",
+        "source_archive_file": "7f00c2d77cd9381fd69902d3276d803c3ef6b5b73ebec535b912063e248e548f.json.gz",
+        "source_url": "https://statsapi.mlb.com/api/v1/people/656775/stats?gameType=R&group=hitting&season=2025&stats=gameLog"
+      },
+      {
+        "data_through": "2026-10-23T18:29:13.058946+00:00",
+        "original_response_archive_schema": "mlb-original-response-archive-v1",
+        "original_response_sha256": "d830d80445a443c6c9c93767e30987956b4a57c8b1426b49712159cb2a42032d",
+        "response_sha256": "919235cd251b1475bd5655ea47dd4fd8482b59af968390862a30957e3e371456",
+        "retrieved_at": "2026-10-23T18:29:13.058946+00:00",
+        "source_archive_file": "d830d80445a443c6c9c93767e30987956b4a57c8b1426b49712159cb2a42032d.json.gz",
+        "source_url": "https://statsapi.mlb.com/api/v1/people/656775/stats?gameType=R&group=hitting&season=2026&stats=gameLog"
+      }
+    ],
+    "pregame_game": {
+      "data_through": "2026-10-23T18:29:12.761800+00:00",
+      "original_response_archive_schema": "mlb-original-response-archive-v1",
+      "original_response_sha256": "34b54da72fea089e83636f94d8aee8208127666a549a6adc4783bcb9ebfe3e62",
+      "response_sha256": "804d1125987140af9d8a85ed8f14f6596082f836982d6fd888576a489e955a52",
+      "retrieved_at": "2026-10-23T18:29:12.761800+00:00",
+      "source_archive_file": "34b54da72fea089e83636f94d8aee8208127666a549a6adc4783bcb9ebfe3e62.json.gz",
+      "source_url": "https://statsapi.mlb.com/api/v1.1/game/849805/feed/live"
+    }
+  },
+  "sportsbook_wager_eligible": false,
+  "status": "IMMUTABLE_PREGAME_SHADOW_NO_BET",
+  "training_game_day_before": "2026-10-23"
+}

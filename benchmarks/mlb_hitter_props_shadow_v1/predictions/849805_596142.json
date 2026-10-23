@@ -1,0 +1,67 @@
+{
+  "actual_wager": 0,
+  "condition": "at_least_one_official_at_bat",
+  "conditional_at_bat_probabilities": {
+    "hit": 0.49,
+    "hr": 0.116
+  },
+  "event_start_utc": "2026-10-24T00:00:00+00:00",
+  "frozen_at_utc": "2026-10-23T18:29:11.548355+00:00",
+  "game_id": 849805,
+  "historical_input_sha256": "2ca0330dd655753387669256cdcc31c70cc4e316fb69bb9da8b51dc4560631c2",
+  "hitter_id": 596142,
+  "hitter_name": "Gary S\u00e1nchez",
+  "hitter_side": "home",
+  "hitter_team_id": 158,
+  "model": "mlb_hitter_game_frequency_shadow_v1",
+  "model_calibrated": false,
+  "official_historical_at_bat_eligible_games": 111,
+  "official_historical_games_observed": 115,
+  "opponent_team_id": 139,
+  "record_digest_sha256": "4fb1df179f046a4b1ac20a18b00a2c937e9ea7bdff7aac461192d0549ceb599d",
+  "schema": "mlb_hit_prop_shadow_ledger_v1",
+  "source_capture_started_at_utc": "2026-10-23T18:29:11.247764+00:00",
+  "source_receipts": {
+    "active_roster": {
+      "data_through": "2026-10-23T18:29:11.342869+00:00",
+      "original_response_archive_schema": "mlb-original-response-archive-v1",
+      "original_response_sha256": "f846ffadfb32bee246728c67383ce506316199bd5ea163a2ea479ebbdb1ff4bb",
+      "response_sha256": "5dfc437d9d071d6b721588988e2eef7b0ec3d42e814b982112c0b338177f8a7b",
+      "retrieved_at": "2026-10-23T18:29:11.342869+00:00",
+      "source_archive_file": "f846ffadfb32bee246728c67383ce506316199bd5ea163a2ea479ebbdb1ff4bb.json.gz",
+      "source_url": "https://statsapi.mlb.com/api/v1/teams/158/roster?date=2026-10-23&rosterType=active"
+    },
+    "hitter_game_logs": [
+      {
+        "data_through": "2026-10-23T18:29:11.463907+00:00",
+        "original_response_archive_schema": "mlb-original-response-archive-v1",
+        "original_response_sha256": "d933e952264b28c1bebe3dd1d6b0e760c34deff793aef282acaa0c97a2538fd3",
+        "response_sha256": "dae64a2aeb7f1a4a2d18336c345b271d51008881d3e4e3e969b6f3ac5c2bb90d",
+        "retrieved_at": "2026-10-23T18:29:11.463907+00:00",
+        "source_archive_file": "d933e952264b28c1bebe3dd1d6b0e760c34deff793aef282acaa0c97a2538fd3.json.gz",
+        "source_url": "https://statsapi.mlb.com/api/v1/people/596142/stats?gameType=R&group=hitting&season=2025&stats=gameLog"
+      },
+      {
+        "data_through": "2026-10-23T18:29:11.540830+00:00",
+        "original_response_archive_schema": "mlb-original-response-archive-v1",
+        "original_response_sha256": "63eb702bdf1e3782cac2681ade7cdd75d0101375b0651c8d3137aa41cb631883",
+        "response_sha256": "b9889e8229670d0853a2c30802c746635eed9db418ad53e665ca26f16e58b467",
+        "retrieved_at": "2026-10-23T18:29:11.540830+00:00",
+        "source_archive_file": "63eb702bdf1e3782cac2681ade7cdd75d0101375b0651c8d3137aa41cb631883.json.gz",
+        "source_url": "https://statsapi.mlb.com/api/v1/people/596142/stats?gameType=R&group=hitting&season=2026&stats=gameLog"
+      }
+    ],
+    "pregame_game": {
+      "data_through": "2026-10-23T18:29:11.274598+00:00",
+      "original_response_archive_schema": "mlb-original-response-archive-v1",
+      "original_response_sha256": "34b54da72fea089e83636f94d8aee8208127666a549a6adc4783bcb9ebfe3e62",
+      "response_sha256": "804d1125987140af9d8a85ed8f14f6596082f836982d6fd888576a489e955a52",
+      "retrieved_at": "2026-10-23T18:29:11.274598+00:00",
+      "source_archive_file": "34b54da72fea089e83636f94d8aee8208127666a549a6adc4783bcb9ebfe3e62.json.gz",
+      "source_url": "https://statsapi.mlb.com/api/v1.1/game/849805/feed/live"
+    }
+  },
+  "sportsbook_wager_eligible": false,
+  "status": "IMMUTABLE_PREGAME_SHADOW_NO_BET",
+  "training_game_day_before": "2026-10-23"
+}
