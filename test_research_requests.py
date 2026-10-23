@@ -17,6 +17,23 @@ LONG_REQUEST = (
 
 
 class ResearchRequestTests(unittest.TestCase):
+    def test_nba_picks_tonight_reaches_research_and_three_evidence_queries(self):
+        from research_requests import is_sports_research
+        self.assertTrue(is_sports_research("NBA picks tonight"))
+        self.assertTrue(app.needs_research("NBA picks tonight"))
+        queries = search_queries("NBA picks tonight")
+        self.assertEqual(len(queries), 3)
+        self.assertIn("schedule", queries[0])
+        self.assertIn("injury", queries[1])
+        self.assertIn("FanDuel", queries[2])
+
+    def test_sports_prediction_and_non_sports_routing(self):
+        from research_requests import is_sports_research
+        self.assertTrue(is_sports_research("NHL predictions"))
+        self.assertTrue(app.needs_research("NFL winners"))
+        self.assertFalse(is_sports_research("What are my personal goals?"))
+        self.assertFalse(app.needs_research("What are my personal goals?"))
+
     def test_large_task_fits_real_search_api_and_keeps_scope(self):
         response = Mock(ok=True)
         response.json.return_value = {'answer': '', 'results': []}
