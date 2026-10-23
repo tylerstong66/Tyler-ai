@@ -6,6 +6,7 @@ import math
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import sports_profitability_v1 as p
 import sports_profitability_selection as selection
@@ -208,6 +209,26 @@ class ProfitabilityContractTests(unittest.TestCase):
         seal(altered)
         with self.assertRaisesRegex(ValueError, "replay/paper probability mismatch"):
             self.evaluate(predictions=[altered], closing=[])
+
+    def test_frozen_model_replays_only_the_sha_verified_bounded_original_bytes(self):
+        # Path.read_bytes would be an unbounded second disk read after the
+        # SHA-256 check, permitting a changed source to be parsed instead.
+        # The original-byte verifier itself uses a bounded regular-file open.
+        with (patch.object(Path, "read_bytes",
+                           side_effect=AssertionError("Unverified second read")),
+              patch.object(p, "original_bytes",
+                           wraps=p.original_bytes) as verified):
+            self.assertTrue(p.verify_original_prediction(self.pred, self.root))
+            verified.assert_called_once_with(self.original_archive, self.root)
+
+    def test_corrupted_frozen_model_never_reaches_an_unverified_second_read(self):
+        target = self.root / self.original_archive["path"]
+        with target.open("ab") as stream:
+            stream.write(b" ")
+        with patch.object(Path, "read_bytes",
+                          side_effect=AssertionError("Unverified second read")):
+            with self.assertRaisesRegex(ValueError, "SHA-256"):
+                p.verify_original_prediction(self.pred, self.root)
 
     def test_original_frozen_forecast_model_fingerprint_and_archive_must_match(self):
         altered = copy.deepcopy(self.pred)
