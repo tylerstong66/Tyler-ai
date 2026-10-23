@@ -25,6 +25,8 @@ def nhl_verified_chat_comparison(prediction, entry_quote, archive_root, now=None
             raise ValueError("Model record is future-dated or event already started")
         if utc(entry_quote["recorded_at"]) > clock:
             raise ValueError("Quote was not available at evaluation time")
+        if (clock - utc(entry_quote["recorded_at"])).total_seconds() > 300:
+            raise ValueError("Archived entry price is stale for a current chat comparison")
         probabilities = prediction["probabilities"]
         outcomes = {}
         for side in ("home", "away"):
