@@ -755,6 +755,8 @@ def reason_with_context(
     )
 
     if sports_research:
+        from sports_chat_model_evidence import chat_model_status
+        prompt += '\n' + chat_model_status()
         prompt += (
             '\nProvide evidence-based sports research and hypothetical selections where supported. '
             'This is analysis only; never execute wagers. Cite supplied source URLs and distinguish '
