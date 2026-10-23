@@ -134,10 +134,12 @@ def parse_scoreboard(payload, league):
     events=payload.get("events")
     if not isinstance(events,list) or len(events)>=LIMIT:
         raise ValueError("Missing or potentially truncated source event slate")
-    if (payload.get("count") is not None
-            and (type(payload["count"]) is not int
-                 or payload["count"]>len(events))):
-        raise ValueError("Provider scoreboard count exceeds returned events")
+    count=payload.get("count")
+    if count is not None:
+        if type(count) is not int or count<0:
+            raise ValueError("Provider scoreboard count must be a nonnegative integer")
+        if count>len(events):
+            raise ValueError("Provider scoreboard count exceeds returned events")
     records=[];excluded=[];ids=set()
     for e in events:
         identifier=str(e.get("id"))
