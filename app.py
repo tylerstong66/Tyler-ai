@@ -250,7 +250,9 @@ def needs_memory(message):
 
 def needs_research(message):
     text = normalized(message)
-    return any((term in text for term in ['research', 'latest', 'current', 'today', 'recent', 'news', 'look up', 'search', 'right now', 'available now']))
+    from research_requests import is_sports_research
+    return (any(term in text for term in ['research', 'latest', 'current', 'today', 'recent', 'news', 'look up', 'search', 'right now', 'available now'])
+            or is_sports_research(message))
 
 def simple_project_recall(message):
     text = normalized(message)
