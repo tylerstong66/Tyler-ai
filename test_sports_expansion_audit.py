@@ -73,6 +73,23 @@ class SourceArchiveAuditTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 audit.audit_capture(path)
 
+    def test_nonfinite_original_json_fails_closed_even_with_updated_hash(self):
+        for constant in (b'NaN', b'Infinity', b'-Infinity'):
+            with self.subTest(constant=constant), tempfile.TemporaryDirectory() as directory:
+                root=Path(directory)
+                capture=self.build(root)
+                path=capture/"manifest.json"
+                manifest=json.loads(path.read_text())
+                snap=manifest["snapshots"][0]
+                blob=capture/snap["compressed_file"]
+                raw=gzip.decompress(blob.read_bytes())
+                altered=b'{"untrusted":' + constant + b',' + raw.lstrip()[1:]
+                blob.write_bytes(gzip.compress(altered,mtime=0))
+                snap["original_response_sha256"]=hashlib.sha256(altered).hexdigest()
+                path.write_text(json.dumps(manifest))
+                with self.assertRaisesRegex(ValueError, "Non-finite JSON constant"):
+                    audit.audit_capture(path)
+
     def test_original_raw_source_tampering_fails_integrity(self):
         for variation in ("compressed_response","normalized_snapshot","quarantine",
                           "no_bet_flag","untracked_file","receipt_sha"):
