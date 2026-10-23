@@ -32,7 +32,7 @@ def search_queries(message):
 def is_sports_research(message):
     text = str(message or "")
     return bool(re.search(r"\b(?:NFL|NBA|NHL|MLB|football|basketball|baseball|hockey)\b", text, re.I)
-                and re.search(r"\b(?:research|odds|parlay|moneyline|matchup|touchdown)\b", text, re.I))
+                and re.search(r"\b(?:research|odds|parlay|moneyline|matchup|touchdown|picks?|predictions?|selections?|recommendations?|betting|winners?|totals?|spreads?)\b", text, re.I))
 
 
 def search_query(message):
