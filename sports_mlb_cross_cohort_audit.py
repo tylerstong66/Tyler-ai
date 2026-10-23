@@ -16,11 +16,26 @@ HITTER_ROOT = Path('benchmarks/mlb_hitter_props_shadow_v1')
 HEX = re.compile(r'[0-9a-f]{64}')
 
 
+def _strict_json(raw):
+    """Archived evidence must not have ambiguous keys or non-standard numbers."""
+    def unique_pairs(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError('Duplicate JSON key in frozen MLB evidence')
+            result[key] = value
+        return result
+    def reject_constant(value):
+        raise ValueError('Non-finite JSON constant in frozen MLB evidence')
+    return json.loads(raw, object_pairs_hook=unique_pairs,
+                      parse_constant=reject_constant)
+
+
 def _read(path, limit=3_000_000):
     if path.is_symlink() or path.parent.is_symlink() or not path.is_file() or path.stat().st_size > limit:
         raise ValueError('Missing or invalid bounded cohort input')
     raw = path.read_bytes()
-    return raw, json.loads(raw)
+    return raw, _strict_json(raw)
 
 
 def _digest(value):
