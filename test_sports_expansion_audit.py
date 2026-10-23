@@ -52,7 +52,7 @@ class SourceArchiveAuditTests(unittest.TestCase):
             capture=self.build(root)
             path=capture/"manifest.json"
             raw=path.read_text()
-            path.write_text(raw.replace('"NO_BET": true', '"NO_BET": false, "NO_BET": true', 1))
+            path.write_text('{"NO_BET":false,' + raw.lstrip()[1:])
             with self.assertRaises(ValueError):
                 audit.audit_capture(path)
 
