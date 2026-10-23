@@ -5,7 +5,7 @@ import json
 import tempfile
 import unittest
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import sports_expansion_observer as obs
@@ -180,6 +180,59 @@ class ExpansionObserverTests(unittest.TestCase):
             result=obs.capture(fetch,now=opening,base=temp,days_ahead=0)
             self.assertEqual(set(x["league"] for x in result["snapshots"]),
                              {"NCAAF_FBS","NCAAM_D1","NBA"})
+
+
+    def test_utc_capture_anchor_independent_of_caller_timezone(self):
+        # Both offsets straddle a UTC day boundary. A local-day anchor
+        # silently requests the wrong ESPN schedule without changing the
+        # UTC timestamp written to the immutable source receipt.
+        cases = [
+            ("west_same_day", datetime(2026, 10, 20, 23, 30,
+                tzinfo=timezone(timedelta(hours=-4))), 0, 0,
+                ("2026-10-21",)),
+            ("east_same_day", datetime(2026, 10, 21, 0, 30,
+                tzinfo=timezone(timedelta(hours=5, minutes=30))), 0, 0,
+                ("2026-10-20",)),
+            ("west_lookback", datetime(2026, 10, 20, 23, 30,
+                tzinfo=timezone(timedelta(hours=-4))), 1, 0,
+                ("2026-10-20", "2026-10-21")),
+            ("east_forward", datetime(2026, 10, 21, 0, 30,
+                tzinfo=timezone(timedelta(hours=5, minutes=30))), 0, 1,
+                ("2026-10-20", "2026-10-21")),
+        ]
+        import sports_expansion_audit as audit
+        for label, now, days_back, days_ahead, days in cases:
+            with self.subTest(label=label), tempfile.TemporaryDirectory() as directory:
+                observed_urls = []
+                def fetch(url):
+                    observed_urls.append(url)
+                    return response()
+                report = obs.capture(fetch, now=now, base=Path(directory),
+                                     days_ahead=days_ahead, days_back=days_back)
+                utc_day = now.astimezone(timezone.utc).date().isoformat()
+                self.assertEqual(report["recorded_at_utc"],
+                                 now.astimezone(timezone.utc).isoformat())
+                self.assertEqual(
+                    {snap["day"] for snap in report["snapshots"]}, set(days))
+                self.assertEqual(
+                    {snap["day"] for snap in report["snapshots"]
+                     if snap["league"] == "NBA"}, set(days))
+                self.assertEqual(
+                    {snap["day"] for snap in report["snapshots"]
+                     if snap["league"] == "NCAAF_FBS"}, set(days))
+                self.assertEqual(
+                    {url.split("dates=")[1][:8] for url in observed_urls},
+                    {day.replace("-", "") for day in days})
+                if days_back:
+                    self.assertEqual(
+                        report["collection_window"]["anchor_utc_date"], utc_day)
+                self.assertTrue(report["NO_BET"])
+                self.assertEqual(report["actual_wagers"], 0)
+                self.assertFalse(report["forecasting_enabled"])
+                replay = audit.audit(Path(directory))
+                self.assertEqual(replay["source_responses_verified"],
+                                 2 * len(days))
+                self.assertTrue(replay["no_official_independent_final_claim"])
 
 
 if __name__=="__main__":
