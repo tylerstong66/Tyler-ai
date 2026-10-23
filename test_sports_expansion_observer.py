@@ -176,6 +176,26 @@ class ExpansionObserverTests(unittest.TestCase):
                 obs.capture(fetch,now=at,base=Path(temp),days_ahead=0)
             self.assertFalse((Path(temp)/obs.ROOT).exists())
 
+    def test_ambiguous_source_json_fails_before_any_archival_write(self):
+        at=datetime(2026,10,17,12,0,tzinfo=timezone.utc)
+        valid=response(event(123,"NCAAF_FBS"))
+        malformed={
+            "duplicate": (b'{"count":0,'+valid[1:], "Duplicate key"),
+            "nan": (valid[:-1]+b',"extra":NaN}', "Non-finite JSON constant"),
+            "infinity": (valid[:-1]+b',"extra":Infinity}', "Non-finite JSON constant"),
+            "negative_infinity": (valid[:-1]+b',"extra":-Infinity}', "Non-finite JSON constant"),
+        }
+        for name,(bad,error) in malformed.items():
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as temp:
+                calls=[]
+                def fetch(url):
+                    calls.append(url)
+                    return valid if len(calls)==1 else bad
+                with self.assertRaisesRegex(ValueError,error):
+                    obs.capture(fetch,now=at,base=Path(temp),days_ahead=0)
+                self.assertEqual(len(calls),2)
+                self.assertFalse((Path(temp)/obs.ROOT).exists())
+
     def test_future_ncaa_mens_basketball_not_opened_retroactively(self):
         base=datetime(2026,10,17,12,0,tzinfo=timezone.utc)
         calls=[]
