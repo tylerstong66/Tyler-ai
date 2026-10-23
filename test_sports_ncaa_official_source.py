@@ -105,6 +105,34 @@ class NcaaSourceTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"collision"):
                 n.run(fetch,base=root,now=at,days_ahead=0)
 
+    def test_all_ncaa_capture_windows_are_utc_anchored_even_without_lookback(self):
+        # These opposite offsets straddle the opening of the 2026-27
+        # Division I basketball source window in UTC.
+        cases=[
+            ("west_opens_d1",datetime(2026,10,29,23,30,
+                tzinfo=timezone(timedelta(hours=-4))),True),
+            ("east_not_yet_d1",datetime(2026,10,30,0,30,
+                tzinfo=timezone(timedelta(hours=5,minutes=30))),False),
+        ]
+        for label,at,expected_d1 in cases:
+            with self.subTest(label=label),tempfile.TemporaryDirectory() as td:
+                seen=[]
+                def fetch(url):
+                    seen.append(url)
+                    return raw(contest())
+                result=n.run(fetch,base=Path(td),now=at,days_ahead=0)
+                expected=n.requested_windows(at.astimezone(timezone.utc).date(),
+                                             days_ahead=0,days_back=0)
+                self.assertEqual([(s["league"],s["window"],s["source_url"])
+                                  for s in result["snapshots"]],expected)
+                self.assertEqual(len(seen),len(expected))
+                self.assertEqual(
+                    result["recorded_at_utc"],at.astimezone(timezone.utc).isoformat())
+                self.assertEqual(any(s["league"]=="NCAAM_D1" for s in
+                                     result["snapshots"]),expected_d1)
+                self.assertTrue(result["NO_BET"])
+                self.assertEqual(result["actual_wagers"],0)
+
     def test_partial_failed_provider_fetch_does_not_publish_source(self):
         counter=0
         def fetch(url):
