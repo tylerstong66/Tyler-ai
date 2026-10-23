@@ -155,7 +155,8 @@ def run(fetch,*,base=Path("."),now=None,days_ahead=3,days_back=0):
     now=now or datetime.now(timezone.utc)
     if now.tzinfo is None:
         raise ValueError("Aware observation time required")
-    anchor=now.astimezone(timezone.utc).date() if days_back else now.date()
+    # Request dates must reflect the same UTC clock sealed in the receipt.
+    anchor=now.astimezone(timezone.utc).date()
     windows=requested_windows(anchor,days_ahead,days_back)
     if not windows:
         raise ValueError("Outside all NCAA seasonal query windows")
