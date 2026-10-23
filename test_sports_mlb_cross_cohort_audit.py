@@ -119,6 +119,27 @@ class CrossCohortTests(unittest.TestCase):
             edit_hitter(hp, lambda d: d.update(hitter_side='away'))
             with self.assertRaisesRegex(ValueError, 'inconsistent team'): audit.build(root)
 
+    def test_duplicate_raw_forecast_keys_fail_even_with_valid_record_digest(self):
+        # The final occurrence still matches the original signed record; a
+        # permissive decoder would hide the contradictory earlier key.
+        for kind, prefix in (('team', b'{"NO_BET":false,'),
+                             ('hitter', b'{"actual_wager":9,')):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as td:
+                root=Path(td)
+                team_path,hitter_path=seed(root)
+                path=team_path if kind=='team' else hitter_path
+                original=path.read_bytes()
+                self.assertTrue(original.startswith(b'{'))
+                path.write_bytes(prefix+original[1:])
+                with self.assertRaisesRegex(ValueError, 'Duplicate JSON key'):
+                    audit.build(root)
+
+    def test_nonfinite_json_constant_is_not_accepted_in_frozen_evidence(self):
+        for literal in (b'NaN', b'Infinity', b'-Infinity'):
+            with self.subTest(literal=literal), self.assertRaisesRegex(
+                    ValueError, 'Non-finite JSON constant'):
+                audit._strict_json(b'{"probe":'+literal+b'}')
+
     def test_original_reduced_source_tamper_fails(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td); tp, _ = seed(root)
