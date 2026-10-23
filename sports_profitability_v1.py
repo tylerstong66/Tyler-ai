@@ -139,8 +139,9 @@ def verify_original_prediction(pred, root):
                      + str(pred["game_id"]) + ".json")
     if source.get("path") != expected_path:
         raise ValueError("Original forecast must use pinned NHL baseline archive path")
-    verify_original(source, root)
-    original = json.loads((Path(root) / expected_path).read_bytes())
+    # Parse exactly the bounded, SHA-256-verified bytes. A second filesystem
+    # read after verification could observe different or unbounded contents.
+    original = json.loads(original_bytes(source, root))
     verify_record(original)
     same_event(pred, original)
     if original.get("sport") != "NHL" or original.get("model_sha256") != MODEL_SHA:
