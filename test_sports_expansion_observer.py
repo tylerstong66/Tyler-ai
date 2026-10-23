@@ -95,6 +95,16 @@ class ExpansionObserverTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"truncated"):
             obs.parse_scoreboard({"events":[good]*500},"NBA")
 
+    def test_scoreboard_count_rejects_noninteger_or_negative_denominator(self):
+        good = event(123, "NBA")
+        for invalid in (True, False, -1, -100, 1.0, "1"):
+            with self.subTest(count=invalid), self.assertRaisesRegex(
+                    ValueError, "nonnegative integer"):
+                obs.parse_scoreboard({"count": invalid, "events": [good]}, "NBA")
+        self.assertEqual(
+            obs.parse_scoreboard({"count": 1, "events": [good]}, "NBA")
+            ["eligible_observed"], 1)
+
     def test_provider_stage_unknown_is_excluded_not_declared_regular(self):
         item=event(1,"NBA")
         item.pop("season")

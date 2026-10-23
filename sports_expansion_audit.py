@@ -63,7 +63,9 @@ def audit_capture(file):
             or manifest.get("model_training_enabled") is not False
             or manifest.get("promotion_allowed") is not False
             or manifest.get("NO_BET") is not True
-            or manifest.get("actual_wagers")!=0):
+            or type(manifest.get("actual_wagers")) is not int
+            or manifest["actual_wagers"]!=0
+            or manifest.get("enabled_leagues")!=list(source.LEAGUES)):
         raise ValueError("Expansion safety or immutable protocol flag mismatch")
     if 'collection_window' in manifest:
         window=source.collection_window.verify(manifest['collection_window'],recorded)
