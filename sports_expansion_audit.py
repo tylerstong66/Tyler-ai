@@ -46,12 +46,24 @@ def bounded_gzip_read(blob, limit=8_000_000):
         raise ValueError("Corrupt or incomplete compressed source archive") from exc
 
 
+def strict_json_loads(raw):
+    """Reject duplicate JSON object keys that could conceal conflicting source fields."""
+    def unique_pairs(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError("Duplicate key in archived source JSON")
+            result[key] = value
+        return result
+    return json.loads(raw, object_pairs_hook=unique_pairs)
+
+
 def audit_capture(file):
     """Replay one closed source capture with all original audit safeguards."""
     file = archive_path(file)
     if file.stat().st_size > MAX_BLOB_SIZE:
         raise ValueError('Oversized source manifest')
-    manifest=json.loads(file.read_text())
+    manifest=strict_json_loads(file.read_text())
     recorded=source.utc(manifest["recorded_at_utc"])
     expected=recorded.strftime("%Y%m%dT%H%M%S%fZ")
     if file.parent.name!=expected:
@@ -98,7 +110,7 @@ def audit_capture(file):
         if (len(raw)>8_000_000 or
                 hashlib.sha256(raw).hexdigest()!=snap["original_response_sha256"]):
             raise ValueError("Compressed source did not reproduce archived response SHA256")
-        parsed=source.parse_scoreboard(json.loads(raw),league)
+        parsed=source.parse_scoreboard(strict_json_loads(raw),league)
         if parsed!=snap["parsed"]:
             raise ValueError("Provider normalized game observations differ from raw archive")
         rebuilt.append(snap)
