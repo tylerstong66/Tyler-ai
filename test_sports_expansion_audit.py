@@ -65,7 +65,7 @@ class SourceArchiveAuditTests(unittest.TestCase):
             snap=manifest["snapshots"][0]
             blob=capture/snap["compressed_file"]
             raw=gzip.decompress(blob.read_bytes())
-            altered=raw.replace(b'"count": 1', b'"count": 999, "count": 1', 1)
+            altered=b'{"count":999,' + raw.lstrip()[1:]
             self.assertNotEqual(altered,raw)
             blob.write_bytes(gzip.compress(altered))
             snap["original_response_sha256"]=hashlib.sha256(altered).hexdigest()
