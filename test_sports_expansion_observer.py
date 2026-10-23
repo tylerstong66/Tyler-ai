@@ -95,6 +95,20 @@ class ExpansionObserverTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"truncated"):
             obs.parse_scoreboard({"events":[good]*500},"NBA")
 
+    def test_mixed_type_team_ids_cannot_normalize_to_same_identity(self):
+        # Source fields with int and str types previously compared as unequal,
+        # although the saved game would contain the same ID for both teams.
+        for home_id, away_id in ((101,"101"), ("202",202), ("0",0)):
+            with self.subTest(home_id=home_id, away_id=away_id):
+                item=event(123,"NBA")
+                comp=item["competitions"][0]["competitors"]
+                comp[0]["team"]["id"]=home_id
+                comp[1]["team"]["id"]=away_id
+                with self.assertRaisesRegex(ValueError, "Identical competing teams"):
+                    obs.parse_scoreboard(payload(item),"NBA")
+        self.assertEqual(obs.parse_scoreboard(
+            payload(event(123,"NBA")),"NBA")["eligible_observed"],1)
+
     def test_scoreboard_count_rejects_noninteger_or_negative_denominator(self):
         good = event(123, "NBA")
         for invalid in (True, False, -1, -100, 1.0, "1"):
