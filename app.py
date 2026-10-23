@@ -724,6 +724,12 @@ def base_payload(
         'task_result': task_result,
     }
 
+def reason_with_verified_nhl_evidence(manifest, archive_root, now=None):
+    """Trusted server-only chat entry; never accepts paths from user messages."""
+    from sports_chat_nhl_response import nhl_chat_evidence_response
+    return nhl_chat_evidence_response(manifest, archive_root, now=now)
+
+
 def reason_with_context(
     message,
     memory_context='',
