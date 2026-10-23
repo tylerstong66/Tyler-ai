@@ -159,6 +159,47 @@ class NbaOfficialCorroborationTests(unittest.TestCase):
                 nba.run(lambda _:b"not json",base=root)
             self.assertFalse((root/nba.ROOT).exists())
 
+    def test_official_schedule_rejects_ambiguous_raw_json_before_archival(self):
+        valid=official_games()
+        for name,raw in (
+                ("duplicate", b'{"leagueSchedule":{"gameDates":[]},'+valid[1:]),
+                ("nonfinite", b'{"unknown":NaN,'+valid[1:])):
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                nba.official_games(raw)
+            with self.subTest(name=name),tempfile.TemporaryDirectory() as td:
+                root=Path(td); self.espn_root(root)
+                with self.assertRaises(ValueError):
+                    nba.run(lambda _:raw,base=root,
+                            now=datetime(2026,10,17,13,tzinfo=timezone.utc))
+                self.assertFalse((root/nba.ROOT).exists())
+
+    def test_duplicate_espn_raw_json_fails_even_with_matching_new_hash(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td); self.espn_root(root)
+            capture=next((root/observer.ROOT/'captures').iterdir())
+            manifest=json.loads((capture/'manifest.json').read_text())
+            snap=next(s for s in manifest['snapshots'] if s['league']=='NBA'
+                      and s['day']=='2026-10-20')
+            blob=capture/snap['compressed_file']
+            original=gzip.decompress(blob.read_bytes())
+            altered=b'{"count":0,'+original[1:]
+            blob.write_bytes(gzip.compress(altered,mtime=0))
+            snap['original_response_sha256']=hashlib.sha256(altered).hexdigest()
+            with self.assertRaisesRegex(ValueError,'Duplicate'):
+                nba.espn_games(manifest,capture)
+
+    def test_nba_crosswalk_requires_replay_of_linked_espn_manifest(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td); self.espn_root(root)
+            capture=next((root/observer.ROOT/'captures').iterdir())
+            manifest=capture/'manifest.json'
+            original=manifest.read_bytes()
+            manifest.write_bytes(b'{"NO_BET":false,'+original[1:])
+            with self.assertRaisesRegex(ValueError,'Duplicate'):
+                nba.run(lambda _:official_games(),base=root,
+                        now=datetime(2026,10,17,13,tzinfo=timezone.utc))
+            self.assertFalse((root/nba.ROOT).exists())
+
     def test_oversized_espn_archive_fails_closed_before_nba_crosswalk(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);self.espn_root(root)
