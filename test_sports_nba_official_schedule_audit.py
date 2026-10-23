@@ -229,7 +229,7 @@ class NbaOfficialCorroborationTests(unittest.TestCase):
             raw["events"][0]["competitions"][0]["competitors"][0]["team"]["abbreviation"]="BOS"
             raw["events"][0]["competitions"][0]["competitors"][1]["team"]["abbreviation"]="NYK"
             target.write_bytes(gzip.compress(json.dumps(raw).encode()))
-            with self.assertRaisesRegex(ValueError,"hash disagrees"):
+            with self.assertRaisesRegex(ValueError,"archived response SHA256|hash disagrees"):
                 nba.run(lambda _:official_games(),base=root)
 
 if __name__=="__main__":
