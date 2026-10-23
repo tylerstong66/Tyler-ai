@@ -1,4 +1,20 @@
-# Sports Betting Analyst v1 — verified handoff (2026-10-22)
+# Sports Betting Analyst v1 — verified handoff (2026-10-23)
+
+## October 23 continuation — UTC source dates and bounded original-byte integrity
+
+Recovered main at `9a63617aa84e7b88e93fd294c7f08c9d082816df`, inspected open issues/PRs, source-only college/NBA archives, NHL/MLB shadow scoreboards and the rejected NFL annual calibrator. Three code-and-adversarial-test PRs were merged after their full applicable checks passed:
+
+- #228 at `086cf0f4846b5db75d5ac4cce130e47bc69903c1`: ESPN FBS/D1/NBA collection always anchors source dates to the UTC date in the immutable receipt, not the caller's local calendar day. Western/eastern offset boundary, lookback, forward-horizon, original replay and no-bet tests passed. All 14 PR checks passed; integrated sports suite ran 975 tests. Post-merge integrated run 39951242662 passed.
+- #229 at `32c162fd88d73ae32a3e2f086339942843702dec`: frozen NHL baseline model replay parses the exact bounded SHA-256-verified original bytes instead of performing an unbounded second disk read. Corruption and forbidden second-read tests passed. All 13 PR checks passed; integrated suite ran 976 tests. Post-merge integrated run 39951640307 passed.
+- #230 at `d17652b9caf6d28349e7b15b3963da9b4a7deee5`: ESPN count metadata must be a nonnegative integer; source receipts require exact three-cohort league roster and integer zero actual wagers. Forged boolean/float/negative counts, omitted/reordered leagues and false zero-wager types fail closed. All 17 PR checks passed; integrated suite ran 977 tests. Post-merge integrated run 39952338682 passed.
+
+The live college/NBA source workflow 39952338631 succeeded on #230's merged code and published original source receipts in `71e81c4f36ed22857e56a38ef2e1834770d2a253`. Its retained status reports successful ESPN collection and byte replay, 22 previously frozen native NBA reference-feature observations, and **no independently certified official final outcomes**. Successful ESPN replay and two-source research agreements are not governing-body final certification. Historical ESPN source-day retrieval is complete for its declared windows (NBA 490, FBS 302, D1 312), but completeness of official results is unverified; all three training/forecasting gates remain closed. D1 current-season collection is scheduled to begin at its separately configured October 30 boundary, not retroactively.
+
+The NHL challenger scoreboard as of October 23 10:04 UTC had 47 enrolled, 45 scored and two pending; its fixed 100-game checkpoint and promotion gate remain incomplete. The NFL annual calibration candidate remains rejected, and the MLB hitter source/settlement exclusions remain unchanged. Future sportsbook-specific offering and independently certified close evidence still require authorized credentials and actual prospective capture (#217); no historic source can fill that gap.
+
+Next: continue source-verified official NCAA/NBA final identity/completeness audits, preserve frozen original starts through reschedules, build separately time-split sport-specific training only when independently qualified historical labels exist, and freeze any future paper predictions before the true game start. Keep NO_BET=true, actual wagers zero, promotion disabled, and Render production unchanged.
+
+
 
 ## October 22 continuation — direct NHL settlement original-byte boundary
 
