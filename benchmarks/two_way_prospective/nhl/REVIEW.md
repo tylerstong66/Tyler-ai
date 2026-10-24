@@ -6,7 +6,7 @@ Recorded: **98** · Settled: **86** · Pending: **12**
 
 100-settlement milestone: **collecting**. This flag requests human review; it does not authorize model promotion or wagering.
 
-Latest result verified: 2026-10-24T22:29:12.557851+00:00 (UTC).
+Latest result verified: 2026-10-24T22:25:52.210698+00:00 (UTC).
 
 Brier is the sum over outcomes (range 0–2); lower Brier and log loss are better.
 Accuracy uses the highest-probability outcome. Two-way ties at 50% select home; NFL three-way ties in probability use home, away, tie order.
@@ -80,7 +80,7 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/two_way_prospective/nhl/captures/20261024T222911279599Z/manifest.json.
+Latest saved manifest: benchmarks/two_way_prospective/nhl/captures/20261024T222515733409Z/manifest.json.
 Manifest completion field: True. Errors: []. Exclusions: [].
 Optional availability errors: [].
 Newer saved collection failure: null.

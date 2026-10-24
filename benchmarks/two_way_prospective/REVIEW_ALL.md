@@ -4,7 +4,7 @@
 
 | Sport | Settled | Recorded | Pending | Market-paired | 100-game review | Report |
 |---|---:|---:|---:|---:|---|---|
-| NFL | 28 | 39 | 11 | 27 | collecting | [Review](../nfl_prospective_v2/REVIEW.md) |
+| NFL | 28 | 36 | 8 | 27 | collecting | [Review](../nfl_prospective_v2/REVIEW.md) |
 | NHL | 86 | 98 | 12 | 86 | collecting | [Review](nhl/REVIEW.md) |
 | MLB | 8 | 12 | 4 | 6 | collecting | [Review](mlb/REVIEW.md) |
 
@@ -12,7 +12,7 @@
 
 | Sport | Status | Selected | Settled in window | Pending in window |
 |---|---|---:|---:|---:|
-| NFL | collecting_forecasts | 39 | 28 | 11 |
+| NFL | collecting_forecasts | 36 | 28 | 8 |
 | NHL | collecting_forecasts | 98 | 86 | 12 |
 | MLB | collecting_forecasts | 12 | 8 | 4 |
 
