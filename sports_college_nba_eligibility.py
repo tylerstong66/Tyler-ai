@@ -8,7 +8,8 @@ LEAGUES = frozenset(("NCAAF_FBS", "NCAAM_D1", "NBA"))
 def classify(record):
     if not isinstance(record, dict) or record.get("league") not in LEAGUES:
         raise ValueError("Unsupported historical research cohort")
-    if record.get("NO_BET") is not True or record.get("actual_wagers") != 0:
+    if (record.get("NO_BET") is not True or type(record.get("actual_wagers")) is not int
+            or record.get("actual_wagers") != 0):
         raise ValueError("No-bet invariant required")
     reasons=[]
     if record.get("source_archive_sha256_verified") is not True:

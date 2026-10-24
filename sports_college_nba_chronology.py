@@ -10,7 +10,8 @@ def verify_pregame_candidate(candidate):
     """Accept only evidence captured before kickoff and frozen before kickoff."""
     if not isinstance(candidate, dict):
         raise ValueError("Candidate must be a dictionary")
-    if candidate.get("NO_BET") is not True or candidate.get("actual_wagers") != 0:
+    if (candidate.get("NO_BET") is not True or type(candidate.get("actual_wagers")) is not int
+            or candidate.get("actual_wagers") != 0):
         raise ValueError("Research-only guard missing")
     if candidate.get("forecasting_enabled") is not False:
         raise ValueError("Forecasting must remain disabled")
