@@ -6,6 +6,8 @@ on:
       - '.github/workflows/mlb_hit_shadow_auto_settlement.yml'
       - 'sports_mlb_prop_prospective.py'
       - 'sports_mlb_prop_settlement_job.py'
+      - 'sports_mlb_prop_scoreboard_publish.py'
+      - 'test_sports_mlb_prop_scoreboard_publish.py'
       - 'sports_mlb_final_source_audit.py'
       - 'test_sports_mlb_final_source_audit.py'
       - 'test_sports_mlb_prop_prospective.py'
@@ -31,7 +33,7 @@ jobs:
           python-version: '3.12'
       - run: pip install -r requirements.txt
       - name: Verify settlement remains separate and non-wagering
-        run: python -m unittest -v test_sports_mlb_prop_prospective test_sports_mlb_prop_settlement_job test_sports_mlb_prop_scoreboard_feed test_sports_mlb_prop_shadow_scoreboard test_sports_mlb_final_source_audit
+        run: python -m unittest -v test_sports_mlb_prop_prospective test_sports_mlb_prop_settlement_job test_sports_mlb_prop_scoreboard_feed test_sports_mlb_prop_shadow_scoreboard test_sports_mlb_final_source_audit test_sports_mlb_prop_scoreboard_publish
       - name: Retain read-only pending final-source identity evidence before strict settlement
         run: python sports_mlb_final_source_audit.py --observe --output-dir mlb-final-source-audit
       - uses: actions/upload-artifact@v4
@@ -63,28 +65,4 @@ jobs:
           git commit -m "Settle officially final MLB hitter conditional shadow trials [no bets]"
           git push origin HEAD:main
       - name: Refresh read-only scoreboard after final-settlement commit
-        shell: bash
-        run: |
-          # When the previous step created a settlement commit, the local HEAD
-          # now contains its true input revision. The public snapshot remains
-          # a separate mutable artifact; predictions and finals are untouched.
-          python sports_mlb_prop_scoreboard_feed.py
-          git add -- benchmarks/mlb_hitter_props_shadow_v1/scoreboard.latest.json
-          if git diff --cached --quiet; then
-            echo "Public MLB scoreboard already reflects committed settlements."
-            exit 0
-          fi
-          python - <<'PY'
-          import subprocess
-          paths=subprocess.check_output(
-              ['git','diff','--cached','--name-status','-z']).split(b'\0')
-          if paths[-1:]==[b'']:
-              paths.pop()
-          permitted=b'benchmarks/mlb_hitter_props_shadow_v1/scoreboard.latest.json'
-          assert paths in ([b'A',permitted],[b'M',permitted]),paths
-          print('PUBLIC_SCOREBOARD_ONLY_NO_WAGERS')
-          PY
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Refresh read-only MLB shadow scoreboard after official settlement [no bets]"
-          git push origin HEAD:main
+        run: python sports_mlb_prop_scoreboard_publish.py
