@@ -2,7 +2,7 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-24T07:18:03.720446+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-24T12:40:42.154340+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
@@ -23,14 +23,14 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-24T07:18:03.720446+00:00. Ready: 11 / 12 observed games. Status: attention.
+As of retained evidence: 2026-10-24T12:40:42.154340+00:00. Ready: 12 / 12 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
 | 2026020168 | ANA at PHI | True | False | True | None |
 | 2026020169 | LAK at NJD | True | False | True | None |
 | 2026020170 | SJS at BOS | True | False | True | None |
-| 2026020171 | NYR at OTT | True | False | False | latest_scoreboard_market_pair_missing |
+| 2026020171 | NYR at OTT | True | False | True | None |
 | 2026020172 | NSH at PIT | True | False | True | None |
 | 2026020173 | BUF at WSH | True | False | True | None |
 | 2026020174 | VGK at CBJ | True | False | True | None |
@@ -145,7 +145,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 88. Latest: `20261024T071802269818Z`.
+Audited capture manifests: 89. Latest: `20261024T124041055153Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
