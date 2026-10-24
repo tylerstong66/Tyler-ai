@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import sports_nba_official_schedule_audit as nba
 import sports_expansion_observer as espn
-from sports_expansion_audit import archive_path,bounded_gzip_read,MAX_BLOB_SIZE,strict_json_loads
+from sports_expansion_audit import archive_path,bounded_gzip_read,MAX_BLOB_SIZE,strict_json_loads,audit_capture
 
 def read_official_games(raw,saved):
     if saved.get('schema')=='nba-espn-independent-schedule-corroboration-v2':
@@ -78,6 +78,11 @@ def verify(root, stamp):
         raise ValueError('Linked ESPN timestamp differs from capture identifier')
     if observed > at:
         raise ValueError('Linked ESPN source captured after NBA receipt')
+    # A manifest digest links bytes; it does not validate normalized game fields.
+    # Replay the complete closed provider capture at this direct reader boundary.
+    rebuilt, _, _ = audit_capture(espn_folder/'manifest.json')
+    if rebuilt != manifest:
+        raise ValueError('Linked ESPN manifest changed during source replay')
     replay=nba.compare(official,nba.espn_games(manifest,espn_folder))
     if replay!=saved["report"]:
         raise ValueError("Saved independent schedule crosswalk differs from replay")
