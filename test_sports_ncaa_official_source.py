@@ -133,6 +133,27 @@ class NcaaSourceTests(unittest.TestCase):
                 self.assertTrue(result["NO_BET"])
                 self.assertEqual(result["actual_wagers"],0)
 
+    def test_ambiguous_ncaa_raw_json_rejected_before_capture(self):
+        valid=raw(contest())
+        bad_responses={
+            "duplicate": b'{"data":{"contests":[]},'+valid[1:],
+            "nan": b'{"unexpected":NaN,'+valid[1:],
+            "infinity": b'{"unexpected":Infinity,'+valid[1:],
+        }
+        for kind,bad in bad_responses.items():
+            with self.subTest(kind=kind),self.assertRaises(ValueError):
+                n.official_scoreboard(bad,"NCAAF_FBS")
+            with self.subTest(kind=kind),tempfile.TemporaryDirectory() as td:
+                root=Path(td); calls=[]
+                def fetch(url):
+                    calls.append(url)
+                    return valid if len(calls)==1 else bad
+                with self.assertRaises(ValueError):
+                    n.run(fetch,base=root,now=datetime(
+                        2026,10,17,12,tzinfo=timezone.utc),days_ahead=0)
+                self.assertEqual(len(calls),2)
+                self.assertFalse((root/n.ROOT).exists())
+
     def test_partial_failed_provider_fetch_does_not_publish_source(self):
         counter=0
         def fetch(url):
