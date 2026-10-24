@@ -5,10 +5,10 @@ forecast generation, or eligibility for paper ROI. It checks the saved byte
 archive and manifest against the parser's original-source contract.
 """
 import hashlib
-import json
 import re
 from datetime import timedelta
 from pathlib import Path
+from sports_expansion_audit import strict_json_loads
 
 from sports_profitability_capture import ENDPOINT, ROOT, SAFE_PARAMS
 from sports_profitability_price_source import ODDS_ENDPOINT, REQUEST, observe
@@ -39,7 +39,7 @@ def parse_archived_capture(repo_root, manifest_path, official):
         raise ValueError("Manifest must have the pinned NHL capture path/name")
     raw_manifest = read_archive_bytes(root, supplied, 100_000)
     try:
-        manifest = json.loads(raw_manifest)
+        manifest = strict_json_loads(raw_manifest)
     except (UnicodeError, ValueError):
         raise ValueError("Archived NHL capture manifest is invalid JSON") from None
     if not isinstance(manifest, dict) or (
@@ -78,7 +78,7 @@ def parse_archived_capture(repo_root, manifest_path, official):
     if hashlib.sha256(source_bytes).hexdigest() != digest:
         raise ValueError("Saved original NHL response bytes differ from SHA-256")
     try:
-        saved_events = json.loads(source_bytes)
+        saved_events = strict_json_loads(source_bytes)
     except (UnicodeError, ValueError):
         raise ValueError("Original source is not valid JSON") from None
     counters = ("event_rows_returned", "still_future_events_at_retrieval",

@@ -80,6 +80,18 @@ class ArchivedNhlOddsTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "offering not verified"):
             p.check_quote(quote, paper, self.root, "entry")
 
+    def test_rehashed_ambiguous_or_nonfinite_original_cannot_become_a_quote(self):
+        path = self.root/self.source['path']; original = path.read_bytes()
+        variants = [original.replace(b'"price": -110', b'"price": 5000, "price": -110', 1)]
+        variants += [original.replace(b'"id":', b'"unused": '+token+b', "id":', 1)
+                     for token in (b'NaN', b'Infinity', b'-Infinity')]
+        for raw in variants:
+            with self.subTest(raw_kind=raw[:40]):
+                path.write_bytes(raw)
+                source = {**self.source, 'sha256': hashlib.sha256(raw).hexdigest()}
+                with self.assertRaisesRegex(ValueError, 'Malformed preserved odds JSON'):
+                    self.observe(source=source)
+
     def test_even_relabelled_aggregator_quote_cannot_become_proven_bookmaker_quote(self):
         quote = self.observe()
         quote["available_to_paper"] = True
