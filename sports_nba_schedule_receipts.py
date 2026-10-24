@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import sports_nba_official_schedule_audit as nba
 import sports_expansion_observer as espn
-from sports_expansion_audit import archive_path,bounded_gzip_read,MAX_BLOB_SIZE
+from sports_expansion_audit import archive_path,bounded_gzip_read,MAX_BLOB_SIZE,strict_json_loads
 
 def read_official_games(raw,saved):
     if saved.get('schema')=='nba-espn-independent-schedule-corroboration-v2':
@@ -29,10 +29,13 @@ def verify(root, stamp):
         path = archive_path(folder/name)
         if path.stat().st_size > MAX_BLOB_SIZE:
             raise ValueError('Oversized NBA schedule receipt component')
-    saved=json.loads((folder/"manifest.json").read_bytes())
+    saved=strict_json_loads((folder/"manifest.json").read_bytes())
     if (saved.get("schema") not in ("nba-espn-independent-schedule-corroboration-v1",
                                     "nba-espn-independent-schedule-corroboration-v2")
-            or saved.get("NO_BET") is not True or saved.get("actual_wagers")!=0
+            or saved.get("NO_BET") is not True or type(saved.get("actual_wagers")) is not int
+            or saved.get("actual_wagers")!=0
+            or saved.get("promotion_allowed") is not False
+            or saved.get("nba_official_source_url")!=nba.NBA_URL
             or saved.get("not_an_independently_verified_final_result") is not True
             or saved.get("nba_raw_file")!="nba_schedule.json.gz"):
         raise ValueError("Invalid NBA schedule receipt")
@@ -65,9 +68,10 @@ def verify(root, stamp):
     original=(espn_folder/"manifest.json").read_bytes()
     if hashlib.sha256(original).hexdigest()!=saved["espn_manifest_sha256"]:
         raise ValueError("Linked ESPN manifest digest mismatch")
-    manifest=json.loads(original)
+    manifest=strict_json_loads(original)
     if (manifest.get("schema")!="tyler-college-nba-provider-observation-v1"
-            or manifest.get("NO_BET") is not True or manifest.get("actual_wagers")!=0):
+            or manifest.get("NO_BET") is not True or type(manifest.get("actual_wagers")) is not int
+            or manifest.get("actual_wagers")!=0):
         raise ValueError("Invalid linked ESPN receipt")
     observed=espn.utc(manifest['recorded_at_utc'])
     if observed.strftime('%Y%m%dT%H%M%S%fZ') != linked:

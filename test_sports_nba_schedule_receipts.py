@@ -51,6 +51,37 @@ class ReceiptReplayTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     receipts.verify(root,stamp)
 
+    def test_receipt_json_and_no_bet_guards_cannot_be_forged(self):
+        for location in ('nba', 'espn'):
+            for fault in ('duplicate_guard', 'nonfinite', 'boolean_wager', 'float_wager'):
+                with self.subTest(location=location, fault=fault), tempfile.TemporaryDirectory() as td:
+                    root=Path(td); stamp=self.seed(root)
+                    path=root/nba.ROOT/'captures'/stamp/'manifest.json'
+                    saved=json.loads(path.read_bytes())
+                    target=(path if location=='nba' else
+                            root/observer.ROOT/'captures'/saved['espn_capture']/'manifest.json')
+                    raw=target.read_bytes(); data=json.loads(raw)
+                    if fault=='duplicate_guard': mutated=b'{"NO_BET":false,'+raw[1:]
+                    elif fault=='nonfinite': mutated=b'{"extra":NaN,'+raw[1:]
+                    else:
+                        data['actual_wagers']=False if fault=='boolean_wager' else 0.0
+                        mutated=json.dumps(data).encode()
+                    target.write_bytes(mutated)
+                    if location=='espn':
+                        saved['espn_manifest_sha256']=hashlib.sha256(mutated).hexdigest()
+                        path.write_text(json.dumps(saved))
+                    with self.assertRaises(ValueError): receipts.verify(root,stamp)
+
+    def test_nba_v1_receipt_cannot_assert_promotion_or_foreign_endpoint(self):
+        for field, value in (('promotion_allowed', True),
+                             ('nba_official_source_url', 'https://example.org/fake')):
+            with self.subTest(field=field), tempfile.TemporaryDirectory() as td:
+                root=Path(td); stamp=self.seed(root)
+                path=root/nba.ROOT/'captures'/stamp/'manifest.json'
+                saved=json.loads(path.read_bytes());saved[field]=value
+                path.write_text(json.dumps(saved))
+                with self.assertRaises(ValueError): receipts.verify(root,stamp)
+
     def test_modified_official_schedule_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);stamp=self.seed(root)
