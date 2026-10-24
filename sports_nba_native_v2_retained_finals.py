@@ -98,6 +98,8 @@ def classify(records, native_sources, provider_sources, *, now):
         row = {'nba_game_id': key, 'espn_game_id': frozen['espn_game_id'],
                'feature_record_sha256': daily.features.digest(frozen),
                'frozen_at_utc': frozen['frozen_at_utc'],
+               'nba_saved_start_utc': frozen['nba_saved_start_utc'],
+               'espn_saved_start_utc': frozen['espn_saved_start_utc'],
                'original_saved_start_reached': now >= min(starts),
                'native_final_claims': len(ns), 'provider_final_claims': len(es),
                'result_observation': None, 'source_pair': None, 'quarantined': False}
