@@ -1,5 +1,11 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-24)
 
+## October 24 continuation — bind NBA provider lookup identity
+
+Direct NBA schedule matching emitted the provider row's game ID without first binding it to the mapping key used by final replay. A second fixture under another key could reuse the first provider ID, causing two research finals to consume one game's scores and provenance. Schedule matching now rejects a key/row-ID disagreement before selecting any fixture. A two-fixture regression reproduces acceptance at both schedule and final boundaries before repair; a positive control retains both distinct provider games and all closed model gates.
+
+The 34 focused NBA schedule, receipt, final and type-boundary tests and all 1,033 integrated sports tests pass. Complete saved-source integration replay passes without changing frozen evidence. These are source consistency checks, not independent official-final qualification or proof of profitability. Keep NO_BET=true, actual wagers zero, model promotion disabled and existing NFL/NHL/MLB cohorts unchanged.
+
 ## October 24 Work continuation — direct NCAA/NBA final and receipt boundaries
 
 Recovered actual main `ab84d92d28285c7309a2645983313a6c66b9ecfb`, verified #246–#248, open issues #98/#217 and source-only cohort gates. #249 merged at `f2efd5d1a5d00eedd446222bf2b29cda45a849fa` after 15 successful checks and one intentional skip. It rejects float ESPN season stages across all three expansion cohorts, truthy college final flags, malformed provider scores, and float NBA final status/stage values. Four adversarial methods reproduced 28 failures; 27 focused and 1,020 integrated sports tests passed. All post-merge checks passed.

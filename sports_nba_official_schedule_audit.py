@@ -140,6 +140,11 @@ def compare(official,espn,*,exact_tipoff_identity=False):
     """Select by unique team identity, then validate time; never fuzzy-force."""
     if type(exact_tipoff_identity) is not bool:
         raise ValueError('NBA identity policy must be an explicit boolean')
+    # Matching emits row IDs which downstream readers use as mapping keys.
+    # Bind the two before any fixture selection so an aliased/reused row ID
+    # cannot make a later final lookup consume another game's source fields.
+    if any(key != row['espn_game_id'] for key, row in espn.items()):
+        raise ValueError('NBA provider game identity differs from lookup key')
     by_teams=defaultdict(list)
     for game in official:
         by_teams[(game["home_tricode"],game["away_tricode"])].append(game)

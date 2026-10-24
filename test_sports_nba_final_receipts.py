@@ -2,6 +2,7 @@
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 import json
+import copy
 import tempfile
 import unittest
 
@@ -14,6 +15,49 @@ AT = datetime(2026, 10, 20, 23, tzinfo=timezone.utc)
 
 
 class NbaFinalReceiptTests(unittest.TestCase):
+    def test_provider_identity_cannot_be_reused_for_a_second_fixture(self):
+        official = nba.official_games(official_games())[:1]
+        official[0].update(nba_status=3, nba_home_score=106, nba_away_score=104)
+        second = copy.deepcopy(official[0])
+        second.update(nba_game_id='0022600001', tipoff_utc='2026-10-27T19:00:00Z')
+        first = {'espn_game_id': '401234567', 'scheduled_start_utc': official[0]['tipoff_utc'],
+                 'home_tricode': 'NYK', 'away_tricode': 'BOS',
+                 'home_team_id': '18', 'away_team_id': '2', 'season_stage': 2,
+                 'provider_completed': True, 'home_score': 106, 'away_score': 104}
+        repeated = {**first, 'scheduled_start_utc': second['tipoff_utc']}
+        provider = {'401234567': first, '401234568': repeated}
+        # A reused row ID previously selected the first row twice, producing
+        # two agreeing finals from one provider game's score/provenance.
+        for boundary in ('schedule', 'finals'):
+            with self.subTest(boundary=boundary), self.assertRaisesRegex(ValueError, 'provider game identity'):
+                if boundary == 'schedule':
+                    nba.compare(official + [second], provider)
+                else:
+                    finals.classify(official + [second], provider,
+                                    nba_observed_at='2026-10-28T01:00:00Z',
+                                    espn_observed_at='2026-10-28T01:00:00Z')
+
+    def test_distinct_provider_identities_preserve_two_separate_finals(self):
+        official = nba.official_games(official_games())[:1]
+        official[0].update(nba_status=3, nba_home_score=106, nba_away_score=104)
+        second = copy.deepcopy(official[0])
+        second.update(nba_game_id='0022600001', tipoff_utc='2026-10-27T19:00:00Z')
+        provider = {}
+        for identifier, game in zip(('401234567', '401234568'), official + [second]):
+            provider[identifier] = {'espn_game_id': identifier,
+                'scheduled_start_utc': game['tipoff_utc'],
+                'home_tricode': 'NYK', 'away_tricode': 'BOS',
+                'home_team_id': '18', 'away_team_id': '2', 'season_stage': 2,
+                'provider_completed': True, 'home_score': 106, 'away_score': 104}
+        out = finals.classify(official + [second], provider,
+                             nba_observed_at='2026-10-28T01:00:00Z',
+                             espn_observed_at='2026-10-28T01:00:00Z')
+        self.assertEqual(out['two_source_final_agreements'], 2)
+        self.assertEqual({row['espn_game_id'] for row in out['corroborated_research_only']}, set(provider))
+        self.assertFalse(out['model_training_enabled'])
+        self.assertFalse(out['forecasting_enabled'])
+        self.assertFalse(out['promotion_allowed'])
+
     def seed(self, root, *, at=AT, score=106, nfinal=True, efinal=True, duplicate=False, postponed=None, stage=2, nba_id=None):
         def fetch(url):
             if 'basketball/nba' in url and 'dates=20261020' in url:
