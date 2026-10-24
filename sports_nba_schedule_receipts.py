@@ -36,8 +36,10 @@ def verify(root, stamp):
             or saved.get("not_an_independently_verified_final_result") is not True
             or saved.get("nba_raw_file")!="nba_schedule.json.gz"):
         raise ValueError("Invalid NBA schedule receipt")
+    at=espn.utc(saved['created_at_utc'])
+    if at.strftime('%Y%m%dT%H%M%S%fZ') != stamp:
+        raise ValueError('NBA source timestamp differs from capture identifier')
     if saved['schema'].endswith('-v2'):
-        at=espn.utc(saved['created_at_utc'])
         if (at.strftime('%Y%m%dT%H%M%S%fZ')!=stamp
                 or saved.get('nba_official_source_url')!=nba.NBA_URL
                 or type(saved.get('actual_wagers')) is not int
@@ -67,6 +69,11 @@ def verify(root, stamp):
     if (manifest.get("schema")!="tyler-college-nba-provider-observation-v1"
             or manifest.get("NO_BET") is not True or manifest.get("actual_wagers")!=0):
         raise ValueError("Invalid linked ESPN receipt")
+    observed=espn.utc(manifest['recorded_at_utc'])
+    if observed.strftime('%Y%m%dT%H%M%S%fZ') != linked:
+        raise ValueError('Linked ESPN timestamp differs from capture identifier')
+    if observed > at:
+        raise ValueError('Linked ESPN source captured after NBA receipt')
     replay=nba.compare(official,nba.espn_games(manifest,espn_folder))
     if replay!=saved["report"]:
         raise ValueError("Saved independent schedule crosswalk differs from replay")

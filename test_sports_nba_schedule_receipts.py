@@ -1,5 +1,6 @@
 """Replayed NBA schedule receipts must remain research-only."""
 import json
+import hashlib
 import tempfile
 import unittest
 from datetime import datetime,timezone
@@ -27,6 +28,28 @@ class ReceiptReplayTests(unittest.TestCase):
             self.assertEqual(out["strict_schedule_correlated"],1)
             self.assertFalse(out["independent_official_final_verified"])
             self.assertFalse(out["eligible_for_historical_evaluation"])
+
+    def test_direct_replay_rejects_impossible_receipt_chronology(self):
+        for fault in ('nba_clock', 'espn_clock', 'espn_after_nba'):
+            with self.subTest(fault=fault), tempfile.TemporaryDirectory() as td:
+                root=Path(td); stamp=self.seed(root)
+                folder=root/nba.ROOT/'captures'/stamp
+                path=folder/'manifest.json'; saved=json.loads(path.read_bytes())
+                if fault=='espn_clock':
+                    linked=root/observer.ROOT/'captures'/saved['espn_capture']/'manifest.json'
+                    manifest=json.loads(linked.read_bytes())
+                    manifest['recorded_at_utc']='2000-01-01T00:00:00Z'
+                    linked.write_text(json.dumps(manifest))
+                    saved['espn_manifest_sha256']=hashlib.sha256(linked.read_bytes()).hexdigest()
+                elif fault=='espn_after_nba':
+                    stamp='20261017T110000000000Z'
+                    moved=folder.parent/stamp;folder.rename(moved)
+                    path=moved/'manifest.json';saved['created_at_utc']='2026-10-17T11:00:00Z'
+                else:
+                    saved['created_at_utc']='2000-01-01T00:00:00Z'
+                path.write_text(json.dumps(saved))
+                with self.assertRaises(ValueError):
+                    receipts.verify(root,stamp)
 
     def test_modified_official_schedule_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
