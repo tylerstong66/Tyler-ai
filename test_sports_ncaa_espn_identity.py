@@ -1,5 +1,6 @@
 """Strict multi-source NCAA identity matching and original archive invariants."""
 import gzip
+import hashlib
 import json
 import tempfile
 import unittest
@@ -81,6 +82,25 @@ class CollegeIdentityTests(unittest.TestCase):
                     start=espn_when,completed=espn_final)]}).encode()
             return b'{"count":0,"events":[]}'
         espn.capture(f_espn,base=root,now=AT,days_ahead=0)
+
+    def test_direct_espn_replay_rejects_ambiguous_original_json_even_if_rehashed(self):
+        for kind, prefix in (
+            ("duplicate", b'{"events":[],'), ("nonfinite", b'{"unused":NaN,')
+        ):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as td:
+                root=Path(td); self.seed(root)
+                folder=next((root/espn.ROOT/"captures").iterdir())
+                manifest=json.loads((folder/"manifest.json").read_bytes())
+                snap=next(x for x in manifest["snapshots"]
+                          if x["league"]=="NCAAF_FBS" and x["day"]=="2026-10-17")
+                path=folder/snap["compressed_file"]
+                original=gzip.decompress(path.read_bytes())
+                self.assertTrue(original.startswith(b"{"))
+                ambiguous=prefix+original[1:]
+                path.write_bytes(gzip.compress(ambiguous,mtime=0))
+                snap["original_response_sha256"]=hashlib.sha256(ambiguous).hexdigest()
+                with self.assertRaisesRegex(ValueError, "Duplicate key" if kind=="duplicate" else "Non-finite"):
+                    identity.verify_espn(folder,manifest)
 
     def test_real_source_replay_and_exact_match_both_providers(self):
         with tempfile.TemporaryDirectory() as td:
