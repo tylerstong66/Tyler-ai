@@ -15,7 +15,7 @@ from datetime import datetime,timezone,timedelta
 from pathlib import Path
 
 import sports_expansion_observer as espn
-from sports_expansion_audit import archive_path, bounded_gzip_read, MAX_BLOB_SIZE
+from sports_expansion_audit import archive_path, bounded_gzip_read, MAX_BLOB_SIZE, strict_json_loads
 import sports_ncaa_official_source as ncaa
 
 ROOT=espn.ROOT/"college_identity"
@@ -140,7 +140,7 @@ def verify_espn(folder,manifest):
         raw=bounded_gzip_read(path.read_bytes())
         if hashlib.sha256(raw).hexdigest()!=snap["original_response_sha256"]:
             raise ValueError("ESPN college source raw digest mismatch")
-        payload=json.loads(raw)
+        payload=strict_json_loads(raw)
         parsed=espn.parse_scoreboard(payload,sport)
         if parsed!=snap["parsed"]:
             raise ValueError("ESPN college parsed source differs from archived receipt")
