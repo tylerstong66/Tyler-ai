@@ -62,7 +62,8 @@ def classify(records, manifest, provider, *, provider_observed_at, now):
     return result
 
 
-def build(base=Path('.'), *, now=None, _post=post, _capture=None, _provider_capture=None):
+def build(base=Path('.'), *, now=None, _post=post, _capture=None, _provider_capture=None,
+          _features=cohort.features):
     post = _post  # Version-pinned reader; v1/v2 defaults retain their own receipt contract.
     base = Path(base); now = now or datetime.now(timezone.utc)
     if not isinstance(now, datetime) or now.tzinfo is None:
@@ -75,7 +76,7 @@ def build(base=Path('.'), *, now=None, _post=post, _capture=None, _provider_capt
     # Replay all original feature bytes, source receipts and both historical
     # seals; no daily source can replace a frozen record's original dependency.
     snapshots = {}
-    records = cohort.features._existing(base, now, cohort.features._reference(base, now), snapshots)
+    records = _features._existing(base, now, _features._reference(base, now), snapshots)
     post.replay_all(base, now=now)
     folders = ([archive_path(base/post.ROOT/_capture/'manifest.json')] if _capture else
                sorted((base/post.ROOT).glob('*/manifest.json')))
