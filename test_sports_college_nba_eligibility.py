@@ -14,6 +14,12 @@ def record():
     )
 
 class EligibilityTests(unittest.TestCase):
+    def test_zero_wager_guard_requires_exact_integer(self):
+        for value in (False, 0.0, -0.0):
+            with self.subTest(value=value):
+                row=record();row['actual_wagers']=value
+                with self.assertRaises(ValueError): classify(row)
+
     def test_caller_asserted_provenance_never_grants_eligibility(self):
         result=classify(record())
         self.assertFalse(result["eligible_for_historical_evaluation"])

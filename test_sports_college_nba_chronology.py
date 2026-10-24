@@ -14,6 +14,12 @@ def candidate():
     }
 
 class ChronologyTests(unittest.TestCase):
+    def test_zero_wager_guard_requires_exact_integer(self):
+        for value in (False, 0.0, -0.0):
+            with self.subTest(value=value):
+                row=candidate();row['actual_wagers']=value
+                with self.assertRaises(ValueError): verify_pregame_candidate(row)
+
     def test_valid_research_candidate_stays_no_bet(self):
         out=verify_pregame_candidate(candidate())
         self.assertTrue(out["chronology_preflight_passed"])
