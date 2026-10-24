@@ -43,6 +43,46 @@ class FinalTypeBoundaryTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError, 'final'):
                         college.classify([n], [e])
 
+    def test_nba_final_game_id_binds_regular_or_postseason_identity(self):
+        official = schedule.official_games(official_games())[:1]
+        official[0].update(nba_status=3, nba_home_score=106, nba_away_score=104)
+        provider = {'401234567': {'espn_game_id': '401234567',
+            'scheduled_start_utc': official[0]['tipoff_utc'],
+            'home_tricode': 'NYK', 'away_tricode': 'BOS',
+            'home_team_id': '18', 'away_team_id': '2',
+            'season_stage': 3, 'provider_completed': True, 'home_score': 106, 'away_score': 104}}
+        for game_id, kind in (('0022600000', 'playoffs'), ('0042600000', 'regular'),
+                              ('0012600000', 'playoffs'), ('002260000０', 'playoffs')):
+            with self.subTest(game_id=game_id, kind=kind):
+                n=json.loads(json.dumps(official));e=json.loads(json.dumps(provider))
+                n[0].update(nba_game_id=game_id,kind=kind)
+                e['401234567']['season_stage']=2 if kind=='regular' else 3
+                out=nba.classify(n,e,nba_observed_at='2026-10-21T01:00:00Z',
+                                 espn_observed_at='2026-10-21T01:00:00Z')
+                self.assertEqual(out['two_source_final_agreements'],0)
+
+    def test_valid_playoff_identity_in_following_calendar_year_stays_research_only(self):
+        official=schedule.official_games(official_games())[:1]
+        official[0].update(nba_game_id='0042600000',kind='playoffs',
+                           tipoff_utc='2027-05-20T19:00:00Z',nba_status=3,
+                           nba_home_score=106,nba_away_score=104)
+        provider={'401234567': {'espn_game_id':'401234567',
+            'scheduled_start_utc':'2027-05-20T19:00:00Z',
+            'home_tricode':'NYK','away_tricode':'BOS',
+            'home_team_id':'18','away_team_id':'2','season_stage':3,
+            'provider_completed':True,'home_score':106,'away_score':104}}
+        out=nba.classify(official,provider,nba_observed_at='2027-05-21T01:00:00Z',
+                         espn_observed_at='2027-05-21T01:00:00Z')
+        self.assertEqual(out['two_source_final_agreements'],1)
+        self.assertFalse(out['model_training_enabled'])
+        self.assertFalse(out['forecasting_enabled'])
+        self.assertFalse(out['promotion_allowed'])
+
+    def test_official_schedule_rejects_non_ascii_game_identifier(self):
+        raw=official_games().decode().replace('0022600000','002260000０')
+        with self.assertRaisesRegex(ValueError,'game ID'):
+            schedule.official_games(raw.encode())
+
     def test_nba_classifier_rejects_equal_float_status_and_stage(self):
         official = schedule.official_games(official_games())[:1]
         official[0].update(nba_status=3, nba_home_score=106, nba_away_score=104)

@@ -3,6 +3,7 @@ from collections import Counter
 from pathlib import Path
 import hashlib
 import json
+import re
 
 import sports_expansion_observer as espn
 import sports_expansion_audit as audit
@@ -41,6 +42,10 @@ def classify(official, provider, *, nba_observed_at, espn_observed_at=None,
         season_year = tip.year if tip.month >= 7 else tip.year - 1
         if uses[n['nba_game_id']] != 1:
             reason = 'NON_BIJECTIVE_GAME_IDENTITY'
+        elif (not isinstance(n['nba_game_id'], str)
+              or not re.fullmatch(r'[0-9]{10}', n['nba_game_id'])
+              or nba.ALLOWED_KINDS.get(n['nba_game_id'][:3]) != n['kind']):
+            reason = 'NBA_GAME_ID_KIND_MISMATCH'
         elif int(n['nba_game_id'][3:5]) != season_year % 100:
             reason = 'NBA_GAME_ID_SEASON_MISMATCH'
         elif n['nba_postponed_status'] not in (None, '', 'N'):

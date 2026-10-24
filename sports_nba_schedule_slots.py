@@ -30,7 +30,7 @@ def parse(raw,*,observed_at):
         games=[]
         for item in block['games']:
             identifier=str(item['gameId'])
-            if not re.fullmatch(r'\d{10}',identifier) or identifier in seen:
+            if not re.fullmatch(r'[0-9]{10}',identifier) or identifier in seen:
                 raise ValueError('Duplicate or invalid NBA slot source game ID')
             seen.add(identifier)
             if identifier[:3] not in nba.ALLOWED_KINDS:

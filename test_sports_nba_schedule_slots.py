@@ -39,6 +39,12 @@ class NbaFutureSlotTests(unittest.TestCase):
         self.assertNotIn(quarantined[0]['nba_game_id'],{x['nba_game_id'] for x in known})
         self.assertEqual(raw,before)
 
+    def test_unassigned_cup_slot_still_requires_canonical_ascii_game_id(self):
+        obj=original()
+        obj['leagueSchedule']['gameDates'][0]['games'][-1]['gameId']='002269999９'
+        with self.assertRaisesRegex(ValueError,'game ID'):
+            slots.parse(json.dumps(obj).encode(),observed_at=NOW.isoformat())
+
     def test_partial_known_teams_unknown_competitions_or_nonfuture_slots_fail(self):
         for kind in ('known_away','ordinary_game','wrong_round','past','bool_status','final','nonzero_score'):
             with self.subTest(kind=kind):
