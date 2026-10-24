@@ -45,9 +45,11 @@ def classify(official, provider, *, nba_observed_at, espn_observed_at=None,
             reason = 'NBA_GAME_ID_SEASON_MISMATCH'
         elif n['nba_postponed_status'] not in (None, '', 'N'):
             reason = 'POSTPONED_OR_UNKNOWN_NBA_STATUS'
-        elif e['season_stage'] != (2 if n['kind'] == 'regular' else 3):
+        elif (type(e['season_stage']) is not int
+              or e['season_stage'] != (2 if n['kind'] == 'regular' else 3)):
             reason = 'NBA_ESPN_SEASON_STAGE_MISMATCH'
-        elif n['nba_status'] != 3 or e['provider_completed'] is not True:
+        elif (type(n['nba_status']) is not int or n['nba_status'] != 3
+              or e['provider_completed'] is not True):
             reason = 'BOTH_SOURCES_NOT_FINAL'
         elif (n['nba_home_score'], n['nba_away_score']) != (e['home_score'], e['away_score']):
             reason = 'CONFLICTING_FINAL_SCORES_NO_GRADE'
