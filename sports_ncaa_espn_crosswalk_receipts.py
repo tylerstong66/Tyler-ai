@@ -7,7 +7,7 @@ import sports_expansion_observer as espn
 import sports_ncaa_official_source as ncaa
 import sports_ncaa_espn_identity as identity
 import sports_ncaa_owned_receipts as ncaa_receipts
-from sports_expansion_audit import archive_path, MAX_BLOB_SIZE
+from sports_expansion_audit import archive_path, MAX_BLOB_SIZE, strict_json_loads
 
 STAMP=re.compile(r"[0-9]{8}T[0-9]{12}Z\Z")
 
@@ -19,9 +19,10 @@ def verify(root,stamp):
     path=archive_path(folder/'manifest.json')
     if path.stat().st_size > MAX_BLOB_SIZE:
         raise ValueError('Oversized college crosswalk receipt')
-    saved=json.loads(path.read_bytes())
+    saved=strict_json_loads(path.read_bytes())
     if (saved.get("schema")!="ncaa-espn-strict-college-game-identity-v1"
-            or saved.get("NO_BET") is not True or saved.get("actual_wagers")!=0
+            or saved.get("NO_BET") is not True or type(saved.get("actual_wagers")) is not int
+            or saved["actual_wagers"] != 0
             or saved.get("promotion_allowed") is not False):
         raise ValueError("Invalid college crosswalk receipt")
     sources=[]
@@ -36,7 +37,7 @@ def verify(root,stamp):
         raw=path.read_bytes()
         if hashlib.sha256(raw).hexdigest()!=saved[key+"_manifest_sha256"]:
             raise ValueError("Linked source manifest digest mismatch")
-        sources.append((source,json.loads(raw)))
+        sources.append((source,strict_json_loads(raw)))
     (ncaa_folder,ncaa_manifest),(espn_folder,espn_manifest)=sources
     ncaa_receipts.verify(ncaa_folder)
     official=identity.verify_ncaa(ncaa_folder,ncaa_manifest)
