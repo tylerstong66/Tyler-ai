@@ -63,12 +63,15 @@ def classify(records, native_sources, provider_sources, *, now):
             or len({row['espn_game_id'] for row in records.values()}) != len(records)):
         raise ValueError('Non-bijective frozen NBA feature identities')
     native_claims = defaultdict(list); provider_claims = defaultdict(list)
+    native_matchups = defaultdict(list); provider_matchups = defaultdict(list)
     provider_quarantines = defaultdict(list)
     for item in native_sources:
         at = utc(item['manifest']['recorded_at_utc'])
         if at > now: raise ValueError('Future-dated retained NBA final source')
         for row in (item['manifest'].get('parsed_final_page') or {}).get('games', []):
-            native_claims[row['nba_game_id']].append((at, item['capture'], item, row))
+            claim = (at, item['capture'], item, row)
+            native_claims[row['nba_game_id']].append(claim)
+            native_matchups[tuple(sorted((row['home_tricode'], row['away_tricode'])))].append(claim)
     for item in provider_sources:
         at = utc(item['manifest']['recorded_at_utc'])
         if at > now: raise ValueError('Future-dated retained provider final source')
@@ -77,14 +80,21 @@ def classify(records, native_sources, provider_sources, *, now):
                 provider_quarantines[row['game_id']].append(_provenance(item, native=False))
         for key, row in item['games'].items():
             if key != row['espn_game_id']: raise ValueError('Retained provider identity differs from lookup key')
+            claim = (at, item['capture'], item, row)
+            provider_matchups[tuple(sorted((row['home_tricode'], row['away_tricode'])))].append(claim)
             if row['provider_completed'] is True:
-                provider_claims[key].append((at, item['capture'], item, row))
+                provider_claims[key].append(claim)
     rows = []
     for key, frozen in sorted(records.items()):
         if key != frozen['nba_game_id']: raise ValueError('Frozen NBA identity differs from lookup key')
         ns = sorted(native_claims[key], key=lambda x: (x[0], x[1]))
         es = sorted(provider_claims[frozen['espn_game_id']], key=lambda x: (x[0], x[1]))
         starts = [utc(frozen[field]) for field in ('nba_saved_start_utc', 'espn_saved_start_utc')]
+        teams = tuple(sorted(frozen['reference_features'][side]['team_tricode'] for side in ('home', 'away')))
+        native_aliases = [x for x in native_matchups[teams] if x[3]['nba_game_id'] != key
+                          and abs((utc(x[3]['tipoff_utc'])-starts[0]).total_seconds()) <= 30*60]
+        provider_aliases = [x for x in provider_matchups[teams] if x[3]['espn_game_id'] != frozen['espn_game_id']
+                            and abs((utc(x[3]['scheduled_start_utc'])-starts[1]).total_seconds()) <= 30*60]
         row = {'nba_game_id': key, 'espn_game_id': frozen['espn_game_id'],
                'feature_record_sha256': daily.features.digest(frozen),
                'frozen_at_utc': frozen['frozen_at_utc'],
@@ -98,12 +108,18 @@ def classify(records, native_sources, provider_sources, *, now):
             reason = 'RETAINED_PROVIDER_IDENTITY_QUARANTINED'
         elif len({_fingerprint(x[3], PROVIDER_FIELDS) for x in es}) > 1:
             reason = 'CONFLICTING_RETAINED_PROVIDER_FINAL_CLAIMS'
+        elif native_aliases:
+            reason = 'RETAINED_NATIVE_GAME_ID_REASSIGNMENT_OR_AMBIGUITY'
+        elif provider_aliases:
+            reason = 'RETAINED_PROVIDER_GAME_ID_REASSIGNMENT_OR_AMBIGUITY'
         if reason:
             row['quarantined'] = True
             row['conflicting_native_sources'] = [dict(_provenance(x[2], native=True),
-                normalized_game_sha256=hashlib.sha256(_fingerprint(x[3], NATIVE_FIELDS)).hexdigest()) for x in ns]
+                claimed_game_id=x[3]['nba_game_id'],
+                normalized_game_sha256=hashlib.sha256(_fingerprint(x[3], NATIVE_FIELDS)).hexdigest()) for x in ns+native_aliases]
             row['conflicting_provider_sources'] = [dict(_provenance(x[2], native=False),
-                normalized_game_sha256=hashlib.sha256(_fingerprint(x[3], PROVIDER_FIELDS)).hexdigest()) for x in es]
+                claimed_game_id=x[3]['espn_game_id'],
+                normalized_game_sha256=hashlib.sha256(_fingerprint(x[3], PROVIDER_FIELDS)).hexdigest()) for x in es+provider_aliases]
             row['provider_quarantine_sources'] = provider_quarantines.get(frozen['espn_game_id'], [])
         elif not ns:
             reason = 'NO_RETAINED_NATIVE_FINAL_FOR_FROZEN_GAME'

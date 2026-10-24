@@ -18,6 +18,12 @@ matching receipt could otherwise hide. The report retains capture identifiers,
 manifest digests and normalized-row digests for contradictory claims. Provider
 identity quarantines also remain visible.
 
+All retained NBA identity context is checked before choosing a pair. A later
+native final or provider event assigning the same matchup within 30 minutes
+of the frozen start to another game ID quarantines that feature, including
+provider previews with no final score. An earlier clean pair cannot hide the
+competing identity.
+
 After consistency is established, selection uses the earliest native final
 observation and earliest provider final observed at or after the native reported
 end. Selection never searches for a favorable score. The existing daily

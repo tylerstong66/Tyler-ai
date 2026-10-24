@@ -95,6 +95,26 @@ class RetainedFinalHistoryTests(unittest.TestCase):
         self.assertEqual(row['reason'],'RETAINED_PROVIDER_IDENTITY_QUARANTINED')
         self.assertEqual(row['provider_quarantine_sources'][0]['capture'],'provider-early')
 
+    def test_later_competing_game_id_cannot_be_hidden_by_earlier_clean_pair(self):
+        for source in ('native','provider'):
+            with self.subTest(source=source):
+                ns=[self.native]; es=[self.provider]
+                if source=='native':
+                    other=deepcopy(self.native); other['capture']='native-competing-id'
+                    other['manifest']['parsed_final_page']['games'][0]['nba_game_id']='0022600001'
+                    ns.append(other); expected='RETAINED_NATIVE_GAME_ID_REASSIGNMENT_OR_AMBIGUITY'
+                else:
+                    other=deepcopy(self.provider); other['capture']='provider-competing-id'
+                    row=other['games'].pop('401234567'); row['espn_game_id']='401234568'
+                    row['provider_completed']=False; row['state']='pre'
+                    row['home_score']=row['away_score']=None
+                    other['games']['401234568']=row
+                    es.append(other); expected='RETAINED_PROVIDER_GAME_ID_REASSIGNMENT_OR_AMBIGUITY'
+                out=self.build(ns,es)
+                self.assertEqual(out['corroborated_result_observations'],0)
+                self.assertEqual(out['rows'][0]['reason'],expected)
+                self.assertTrue(out['rows'][0]['quarantined'])
+
     def test_provider_before_native_end_is_withheld_until_a_later_identical_observation(self):
         early=deepcopy(self.provider); early['capture']='provider-before-end'
         early['manifest']['recorded_at_utc']=(START+timedelta(hours=1)).isoformat()
