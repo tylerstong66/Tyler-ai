@@ -82,6 +82,27 @@ class ReceiptReplayTests(unittest.TestCase):
                 path.write_text(json.dumps(saved))
                 with self.assertRaises(ValueError): receipts.verify(root,stamp)
 
+    def test_linked_normalization_and_protocol_replay_from_original_bytes(self):
+        for fault in ('game_score', 'parsed_team', 'endpoint', 'forecasting'):
+            with self.subTest(fault=fault), tempfile.TemporaryDirectory() as td:
+                root=Path(td); stamp=self.seed(root)
+                path=root/nba.ROOT/'captures'/stamp/'manifest.json'
+                saved=json.loads(path.read_bytes())
+                linked=root/observer.ROOT/'captures'/saved['espn_capture']/'manifest.json'
+                manifest=json.loads(linked.read_bytes())
+                snap=next(s for s in manifest['snapshots']
+                          if s['league']=='NBA' and s['parsed']['games'])
+                if fault=='game_score':
+                    next(r for r in manifest['undisputed_provider_games']
+                         if r['league']=='NBA')['home_score']=999
+                elif fault=='parsed_team': snap['parsed']['games'][0]['home_team_id']='999'
+                elif fault=='endpoint': snap['url']='https://example.org/fake'
+                else: manifest['forecasting_enabled']=True
+                linked.write_text(json.dumps(manifest))
+                saved['espn_manifest_sha256']=hashlib.sha256(linked.read_bytes()).hexdigest()
+                path.write_text(json.dumps(saved))
+                with self.assertRaises(ValueError): receipts.verify(root,stamp)
+
     def test_modified_official_schedule_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);stamp=self.seed(root)
