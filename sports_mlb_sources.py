@@ -12,6 +12,7 @@ from urllib.parse import urlencode
 import requests
 
 from sports_mlb_matchups import analyze
+from sports_expansion_audit import strict_json_loads
 
 ORIGIN = "https://statsapi.mlb.com/api/v1/"
 ALLOWED_TYPES = {"R", "F", "D", "L", "W"}
@@ -109,7 +110,7 @@ class OfficialMlbReader:
         final_url = getattr(response, "url", url)
         if not isinstance(final_url, str) or not final_url.startswith(url):
             raise ValueError("Unexpected MLB response origin.")
-        data = response.json()
+        data = strict_json_loads(response.content)
         if not isinstance(data, dict):
             raise ValueError("Malformed MLB source JSON.")
         captured = utc(self.clock()).isoformat()

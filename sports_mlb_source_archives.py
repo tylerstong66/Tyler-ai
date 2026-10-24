@@ -7,7 +7,7 @@ import json
 import re
 import subprocess
 
-from sports_expansion_audit import archive_path, bounded_gzip_read
+from sports_expansion_audit import archive_path, bounded_gzip_read, strict_json_loads
 
 MAX_BYTES = 3_000_000
 MAX_COMPRESSED = 3_500_000
@@ -27,7 +27,7 @@ def _decode(blob, filename):
     raw = bounded_gzip_read(blob, limit=MAX_BYTES)
     if hashlib.sha256(raw).hexdigest() != match.group(1):
         raise ValueError('MLB original source response digest mismatch')
-    data = json.loads(raw)
+    data = strict_json_loads(raw)
     if not isinstance(data, dict):
         raise ValueError('MLB original source JSON is not an object')
     canonical_digest(data) # reject nonfinite values under the original reader policy
@@ -47,7 +47,7 @@ def audit_directory(root):
 def retain(root, raw, expected_canonical_sha256):
     if not isinstance(raw, bytes) or len(raw) > MAX_BYTES:
         raise ValueError('Invalid MLB original response bytes')
-    data = json.loads(raw)
+    data = strict_json_loads(raw)
     if not isinstance(data, dict) or canonical_digest(data) != expected_canonical_sha256:
         raise ValueError('MLB response JSON differs from original reader normalization')
     digest = hashlib.sha256(raw).hexdigest(); filename = digest + '.json.gz'

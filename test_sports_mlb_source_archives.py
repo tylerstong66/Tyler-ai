@@ -3,6 +3,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 from types import SimpleNamespace
 import gzip
+import hashlib
 import json
 import subprocess
 import tempfile
@@ -16,6 +17,39 @@ NOW = datetime(2026, 10, 18, 12, tzinfo=timezone.utc)
 
 
 class MlbSourceArchiveTests(unittest.TestCase):
+    def test_duplicate_json_keys_rejected_before_receipt_or_archive_creation(self):
+        cases = (b'{"gamePk":1,"gamePk":2}',
+                 b'{"batting":{"atBats":0,"atBats":4}}')
+        for raw in cases:
+            for retained in (False, True):
+                with self.subTest(raw=raw, retained=retained), tempfile.TemporaryDirectory() as td:
+                    def get(url, **kwargs):
+                        return SimpleNamespace(status_code=200, content=raw, url=url,
+                                               json=lambda: json.loads(raw))
+                    reader = OfficialMlbReader(get=get, clock=lambda: NOW,
+                                               archive_dir=td if retained else None)
+                    with self.assertRaises(ValueError): reader.load('schedule')
+                    self.assertEqual(reader.audit, [])
+                    self.assertEqual(list(Path(td).iterdir()), [])
+            with self.subTest(raw=raw, boundary='retain'), tempfile.TemporaryDirectory() as td:
+                normalized = archive.canonical_digest(json.loads(raw))
+                with self.assertRaises(ValueError): archive.retain(td, raw, normalized)
+                self.assertEqual(list(Path(td).iterdir()), [])
+
+    def test_rehashed_duplicate_source_cannot_pass_independent_archive_replay(self):
+        for raw in (b'{"gamePk":1,"gamePk":2}',
+                    b'{"batting":{"hits":0,"hits":1}}'):
+            with self.subTest(raw=raw), tempfile.TemporaryDirectory() as td:
+                sha = hashlib.sha256(raw).hexdigest(); filename = sha+'.json.gz'
+                path = Path(td)/filename; path.write_bytes(gzip.compress(raw, mtime=0))
+                receipt = {'original_response_archive_schema': 'mlb-original-response-archive-v1',
+                    'original_response_sha256': sha, 'source_archive_file': filename,
+                    'source_url': 'https://statsapi.mlb.com/api/v1/schedule',
+                    'response_sha256': archive.canonical_digest(json.loads(raw))}
+                before = path.read_bytes()
+                with self.assertRaises(ValueError): archive.verify(td, receipt)
+                self.assertEqual(path.read_bytes(), before)
+
     def test_symlinked_archive_root_or_ancestor_rejects_reads_and_writes(self):
         for nested in (False, True):
             with self.subTest(nested=nested), tempfile.TemporaryDirectory() as td:
