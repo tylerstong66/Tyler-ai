@@ -3,16 +3,17 @@ import hashlib
 import json
 from pathlib import Path
 import sports_ncaa_official_source as ncaa
-from sports_expansion_audit import archive_path, bounded_gzip_read, MAX_BLOB_SIZE
+from sports_expansion_audit import archive_path, bounded_gzip_read, MAX_BLOB_SIZE, strict_json_loads
 
 def verify(folder):
     folder=archive_path(folder, directory=True)
     path=archive_path(folder/'manifest.json')
     if path.stat().st_size > MAX_BLOB_SIZE:
         raise ValueError('Oversized NCAA source manifest')
-    saved=json.loads(path.read_bytes())
+    saved=strict_json_loads(path.read_bytes())
     if (saved.get("schema")!="ncaa-owned-2026-source-observations-v1"
-            or saved.get("NO_BET") is not True or saved.get("actual_wagers")!=0
+            or saved.get("NO_BET") is not True or type(saved.get("actual_wagers")) is not int
+            or saved["actual_wagers"] != 0
             or saved.get("official_final_scoring_enabled") is not False
             or saved.get("fbs_source_week_completeness_verified") is not False
             or saved.get("college_to_espn_identity_map_verified") is not False):

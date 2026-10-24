@@ -52,6 +52,23 @@ class NcaaReceiptReplayTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"digest mismatch"):
                 receipts.verify(folder)
 
+    def test_saved_ncaa_manifest_duplicate_keys_and_boolean_wagers_fail_closed(self):
+        for fault in ("duplicate_no_bet", "boolean_wager"):
+            with self.subTest(fault=fault),tempfile.TemporaryDirectory() as td:
+                folder=self.seed(Path(td))
+                path=folder/"manifest.json"
+                original=path.read_bytes()
+                if fault=="duplicate_no_bet":
+                    path.write_bytes(b'{"NO_BET":false,'+original[1:])
+                    error="Duplicate"
+                else:
+                    saved=json.loads(original)
+                    saved["actual_wagers"]=False
+                    path.write_text(json.dumps(saved))
+                    error="Invalid NCAA-owned"
+                with self.assertRaisesRegex(ValueError,error):
+                    receipts.verify(folder)
+
     def test_forged_reconciliation_rejected(self):
         with tempfile.TemporaryDirectory() as td:
             folder=self.seed(Path(td))

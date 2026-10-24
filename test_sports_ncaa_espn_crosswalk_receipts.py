@@ -46,6 +46,23 @@ class CrosswalkReceiptTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"differs"):
                 receipts.verify(root,stamp)
 
+    def test_crosswalk_duplicate_keys_and_boolean_wagers_fail_closed(self):
+        for fault in ("duplicate_no_bet", "boolean_wager"):
+            with self.subTest(fault=fault),tempfile.TemporaryDirectory() as td:
+                root=Path(td); stamp=self.seed(root)
+                path=root/identity.ROOT/"captures"/stamp/"manifest.json"
+                original=path.read_bytes()
+                if fault=="duplicate_no_bet":
+                    path.write_bytes(b'{"NO_BET":false,'+original[1:])
+                    expected="Duplicate"
+                else:
+                    row=json.loads(original)
+                    row["actual_wagers"]=False
+                    path.write_text(json.dumps(row))
+                    expected="Invalid college"
+                with self.assertRaisesRegex(ValueError,expected):
+                    receipts.verify(root,stamp)
+
     def test_linked_manifest_mutation_rejected(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td);stamp=self.seed(root)
