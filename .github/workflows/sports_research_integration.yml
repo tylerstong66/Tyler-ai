@@ -42,6 +42,7 @@ jobs:
           python sports_nba_native_feature_cohort.py > nba-native-feature-cohort-verification.json
           python sports_nba_v3_feature_cohort.py > nba-v3-frozen-feature-source-audit.json
           python sports_nba_native_v2_final_v3_cohort.py > nba-native-v2-v3-feature-lifecycle.json
+          python sports_nba_native_v2_retained_finals.py > nba-native-v2-retained-finals.json
           python sports_nba_receipt_coverage.py --json > nba-native-receipt-coverage-verification.json
           python - <<'PY'
           import json
@@ -70,6 +71,7 @@ jobs:
             nba-v3-frozen-feature-source-diagnostic.json
             nba-v3-frozen-feature-source-audit.json
             nba-native-v2-v3-feature-lifecycle.json
+            nba-native-v2-retained-finals.json
             nba-native-pregame-feature-replay.json
           if-no-files-found: error
           retention-days: 30

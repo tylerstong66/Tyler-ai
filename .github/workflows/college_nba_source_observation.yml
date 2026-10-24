@@ -29,6 +29,8 @@ on:
       - sports_nba_native_feature_cohort.py
       - sports_nba_v3_feature_cohort.py
       - sports_nba_native_v2_final_v3_cohort.py
+      - sports_nba_native_v2_retained_finals.py
+      - test_sports_nba_native_v2_retained_finals.py
       - test_sports_nba_native_v2_final_v3_cohort.py
       - test_sports_nba_v3_feature_cohort.py
       - test_sports_nba_native_feature_cohort.py
@@ -314,6 +316,20 @@ jobs:
           path: nba-native-v2-v3-feature-lifecycle.json
           if-no-files-found: error
           retention-days: 30
+      - name: Audit native-v2 feature finals across all retained source dates
+        id: nba_native_v2_retained
+        if: steps.audit.outcome == 'success'
+        continue-on-error: true
+        run: |
+          python -m unittest -q test_sports_nba_native_v2_retained_finals
+          python sports_nba_native_v2_retained_finals.py > nba-native-v2-retained-finals.json
+      - uses: actions/upload-artifact@v4
+        if: steps.nba_native_v2_retained.outcome == 'success'
+        with:
+          name: nba-native-v2-retained-finals
+          path: nba-native-v2-retained-finals.json
+          if-no-files-found: error
+          retention-days: 30
       - name: Compare NBA CDN schedule to archived ESPN season games
         id: nba_source
         continue-on-error: true
@@ -441,6 +457,7 @@ jobs:
           NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2: ${{ steps.nba_native_features_v2.outcome }}
           NBA_POSTGAME_NATIVE_SOURCE_V2: ${{ steps.nba_postgame_v2.outcome }}
           NBA_POSTGAME_NATIVE_SOURCE_V3: ${{ steps.nba_postgame_v3.outcome }}
+          NBA_NATIVE_V2_RETAINED_FINAL_AUDIT: ${{ steps.nba_native_v2_retained.outcome }}
           NBA_NATIVE_V2_FEATURE_V3_FINAL_AUDIT: ${{ steps.nba_native_v2_v3_cohort.outcome }}
           NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V3: ${{ steps.nba_native_cohort_v3.outcome }}
           NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2: ${{ steps.nba_native_cohort_v2.outcome }}
@@ -462,7 +479,7 @@ jobs:
           from datetime import datetime, timezone
           from pathlib import Path
           outcomes = {name: os.environ[name] for name in (
-              'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE', 'NBA_DAILY_PREGAME_SOURCE', 'NBA_DAILY_PREGAME_SOURCE_V2', 'NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V3', 'NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V3', 'NBA_NATIVE_V2_FEATURE_V3_FINAL_AUDIT', 'NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2', 'NBA_CROSS_PHASE_SOURCE_COVERAGE',
+              'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE', 'NBA_DAILY_PREGAME_SOURCE', 'NBA_DAILY_PREGAME_SOURCE_V2', 'NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V3', 'NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V3', 'NBA_NATIVE_V2_FEATURE_V3_FINAL_AUDIT', 'NBA_NATIVE_V2_RETAINED_FINAL_AUDIT', 'NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2', 'NBA_CROSS_PHASE_SOURCE_COVERAGE',
               'NCAA_OWNED_SOURCE', 'NCAA_ESPN_CROSSWALK', 'NCAA_FINAL_RECEIPTS', 'NCAA_RESULT_DATASET', 'NBA_FINAL_REPLAY', 'NBA_FEATURE_OBSERVATIONS', 'NBA_FEATURE_COHORT_AUDIT', 'FBS_FEATURE_OBSERVATIONS', 'FBS_FEATURE_COHORT_AUDIT', 'D1_FEATURE_OBSERVATIONS', 'D1_FEATURE_COHORT_AUDIT')}
           postgame = (json.loads(Path('nba-postgame-v2-source-observation.json').read_text())
                       if outcomes['NBA_POSTGAME_NATIVE_SOURCE_V2'] == 'success' else {})
@@ -480,6 +497,15 @@ jobs:
               assert type(newer_lifecycle['actual_wagers']) is int and newer_lifecycle['actual_wagers'] == 0
               assert type(newer_lifecycle['outcomes_enrolled']) is int and newer_lifecycle['outcomes_enrolled'] == 0
               assert all(newer_lifecycle[key] is False for key in ('settlement_enabled', 'forecasting_enabled', 'model_training_enabled', 'historical_evaluation_enabled', 'promotion_allowed', 'prediction_accuracy_computed', 'official_final_results_verified'))
+          retained_lifecycle = (json.loads(Path('nba-native-v2-retained-finals.json').read_text())
+                                if outcomes['NBA_NATIVE_V2_RETAINED_FINAL_AUDIT'] == 'success' else {})
+          if retained_lifecycle:
+              assert retained_lifecycle['feature_cohort'] == 'NATIVE_DAILY_V2_ONLY'
+              assert retained_lifecycle['not_a_prediction'] is True
+              assert retained_lifecycle['NO_BET'] is True
+              assert type(retained_lifecycle['actual_wagers']) is int and retained_lifecycle['actual_wagers'] == 0
+              assert type(retained_lifecycle['outcomes_enrolled']) is int and retained_lifecycle['outcomes_enrolled'] == 0
+              assert all(retained_lifecycle[key] is False for key in ('settlement_enabled', 'forecasting_enabled', 'model_training_enabled', 'historical_evaluation_enabled', 'promotion_allowed', 'prediction_accuracy_computed', 'official_final_results_verified'))
           native_features = (json.loads(Path('nba-native-feature-observation-v2.json').read_text())
                              if outcomes['NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2'] == 'success' else {})
           native_feature_audit = (json.loads(Path('nba-native-feature-audit-v2.json').read_text())
@@ -506,6 +532,13 @@ jobs:
               'native_daily_verified_feature_observations': native_feature_audit.get('verified_feature_observations'),
               'native_daily_feature_source_capture': native_features.get('source_capture'),
               'native_daily_feature_targets_withheld': len(native_features['not_enrolled']) if native_features else None,
+              'native_v2_retained_final_audit_checked': outcomes['NBA_NATIVE_V2_RETAINED_FINAL_AUDIT'] == 'success',
+              'native_v2_retained_frozen_features': retained_lifecycle.get('frozen_feature_observations'),
+              'native_v2_retained_corroborated_observations': retained_lifecycle.get('corroborated_result_observations'),
+              'native_v2_retained_pending_features': retained_lifecycle.get('pending_feature_observations'),
+              'native_v2_retained_awaiting_start': retained_lifecycle.get('awaiting_original_saved_start'),
+              'native_v2_retained_quarantined_features': retained_lifecycle.get('quarantined_features'),
+              'native_v2_retained_outcomes_enrolled': retained_lifecycle.get('outcomes_enrolled'),
               'native_v2_features_v3_final_audit_checked': outcomes['NBA_NATIVE_V2_FEATURE_V3_FINAL_AUDIT'] == 'success',
               'native_v2_features_v3_frozen_features': newer_lifecycle.get('frozen_feature_observations'),
               'native_v2_features_v3_corroborated_observations': newer_lifecycle.get('corroborated_result_observations'),
