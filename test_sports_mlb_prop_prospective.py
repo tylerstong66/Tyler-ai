@@ -7,7 +7,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from sports_mlb_prop_prospective import (
-    freeze_pregame_hit_props, settle_frozen_hit_props, write_exclusive_json, _verify
+    freeze_pregame_hit_props, settle_frozen_hit_props, write_exclusive_json, _verify, _seal
 )
 
 START="2026-10-15T23:00:00Z"
@@ -80,6 +80,19 @@ class OfficialReader:
 
 
 class FrozenTrialTests(unittest.TestCase):
+    def test_resealed_noninteger_zero_wager_rejected_before_final_fetch(self):
+        for value in (False, 0.0, -0.0):
+            with self.subTest(value=value):
+                reader = OfficialReader()
+                record = freeze_pregame_hit_props(849810, 683734, 'away', reader=reader)
+                core = _verify(record); core['actual_wager'] = value
+                forged = _seal(core); before = copy.deepcopy(forged)
+                reader.now = AFTER; reader.final = True; reader.audit.clear()
+                with self.assertRaisesRegex(ValueError, 'no-bet'):
+                    settle_frozen_hit_props(forged, reader=reader)
+                self.assertEqual(reader.audit, [])
+                self.assertEqual(forged, before)
+
     def test_frozen_pregame_content_and_final_are_separate_records(self):
         r=OfficialReader()
         original=freeze_pregame_hit_props(849810,683734,"away",reader=r)

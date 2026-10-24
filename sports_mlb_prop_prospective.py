@@ -173,7 +173,7 @@ def settle_frozen_hit_props(record, *, reader=None):
             core.get("status")!="IMMUTABLE_PREGAME_SHADOW_NO_BET" or
             core.get("sportsbook_wager_eligible") is not False or
             core.get("model_calibrated") is not False or
-            core.get("actual_wager")!=0):
+            type(core.get("actual_wager")) is not int or core.get("actual_wager")!=0):
         raise ValueError("Not a recognized untouched no-bet shadow prediction.")
     begin=utc(core.get("frozen_at_utc"))
     event=utc(core.get("event_start_utc"))
