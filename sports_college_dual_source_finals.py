@@ -28,13 +28,14 @@ def classify(ncaa_rows,espn_rows,*,use_curated_fbs_aliases=True):
         if identity_uses[key] != 1:
             pending.append({**base,"reason":"NON_BIJECTIVE_GAME_IDENTITY"})
             continue
-        if not (nc["provider_reported_final"] and es["provider_completed"]):
+        if not (nc["provider_reported_final"] is True and es["provider_completed"] is True):
             pending.append({**base,"reason":"BOTH_SOURCES_NOT_FINAL"})
             continue
         home,away=nc["ncaa_home_score"],nc["ncaa_away_score"]
-        if (not isinstance(home,int) or isinstance(home,bool)
-                or not isinstance(away,int) or isinstance(away,bool)
-                or home<0 or away<0 or home==away
+        # Direct callers must meet the same exact integer contract as raw parsers.
+        scores=(home,away,es["home_score"],es["away_score"])
+        if (any(type(value) is not int or value<0 for value in scores)
+                or home==away
                 or es["home_score"]!=home or es["away_score"]!=away):
             raise ValueError("Invalid or contradictory final in matched identity")
         corroborated.append({**base,"home_score":home,"away_score":away,

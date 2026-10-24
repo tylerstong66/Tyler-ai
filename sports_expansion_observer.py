@@ -78,7 +78,7 @@ def _event(event, payload):
         raise ValueError("Non-numeric provider game identity")
     season=event.get("season") or payload.get("season") or {}
     stage=season.get("type")
-    if stage not in (2,3): # Never include NBA preseason or college exhibitions.
+    if type(stage) is not int or stage not in (2,3): # No coerced season identity.
         return None,"not_confirmed_regular_or_postseason"
     competition=event["competitions"]
     if len(competition)!=1:
