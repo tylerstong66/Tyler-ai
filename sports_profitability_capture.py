@@ -14,7 +14,7 @@ from pathlib import Path
 import requests
 
 from sports_profitability_v1 import utc
-from sports_expansion_audit import archive_path
+from sports_expansion_audit import archive_path, strict_json_loads
 
 ENDPOINT = "https://api.the-odds-api.com/v4/sports/icehockey_nhl/odds"
 SAFE_PARAMS = {
@@ -55,7 +55,7 @@ def observe_source(api_key, *, root=ROOT, get=None, clock=None):
     if api_key.encode() in raw:
         raise ValueError("Provider response contains confidential token; not archiving")
     try:
-        events = json.loads(raw)
+        events = strict_json_loads(raw)
     except (UnicodeError, ValueError):
         raise ValueError("Provider original NHL odds response is not valid JSON") from None
     if not isinstance(events, list):

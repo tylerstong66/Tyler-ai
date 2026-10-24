@@ -165,6 +165,31 @@ class ArchivedOriginalInteroperabilityTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "offering not verified"):
             profit.check_quote(quote, model, self.repo, "entry")
 
+    def test_ambiguous_or_nonfinite_manifest_never_replays(self):
+        self.archive(); path = self.repo/self.manifest_path; original = path.read_bytes()
+        variants = [original.replace(b'"actual_wagers": 0', b'"actual_wagers": 9, "actual_wagers": 0', 1)]
+        variants += [b'{"unused": '+token+b','+original[1:]
+                     for token in (b'NaN', b'Infinity', b'-Infinity')]
+        for raw in variants:
+            with self.subTest(raw_kind=raw[:40]):
+                path.write_bytes(raw)
+                with self.assertRaisesRegex(ValueError, 'manifest is invalid JSON'):
+                    self.quote()
+                self.assertEqual(path.read_bytes(), raw)
+
+    def test_rehashed_ambiguous_or_nonfinite_original_never_replays(self):
+        self.archive(); manifest = self.read_manifest(); original = Path(manifest['original_path']).read_bytes()
+        variants = [original.replace(b'"price": -110', b'"price": 5000, "price": -110', 1)]
+        variants += [original.replace(b'"id":', b'"unused": '+token+b', "id":', 1)
+                     for token in (b'NaN', b'Infinity', b'-Infinity')]
+        for raw in variants:
+            with self.subTest(raw_kind=raw[:40]):
+                digest = hashlib.sha256(raw).hexdigest()
+                path = self.repo/capture.ROOT/'originals'/(digest+'.json'); path.write_bytes(raw)
+                self.replace_manifest({**manifest, 'raw_entity_body_sha256': digest, 'original_path': str(path)})
+                with self.assertRaisesRegex(ValueError, 'Original source is not valid JSON'):
+                    self.quote()
+                self.assertEqual(path.read_bytes(), raw)
     def test_captured_retrieval_and_archive_time_are_distinct(self):
         self.archive()
         manifest = self.read_manifest()

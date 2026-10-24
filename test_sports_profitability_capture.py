@@ -88,6 +88,19 @@ class NhlPriceArchiveTests(unittest.TestCase):
         self.assertEqual(len(list((self.root / "originals").glob("*.json"))), 1)
         self.assertEqual(len(list((self.root / "captures").glob("*.json"))), 2)
 
+    def test_ambiguous_or_nonfinite_original_json_is_rejected_before_archive(self):
+        original = json.dumps(self.events).encode()
+        variants = [original.replace(b'"price": -110', b'"price": 5000, "price": -110', 1)]
+        variants += [original.replace(b'"id":', b'"unused": '+token+b', "id":', 1)
+                     for token in (b'NaN', b'Infinity', b'-Infinity')]
+        for index, raw in enumerate(variants):
+            with self.subTest(raw_kind=raw[:40]):
+                variant_root = self.root/str(index)
+                with self.assertRaisesRegex(ValueError, 'valid JSON'):
+                    capture.observe_source('test-key-only', root=variant_root,
+                        get=lambda *a, **kw: FakeResponse(raw), clock=lambda: self.now)
+                self.assertFalse(variant_root.exists())
+
     def test_duplicate_timestamp_manifest_not_replaced(self):
         output = self.archive()
         before = Path(output["manifest_path"]).read_bytes()

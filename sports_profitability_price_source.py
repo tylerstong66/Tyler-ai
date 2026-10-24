@@ -4,9 +4,9 @@ This is not an executable sportsbook quote, a final closing line, or a paper
 selection. It must never promote ESPN 'close' values or aggregation timestamps
 into a verified offering. No network calls, API key handling, or wagering.
 """
-import json
 from datetime import timedelta
 from urllib.parse import urlsplit
+from sports_expansion_audit import strict_json_loads
 
 from sports_profitability_v1 import (
     BOOK, MARKET, decimal_odds, hash_record, utc, original_bytes,
@@ -44,7 +44,7 @@ def observe(original_root, source, official, archived_at):
     if not at <= saved < start or saved - at > timedelta(minutes=5):
         raise ValueError("Market observation must be archived before kickoff")
     try:
-        data = json.loads(raw)
+        data = strict_json_loads(raw)
     except (ValueError, UnicodeError) as exc:
         raise ValueError("Malformed preserved odds JSON") from exc
     if not isinstance(data, list):
