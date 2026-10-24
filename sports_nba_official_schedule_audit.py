@@ -44,7 +44,7 @@ def official_games(raw):
     for date_block in groups:
         for item in date_block["games"]:
             identifier=str(item["gameId"])
-            if not re.fullmatch(r"\d{10}",identifier):
+            if not re.fullmatch(r"[0-9]{10}",identifier):
                 raise ValueError("Invalid NBA official game ID")
             if identifier in seen:
                 raise ValueError("Duplicate official NBA game ID")
