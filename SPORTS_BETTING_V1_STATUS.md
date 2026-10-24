@@ -1,5 +1,13 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-24)
 
+## October 24 continuation — bounded missing-final retries
+
+PR #261 is merged and the live source workflow published 29 frozen native-v2 records / 14 matching retained research observations / 15 unresolved, with zero quarantines or enrolled outcomes. All 1,058 sports tests and all 15 exact-head checks passed before merge; the post-merge source and integrated replay runs also succeeded.
+
+The next collection gap is recovery after a temporarily unsupported yesterday page. A separate read-only plan now selects only missing-native-final records from two or three Eastern days ago, after verifying their original starts and every retained source. Opt-in collection makes at most two date requests, preserves opaque originals, rejects stale midnight-crossing plans, and leaves score/identity conflicts quarantined. Yesterday's normal receipt remains the latest successful capture. Only explicitly listed and replayed directories can be staged, preventing failed catchup partials from entering publication. The real October 24 plan requested zero older-date retries; the remaining records are October 24/25 games. No future final is inferred. See `NBA_NATIVE_FINAL_CATCHUP_V1.md`.
+
+NO_BET=true, actual wagers zero, outcome enrollment/settlement/training/forecasting/promotion disabled; no Render deployment.
+
 ## October 24 continuation — retained-date NBA source history
 
 Post-#260 integrated, live-source and historical-receipt workflows passed. The live source status at 18:40:38 UTC (run 40121485462) correctly publishes 29 newer native-v2 features, 12 matching single-date research observations, 17 pending and zero outcomes enrolled. Read-only Render inspection confirmed automatic deployment disabled and latest live deployment still October 22; no production deploy was initiated.

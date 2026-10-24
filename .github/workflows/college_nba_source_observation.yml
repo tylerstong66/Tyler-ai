@@ -31,6 +31,8 @@ on:
       - sports_nba_native_v2_final_v3_cohort.py
       - sports_nba_native_v2_retained_finals.py
       - test_sports_nba_native_v2_retained_finals.py
+      - sports_nba_final_catchup.py
+      - test_sports_nba_final_catchup.py
       - test_sports_nba_native_v2_final_v3_cohort.py
       - test_sports_nba_v3_feature_cohort.py
       - test_sports_nba_native_feature_cohort.py
@@ -225,6 +227,31 @@ jobs:
             nba-postgame-v2-source-observation.json
             nba-postgame-v2-source-replay.json
             benchmarks/nba_postgame_daily_v2/captures/${{ steps.nba_postgame_v2.outputs.capture }}/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Retry missing native finals from two or three Eastern days ago
+        id: nba_final_catchup
+        if: steps.audit.outcome == 'success'
+        continue-on-error: true
+        run: |
+          python -m unittest -q test_sports_nba_final_catchup
+          python sports_nba_final_catchup.py --collect > nba-native-final-catchup.json
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from sports_nba_final_catchup import publication_paths
+          report = json.loads(Path('nba-native-final-catchup.json').read_text())
+          paths = publication_paths(Path('.'), report)
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('capture_paths<<NBA_CATCHUP_PATHS\n'+'\n'.join(paths)+'\nNBA_CATCHUP_PATHS\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: steps.nba_final_catchup.outcome == 'success'
+        with:
+          name: nba-native-final-catchup
+          path: |
+            nba-native-final-catchup.json
+            ${{ steps.nba_final_catchup.outputs.capture_paths }}
           if-no-files-found: error
           retention-days: 30
       - name: Retain separate Final-break v3 original NBA postgame bytes without grading
@@ -457,6 +484,7 @@ jobs:
           NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2: ${{ steps.nba_native_features_v2.outcome }}
           NBA_POSTGAME_NATIVE_SOURCE_V2: ${{ steps.nba_postgame_v2.outcome }}
           NBA_POSTGAME_NATIVE_SOURCE_V3: ${{ steps.nba_postgame_v3.outcome }}
+          NBA_NATIVE_FINAL_CATCHUP: ${{ steps.nba_final_catchup.outcome }}
           NBA_NATIVE_V2_RETAINED_FINAL_AUDIT: ${{ steps.nba_native_v2_retained.outcome }}
           NBA_NATIVE_V2_FEATURE_V3_FINAL_AUDIT: ${{ steps.nba_native_v2_v3_cohort.outcome }}
           NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V3: ${{ steps.nba_native_cohort_v3.outcome }}
@@ -479,6 +507,7 @@ jobs:
           from datetime import datetime, timezone
           from pathlib import Path
           outcomes = {name: os.environ[name] for name in (
+              'NBA_NATIVE_FINAL_CATCHUP',
               'ESPN_OBSERVATION', 'ESPN_REPLAY_AUDIT', 'NBA_SCHEDULE_SOURCE', 'NBA_DAILY_PREGAME_SOURCE', 'NBA_DAILY_PREGAME_SOURCE_V2', 'NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V2', 'NBA_POSTGAME_NATIVE_SOURCE_V3', 'NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V3', 'NBA_NATIVE_V2_FEATURE_V3_FINAL_AUDIT', 'NBA_NATIVE_V2_RETAINED_FINAL_AUDIT', 'NBA_NATIVE_DAILY_FEATURE_COHORT_AUDIT_V2', 'NBA_CROSS_PHASE_SOURCE_COVERAGE',
               'NCAA_OWNED_SOURCE', 'NCAA_ESPN_CROSSWALK', 'NCAA_FINAL_RECEIPTS', 'NCAA_RESULT_DATASET', 'NBA_FINAL_REPLAY', 'NBA_FEATURE_OBSERVATIONS', 'NBA_FEATURE_COHORT_AUDIT', 'FBS_FEATURE_OBSERVATIONS', 'FBS_FEATURE_COHORT_AUDIT', 'D1_FEATURE_OBSERVATIONS', 'D1_FEATURE_COHORT_AUDIT')}
           postgame = (json.loads(Path('nba-postgame-v2-source-observation.json').read_text())
@@ -506,6 +535,11 @@ jobs:
               assert type(retained_lifecycle['actual_wagers']) is int and retained_lifecycle['actual_wagers'] == 0
               assert type(retained_lifecycle['outcomes_enrolled']) is int and retained_lifecycle['outcomes_enrolled'] == 0
               assert all(retained_lifecycle[key] is False for key in ('settlement_enabled', 'forecasting_enabled', 'model_training_enabled', 'historical_evaluation_enabled', 'promotion_allowed', 'prediction_accuracy_computed', 'official_final_results_verified'))
+          catchup = (json.loads(Path('nba-native-final-catchup.json').read_text())
+                     if outcomes['NBA_NATIVE_FINAL_CATCHUP'] == 'success' else {})
+          if catchup:
+              from sports_nba_final_catchup import publication_paths
+              publication_paths(Path('.'), catchup)
           native_features = (json.loads(Path('nba-native-feature-observation-v2.json').read_text())
                              if outcomes['NBA_NATIVE_DAILY_FEATURE_OBSERVATIONS_V2'] == 'success' else {})
           native_feature_audit = (json.loads(Path('nba-native-feature-audit-v2.json').read_text())
@@ -533,6 +567,9 @@ jobs:
               'native_daily_feature_source_capture': native_features.get('source_capture'),
               'native_daily_feature_targets_withheld': len(native_features['not_enrolled']) if native_features else None,
               'native_v2_retained_final_audit_checked': outcomes['NBA_NATIVE_V2_RETAINED_FINAL_AUDIT'] == 'success',
+              'native_final_catchup_checked': outcomes['NBA_NATIVE_FINAL_CATCHUP'] == 'success',
+              'native_final_catchup_captures': len(catchup['captures']) if catchup else None,
+              'native_final_catchup_outside_window_game_ids': catchup.get('outside_retry_window_game_ids'),
               'native_v2_retained_frozen_features': retained_lifecycle.get('frozen_feature_observations'),
               'native_v2_retained_corroborated_observations': retained_lifecycle.get('corroborated_result_observations'),
               'native_v2_retained_pending_features': retained_lifecycle.get('pending_feature_observations'),
@@ -619,9 +656,16 @@ jobs:
             echo '::warning::Native NBA postgame capture unavailable; no postgame receipt publication'
           fi
           if [ "${{ steps.nba_postgame_v3.outcome }}" = "success" ]; then
-            git add benchmarks/nba_postgame_daily_v3/captures
+            git add "benchmarks/nba_postgame_daily_v3/captures/${{ steps.nba_postgame_v3.outputs.capture }}"
           else
             echo '::warning::Separate Final-break NBA source unavailable; do not publish unverified v3 capture'
+          fi
+          if [ "${{ steps.nba_final_catchup.outcome }}" = "success" ]; then
+            python sports_nba_final_catchup.py --publication-paths nba-native-final-catchup.json > nba-final-catchup-publication-paths.txt
+            mapfile -t catchup_paths < nba-final-catchup-publication-paths.txt
+            if [ "${#catchup_paths[@]}" -gt 0 ] && [ -n "${catchup_paths[0]}" ]; then
+              git add -- "${catchup_paths[@]}"
+            fi
           fi
           if [ "${{ steps.nba_source.outcome }}" = "success" ]; then
             git add benchmarks/college_nba_source_v1/nba_official
