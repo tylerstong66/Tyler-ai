@@ -1,6 +1,6 @@
 # Tyler NHL prospective paper test
 
-Recorded: **96** · Settled: **84** · Pending: **12**
+Recorded: **97** · Settled: **84** · Pending: **13**
 
 **NO BET — actual wagers $0.**
 
@@ -110,6 +110,7 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | TBL at UTA | Oct 24 09:00 PM | TBL | 50.6% |
 | DET at CGY | Oct 24 10:00 PM | CGY | 52.4% |
 | MIN at SEA | Oct 24 10:00 PM | MIN | 50.3% |
+| FLA at CHI | Oct 25 03:00 PM | FLA | 52.1% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
 

@@ -276,26 +276,26 @@
       "uncertainty_status": "available_descriptive"
     }
   },
-  "as_of_utc": "2026-10-24T16:35:36.985544+00:00",
+  "as_of_utc": "2026-10-24T19:29:35.675267+00:00",
   "candidate": "ridge_recipe",
-  "enrolled": 59,
+  "enrolled": 60,
   "first_100_enrolled": {
     "preserved_checkpoint": {
       "checkpoint_sha256": null,
       "path": null,
-      "selected": 59,
+      "selected": 60,
       "settled_selected": 47,
       "status": "collecting_forecasts",
       "target": 100
     },
-    "selected": 59,
+    "selected": 60,
     "settled_selected": 47,
     "status": "collecting_or_awaiting_selected_finals",
     "target": 100
   },
-  "input_digest": "a8f05688e4868829f1756371d8f6d0ce3991c19ae6792d25d139df4f7a9bdb09",
+  "input_digest": "8b780510c79178e46b2120d7a058cadfc3dec44a8ed41bfbf5cc1be84ce26a34",
   "limitation": "Research only; all results are descriptive. No candidate selection, model promotion, bets, odds backfills or claims of an edge.",
-  "newly_enrolled": 0,
+  "newly_enrolled": 1,
   "paired_challenger_minus_baseline": {
     "fixed_elo": {
       "blocks": 7,
@@ -382,7 +382,7 @@
       "uncertainty_status": "available_descriptive"
     }
   },
-  "pending": 12,
+  "pending": 13,
   "promotion_allowed": false,
   "recent_verified_game_casebook": {
     "NO_BET": true,
@@ -2263,10 +2263,10 @@
   "scored": 47,
   "selection_warning": "2025 retrospective model selection was not blind; only post-activation NHL shadow games are prospective.",
   "source_enrollment_coverage": {
-    "eligible_saved_primary_forecasts_since_activation": 59,
+    "eligible_saved_primary_forecasts_since_activation": 60,
     "missed_started_source_forecasts": [],
     "note": "Only hash-verified saved primary forecasts; no upstream schedule completeness claim or retrospective repair.",
-    "shadow_enrolled": 59,
+    "shadow_enrolled": 60,
     "unseen_official_schedule_not_measured": true
   },
   "source_report": "benchmarks/two_way_challenger_v1/nhl_report.json",
@@ -2275,27 +2275,6 @@
     "NO_BET": true,
     "actual_wagers": 0,
     "games": [
-      {
-        "archived_forecast_recorded_at_utc": "2026-10-23T19:13:50.684060+00:00",
-        "away": "ANA",
-        "event_id": "401892566",
-        "game_id": "2026020168",
-        "home": "PHI",
-        "home_win_probabilities": {
-          "challenger": 0.5711944203934938,
-          "fixed_elo": 0.5855271367481535,
-          "original_model": 0.5275126634334079,
-          "saved_market": 0.5260865852617197
-        },
-        "live_market_quote": false,
-        "result_eligible_to_score_now": false,
-        "saved_market_observed_at_utc": "2026-10-23T19:13:47.025903+00:00",
-        "saved_market_provider": "DraftKings",
-        "scheduled_start_utc": "2026-10-24T17:00:00+00:00",
-        "shadow_forecast_sha256": "58a96421a6663754883b3efd350f126e2b989b01c7836c5e19f9e6c0b48ee40c",
-        "source_forecast_sha256": "24cce8634d8459421d84a2699d098e97052c2e6978306a927a3e5c95a4bd0c5c",
-        "source_generated_at_utc": "2026-10-23T19:13:47.194448+00:00"
-      },
       {
         "archived_forecast_recorded_at_utc": "2026-10-23T22:17:22.596015+00:00",
         "away": "LAK",
@@ -2526,6 +2505,27 @@
         "shadow_forecast_sha256": "d697a10974a079f7b566ffc895c998af92ca7d705269771dc6424c825a56af1b",
         "source_forecast_sha256": "fd2815cc54d792ffb64a51dabd515f8cf2946ee3bf59f9c6d95bdc24f96e77ff",
         "source_generated_at_utc": "2026-10-24T07:18:03.741626+00:00"
+      },
+      {
+        "archived_forecast_recorded_at_utc": "2026-10-24T19:29:35.675267+00:00",
+        "away": "FLA",
+        "event_id": "401892578",
+        "game_id": "2026020180",
+        "home": "CHI",
+        "home_win_probabilities": {
+          "challenger": 0.49792117109066825,
+          "fixed_elo": 0.4475380731634267,
+          "original_model": 0.47850618133332784,
+          "saved_market": 0.3835616438356164
+        },
+        "live_market_quote": false,
+        "result_eligible_to_score_now": false,
+        "saved_market_observed_at_utc": "2026-10-24T19:29:31.708409+00:00",
+        "saved_market_provider": "Draft Kings",
+        "scheduled_start_utc": "2026-10-25T19:00:00+00:00",
+        "shadow_forecast_sha256": "afbdc8a92255281ffa7c8cfe35081076de5b33ba45741c092fc980bbb7c56b42",
+        "source_forecast_sha256": "4e46dd2fc3cbba41c446622ae7f32c0091b877643c008e935ec7a02a4c106011",
+        "source_generated_at_utc": "2026-10-24T19:29:31.819284+00:00"
       }
     ],
     "probability_convention": "probability of home team winning including overtime or shootout",

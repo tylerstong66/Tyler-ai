@@ -1,12 +1,12 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-10-24T16:35:31.114904+00:00",
-  "capture_count": 92,
+  "as_of_evidence_at": "2026-10-24T19:29:29.384938+00:00",
+  "capture_count": 93,
   "cohort_started_at": "2026-10-11T15:19:59+00:00",
   "completion_note": "Saved NFL manifests before coverage-v1 lack a completion flag; successful workflow corroboration remains required.",
   "decisive_market_paired": 27,
-  "enrollment_priced": 29,
+  "enrollment_priced": 36,
   "followup_quotes_separate_from_original_metrics": [],
   "games": [
     {
@@ -430,6 +430,82 @@
       "status": "enrolled"
     },
     {
+      "away": "CIN",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-10-24T19:29:27.524381+00:00",
+      "game_id": "2026_07_CIN_BAL",
+      "home": "BAL",
+      "kickoff": "2026-10-25T17:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-10-24T19:29:29.401710+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_07_CIN_BAL",
+        "priced": true
+      },
+      "lead_hours": 21.508478982499998,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-10-24T19:29:29.475663+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
+      "away": "CLE",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-10-24T19:29:27.524381+00:00",
+      "game_id": "2026_07_CLE_TEN",
+      "home": "TEN",
+      "kickoff": "2026-10-25T17:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-10-24T19:29:29.476137+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_07_CLE_TEN",
+        "priced": true
+      },
+      "lead_hours": 21.508458713611113,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-10-24T19:29:29.548631+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
+      "away": "IND",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-10-24T19:29:27.524381+00:00",
+      "game_id": "2026_07_IND_MIN",
+      "home": "MIN",
+      "kickoff": "2026-10-25T17:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-10-24T19:29:29.549075+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_07_IND_MIN",
+        "priced": true
+      },
+      "lead_hours": 21.508436588333332,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-10-24T19:29:29.628282+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
+      "away": "MIA",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-10-24T19:29:27.524381+00:00",
+      "game_id": "2026_07_MIA_NYJ",
+      "home": "NYJ",
+      "kickoff": "2026-10-25T17:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-10-24T19:29:29.628740+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_07_MIA_NYJ",
+        "priced": true
+      },
+      "lead_hours": 21.508416046944443,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-10-24T19:29:29.702231+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
       "away": "NE",
       "exclusion_reasons": [],
       "first_observed_in_window": "2026-10-22T04:46:58.365575+00:00",
@@ -447,6 +523,25 @@
       "status": "enrolled"
     },
     {
+      "away": "NYG",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-10-24T19:29:27.524381+00:00",
+      "game_id": "2026_07_NYG_HOU",
+      "home": "HOU",
+      "kickoff": "2026-10-25T17:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-10-24T19:29:29.702647+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_07_NYG_HOU",
+        "priced": true
+      },
+      "lead_hours": 21.508395449444446,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-10-24T19:29:29.776382+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
       "away": "PIT",
       "exclusion_reasons": [],
       "first_observed_in_window": "2026-10-24T16:35:29.227616+00:00",
@@ -454,19 +549,55 @@
       "home": "NO",
       "kickoff": "2026-10-25T13:30:00+00:00",
       "latest_saved_decision": {
-        "checked_at": "2026-10-24T16:35:31.118262+00:00",
-        "decision": "enrolled",
-        "game_id": "2026_07_PIT_NO",
-        "priced": true
+        "decision": "already_enrolled",
+        "game_id": "2026_07_PIT_NO"
       },
       "lead_hours": 20.908011461666668,
-      "pregame_schedule_observations_in_window": 1,
+      "pregame_schedule_observations_in_window": 2,
       "recorded_at": "2026-10-24T16:35:31.158738+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
+      "away": "SF",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-10-24T19:29:27.524381+00:00",
+      "game_id": "2026_07_SF_ATL",
+      "home": "ATL",
+      "kickoff": "2026-10-25T17:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-10-24T19:29:29.776816+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_07_SF_ATL",
+        "priced": true
+      },
+      "lead_hours": 21.508374806944445,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-10-24T19:29:29.850695+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
+      "away": "TB",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-10-24T19:29:27.524381+00:00",
+      "game_id": "2026_07_TB_CAR",
+      "home": "CAR",
+      "kickoff": "2026-10-25T17:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-10-24T19:29:29.851137+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_07_TB_CAR",
+        "priced": true
+      },
+      "lead_hours": 21.508354328333336,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-10-24T19:29:29.924418+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
     }
   ],
-  "input_digest": "feafa04ad3b64c5f31f4e33f911ea40e6505677724860c5f7eeebce240f06c68",
+  "input_digest": "3bf64c4aa9d1db8b3d9df66bfc37ede36b9c65a914feb518c8d58fb4f67476ef",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -495,28 +626,138 @@
       "to": "2026-10-12T07:21:42.028391+00:00"
     }
   ],
-  "latest_attempted_capture": "20261024T163528060386Z",
-  "latest_capture": "20261024T163528060386Z",
+  "latest_attempted_capture": "20261024T192927021832Z",
+  "latest_capture": "20261024T192927021832Z",
   "latest_enrollment_decisions": [
     {
-      "checked_at": "2026-10-24T16:35:31.118262+00:00",
+      "decision": "already_enrolled",
+      "game_id": "2026_07_PIT_NO"
+    },
+    {
+      "checked_at": "2026-10-24T19:29:29.401710+00:00",
       "decision": "enrolled",
-      "game_id": "2026_07_PIT_NO",
+      "game_id": "2026_07_CIN_BAL",
+      "priced": true
+    },
+    {
+      "checked_at": "2026-10-24T19:29:29.476137+00:00",
+      "decision": "enrolled",
+      "game_id": "2026_07_CLE_TEN",
+      "priced": true
+    },
+    {
+      "checked_at": "2026-10-24T19:29:29.549075+00:00",
+      "decision": "enrolled",
+      "game_id": "2026_07_IND_MIN",
+      "priced": true
+    },
+    {
+      "checked_at": "2026-10-24T19:29:29.628740+00:00",
+      "decision": "enrolled",
+      "game_id": "2026_07_MIA_NYJ",
+      "priced": true
+    },
+    {
+      "checked_at": "2026-10-24T19:29:29.702647+00:00",
+      "decision": "enrolled",
+      "game_id": "2026_07_NYG_HOU",
+      "priced": true
+    },
+    {
+      "checked_at": "2026-10-24T19:29:29.776816+00:00",
+      "decision": "enrolled",
+      "game_id": "2026_07_SF_ATL",
+      "priced": true
+    },
+    {
+      "checked_at": "2026-10-24T19:29:29.851137+00:00",
+      "decision": "enrolled",
+      "game_id": "2026_07_TB_CAR",
       "priced": true
     }
   ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": null,
-  "latest_official_schedule_observed_at": "2026-10-24T16:35:29.227616+00:00",
+  "latest_official_schedule_observed_at": "2026-10-24T19:29:27.524381+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [],
   "minimum_forecast_lead_hours": 1.5221828808333333,
   "observed_missing_started_games": [],
   "official_daily_conflicted_capture_count": 0,
-  "pending": 1,
+  "pending": 8,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-10-24T16:35:31.114904+00:00",
+    "as_of_evidence_at": "2026-10-24T19:29:29.384938+00:00",
     "games": [
+      {
+        "away": "CIN",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_07_CIN_BAL",
+        "home": "BAL",
+        "issues": [],
+        "kickoff": "2026-10-25T17:00:00+00:00",
+        "latest_scoreboard_observed_at": "2026-10-24T19:29:28.904176+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "CLE",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_07_CLE_TEN",
+        "home": "TEN",
+        "issues": [],
+        "kickoff": "2026-10-25T17:00:00+00:00",
+        "latest_scoreboard_observed_at": "2026-10-24T19:29:28.904176+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "IND",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_07_IND_MIN",
+        "home": "MIN",
+        "issues": [],
+        "kickoff": "2026-10-25T17:00:00+00:00",
+        "latest_scoreboard_observed_at": "2026-10-24T19:29:28.904176+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "MIA",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_07_MIA_NYJ",
+        "home": "NYJ",
+        "issues": [],
+        "kickoff": "2026-10-25T17:00:00+00:00",
+        "latest_scoreboard_observed_at": "2026-10-24T19:29:28.904176+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "NYG",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_07_NYG_HOU",
+        "home": "HOU",
+        "issues": [],
+        "kickoff": "2026-10-25T17:00:00+00:00",
+        "latest_scoreboard_observed_at": "2026-10-24T19:29:28.904176+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
       {
         "away": "PIT",
         "enrolled": true,
@@ -525,7 +766,35 @@
         "home": "NO",
         "issues": [],
         "kickoff": "2026-10-25T13:30:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-24T16:35:30.695116+00:00",
+        "latest_scoreboard_observed_at": "2026-10-24T19:29:28.904176+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "SF",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_07_SF_ATL",
+        "home": "ATL",
+        "issues": [],
+        "kickoff": "2026-10-25T17:00:00+00:00",
+        "latest_scoreboard_observed_at": "2026-10-24T19:29:28.904176+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "TB",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_07_TB_CAR",
+        "home": "CAR",
+        "issues": [],
+        "kickoff": "2026-10-25T17:00:00+00:00",
+        "latest_scoreboard_observed_at": "2026-10-24T19:29:28.904176+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
@@ -533,13 +802,13 @@
       }
     ],
     "limitation": "Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.",
-    "observed_games": 1,
-    "ready_games": 1,
+    "observed_games": 8,
+    "ready_games": 8,
     "status": "ready_as_of_snapshot",
     "window_hours": 24
   },
   "report_version": "prospective-coverage-v1",
-  "saved": 29,
+  "saved": 36,
   "saved_collector_errors": [
     {
       "capture": "20261011T201726017233Z",
