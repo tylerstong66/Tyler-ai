@@ -1,5 +1,6 @@
 """Crosswalk receipt must replay archived sources, never trust report flags."""
 import json
+import hashlib
 import tempfile
 import unittest
 from datetime import timedelta
@@ -35,6 +36,34 @@ class CrosswalkReceiptTests(unittest.TestCase):
             self.assertTrue(out["identity_crosswalk_replayed"])
             self.assertFalse(out["independent_official_final_verified"])
             self.assertFalse(out["eligible_for_historical_evaluation"])
+
+    def test_receipt_and_linked_source_chronology_replayed_directly(self):
+        # Recompute links so hash checks alone cannot conceal impossible clocks.
+        for fault in ('crosswalk_clock', 'espn_clock', 'ncaa_clock',
+                      'crosswalk_before_sources', 'crosswalk_naive_clock'):
+            with self.subTest(fault=fault), tempfile.TemporaryDirectory() as td:
+                root=Path(td); stamp=self.seed(root)
+                folder=root/identity.ROOT/'captures'/stamp
+                path=folder/'manifest.json'; saved=json.loads(path.read_bytes())
+                if fault in ('espn_clock', 'ncaa_clock'):
+                    source=fault.split('_')[0]
+                    base=identity.espn.ROOT if source=='espn' else identity.ncaa.ROOT
+                    linked=root/base/'captures'/saved[source+'_capture']/'manifest.json'
+                    data=json.loads(linked.read_bytes())
+                    data['recorded_at_utc']='2000-01-01T00:00:00Z'
+                    linked.write_text(json.dumps(data))
+                    saved[source+'_manifest_sha256']=hashlib.sha256(linked.read_bytes()).hexdigest()
+                elif fault=='crosswalk_before_sources':
+                    at=AT-timedelta(minutes=1)
+                    stamp=at.strftime('%Y%m%dT%H%M%S%fZ')
+                    moved=folder.parent/stamp; folder.rename(moved)
+                    path=moved/'manifest.json'; saved['recorded_at_utc']=at.isoformat()
+                else:
+                    saved['recorded_at_utc']=('2026-10-17T14:10:00' if fault=='crosswalk_naive_clock'
+                                              else '2000-01-01T00:00:00Z')
+                path.write_text(json.dumps(saved))
+                with self.assertRaises(ValueError):
+                    receipts.verify(root,stamp)
 
     def test_forged_crosswalk_rejected(self):
         with tempfile.TemporaryDirectory() as td:

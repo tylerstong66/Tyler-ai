@@ -25,6 +25,9 @@ def verify(root,stamp):
             or saved["actual_wagers"] != 0
             or saved.get("promotion_allowed") is not False):
         raise ValueError("Invalid college crosswalk receipt")
+    recorded=espn.utc(saved['recorded_at_utc'])
+    if recorded.strftime('%Y%m%dT%H%M%S%fZ') != stamp:
+        raise ValueError('Crosswalk timestamp differs from capture identifier')
     sources=[]
     for key,base in (("ncaa",ncaa.ROOT),("espn",espn.ROOT)):
         linked=saved[key+"_capture"]
@@ -37,7 +40,13 @@ def verify(root,stamp):
         raw=path.read_bytes()
         if hashlib.sha256(raw).hexdigest()!=saved[key+"_manifest_sha256"]:
             raise ValueError("Linked source manifest digest mismatch")
-        sources.append((source,strict_json_loads(raw)))
+        manifest=strict_json_loads(raw)
+        observed=espn.utc(manifest['recorded_at_utc'])
+        if observed.strftime('%Y%m%dT%H%M%S%fZ') != linked:
+            raise ValueError('Linked source timestamp differs from capture identifier')
+        if observed > recorded:
+            raise ValueError('Linked source captured after crosswalk receipt')
+        sources.append((source,manifest))
     (ncaa_folder,ncaa_manifest),(espn_folder,espn_manifest)=sources
     ncaa_receipts.verify(ncaa_folder)
     official=identity.verify_ncaa(ncaa_folder,ncaa_manifest)
