@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-24T12:40:40.836633+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-10-24T16:35:31.114904+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 28 / 28 / 0 |
+| Recorded / settled / pending | 29 / 28 / 1 |
 | Started games in retained official schedules / enrolled | 28 / 28 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 28 / 28 |
+| Enrollment-time priced forecasts | 29 / 29 |
 | Settled with enrollment prices / decisive market-paired | 28 / 27 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -25,10 +25,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-24T12:40:40.836633+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
+As of retained evidence: 2026-10-24T16:35:31.114904+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
+| 2026_07_PIT_NO | PIT at NO | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -64,10 +65,11 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026_06_TEN_IND | TEN at IND | 2026-10-18T17:00:00+00:00 | enrolled | — |
 | 2026_06_WAS_SF | WAS at SF | 2026-10-20T00:15:00+00:00 | enrolled | — |
 | 2026_07_NE_CHI | NE at CHI | 2026-10-23T00:15:00+00:00 | enrolled | — |
+| 2026_07_PIT_NO | PIT at NO | 2026-10-25T13:30:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 91. Latest: `20261024T124038780335Z`.
+Audited capture manifests: 92. Latest: `20261024T163528060386Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
