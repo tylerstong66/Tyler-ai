@@ -26,5 +26,5 @@ def compare_nhl_manifest(manifest, archive_root, now=None):
             records[name] = record
         return nhl_verified_chat_comparison(
             records["prediction"], records["entry_quote"], archive_root, now=now)
-    except (ValueError, TypeError, KeyError, OSError, UnicodeError, OverflowError) as exc:
-        return {"status": "unavailable", "reason": str(exc), "NO_BET": True}
+    except (ValueError, TypeError, KeyError, OSError, UnicodeError, OverflowError, RecursionError):
+        return {"status": "unavailable", "reason": "Archived NHL evidence missing or failed verification", "NO_BET": True}
