@@ -13,6 +13,22 @@ from test_sports_mlb_prop_prospective import OfficialReader, AFTER
 
 
 class SettlementScheduleTests(unittest.TestCase):
+    def test_later_noninteger_zero_wager_blocks_entire_batch_before_fetch(self):
+        for value in (False, 0.0, -0.0):
+            with self.subTest(value=value), tempfile.TemporaryDirectory() as root:
+                reader, original, path = self.prepare(root)
+                core = copy.deepcopy(original); core.pop('record_digest_sha256')
+                core.update(hitter_id=700001, actual_wager=value)
+                later = path.with_name('849810_700001.json')
+                write_exclusive_json(later, _seal(core))
+                before = {p.name: p.read_bytes() for p in path.parent.glob('*.json')}
+                reader.now = AFTER; reader.final = True; reader.audit.clear()
+                with self.assertRaisesRegex(ValueError, 'no-bet'):
+                    settle_ready_records(root, reader=reader)
+                self.assertEqual(reader.audit, [])
+                self.assertFalse((Path(root)/'settlements').exists())
+                self.assertEqual(before, {p.name: p.read_bytes() for p in path.parent.glob('*.json')})
+
     def prepare(self,root):
         reader=OfficialReader()
         record=freeze_pregame_hit_props(849810,683734,"away",reader=reader)

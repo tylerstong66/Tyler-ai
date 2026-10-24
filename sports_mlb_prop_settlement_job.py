@@ -73,6 +73,8 @@ def settle_ready_records(root=DEFAULT_ROOT, *, reader=None, max_files=100):
     for path in entries:
         record=json.loads(path.read_text(encoding="utf-8"))
         core=_verify(record)
+        if type(core.get('actual_wager')) is not int or core['actual_wager'] != 0:
+            raise ValueError('Frozen MLB prediction requires exact integer zero no-bet wager.')
         game=core.get("game_id")
         hitter=core.get("hitter_id")
         if path.name!=str(game)+"_"+str(hitter)+".json":
