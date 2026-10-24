@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-24T19:29:31.817284+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-24T22:29:12.530737+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 97 / 84 / 13 |
-| Started games in retained official schedules / enrolled | 85 / 85 |
+| Recorded / settled / pending | 98 / 86 / 12 |
+| Started games in retained official schedules / enrolled | 86 / 86 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 97 / 97 |
-| Settled with enrollment prices / decisive market-paired | 84 / 84 |
+| Enrollment-time priced forecasts | 98 / 98 |
+| Settled with enrollment prices / decisive market-paired | 86 / 86 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,11 +23,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-24T19:29:31.817284+00:00. Ready: 12 / 12 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-24T22:29:12.530737+00:00. Ready: 12 / 12 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020169 | LAK at NJD | True | False | True | None |
 | 2026020170 | SJS at BOS | True | False | True | None |
 | 2026020171 | NYR at OTT | True | False | True | None |
 | 2026020172 | NSH at PIT | True | False | True | None |
@@ -39,6 +38,7 @@ As of retained evidence: 2026-10-24T19:29:31.817284+00:00. Ready: 12 / 12 observ
 | 2026020178 | DET at CGY | True | False | True | None |
 | 2026020179 | MIN at SEA | True | False | True | None |
 | 2026020180 | FLA at CHI | True | False | True | None |
+| 2026020181 | NYI at DAL | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -143,10 +143,11 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020178 | DET at CGY | 2026-10-25T02:00:00+00:00 | enrolled | — |
 | 2026020179 | MIN at SEA | 2026-10-25T02:00:00+00:00 | enrolled | — |
 | 2026020180 | FLA at CHI | 2026-10-25T19:00:00+00:00 | enrolled | — |
+| 2026020181 | NYI at DAL | 2026-10-25T22:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 91. Latest: `20261024T192930082920Z`.
+Audited capture manifests: 92. Latest: `20261024T222911279599Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

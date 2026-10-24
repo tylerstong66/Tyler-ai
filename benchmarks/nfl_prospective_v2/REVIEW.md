@@ -2,7 +2,7 @@
 
 **NO BET — actual wagers $0.**
 
-Recorded: **36** · Settled: **28** · Pending: **8**
+Recorded: **39** · Settled: **28** · Pending: **11**
 
 100-settlement milestone: **collecting**. This flag requests human review; it does not authorize model promotion or wagering.
 
@@ -16,7 +16,7 @@ Uncertainty unit: season/week. CIs require at least 5 blocks.
 ## First-100-enrolled checkpoint
 
 Status: **collecting_forecasts**. This is separate from the cumulative 100-settlement flag.
-Selected: 36 / 100; settled among selected: 28; pending among selected: 8.
+Selected: 39 / 100; settled among selected: 28; pending among selected: 11.
 First 100 by recorded_at in UTC, then game_id; never by outcome, price or settlement order.
 
 ## All settled games — three outcomes, including NFL ties
@@ -117,7 +117,7 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/nfl_prospective_v2/captures/20261024T192927021832Z/manifest.json.
+Latest saved manifest: benchmarks/nfl_prospective_v2/captures/20261024T222908086344Z/manifest.json.
 Manifest completion field: True. Errors: []. Exclusions: [].
 Optional availability errors: [].
 Newer saved collection failure: null.
