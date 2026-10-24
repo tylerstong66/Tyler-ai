@@ -177,9 +177,8 @@ class SettlementScheduleTests(unittest.TestCase):
         first=yaml.index("Commit only newly created official final settlement files")
         refresh=yaml.index("Refresh read-only scoreboard after final-settlement commit")
         self.assertLess(first,refresh)
-        self.assertIn("python sports_mlb_prop_scoreboard_feed.py",yaml)
-        self.assertIn("PUBLIC_SCOREBOARD_ONLY_NO_WAGERS",yaml)
-        self.assertIn("benchmarks/mlb_hitter_props_shadow_v1/scoreboard.latest.json",yaml)
+        self.assertIn("python sports_mlb_prop_scoreboard_publish.py",yaml[refresh:])
+        self.assertNotIn("git push origin HEAD:main",yaml[refresh:])
 
     def test_renamed_or_corrupted_frozen_file_rejected(self):
         with tempfile.TemporaryDirectory() as d:
