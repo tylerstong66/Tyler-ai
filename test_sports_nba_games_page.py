@@ -87,6 +87,8 @@ class GamesPageTests(unittest.TestCase):
         card = ['props', 'pageProps', 'gameCardFeed', 'modules', 0, 'cards', 0]
         g = card+['cardData']
         mutations = [(card+['cardType'], 'ad'), (g+['gameId'], '0022500001'),
+            (g+['gameId'], '002260000１'), (g+['gameId'], '002260000١'),
+            (g+['gameId'], '00226００００１'),
             (g+['gameId'], '0042600001'), (g+['seasonYear'], '2025-26'),
             (g+['seasonType'], 'Pre Season'), (g+['leagueId'], '10'),
             (g+['homeTeam', 'teamId'], 1610612738),

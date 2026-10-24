@@ -29,7 +29,7 @@ def _parse(raw, *, requested_date, season, observed_at, document_reader, break_s
                 if card['cardType'] != 'game': raise ValueError('Unsupported NBA final card')
                 game = card['cardData']; identifier = game['gameId']
                 if (not isinstance(identifier, str)
-                        or not re.fullmatch('002'+season[2:4]+r'\d{5}', identifier)
+                        or not re.fullmatch('002'+season[2:4]+r'[0-9]{5}', identifier)
                         or identifier in seen or game['leagueId'] != '00'
                         or game['seasonYear'] != season or game['seasonType'] != 'Regular Season'):
                     raise ValueError('Invalid NBA final regular-season identity')

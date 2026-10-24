@@ -1,5 +1,11 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-24)
 
+## October 24 continuation — canonical native NBA daily game IDs
+
+The native pregame/final page readers accepted Unicode decimal digits in the five-digit game-ID suffix, unlike the canonical full-schedule identity policy. Require ASCII digits in the shared pregame and final parsers, which also protects the opt-in null-envelope and Final-break readers. Synthetic full-width and Arabic-Indic suffixes reproduced eight failing assertions across v1/v2 pregame and v1/v3 final tests before repair; all 32 focused tests and 1,033 integrated sports tests now pass. Complete saved-source integration replay passes without rewriting tracked original evidence.
+
+Depends on the provider key/row-ID binding repair in #255. Valid source schemas, original archived bytes and all source-only/model/wager guards are unchanged. No new outcome qualification, historical training eligibility, forecast, wager or production deployment follows from these parser checks.
+
 ## October 24 continuation — bind NBA provider lookup identity
 
 Direct NBA schedule matching emitted the provider row's game ID without first binding it to the mapping key used by final replay. A second fixture under another key could reuse the first provider ID, causing two research finals to consume one game's scores and provenance. Schedule matching now rejects a key/row-ID disagreement before selecting any fixture. A two-fixture regression reproduces acceptance at both schedule and final boundaries before repair; a positive control retains both distinct provider games and all closed model gates.

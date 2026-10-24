@@ -71,6 +71,8 @@ class FinalGamesPageTests(unittest.TestCase):
 
     def test_game_season_franchise_and_side_identity_fail(self):
         for path, value in [(['gameId'], '0022601171'), (['gameId'], '0042501171'),
+                (['gameId'], '002250117１'), (['gameId'], '002250117١'),
+                (['gameId'], '00225０１１７１'),
                 (['seasonYear'], '2026-27'), (['leagueId'], '10'),
                 (['homeTeam', 'teamId'], True), (['homeTeam', 'teamId'], 1610612738),
                 (['homeTeam', 'teamTricode'], 'BOS')]:
