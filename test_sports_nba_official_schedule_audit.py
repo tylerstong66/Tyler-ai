@@ -129,6 +129,62 @@ class NbaOfficialCorroborationTests(unittest.TestCase):
         self.assertEqual(duplicates["unverified"][0]["reason"],
                          "AMBIGUOUS_NBA_IDENTITY")
 
+    def test_two_espn_ids_cannot_claim_same_nba_owned_fixture(self):
+        official=nba.official_games(official_games((
+            "2026-10-20T19:00:00Z", "2026-10-26T19:00:00Z")))
+        def espn_row(identifier, start):
+            return {"espn_game_id":identifier,"home_tricode":"NYK",
+                    "away_tricode":"BOS","scheduled_start_utc":start,
+                    "provider_completed":False}
+        espn={
+            "401234567":espn_row("401234567","2026-10-20T19:00:00Z"),
+            "401234568":espn_row("401234568","2026-10-20T19:05:00Z"),
+            "401234569":espn_row("401234569","2026-10-26T19:00:00Z"),
+        }
+        for exact in (False, True):
+            with self.subTest(exact=exact):
+                report=nba.compare(official,espn,exact_tipoff_identity=exact)
+                self.assertEqual(report["espn_observed_games"],3)
+                self.assertEqual(report["strict_schedule_correlated"],1)
+                self.assertEqual(report["not_correlated"],2)
+                self.assertEqual(report["matched"][0]["espn_game_id"],"401234569")
+                self.assertEqual(
+                    {r["espn_game_id"] for r in report["unverified"]},
+                    {"401234567","401234568"})
+                self.assertTrue(all(
+                    r["reason"]=="NON_BIJECTIVE_GAME_IDENTITY" and
+                    r["candidate_official_game_ids"]==["0022600000"]
+                    for r in report["unverified"]))
+                self.assertFalse(report["official_final_scoring_enabled"])
+                self.assertTrue(report["NO_BET"])
+
+    def test_replayed_two_id_provider_capture_cannot_inflate_corroboration(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            one=espn_event()
+            other=json.loads(json.dumps(one))
+            other["id"]="401234568"
+            other["date"]="2026-10-20T19:05:00Z"
+            def fetch(url):
+                if "basketball/nba" in url and "dates=20261020" in url:
+                    return json.dumps({"events":[one,other],"count":2}).encode()
+                return b'{"events":[],"count":0}'
+            observer.capture(fetch,base=root,
+                             now=datetime(2026,10,17,12,tzinfo=timezone.utc),
+                             days_ahead=3)
+            saved=nba.run(lambda _:official_games(),base=root,
+                          now=datetime(2026,10,17,13,tzinfo=timezone.utc))
+            report=saved["report"]
+            self.assertEqual(report["espn_observed_games"],2)
+            self.assertEqual(report["strict_schedule_correlated"],0)
+            self.assertEqual(report["not_correlated"],2)
+            self.assertTrue(all(
+                row["reason"]=="NON_BIJECTIVE_GAME_IDENTITY"
+                for row in report["unverified"]))
+            self.assertFalse(report["official_final_scoring_enabled"])
+            self.assertFalse(report["forecasting_enabled"])
+            self.assertEqual(saved["actual_wagers"],0)
+
     def test_unknown_games_and_invalid_finals_are_excluded_or_rejected(self):
         raw=official_games()
         obj=json.loads(raw)

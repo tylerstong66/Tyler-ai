@@ -180,6 +180,28 @@ def compare(official,espn,*,exact_tipoff_identity=False):
             unverified.append({**base,"reason":reason,
                                "candidate_official_game_ids":[n["nba_game_id"] for n in possibilities],
                                "action":"NO_OUTCOME_GRADE_NO_RETROACTIVE_PREDICTION"})
+    # The two providers have independent event IDs. A one-to-many match can
+    # otherwise count one NBA-owned fixture as two independently corroborated
+    # ESPN events even though each row passed the local team/time tolerance.
+    # Quarantine every claimant; choosing one by iteration order is unsafe.
+    claims=defaultdict(list)
+    for row in matched:
+        claims[row["nba_official_game_id"]].append(row)
+    duplicate_ids={game_id for game_id, rows in claims.items() if len(rows)>1}
+    if duplicate_ids:
+        matched=[row for row in matched
+                 if row["nba_official_game_id"] not in duplicate_ids]
+        for game_id in sorted(duplicate_ids):
+            for row in claims[game_id]:
+                unverified.append({
+                    "espn_game_id":row["espn_game_id"],
+                    "teams":row["teams"],
+                    "espn_saved_tipoff_utc":row["espn_saved_tipoff_utc"],
+                    "reason":"NON_BIJECTIVE_GAME_IDENTITY",
+                    "candidate_official_game_ids":[game_id],
+                    "action":"NO_OUTCOME_GRADE_NO_RETROACTIVE_PREDICTION",
+                })
+        unverified.sort(key=lambda row:row["espn_game_id"])
     return {"espn_observed_games":len(espn),
             "strict_schedule_correlated":len(matched),
             "not_correlated":len(unverified),
