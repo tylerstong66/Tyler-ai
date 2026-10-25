@@ -197,7 +197,7 @@ def compare(official,espn,*,exact_tipoff_identity=False):
                     "espn_game_id":row["espn_game_id"],
                     "teams":row["teams"],
                     "espn_saved_tipoff_utc":row["espn_saved_tipoff_utc"],
-                    "reason":"NON_UNIQUE_ESPN_TO_NBA_MAPPING",
+                    "reason":"NON_BIJECTIVE_GAME_IDENTITY",
                     "candidate_official_game_ids":[game_id],
                     "action":"NO_OUTCOME_GRADE_NO_RETROACTIVE_PREDICTION",
                 })
