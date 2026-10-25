@@ -4,16 +4,16 @@
 
 | Sport | Settled | Recorded | Pending | Market-paired | 100-game review | Report |
 |---|---:|---:|---:|---:|---|---|
-| NFL | 28 | 39 | 11 | 27 | collecting | [Review](../nfl_prospective_v2/REVIEW.md) |
-| NHL | 86 | 98 | 12 | 86 | collecting | [Review](nhl/REVIEW.md) |
+| NFL | 28 | 40 | 12 | 27 | collecting | [Review](../nfl_prospective_v2/REVIEW.md) |
+| NHL | 86 | 99 | 13 | 86 | collecting | [Review](nhl/REVIEW.md) |
 | MLB | 8 | 12 | 4 | 6 | collecting | [Review](mlb/REVIEW.md) |
 
 ## First-100-enrolled checkpoints
 
 | Sport | Status | Selected | Settled in window | Pending in window |
 |---|---|---:|---:|---:|
-| NFL | collecting_forecasts | 39 | 28 | 11 |
-| NHL | collecting_forecasts | 98 | 86 | 12 |
+| NFL | collecting_forecasts | 40 | 28 | 12 |
+| NHL | collecting_forecasts | 99 | 86 | 13 |
 | MLB | collecting_forecasts | 12 | 8 | 4 |
 
 The fixed checkpoint waits for the first 100 enrolled forecasts to settle, even if later games finish sooner. Its saved inputs and report are checked on later runs and never silently replaced. [Checkpoint method](CHECKPOINT_METHOD.md). No automatic promotion or wagers.

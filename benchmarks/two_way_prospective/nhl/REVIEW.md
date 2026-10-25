@@ -2,7 +2,7 @@
 
 **NO BET — actual wagers $0.**
 
-Recorded: **98** · Settled: **86** · Pending: **12**
+Recorded: **99** · Settled: **86** · Pending: **13**
 
 100-settlement milestone: **collecting**. This flag requests human review; it does not authorize model promotion or wagering.
 
@@ -16,7 +16,7 @@ Uncertainty unit: Eastern scheduled game date. CIs require at least 5 blocks.
 ## First-100-enrolled checkpoint
 
 Status: **collecting_forecasts**. This is separate from the cumulative 100-settlement flag.
-Selected: 98 / 100; settled among selected: 86; pending among selected: 12.
+Selected: 99 / 100; settled among selected: 86; pending among selected: 13.
 First 100 by recorded_at in UTC, then game_id; never by outcome, price or settlement order.
 
 ## All decisive games — conditional two-way scores
@@ -80,8 +80,8 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/two_way_prospective/nhl/captures/20261024T222911279599Z/manifest.json.
-Manifest completion field: True. Errors: []. Exclusions: [].
+Latest saved manifest: benchmarks/two_way_prospective/nhl/captures/20261025T011055635121Z/manifest.json.
+Manifest completion field: True. Errors: []. Exclusions: [{"game_id": "2026020182", "reason": "Official/ESPN venue disagreement"}].
 Optional availability errors: [].
 Newer saved collection failure: null.
 Manifest completion alone does not imply absence of per-game errors.

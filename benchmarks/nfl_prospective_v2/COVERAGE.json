@@ -1,12 +1,12 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-10-24T22:29:10.944251+00:00",
-  "capture_count": 94,
+  "as_of_evidence_at": "2026-10-25T01:10:55.369833+00:00",
+  "capture_count": 95,
   "cohort_started_at": "2026-10-11T15:19:59+00:00",
   "completion_note": "Saved NFL manifests before coverage-v1 lack a completion flag; successful workflow corroboration remains required.",
   "decisive_market_paired": 27,
-  "enrollment_priced": 39,
+  "enrollment_priced": 40,
   "followup_quotes_separate_from_original_metrics": [],
   "games": [
     {
@@ -441,7 +441,7 @@
         "game_id": "2026_07_CIN_BAL"
       },
       "lead_hours": 21.508478982499998,
-      "pregame_schedule_observations_in_window": 2,
+      "pregame_schedule_observations_in_window": 3,
       "recorded_at": "2026-10-24T19:29:29.475663+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -458,7 +458,7 @@
         "game_id": "2026_07_CLE_TEN"
       },
       "lead_hours": 21.508458713611113,
-      "pregame_schedule_observations_in_window": 2,
+      "pregame_schedule_observations_in_window": 3,
       "recorded_at": "2026-10-24T19:29:29.548631+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -471,13 +471,11 @@
       "home": "ARI",
       "kickoff": "2026-10-25T20:05:00+00:00",
       "latest_saved_decision": {
-        "checked_at": "2026-10-24T22:29:10.962110+00:00",
-        "decision": "enrolled",
-        "game_id": "2026_07_DEN_ARI",
-        "priced": true
+        "decision": "already_enrolled",
+        "game_id": "2026_07_DEN_ARI"
       },
       "lead_hours": 21.596938655555558,
-      "pregame_schedule_observations_in_window": 1,
+      "pregame_schedule_observations_in_window": 2,
       "recorded_at": "2026-10-24T22:29:11.020840+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -490,13 +488,11 @@
       "home": "DET",
       "kickoff": "2026-10-25T20:25:00+00:00",
       "latest_saved_decision": {
-        "checked_at": "2026-10-24T22:29:11.027947+00:00",
-        "decision": "enrolled",
-        "game_id": "2026_07_GB_DET",
-        "priced": true
+        "decision": "already_enrolled",
+        "game_id": "2026_07_GB_DET"
       },
       "lead_hours": 21.93025403111111,
-      "pregame_schedule_observations_in_window": 1,
+      "pregame_schedule_observations_in_window": 2,
       "recorded_at": "2026-10-24T22:29:11.085488+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -513,8 +509,27 @@
         "game_id": "2026_07_IND_MIN"
       },
       "lead_hours": 21.508436588333332,
-      "pregame_schedule_observations_in_window": 2,
+      "pregame_schedule_observations_in_window": 3,
       "recorded_at": "2026-10-24T19:29:29.628282+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
+      "away": "KC",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-10-25T01:10:53.342715+00:00",
+      "game_id": "2026_07_KC_SEA",
+      "home": "SEA",
+      "kickoff": "2026-10-26T00:20:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-10-25T01:10:55.393489+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_07_KC_SEA",
+        "priced": true
+      },
+      "lead_hours": 23.15125961111111,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-10-25T01:10:55.465400+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
     },
@@ -526,13 +541,11 @@
       "home": "LV",
       "kickoff": "2026-10-25T20:25:00+00:00",
       "latest_saved_decision": {
-        "checked_at": "2026-10-24T22:29:11.085899+00:00",
-        "decision": "enrolled",
-        "game_id": "2026_07_LA_LV",
-        "priced": true
+        "decision": "already_enrolled",
+        "game_id": "2026_07_LA_LV"
       },
       "lead_hours": 21.930236296944447,
-      "pregame_schedule_observations_in_window": 1,
+      "pregame_schedule_observations_in_window": 2,
       "recorded_at": "2026-10-24T22:29:11.149331+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -549,7 +562,7 @@
         "game_id": "2026_07_MIA_NYJ"
       },
       "lead_hours": 21.508416046944443,
-      "pregame_schedule_observations_in_window": 2,
+      "pregame_schedule_observations_in_window": 3,
       "recorded_at": "2026-10-24T19:29:29.702231+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -583,7 +596,7 @@
         "game_id": "2026_07_NYG_HOU"
       },
       "lead_hours": 21.508395449444446,
-      "pregame_schedule_observations_in_window": 2,
+      "pregame_schedule_observations_in_window": 3,
       "recorded_at": "2026-10-24T19:29:29.776382+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -600,7 +613,7 @@
         "game_id": "2026_07_PIT_NO"
       },
       "lead_hours": 20.908011461666668,
-      "pregame_schedule_observations_in_window": 3,
+      "pregame_schedule_observations_in_window": 4,
       "recorded_at": "2026-10-24T16:35:31.158738+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -617,7 +630,7 @@
         "game_id": "2026_07_SF_ATL"
       },
       "lead_hours": 21.508374806944445,
-      "pregame_schedule_observations_in_window": 2,
+      "pregame_schedule_observations_in_window": 3,
       "recorded_at": "2026-10-24T19:29:29.850695+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -634,13 +647,13 @@
         "game_id": "2026_07_TB_CAR"
       },
       "lead_hours": 21.508354328333336,
-      "pregame_schedule_observations_in_window": 2,
+      "pregame_schedule_observations_in_window": 3,
       "recorded_at": "2026-10-24T19:29:29.924418+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
     }
   ],
-  "input_digest": "93bcfc9447615169ea35cc29772f6be39391c4d09cc98d22b4a8f5adacafd1cb",
+  "input_digest": "7cf1d04d2c07501661c8b204351405f744f4d5386ac6f1614a0034a9b753cda9",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -669,8 +682,8 @@
       "to": "2026-10-12T07:21:42.028391+00:00"
     }
   ],
-  "latest_attempted_capture": "20261024T222908086344Z",
-  "latest_capture": "20261024T222908086344Z",
+  "latest_attempted_capture": "20261025T011051576428Z",
+  "latest_capture": "20261025T011051576428Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
@@ -705,35 +718,35 @@
       "game_id": "2026_07_TB_CAR"
     },
     {
-      "checked_at": "2026-10-24T22:29:10.962110+00:00",
-      "decision": "enrolled",
-      "game_id": "2026_07_DEN_ARI",
-      "priced": true
+      "decision": "already_enrolled",
+      "game_id": "2026_07_DEN_ARI"
     },
     {
-      "checked_at": "2026-10-24T22:29:11.027947+00:00",
-      "decision": "enrolled",
-      "game_id": "2026_07_GB_DET",
-      "priced": true
+      "decision": "already_enrolled",
+      "game_id": "2026_07_GB_DET"
     },
     {
-      "checked_at": "2026-10-24T22:29:11.085899+00:00",
+      "decision": "already_enrolled",
+      "game_id": "2026_07_LA_LV"
+    },
+    {
+      "checked_at": "2026-10-25T01:10:55.393489+00:00",
       "decision": "enrolled",
-      "game_id": "2026_07_LA_LV",
+      "game_id": "2026_07_KC_SEA",
       "priced": true
     }
   ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": null,
-  "latest_official_schedule_observed_at": "2026-10-24T22:29:08.909069+00:00",
+  "latest_official_schedule_observed_at": "2026-10-25T01:10:53.342715+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [],
   "minimum_forecast_lead_hours": 1.5221828808333333,
   "observed_missing_started_games": [],
   "official_daily_conflicted_capture_count": 0,
-  "pending": 11,
+  "pending": 12,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-10-24T22:29:10.944251+00:00",
+    "as_of_evidence_at": "2026-10-25T01:10:55.369833+00:00",
     "games": [
       {
         "away": "CIN",
@@ -743,7 +756,7 @@
         "home": "BAL",
         "issues": [],
         "kickoff": "2026-10-25T17:00:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-24T22:29:10.374511+00:00",
+        "latest_scoreboard_observed_at": "2026-10-25T01:10:54.639648+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
@@ -757,7 +770,7 @@
         "home": "TEN",
         "issues": [],
         "kickoff": "2026-10-25T17:00:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-24T22:29:10.374511+00:00",
+        "latest_scoreboard_observed_at": "2026-10-25T01:10:54.639648+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
@@ -771,7 +784,7 @@
         "home": "ARI",
         "issues": [],
         "kickoff": "2026-10-25T20:05:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-24T22:29:10.374511+00:00",
+        "latest_scoreboard_observed_at": "2026-10-25T01:10:54.639648+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
@@ -785,7 +798,7 @@
         "home": "DET",
         "issues": [],
         "kickoff": "2026-10-25T20:25:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-24T22:29:10.374511+00:00",
+        "latest_scoreboard_observed_at": "2026-10-25T01:10:54.639648+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
@@ -799,7 +812,21 @@
         "home": "MIN",
         "issues": [],
         "kickoff": "2026-10-25T17:00:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-24T22:29:10.374511+00:00",
+        "latest_scoreboard_observed_at": "2026-10-25T01:10:54.639648+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "KC",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_07_KC_SEA",
+        "home": "SEA",
+        "issues": [],
+        "kickoff": "2026-10-26T00:20:00+00:00",
+        "latest_scoreboard_observed_at": "2026-10-25T01:10:54.639648+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
@@ -813,7 +840,7 @@
         "home": "LV",
         "issues": [],
         "kickoff": "2026-10-25T20:25:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-24T22:29:10.374511+00:00",
+        "latest_scoreboard_observed_at": "2026-10-25T01:10:54.639648+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
@@ -827,7 +854,7 @@
         "home": "NYJ",
         "issues": [],
         "kickoff": "2026-10-25T17:00:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-24T22:29:10.374511+00:00",
+        "latest_scoreboard_observed_at": "2026-10-25T01:10:54.639648+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
@@ -841,7 +868,7 @@
         "home": "HOU",
         "issues": [],
         "kickoff": "2026-10-25T17:00:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-24T22:29:10.374511+00:00",
+        "latest_scoreboard_observed_at": "2026-10-25T01:10:54.639648+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
@@ -855,7 +882,7 @@
         "home": "NO",
         "issues": [],
         "kickoff": "2026-10-25T13:30:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-24T22:29:10.374511+00:00",
+        "latest_scoreboard_observed_at": "2026-10-25T01:10:54.639648+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
@@ -869,7 +896,7 @@
         "home": "ATL",
         "issues": [],
         "kickoff": "2026-10-25T17:00:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-24T22:29:10.374511+00:00",
+        "latest_scoreboard_observed_at": "2026-10-25T01:10:54.639648+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
@@ -883,7 +910,7 @@
         "home": "CAR",
         "issues": [],
         "kickoff": "2026-10-25T17:00:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-24T22:29:10.374511+00:00",
+        "latest_scoreboard_observed_at": "2026-10-25T01:10:54.639648+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
@@ -891,13 +918,13 @@
       }
     ],
     "limitation": "Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.",
-    "observed_games": 11,
-    "ready_games": 11,
+    "observed_games": 12,
+    "ready_games": 12,
     "status": "ready_as_of_snapshot",
     "window_hours": 24
   },
   "report_version": "prospective-coverage-v1",
-  "saved": 39,
+  "saved": 40,
   "saved_collector_errors": [
     {
       "capture": "20261011T201726017233Z",
