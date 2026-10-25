@@ -1,5 +1,15 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-25)
 
+## October 25 continuation — NBA cross-provider one-to-one identity and ASCII tricodes
+
+Merged #267 at `ac5c490076caf8500968127f14ad8d50ce0494da` after 15 successful checks; the NBA-owned historical final parser rejects non-ASCII numeric score strings. The subsequently saved source status at **2026-10-25 12:44:10 UTC**, with source head `ac5c490076caf8500968127f14ad8d50ce0494da`, still reports 38 frozen native-v2 NBA features, 14 retained source agreements, 24 pending, zero enrolled outcomes and `independent_official_final_results_verified=false`. It predates the following two merges and is **not** post-merge collector validation for them.
+
+Merged #268 at `e7157a44497c1481dc1bd740034387f87a3c2186` after all **15 exact-head checks passed**. NBA-owned/ESPN schedule reconciliation now quarantines every ESPN game ID claiming the same NBA-owned official game, instead of double-counting the independent schedule corroboration. Direct standard/exact identity and saved-provider-archive regression tests cover multiple claimants while preserving unrelated unique matches. An initial CI failure exposed a downstream dependency on the existing `NON_BIJECTIVE_GAME_IDENTITY` quarantine reason; the branch was corrected and fully retested before merge.
+
+Merged #269 at `02b36ac905eca6f3aa301d8fd65c7c6d33fdac97` after all **15 exact-head checks passed**. NBA-owned and replayed ESPN tricodes now reject non-ASCII input before case normalization (for example, Unicode long-s `ſAS` previously normalized into `SAS`). Adversarial tests cover both direct schedule parsing and provider-archive replay before any NBA crosswalk archive write. ASCII source aliases remain supported.
+
+These are source-integrity and ID-mapping safeguards, **not** governing-body final certification, historical model training, prospective prediction grading or evidence of profitability. No source originals or frozen features were rewritten. The next task is to verify a live collector on the merged head, then continue independent official-result completeness/season/postseason/reschedule qualification for FBS/D1/NBA; NHL/MLB/NFL research and blockers #217/#98 remain separate. Keep `NO_BET=true`, zero wagers, training/forecasting/promotion gates closed and Render production unchanged.
+
 ## October 25 — canonical source identity safeguards
 
 Merged #265 at `e716b4e2f9699cb6224ee5db846ce967aa9b9d02` after all 14 exact-head PR workflows passed. The separate FBS, D1 and NBA ESPN source reader now rejects Unicode/noncanonical game and team IDs and non-ASCII final-score digits; adversarial tests cover all three leagues, failed-batch no-write and rehashed archived replay. This is provider-source integrity only, not independently certified official outcomes. The original source archives and frozen features were not rewritten.
