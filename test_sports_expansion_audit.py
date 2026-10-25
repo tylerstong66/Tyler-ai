@@ -90,6 +90,29 @@ class SourceArchiveAuditTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "Non-finite JSON constant"):
                     audit.audit_capture(path)
 
+    def test_rehashed_nonascii_source_identity_rejected_on_direct_replay(self):
+        # Even a recalculated digest cannot turn ambiguous Unicode IDs into
+        # accepted originals; strict parsing is enforced again during replay.
+        for field in ("game", "team"):
+            with self.subTest(field=field), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                capture = self.build(root)
+                path = capture / "manifest.json"
+                manifest = json.loads(path.read_text())
+                snap = manifest["snapshots"][0]
+                blob = capture / snap["compressed_file"]
+                raw = json.loads(gzip.decompress(blob.read_bytes()))
+                if field == "game":
+                    raw["events"][0]["id"] = "١٢٣"
+                else:
+                    raw["events"][0]["competitions"][0]["competitors"][0]["team"]["id"] = "١"
+                changed = json.dumps(raw, ensure_ascii=False).encode()
+                blob.write_bytes(gzip.compress(changed, mtime=0))
+                snap["original_response_sha256"] = hashlib.sha256(changed).hexdigest()
+                path.write_text(json.dumps(manifest))
+                with self.assertRaisesRegex(ValueError, "Non-numeric"):
+                    audit.audit_capture(path)
+
     def test_original_raw_source_tampering_fails_integrity(self):
         for variation in ("compressed_response","normalized_snapshot","quarantine",
                           "no_bet_flag","untracked_file","receipt_sha"):
