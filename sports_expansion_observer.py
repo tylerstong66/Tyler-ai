@@ -62,20 +62,27 @@ def scoreboard_url(league, day):
             +config["path"]+"/scoreboard?"+urlencode(args))
 
 
+def _numeric_identity(value, label):
+    """Preserve canonical ASCII IDs; do not normalize Unicode or float/bool IDs."""
+    if type(value) is int and value >= 0:
+        return str(value)
+    if isinstance(value, str) and value and value.isascii() and value.isdecimal():
+        return value
+    raise ValueError("Non-numeric " + label + " identity")
+
+
 def _score(value):
     if isinstance(value,dict):
         value=value.get("value",value.get("displayValue"))
     if type(value) is int and value>=0:
         return value
-    if isinstance(value,str) and value.isdigit():
+    if isinstance(value,str) and value.isascii() and value.isdecimal():
         return int(value)
     raise ValueError("Source final requires an integer score")
 
 
 def _event(event, payload):
-    game_id=str(event["id"])
-    if not game_id.isdigit():
-        raise ValueError("Non-numeric provider game identity")
+    game_id=_numeric_identity(event["id"], "provider game")
     season=event.get("season") or payload.get("season") or {}
     stage=season.get("type")
     if type(stage) is not int or stage not in (2,3): # No coerced season identity.
@@ -89,13 +96,11 @@ def _event(event, payload):
         side=team.get("homeAway")
         if side not in ("home","away") or side in sides:
             raise ValueError("Ambiguous home/away identity")
-        ident=str(team["team"]["id"])
-        if not ident.isdigit():
-            raise ValueError("Non-numeric team identity")
+        ident=_numeric_identity(team["team"]["id"], "team")
         sides[side]=team
     if set(sides)!=set(("home","away")):
         raise ValueError("Missing opponent")
-    if str(sides["home"]["team"]["id"])==str(sides["away"]["team"]["id"]):
+    if _numeric_identity(sides["home"]["team"]["id"], "team")==_numeric_identity(sides["away"]["team"]["id"], "team"):
         raise ValueError("Identical competing teams")
     status=event["status"]["type"]
     state=status.get("state")
@@ -113,8 +118,8 @@ def _event(event, payload):
             raise ValueError("Final team-winner source tied or incomplete")
     return {
         "game_id":game_id, "scheduled_start_utc":start,
-        "home_team_id":str(sides["home"]["team"]["id"]),
-        "away_team_id":str(sides["away"]["team"]["id"]),
+        "home_team_id":_numeric_identity(sides["home"]["team"]["id"], "team"),
+        "away_team_id":_numeric_identity(sides["away"]["team"]["id"], "team"),
         "home_name":sides["home"]["team"].get("displayName") or
                     sides["home"]["team"].get("name"),
         "away_name":sides["away"]["team"].get("displayName") or
@@ -142,7 +147,7 @@ def parse_scoreboard(payload, league):
             raise ValueError("Provider scoreboard count exceeds returned events")
     records=[];excluded=[];ids=set()
     for e in events:
-        identifier=str(e.get("id"))
+        identifier=_numeric_identity(e.get("id"), "provider game")
         if identifier in ids:
             raise ValueError("Repeated game ID in one source response")
         ids.add(identifier)
