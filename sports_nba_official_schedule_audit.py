@@ -66,7 +66,7 @@ def official_games(raw):
                     value=team["score"]
                     if type(value) is int and value>=0:
                         score[side]=value
-                    elif isinstance(value,str) and value.isdigit():
+                    elif isinstance(value,str) and value.isascii() and value.isdecimal():
                         score[side]=int(value)
                     else:
                         raise ValueError("Malformed NBA official final score")
