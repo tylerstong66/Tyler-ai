@@ -152,7 +152,7 @@ class NbaOfficialCorroborationTests(unittest.TestCase):
                     {r["espn_game_id"] for r in report["unverified"]},
                     {"401234567","401234568"})
                 self.assertTrue(all(
-                    r["reason"]=="NON_UNIQUE_ESPN_TO_NBA_MAPPING" and
+                    r["reason"]=="NON_BIJECTIVE_GAME_IDENTITY" and
                     r["candidate_official_game_ids"]==["0022600000"]
                     for r in report["unverified"]))
                 self.assertFalse(report["official_final_scoring_enabled"])
@@ -179,7 +179,7 @@ class NbaOfficialCorroborationTests(unittest.TestCase):
             self.assertEqual(report["strict_schedule_correlated"],0)
             self.assertEqual(report["not_correlated"],2)
             self.assertTrue(all(
-                row["reason"]=="NON_UNIQUE_ESPN_TO_NBA_MAPPING"
+                row["reason"]=="NON_BIJECTIVE_GAME_IDENTITY"
                 for row in report["unverified"]))
             self.assertFalse(report["official_final_scoring_enabled"])
             self.assertFalse(report["forecasting_enabled"])
