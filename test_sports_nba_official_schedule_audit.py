@@ -185,6 +185,36 @@ class NbaOfficialCorroborationTests(unittest.TestCase):
             self.assertFalse(report["forecasting_enabled"])
             self.assertEqual(saved["actual_wagers"],0)
 
+    def test_unicode_team_tricode_cannot_normalize_into_valid_nba_team(self):
+        self.assertEqual(nba.tricode("SA"),"SAS")
+        self.assertEqual(nba.tricode("ny"),"NYK")
+        for bad in ("ſAS","ＳＡＳ","SΑS"):
+            with self.subTest(tricode=bad):
+                with self.assertRaises(ValueError):
+                    nba.tricode(bad)
+        source=json.loads(official_games())
+        source["leagueSchedule"]["gameDates"][0]["games"][0]["homeTeam"]["teamTricode"]="ſAS"
+        with self.assertRaisesRegex(ValueError,"Non-ASCII NBA team abbreviation"):
+            nba.official_games(json.dumps(source,ensure_ascii=False).encode())
+
+    def test_nonascii_provider_tricode_rejected_before_official_archive_write(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            malformed=espn_event()
+            malformed["competitions"][0]["competitors"][0]["team"]["abbreviation"]="ſAS"
+            def fetch(url):
+                if "basketball/nba" in url and "dates=20261020" in url:
+                    return json.dumps({"events":[malformed],"count":1},
+                                      ensure_ascii=False).encode()
+                return b'{"events":[],"count":0}'
+            observer.capture(fetch,base=root,
+                             now=datetime(2026,10,17,12,tzinfo=timezone.utc),
+                             days_ahead=3)
+            with self.assertRaisesRegex(ValueError,"Non-ASCII NBA team abbreviation"):
+                nba.run(lambda _:official_games(),base=root,
+                        now=datetime(2026,10,17,13,tzinfo=timezone.utc))
+            self.assertFalse((root/nba.ROOT).exists())
+
     def test_unknown_games_and_invalid_finals_are_excluded_or_rejected(self):
         raw=official_games()
         obj=json.loads(raw)
