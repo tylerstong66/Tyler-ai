@@ -27,6 +27,10 @@ ALLOWED_KINDS={"002":"regular","004":"playoffs"}
 def tricode(value):
     if not isinstance(value,str):
         raise ValueError("Team abbreviation missing")
+    # Unicode case-folding can turn non-ASCII source letters (e.g. long-s)
+    # into a real NBA tricode, hiding a malformed provider identity.
+    if not value.isascii():
+        raise ValueError("Non-ASCII NBA team abbreviation")
     value=ABBR_ALIASES.get(value.upper(),value.upper())
     if not re.fullmatch(r"[A-Z]{2,3}",value):
         raise ValueError("Unsupported team abbreviation")
