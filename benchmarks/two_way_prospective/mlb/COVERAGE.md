@@ -2,11 +2,11 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-25T01:11:00.765045+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
+Evidence through **2026-10-25T06:09:21.979006+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 12 / 8 / 4 |
+| Recorded / settled / pending | 12 / 9 / 3 |
 | Started games in retained official schedules / enrolled | 14 / 12 |
 | Observed missing started games | 2 |
 | Enrollment-time priced forecasts | 8 / 12 |
@@ -17,7 +17,7 @@ Evidence through **2026-10-25T01:11:00.765045+00:00**; cohort began 2026-10-11T1
 
 | Game | Matchup | Settled | Enrollment evidence | First later archived pregame pair (UTC) |
 |---|---|---|---|---|
-| 849802 | TB at MIL | False | no provider odds | 2026-10-24T07:18:05.977332+00:00 |
+| 849802 | TB at MIL | True | no provider odds | 2026-10-24T07:18:05.977332+00:00 |
 | 849808 | MIL at LAD | False | no provider odds | Unavailable |
 | 849812 | LAD at MIL | True | no usable pair in reduced snapshot raw schema unavailable | 2026-10-12T07:21:49.547508+00:00 |
 | 849813 | CLE at TB | True | no usable pair in reduced snapshot raw schema unavailable | 2026-10-13T07:43:09.630071+00:00 |
@@ -31,7 +31,7 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-25T01:11:00.765045+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
+As of retained evidence: 2026-10-25T06:09:21.979006+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
@@ -59,7 +59,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 91. Latest: `20261025T011057072882Z`.
+Audited capture manifests: 92. Latest: `20261025T060917912547Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
