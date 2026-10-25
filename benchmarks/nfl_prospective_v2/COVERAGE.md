@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-25T16:20:04.811669+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-10-25T19:37:52.206656+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 40 / 28 / 12 |
-| Started games in retained official schedules / enrolled | 29 / 29 |
+| Recorded / settled / pending | 40 / 29 / 11 |
+| Started games in retained official schedules / enrolled | 36 / 36 |
 | Observed missing started games | 0 |
 | Enrollment-time priced forecasts | 40 / 40 |
-| Settled with enrollment prices / decisive market-paired | 28 / 27 |
+| Settled with enrollment prices / decisive market-paired | 29 / 28 |
 | Separate later quotes recorded prospectively | 0 |
 
 A priced NFL tie is excluded only from binary decisive market comparisons.
@@ -25,21 +25,14 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-25T16:20:04.811669+00:00. Ready: 11 / 11 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-25T19:37:52.206656+00:00. Ready: 4 / 4 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026_07_CIN_BAL | CIN at BAL | True | False | True | None |
-| 2026_07_CLE_TEN | CLE at TEN | True | False | True | None |
 | 2026_07_DEN_ARI | DEN at ARI | True | False | True | None |
 | 2026_07_GB_DET | GB at DET | True | False | True | None |
-| 2026_07_IND_MIN | IND at MIN | True | False | True | None |
 | 2026_07_KC_SEA | KC at SEA | True | False | True | None |
 | 2026_07_LA_LV | LA at LV | True | False | True | None |
-| 2026_07_MIA_NYJ | MIA at NYJ | True | False | True | None |
-| 2026_07_NYG_HOU | NYG at HOU | True | False | True | None |
-| 2026_07_SF_ATL | SF at ATL | True | False | True | None |
-| 2026_07_TB_CAR | TB at CAR | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -90,7 +83,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 98. Latest: `20261025T162001015537Z`.
+Audited capture manifests: 99. Latest: `20261025T193749090576Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

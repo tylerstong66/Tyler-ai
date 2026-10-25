@@ -1,6 +1,6 @@
 # Tyler NFL prospective paper test
 
-Recorded: **40/100** · Settled: **28** · Pending: **12**
+Recorded: **40/100** · Settled: **29** · Pending: **11**
 
 **NO BET — actual wagers $0.**
 
@@ -8,9 +8,9 @@ Frozen experimental v2 compared with frozen v1 and market odds observed before k
 
 | Model | Paired games | Brier (lower is better) | Log loss (lower is better) | Accuracy |
 |---|---:|---:|---:|---:|
-| v2 | 27 | 0.4886 | 0.6826 | 63.0% |
-| v1 | 27 | 0.4911 | 0.6853 | 59.3% |
-| market | 27 | 0.4623 | 0.6595 | 63.0% |
+| v2 | 28 | 0.4835 | 0.6774 | 64.3% |
+| v1 | 28 | 0.4857 | 0.6798 | 60.7% |
+| market | 28 | 0.4576 | 0.6546 | 64.3% |
 
 | Game | Kickoff (Eastern) | V2 pick | V2 win probability | Saved (Eastern) |
 |---|---|---|---:|---|

@@ -2,12 +2,12 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-25T16:20:06.110200+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-25T19:37:53.304608+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
 | Recorded / settled / pending | 100 / 96 / 4 |
-| Started games in retained official schedules / enrolled | 96 / 96 |
+| Started games in retained official schedules / enrolled | 97 / 97 |
 | Observed missing started games | 0 |
 | Enrollment-time priced forecasts | 100 / 100 |
 | Settled with enrollment prices / decisive market-paired | 96 / 96 |
@@ -23,11 +23,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-25T16:20:06.110200+00:00. Ready: 4 / 5 observed games. Status: attention.
+As of retained evidence: 2026-10-25T19:37:53.304608+00:00. Ready: 3 / 4 observed games. Status: attention.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020180 | FLA at CHI | True | False | True | None |
 | 2026020181 | NYI at DAL | True | False | True | None |
 | 2026020182 | MTL at WPG | False | False | False | forecast_not_enrolled, latest_scoreboard_event_missing_or_ambiguous |
 | 2026020183 | COL at NSH | True | False | True | None |
@@ -143,7 +142,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 96. Latest: `20261025T162004973669Z`.
+Audited capture manifests: 97. Latest: `20261025T193752379816Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
