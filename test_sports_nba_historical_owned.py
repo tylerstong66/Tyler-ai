@@ -36,6 +36,16 @@ class NbaHistoricalOwnedTests(unittest.TestCase):
             self.assertEqual(owned.capture(lambda _:self.fail('No refetch'),base=td,now=NOW)['new_source_seasons'],0)
             self.assertEqual(before,path.read_bytes())
 
+    def test_unicode_historical_nba_final_rejected_before_archive_write(self):
+        original_source = json.loads(original())
+        first = original_source["leagueSchedule"]["gameDates"][0]["games"][0]
+        first["homeTeam"]["score"] = "١٠٦"
+        with tempfile.TemporaryDirectory() as td:
+            with self.assertRaisesRegex(ValueError, "Malformed NBA official final score"):
+                owned.capture(lambda _: json.dumps(original_source, ensure_ascii=False).encode(),
+                              base=td, now=NOW)
+            self.assertFalse((Path(td)/owned.ROOT).exists())
+
     def test_corrupt_retained_source_prevents_new_network_request(self):
         with tempfile.TemporaryDirectory() as td:
             owned.capture(lambda _:original(),base=td,now=NOW)
