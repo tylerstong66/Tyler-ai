@@ -148,6 +148,23 @@ class NbaOfficialCorroborationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"Malformed"):
             nba.official_games(json.dumps(obj).encode())
 
+    def test_nba_owned_final_scores_reject_unicode_and_noninteger_values(self):
+        for bad in ("١٠٦", "１０６", "10٦", "²", 106.0, True, -1):
+            with self.subTest(score=bad):
+                obj = json.loads(official_games())
+                game = obj["leagueSchedule"]["gameDates"][0]["games"][0]
+                game["gameStatus"] = 3
+                game["homeTeam"]["score"] = bad
+                game["awayTeam"]["score"] = 104
+                with self.assertRaisesRegex(ValueError, "Malformed NBA official final score"):
+                    nba.official_games(json.dumps(obj, ensure_ascii=False).encode())
+        obj = json.loads(official_games())
+        game = obj["leagueSchedule"]["gameDates"][0]["games"][0]
+        game["gameStatus"] = 3
+        game["homeTeam"]["score"] = "106"
+        game["awayTeam"]["score"] = 104
+        self.assertEqual(nba.official_games(json.dumps(obj).encode())[0]["nba_home_score"], 106)
+
     def test_capture_and_fetch_failures_leave_original_archive_untouched(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);self.espn_root(root)
