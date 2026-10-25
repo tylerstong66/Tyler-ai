@@ -95,6 +95,57 @@ class ExpansionObserverTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"truncated"):
             obs.parse_scoreboard({"events":[good]*500},"NBA")
 
+    def test_non_ascii_and_noncanonical_source_ids_fail_in_all_cohorts(self):
+        # Unicode decimal digits previously passed isdigit() and were
+        # retained as visually ambiguous, noncanonical provider identities.
+        for league in obs.LEAGUES:
+            for bad in ("١٢٣", "１２３", "12٣", "²", 123.0, True, -1):
+                with self.subTest(league=league, bad=bad):
+                    item = event(123, league)
+                    item["id"] = bad
+                    with self.assertRaisesRegex(ValueError, "Non-numeric"):
+                        obs.parse_scoreboard(payload(item), league)
+                    item = event(123, league)
+                    item["competitions"][0]["competitors"][0]["team"]["id"] = bad
+                    with self.assertRaisesRegex(ValueError, "Non-numeric"):
+                        obs.parse_scoreboard(payload(item), league)
+            self.assertEqual(
+                obs.parse_scoreboard(payload(event(123, league)), league)
+                ["games"][0]["game_id"], "123")
+
+    def test_non_ascii_final_scores_cannot_be_normalized(self):
+        for league in obs.LEAGUES:
+            for bad in ("١٠٢", "１０２", "10٢", "²", 102.0, True, -1):
+                with self.subTest(league=league, bad=bad):
+                    item = event(123, league, state="post", completed=True,
+                                 home_score=bad)
+                    with self.assertRaisesRegex(ValueError, "integer score"):
+                        obs.parse_scoreboard(payload(item), league)
+            accepted = obs.parse_scoreboard(
+                payload(event(123, league, state="post", completed=True,
+                              home_score=102, away_score="98")), league)
+            self.assertEqual(accepted["games"][0]["home_score"], 102)
+
+    def test_invalid_identity_does_not_write_partial_source_capture(self):
+        at = datetime(2026, 10, 17, 12, tzinfo=timezone.utc)
+        for field in ("game", "team", "score"):
+            with self.subTest(field=field), tempfile.TemporaryDirectory() as directory:
+                item = event(123, "NBA", state="post", completed=True)
+                if field == "game":
+                    item["id"] = "١٢٣"
+                elif field == "team":
+                    item["competitions"][0]["competitors"][0]["team"]["id"] = "١٠١"
+                else:
+                    item["competitions"][0]["competitors"][0]["score"] = "١٠٢"
+                calls = []
+                def fetch(url):
+                    calls.append(url)
+                    return response(event(123, "NCAAF_FBS")) if len(calls) == 1 else response(item)
+                with self.assertRaises(ValueError):
+                    obs.capture(fetch, now=at, base=Path(directory), days_ahead=0)
+                self.assertEqual(len(calls), 2)
+                self.assertFalse((Path(directory) / obs.ROOT).exists())
+
     def test_mixed_type_team_ids_cannot_normalize_to_same_identity(self):
         # Source fields with int and str types previously compared as unequal,
         # although the saved game would contain the same ID for both teams.
