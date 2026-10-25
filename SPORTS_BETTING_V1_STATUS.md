@@ -1,4 +1,11 @@
-# Sports Betting Analyst v1 — verified handoff (2026-10-24)
+# Sports Betting Analyst v1 — verified handoff (2026-10-25)
+
+## October 25 — canonical source identity safeguards
+
+Merged #265 at `e716b4e2f9699cb6224ee5db846ce967aa9b9d02` after all 14 exact-head PR workflows passed. The separate FBS, D1 and NBA ESPN source reader now rejects Unicode/noncanonical game and team IDs and non-ASCII final-score digits; adversarial tests cover all three leagues, failed-batch no-write and rehashed archived replay. This is provider-source integrity only, not independently certified official outcomes. The original source archives and frozen features were not rewritten.
+
+The next independent NCAA-owned reader review addresses the same Unicode ID/score ambiguity and historical kickoff-epoch normalization in FBS and D1. This follow-on change must pass its own exact-head CI before merge; no model-training, outcome-grading or prospective forecast eligibility is inferred. NFL/NHL/MLB research ledgers, NHL first-100 policy, sportsbook-price blocker #217 and MLB drift issue #98 remain separate. NO_BET=true, actual wagers zero, promotion disabled and Render production unchanged.
+
 
 ## October 24 continuation — bounded missing-final retries
 

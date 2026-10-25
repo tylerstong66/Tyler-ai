@@ -79,6 +79,35 @@ class NcaaSourceTests(unittest.TestCase):
             with self.subTest(reason=reason),self.assertRaisesRegex(ValueError,reason):
                 n.official_scoreboard(json.dumps(payload).encode(),"NCAAM_D1")
 
+    def test_ncaa_owned_ids_and_final_scores_reject_unicode_digits(self):
+        for sport in ("NCAAF_FBS", "NCAAM_D1"):
+            for bad in ("١٢٣٤٥", "１２３４５", "123٤5", "²", 12345.0, True):
+                with self.subTest(sport=sport, bad=bad):
+                    with self.assertRaisesRegex(ValueError, "Invalid NCAA contest ID"):
+                        n.official_scoreboard(raw(contest(identifier=bad)), sport)
+            for bad in ("٢٧", "２７", "2٧", "²", 27.0, True):
+                with self.subTest(sport=sport, score=bad):
+                    with self.assertRaisesRegex(ValueError, "Incomplete final"):
+                        n.official_scoreboard(
+                            raw(contest(state="F", score1=bad, score2=24)), sport)
+            accepted = n.official_scoreboard(
+                raw(contest(identifier=12345, state="F", score1=27, score2="24")), sport)
+            self.assertEqual(accepted[0]["ncaa_game_id"], "12345")
+            self.assertEqual(accepted[0]["ncaa_home_score"], 27)
+            self.assertFalse(accepted[0]["final_result_scoring_authorized"])
+
+    def test_unicode_ncaa_id_cannot_write_partial_source_batch(self):
+        at = datetime(2026, 10, 17, 12, tzinfo=timezone.utc)
+        with tempfile.TemporaryDirectory() as td:
+            calls = []
+            def fetch(url):
+                calls.append(url)
+                return raw(contest()) if len(calls) == 1 else raw(contest(identifier="١٢٣٤٥"))
+            with self.assertRaisesRegex(ValueError, "Invalid NCAA contest ID"):
+                n.run(fetch, base=Path(td), now=at, days_ahead=0)
+            self.assertEqual(len(calls), 2)
+            self.assertFalse((Path(td) / n.ROOT).exists())
+
     def test_sealed_source_replay_and_conflicting_week_quarantine(self):
         at=datetime(2026,10,17,12,tzinfo=timezone.utc)
         original=raw(contest())

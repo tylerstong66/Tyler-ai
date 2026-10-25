@@ -57,6 +57,18 @@ class D1HistoricalOwnedTests(unittest.TestCase):
                 owned.capture(source,base=td,now=NOW,per_run=2)
             self.assertFalse((Path(td)/owned.ROOT).exists())
 
+    def test_unicode_historical_tipoff_epoch_rejected_before_write(self):
+        def invalid(url):
+            original = json.loads(fetch(url))
+            game = original['data']['contests'][0]
+            game['startTimeEpoch'] = str(game['startTimeEpoch']).translate(
+                str.maketrans('0123456789', '٠١٢٣٤٥٦٧٨٩'))
+            return json.dumps(original).encode()
+        with tempfile.TemporaryDirectory() as td:
+            with self.assertRaisesRegex(ValueError, 'kickoff identity'):
+                owned.capture(invalid, base=td, now=NOW, per_run=1)
+            self.assertFalse((Path(td)/owned.ROOT).exists())
+
     def test_modified_retained_bytes_block_new_fetch(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td);owned.capture(fetch,base=root,now=NOW,per_run=1)

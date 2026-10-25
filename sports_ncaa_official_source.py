@@ -60,10 +60,11 @@ class TiedNcaaFinalError(ValueError):
 
 
 def _positive_id(value,label):
-    s=str(value)
-    if not s.isdigit() or int(s)<=0:
-        raise ValueError("Invalid NCAA "+label)
-    return s
+    if type(value) is int and value > 0:
+        return str(value)
+    if isinstance(value, str) and value and value.isascii() and value.isdecimal() and int(value) > 0:
+        return value
+    raise ValueError("Invalid NCAA "+label)
 
 
 def official_scoreboard(raw,sport):
@@ -108,7 +109,7 @@ def official_scoreboard(raw,sport):
                 value=team.get("score")
                 if type(value) is int and value>=0:
                     scores[side]=value
-                elif isinstance(value,str) and value.isdigit():
+                elif isinstance(value,str) and value.isascii() and value.isdecimal():
                     scores[side]=int(value)
                 else:
                     raise ValueError("Incomplete final NCAA source score")

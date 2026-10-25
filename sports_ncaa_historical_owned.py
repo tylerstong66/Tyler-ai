@@ -26,7 +26,7 @@ def _rows(raw, split, observed, *, league='NCAAF_FBS'):
     low, high = history.SEASONS[league][split]
     for row in rows:
         value = row['source_start_time_epoch']
-        if isinstance(value, bool) or not str(value).isdigit():
+        if isinstance(value, bool) or not str(value).isascii() or not str(value).isdecimal():
             raise ValueError('Missing NCAA historical kickoff identity')
         kickoff = datetime.fromtimestamp(int(value), timezone.utc)
         display = row['source_start_date']
