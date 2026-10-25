@@ -46,6 +46,17 @@ class NcaaHistoricalOwnedTests(unittest.TestCase):
                     owned.capture(fetch, base=td, now=NOW)
                 self.assertFalse((Path(td)/owned.ROOT).exists())
 
+    def test_unicode_historical_kickoff_epoch_rejected_before_write(self):
+        source = json.loads(payload())
+        game = source['data']['contests'][0]
+        game['startTimeEpoch'] = str(game['startTimeEpoch']).translate(
+            str.maketrans('0123456789', '٠١٢٣٤٥٦٧٨٩'))
+        with tempfile.TemporaryDirectory() as td:
+            with self.assertRaisesRegex(ValueError, 'kickoff identity'):
+                owned.capture(lambda _: json.dumps(source).encode(), base=td,
+                              now=NOW, per_run=1)
+            self.assertFalse((Path(td)/owned.ROOT).exists())
+
     def test_corrupt_retained_source_blocks_fetch(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
