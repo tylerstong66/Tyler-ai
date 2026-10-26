@@ -232,6 +232,27 @@ def reconcile(source_rows,espn_rows,*,use_curated_fbs_aliases=True):
                         "ncaa_provider_reported_final":nc["provider_reported_final"],
                         "identity_status":"EXACT_SCHOOL_AND_SCHEDULE_MATCH_ONLY",
                         "independent_result_grading_enabled":False})
+    # A single NCAA-owned contest cannot independently corroborate two ESPN
+    # events. Quarantine *every* claimant instead of selecting by input order.
+    # This is source-identity hygiene only, never an official-final grade.
+    claims=defaultdict(list)
+    for row in matched:
+        claims[(row["league"],row["ncaa_game_id"])].append(row)
+    duplicates={key for key, rows in claims.items() if len(rows)>1}
+    if duplicates:
+        matched=[row for row in matched
+                 if (row["league"],row["ncaa_game_id"]) not in duplicates]
+        for key in sorted(duplicates):
+            for row in claims[key]:
+                unverified.append({
+                    "league":row["league"],"espn_game_id":row["espn_game_id"],
+                    "espn_scheduled_start_utc":row["espn_scheduled_start_utc"],
+                    "espn_home":row["espn_home"],"espn_away":row["espn_away"],
+                    "ncaa_game_id":row["ncaa_game_id"],
+                    "reason":"NON_BIJECTIVE_GAME_IDENTITY",
+                    "action":"NO_OUTCOME_GRADE_NO_RETROACTIVE_PREDICTION",
+                })
+        unverified.sort(key=lambda row:(row["league"],row["espn_game_id"]))
     return {
         "espn_games_examined":len(espn_rows),
         "unique_source_game_identity_matches":len(matched),
