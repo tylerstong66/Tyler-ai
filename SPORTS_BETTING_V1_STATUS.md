@@ -1,4 +1,15 @@
-# Sports Betting Analyst v1 — verified handoff (2026-10-25)
+# Sports Betting Analyst v1 — verified handoff (2026-10-26)
+
+## October 26 — strict historical source replay and independent receipt integrity
+
+Recovered live main and the latest ESPN, NBA-owned and NCAA-owned research evidence. PR #270 merged at `6ad0bd0ca2c429a00b6542d6f07cc6d019906569` after all **13** exact-head checks passed. The shared historical FBS/D1/NBA ESPN source reader now rejects duplicate JSON object keys and nonfinite JSON constants at capture, receipt replay and the direct NBA historical identity join. Rehashed originals and receipts cannot launder an ambiguous source into a valid research observation; direct NBA provider IDs must also be unique and canonical. Adversarial tests cover all three cohorts, no partial source writes and no new fetch after retained evidence fails. The initial receipt fixture omitted a canonical trailing newline and failed CI; it was corrected and the entire final head was retested before merge. The subsequent **post-#270** NBA/college historical source workflow [40318811472](https://github.com/tylerstong66/Tyler-ai/actions/runs/40318811472) succeeded. It remains historical source replay, not independent official-result certification.
+
+PR #271 merged at `e7e9a0ca6f7895321641c4032edb18cad785effb` after all **14** exact-head checks passed. The independent NBA-owned season, NCAA-owned FBS week and NCAA-owned D1 day receipt readers now reject ambiguous duplicate-key/nonfinite JSON; NBA-owned original season parsing and the D1 tied-final quarantine fallback use the same strict parser. Six adversarial retained-receipt cases prove that conflicting or nonfinite metadata blocks direct verification and future acquisition across the three independent source cohorts. Original frozen sources and receipts were not modified. Post-#271 main integration and live collector validation remain to be checked separately; green PR tests alone are not live collection evidence.
+
+The latest pre-merge source workflow status at **2026-10-26 11:07:43 UTC** retains **42** native-v2 NBA frozen feature observations, **21** retained source agreements and **zero** enrolled outcomes, with `independent_official_final_results_verified=false`. Historical ESPN retrieval remains **490 NBA / 302 FBS / 312 D1 declared source days**, with official result completeness unverified. The latest NHL challenger snapshot has **66 enrolled / 63 scored / 3 pending**, short of its fixed first-100 checkpoint; the NFL v2 snapshot has 40 settled with 39 paired priced decisive games and no established edge; MLB hitter paper observations remain unpriced and dependent within game. These research cohorts are not interchangeable. Blockers #217 (future sportsbook-specific NHL quotes) and #98 (MLB cross-cohort schedule drift) remain.
+
+Next: verify post-#271 integrated and live historical-source collection on the exact merged head; then continue source-specific official result completeness, season/postseason and rescheduling qualification for FBS/D1/NBA without turning source agreements into certified labels. Keep `NO_BET=true`, zero actual wagers, historical model training/forecasting/promotion disabled, and Render production unchanged.
+
 
 ## October 25 continuation — NBA cross-provider one-to-one identity and ASCII tricodes
 
