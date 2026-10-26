@@ -186,7 +186,7 @@ class FbsFeatureTests(unittest.TestCase):
                 path.write_bytes(features.source.canonical(crosswalk))
                 with self.assertRaisesRegex(ValueError, 'target season' if kind == 'year' else
                                             'Invalid NCAA-owned research receipt' if kind == 'ncaa_bool'
-                                            else 'research guards'):
+                                            else 'ESPN original source provenance invalid'):
                     features.inspect(base, now=NOW, collect=True)
 
     def test_digest_pinned_protocol_cannot_be_replaced(self):

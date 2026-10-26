@@ -77,12 +77,21 @@ def official_school_name(sport,school):
 
 
 
+def _source_safety(manifest):
+    """Do not relabel unsafe or wager-bearing receipts as source-only."""
+    return (manifest.get("official_final_scoring_enabled") is False
+            and manifest.get("forecasting_enabled") is False
+            and manifest.get("model_training_enabled") is False
+            and manifest.get("promotion_allowed") is False
+            and manifest.get("NO_BET") is True
+            and type(manifest.get("actual_wagers")) is int
+            and manifest["actual_wagers"] == 0)
+
+
 def verify_ncaa(folder, manifest):
     folder=archive_path(folder, directory=True)
     if (manifest.get("schema")!="ncaa-owned-2026-source-observations-v1"
-            or manifest.get("official_final_scoring_enabled") is not False
-            or manifest.get("forecasting_enabled") is not False
-            or manifest.get("NO_BET") is not True):
+            or not _source_safety(manifest)):
         raise ValueError("NCAA original source provenance invalid")
     observed=defaultdict(list)
     for snap in manifest["snapshots"]:
@@ -122,8 +131,7 @@ def verify_espn(folder,manifest):
     folder=archive_path(folder, directory=True)
     if (manifest.get("schema")!="tyler-college-nba-provider-observation-v1"
             or manifest.get("source_trust")!="ESPN_ONLY_NOT_INDEPENDENT_OFFICIAL_VERIFICATION"
-            or manifest.get("NO_BET") is not True
-            or manifest.get("forecasting_enabled") is not False):
+            or not _source_safety(manifest)):
         raise ValueError("ESPN original source provenance invalid")
     by_identity=defaultdict(list)
     normalized=[]
