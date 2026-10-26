@@ -206,7 +206,7 @@ class HistoricalCaptureTests(unittest.TestCase):
             receipt = (root / h.ROOT / 'sources' / 'NBA' / 'train' /
                        '2024-10-22.receipt.json')
             original = receipt.read_bytes()
-            receipt.write_bytes(original[:-1] + b',"NO_BET":true}')
+            receipt.write_bytes(original.rstrip()[:-1] + b',"NO_BET":true}')
             with self.assertRaisesRegex(ValueError, 'Duplicate key'):
                 h.verify_existing(root, 'NBA', 'train', '2024-10-22', as_of=CLOCK)
 
