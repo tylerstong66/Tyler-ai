@@ -255,7 +255,9 @@ def run(*,base=Path("."),now=None):
     ef=archive_path(espn_files[-1]); nf=archive_path(ncaa_files[-1])
     if max(ef.stat().st_size, nf.stat().st_size) > MAX_BLOB_SIZE:
         raise ValueError('Oversized college identity source manifest')
-    es=json.loads(ef.read_text());ns=json.loads(nf.read_text())
+    # Reject ambiguous receipt JSON at this direct crosswalk boundary, even if
+    # the linked source bytes and receipt hashes were otherwise recomputed.
+    es=strict_json_loads(ef.read_bytes());ns=strict_json_loads(nf.read_bytes())
     for src in (es,ns):
         elapsed=now-espn.utc(src["recorded_at_utc"])
         if elapsed<timedelta(seconds=-60) or elapsed>timedelta(hours=12):
