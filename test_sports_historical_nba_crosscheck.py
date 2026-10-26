@@ -4,6 +4,7 @@ from pathlib import Path
 import json
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import sports_expansion_historical_capture as history
 import sports_nba_historical_owned as owned
@@ -123,6 +124,40 @@ class HistoricalNbaCrosscheckTests(unittest.TestCase):
                 self.seed(td,**kwargs);out=check.build(td,now=NOW)
                 self.assertEqual(out['two_source_final_agreements'],0)
                 self.assertEqual(out['pending'][0]['reason'],reason)
+
+    def test_direct_join_rejects_ambiguous_receipt_after_first_verification(self):
+        with tempfile.TemporaryDirectory() as td:
+            self.seed(td)
+            folder=Path(td)/history.ROOT/'sources'/'NBA'/'train'
+            receipt=next(folder.glob('*.receipt.json'))
+            raw=receipt.read_bytes().rstrip()
+            receipt.write_bytes(raw[:-1]+b',"NO_BET":true}')
+            # Reproduce an archive replacement after the upstream verification.
+            with patch.object(check.audit,'audit',return_value={'quarantined':[]}), \
+                 patch.object(history,'verify_existing',
+                              side_effect=lambda base,league,split,day,as_of=None:
+                              league=='NBA' and split=='train' and day=='2024-10-22'):
+                with self.assertRaisesRegex(ValueError,'Duplicate key'):
+                    check.build(td,now=NOW)
+
+    def test_direct_join_rejects_rewritten_scores_and_safety_flags(self):
+        for tamper in ('score','promotion'):
+            with self.subTest(tamper=tamper),tempfile.TemporaryDirectory() as td:
+                self.seed(td)
+                folder=Path(td)/history.ROOT/'sources'/'NBA'/'train'
+                receipt=next(folder.glob('*.receipt.json'))
+                saved=json.loads(receipt.read_bytes())
+                if tamper=='score':
+                    saved['parsed_provider_scoreboard']['games'][0]['home_score']=999
+                else:
+                    saved['promotion_allowed']=True
+                receipt.write_text(json.dumps(saved))
+                with patch.object(check.audit,'audit',return_value={'quarantined':[]}), \
+                     patch.object(history,'verify_existing',
+                                  side_effect=lambda base,league,split,day,as_of=None:
+                                  league=='NBA' and split=='train' and day=='2024-10-22'):
+                    with self.assertRaises(ValueError):
+                        check.build(td,now=NOW)
 
     def test_per_game_time_cannot_borrow_a_later_unrelated_observation(self):
         with tempfile.TemporaryDirectory() as td:
