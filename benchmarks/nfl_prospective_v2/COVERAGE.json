@@ -1,8 +1,8 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-10-26T06:16:44.031447+00:00",
-  "capture_count": 102,
+  "as_of_evidence_at": "2026-10-26T14:16:48.442672+00:00",
+  "capture_count": 103,
   "cohort_started_at": "2026-10-11T15:19:59+00:00",
   "completion_note": "Saved NFL manifests before coverage-v1 lack a completion flag; successful workflow corroboration remains required.",
   "decisive_market_paired": 39,
@@ -475,7 +475,7 @@
         "game_id": "2026_07_DAL_PHI"
       },
       "lead_hours": 23.063854034166667,
-      "pregame_schedule_observations_in_window": 2,
+      "pregame_schedule_observations_in_window": 3,
       "recorded_at": "2026-10-26T01:11:10.125477+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -668,7 +668,7 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "4187544bc525cb99ecd193cbaf36fb4dd9af192ed2e94e007a5e66e7e67a2f34",
+  "input_digest": "dc79efc43e15d4e833e9646be21f17931ef9438b133e6e6f890f70b8fc70e8c4",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -682,6 +682,11 @@
       "to": "2026-10-13T15:59:32.638363+00:00"
     },
     {
+      "from": "2026-10-26T06:16:40.812933+00:00",
+      "hours": 8.000863995,
+      "to": "2026-10-26T14:16:43.923315+00:00"
+    },
+    {
       "from": "2026-10-19T07:47:09.802502+00:00",
       "hours": 7.821590828333333,
       "to": "2026-10-19T15:36:27.529484+00:00"
@@ -690,20 +695,11 @@
       "from": "2026-10-13T00:40:30.994313+00:00",
       "hours": 7.042471286666666,
       "to": "2026-10-13T07:43:03.890945+00:00"
-    },
-    {
-      "from": "2026-10-12T00:32:36.103600+00:00",
-      "hours": 6.818312441944445,
-      "to": "2026-10-12T07:21:42.028391+00:00"
     }
   ],
-  "latest_attempted_capture": "20261026T061640812933Z",
-  "latest_capture": "20261026T061640812933Z",
+  "latest_attempted_capture": "20261026T141643923315Z",
+  "latest_capture": "20261026T141643923315Z",
   "latest_enrollment_decisions": [
-    {
-      "decision": "already_enrolled",
-      "game_id": "2026_07_PIT_NO"
-    },
     {
       "decision": "already_enrolled",
       "game_id": "2026_07_CIN_BAL"
@@ -755,7 +751,7 @@
   ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": null,
-  "latest_official_schedule_observed_at": "2026-10-26T06:16:41.894382+00:00",
+  "latest_official_schedule_observed_at": "2026-10-26T14:16:46.058413+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [],
   "minimum_forecast_lead_hours": 1.5221828808333333,
@@ -763,7 +759,7 @@
   "official_daily_conflicted_capture_count": 0,
   "pending": 1,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-10-26T06:16:44.031447+00:00",
+    "as_of_evidence_at": "2026-10-26T14:16:48.442672+00:00",
     "games": [
       {
         "away": "DAL",
@@ -773,7 +769,7 @@
         "home": "PHI",
         "issues": [],
         "kickoff": "2026-10-27T00:15:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-26T06:16:43.486099+00:00",
+        "latest_scoreboard_observed_at": "2026-10-26T14:16:47.805803+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
