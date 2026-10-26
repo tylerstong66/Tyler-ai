@@ -1,5 +1,14 @@
 # Sports Betting Analyst v1 — verified handoff (2026-10-26)
 
+## October 26 continuation — race-safe historical source publication verified on main
+
+PR #276 merged at `0f8d6158786bca635dbfc35a3bdd891d871a0889` after **all 13 exact-head CI workflows passed**, including integrated sports regressions and archived college receipt replay. Issue #275 is closed. The historical NBA/FBS/D1 publisher no longer rebases a stale derived coverage file onto concurrent source writers: it uses a bounded three-attempt, fresh-main detached worktree, validates retained original receipt pairs and immutable frozen indexes, rejects changed or conflicting original bytes, reconstructs derived coverage from current committed inputs, and stages only explicitly allowed original paths and coverage. Eight offline competing-writer Git regressions passed, including concurrent coverage edits/new originals, conflicting original bytes, exhausted races, unexpected push errors, modified tracked originals, half-pairs and unchanged caller checkout.
+
+The exact post-merge main historical source workflow [40326893167](https://github.com/tylerstong66/Tyler-ai/actions/runs/40326893167) completed successfully on **2026-10-26 at 13:02 UTC**. Its publisher reported `{"status":"UNCHANGED","attempts":1,"NO_BET":true}` on source head `0f8d6158786bca635dbfc35a3bdd891d871a0889`: the existing archives and derived coverage were already consistent, so **no new original source or result was published**. This verifies the no-op production workflow path, not a live concurrent-writer collision. The race-handling paths were exercised by isolated offline Git tests, not a live induced race.
+
+Historical ESPN declared date retrieval remains 490 NBA / 302 FBS / 312 D1. No independently certified official-result completeness, training-ready labels or prospective college/NBA forecasts were established. NHL/NFL/MLB stay separate; #217 sportsbook-specific NHL quote proof and #98 MLB cross-cohort schedule drift remain. Keep `NO_BET=true`, zero wagers, no promotion or Render deployment. Next: independently qualify official finals by league, season, postseason, rescheduling and exact original publication chronology; do not promote ESPN source agreement into official-result certification.
+
+
 ## October 26 continuation — live NCAA crosswalk one-to-one identity and fail-closed receipts
 
 PR #272 merged at `5d7c7bbdb0217d7978842f11359af52e291cd5cf` after all 14 exact-head checks passed. The direct NCAA/ESPN identity crosswalk now quarantines *all* ESPN event IDs that claim the same NCAA-owned game within one sport, rather than reporting multiple independent source matches. FBS and D1 adversarial tests cover duplicate claimants, separate-league namespaces and unrelated rematches. The existing downstream dual-final classifier's no-grade guard remains intact.
