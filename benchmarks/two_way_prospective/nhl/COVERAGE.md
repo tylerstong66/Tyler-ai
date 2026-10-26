@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-26T01:11:11.483531+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-26T06:16:46.802600+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 102 / 98 / 4 |
-| Started games in retained official schedules / enrolled | 100 / 99 |
-| Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 102 / 102 |
-| Settled with enrollment prices / decisive market-paired | 98 / 98 |
+| Recorded / settled / pending | 103 / 100 / 3 |
+| Started games in retained official schedules / enrolled | 101 / 100 |
+| Observed missing started games | 1 |
+| Enrollment-time priced forecasts | 103 / 103 |
+| Settled with enrollment prices / decisive market-paired | 100 / 100 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,13 +23,13 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-26T01:11:11.483531+00:00. Ready: 3 / 3 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-26T06:16:46.802600+00:00. Ready: 3 / 3 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020184 | MIN at VAN | True | False | True | None |
 | 2026020185 | LAK at NYR | True | False | True | None |
 | 2026020186 | TOR at CGY | True | False | True | None |
+| 2026020187 | DET at EDM | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -135,15 +135,16 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020179 | MIN at SEA | 2026-10-25T02:00:00+00:00 | enrolled | — |
 | 2026020180 | FLA at CHI | 2026-10-25T19:00:00+00:00 | enrolled | — |
 | 2026020181 | NYI at DAL | 2026-10-25T22:00:00+00:00 | enrolled | — |
-| 2026020182 | MTL at WPG | 2026-10-25T23:00:00+00:00 | unverified or not normally scheduled | Official/ESPN venue disagreement |
+| 2026020182 | MTL at WPG | 2026-10-25T23:00:00+00:00 | missed despite pregame schedule observation | Official/ESPN venue disagreement |
 | 2026020183 | COL at NSH | 2026-10-26T00:00:00+00:00 | enrolled | — |
 | 2026020184 | MIN at VAN | 2026-10-26T02:00:00+00:00 | enrolled | — |
 | 2026020185 | LAK at NYR | 2026-10-26T23:00:00+00:00 | enrolled | — |
 | 2026020186 | TOR at CGY | 2026-10-27T00:30:00+00:00 | enrolled | — |
+| 2026020187 | DET at EDM | 2026-10-27T01:30:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 99. Latest: `20261026T011110237348Z`.
+Audited capture manifests: 100. Latest: `20261026T061644569912Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
