@@ -121,6 +121,33 @@ class CollegeIdentityTests(unittest.TestCase):
                             identity.run(base=root,now=AT+timedelta(minutes=10))
                         self.assertFalse((root/identity.ROOT).exists())
 
+    def test_direct_source_replay_requires_exact_no_wager_research_flags(self):
+        changes=(
+            ("actual_wagers",True), ("actual_wagers",1),
+            ("actual_wagers",0.0), ("promotion_allowed",True),
+            ("model_training_enabled",True),
+            ("official_final_scoring_enabled",True),
+            ("NO_BET",False), ("forecasting_enabled",True),
+        )
+        for provider in ("ncaa","espn"):
+            with self.subTest(provider=provider), tempfile.TemporaryDirectory() as td:
+                root=Path(td); self.seed(root)
+                module=ncaa if provider=="ncaa" else espn
+                folder=next((root/module.ROOT/"captures").iterdir())
+                original=json.loads((folder/"manifest.json").read_bytes())
+                verify=identity.verify_ncaa if provider=="ncaa" else identity.verify_espn
+                self.assertTrue(verify(folder,original))
+                for field,value in changes:
+                    with self.subTest(provider=provider,field=field,value=value):
+                        altered={**original,field:value}
+                        with self.assertRaisesRegex(ValueError,"provenance invalid"):
+                            verify(folder,altered)
+                (folder/"manifest.json").write_bytes(
+                    espn.canonical({**original,"actual_wagers":True}))
+                with self.assertRaisesRegex(ValueError,"provenance invalid"):
+                    identity.run(base=root,now=AT+timedelta(minutes=10))
+                self.assertFalse((root/identity.ROOT).exists())
+
     def test_real_source_replay_and_exact_match_both_providers(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td);self.seed(root)
