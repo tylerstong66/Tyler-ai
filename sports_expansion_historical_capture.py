@@ -163,7 +163,7 @@ def capture(fetch,*,base=Path("."),now=None,per_league=20,date_plan=None):
         raw=fetch(url)
         if not isinstance(raw,bytes) or not raw or len(raw)>8_000_000:
             raise ValueError("Historical provider source unavailable or oversized")
-        parsed=observer.parse_scoreboard(json.loads(raw),sport)
+        parsed=observer.parse_scoreboard(strict_json_loads(raw),sport)
         receipt={
             "schema":"college-nba-history-provider-day-v1",
             "league":sport,"split":split,"source_date":day,
