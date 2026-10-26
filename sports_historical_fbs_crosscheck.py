@@ -11,7 +11,7 @@ import sports_historical_identity_audit as historical_audit
 import sports_expansion_observer as espn
 import sports_ncaa_espn_identity as identity
 import sports_college_dual_source_finals as finals
-from sports_expansion_audit import bounded_gzip_read
+from sports_expansion_audit import bounded_gzip_read, strict_json_loads
 
 
 def _owned_sources(base, league, split, now):
@@ -61,11 +61,14 @@ def build(base=Path('.'), *, split='train', now=None, league='NCAAF_FBS', verifi
             continue
         folder = base / history.ROOT / 'sources' / league / split
         path = folder / (day + '.receipt.json'); raw_receipt = path.read_bytes()
-        saved = json.loads(raw_receipt)
+        saved = strict_json_loads(raw_receipt)
         raw = bounded_gzip_read((folder / (day + '.json.gz')).read_bytes())
         if hashlib.sha256(raw).hexdigest() != saved['original_response_sha256']:
             raise ValueError('ESPN historical response changed during crosscheck')
-        events = {str(row['id']): row for row in json.loads(raw)['events']}
+        events_raw = strict_json_loads(raw)['events']
+        events = {str(row['id']): row for row in events_raw}
+        if len(events) != len(events_raw):
+            raise ValueError('Repeated ESPN game identity at direct college join')
         ref = {'source_date': day, 'receipt_sha256': hashlib.sha256(raw_receipt).hexdigest(),
                'response_sha256': saved['original_response_sha256'],
                'observed_at_utc': saved['recorded_at_utc']}
