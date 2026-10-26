@@ -9,7 +9,7 @@ import json
 import sports_expansion_historical_capture as history
 import sports_expansion_observer as source
 import sports_nba_official_schedule_audit as nba
-from sports_expansion_audit import archive_path, bounded_gzip_read, MAX_BLOB_SIZE
+from sports_expansion_audit import archive_path, bounded_gzip_read, strict_json_loads, MAX_BLOB_SIZE
 
 ROOT = history.ROOT/'nba_owned'
 YEARS = {'train':2024,'validation':2025}
@@ -36,7 +36,7 @@ def url(split):
 
 
 def parse(raw,split,observed):
-    payload=json.loads(raw);schedule=payload.get('leagueSchedule')
+    payload=strict_json_loads(raw);schedule=payload.get('leagueSchedule')
     if not isinstance(schedule,dict) or schedule.get('leagueId')!='00' or schedule.get('seasonYear')!=season(split):
         raise ValueError('NBA original league or season identity mismatch')
     rows=nba.official_games(raw)
@@ -67,7 +67,7 @@ def verify(base,split,*,now=None):
         raise ValueError('NBA historical receipt must be a regular file')
     if path.stat().st_size > MAX_BLOB_SIZE:
         raise ValueError('Oversized NBA historical receipt')
-    saved=json.loads(path.read_bytes())
+    saved=strict_json_loads(path.read_bytes())
     if (saved.get('schema')!='tyler-nba-owned-historical-season-v1'
             or saved.get('league')!='NBA' or saved.get('split')!=split
             or saved.get('season')!=selected or saved.get('source_url')!=url(split)
