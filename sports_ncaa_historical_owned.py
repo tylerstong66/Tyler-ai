@@ -8,7 +8,7 @@ import json
 import sports_ncaa_official_source as ncaa
 import sports_expansion_historical_capture as history
 import sports_expansion_observer as source
-from sports_expansion_audit import archive_path, bounded_gzip_read, MAX_BLOB_SIZE
+from sports_expansion_audit import archive_path, bounded_gzip_read, strict_json_loads, MAX_BLOB_SIZE
 
 ROOT = history.ROOT / 'ncaa_owned' / 'NCAAF_FBS'
 YEARS = {'train': 2024, 'validation': 2025}
@@ -57,7 +57,7 @@ def verify(base, split, week, *, now=None):
         raise ValueError('Missing sealed NCAA historical archive component')
     if path.stat().st_size > MAX_BLOB_SIZE:
         raise ValueError('Oversized NCAA historical receipt')
-    saved = json.loads(path.read_bytes())
+    saved = strict_json_loads(path.read_bytes())
     if (saved.get('schema') != 'tyler-ncaa-owned-history-week-v1'
             or saved.get('league') != 'NCAAF_FBS' or saved.get('split') != split
             or saved.get('season_year') != YEARS[split] or saved.get('week') != week
