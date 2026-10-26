@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-25T22:33:48.680305+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-10-26T01:11:10.079686+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 40 / 36 / 4 |
-| Started games in retained official schedules / enrolled | 39 / 39 |
+| Recorded / settled / pending | 41 / 39 / 2 |
+| Started games in retained official schedules / enrolled | 40 / 40 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 40 / 40 |
-| Settled with enrollment prices / decisive market-paired | 36 / 35 |
+| Enrollment-time priced forecasts | 41 / 41 |
+| Settled with enrollment prices / decisive market-paired | 39 / 38 |
 | Separate later quotes recorded prospectively | 0 |
 
 A priced NFL tie is excluded only from binary decisive market comparisons.
@@ -25,11 +25,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-25T22:33:48.680305+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-26T01:11:10.079686+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026_07_KC_SEA | KC at SEA | True | False | True | None |
+| 2026_07_DAL_PHI | DAL at PHI | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -66,6 +66,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026_06_WAS_SF | WAS at SF | 2026-10-20T00:15:00+00:00 | enrolled | — |
 | 2026_07_CIN_BAL | CIN at BAL | 2026-10-25T17:00:00+00:00 | enrolled | — |
 | 2026_07_CLE_TEN | CLE at TEN | 2026-10-25T17:00:00+00:00 | enrolled | — |
+| 2026_07_DAL_PHI | DAL at PHI | 2026-10-27T00:15:00+00:00 | enrolled | — |
 | 2026_07_DEN_ARI | DEN at ARI | 2026-10-25T20:05:00+00:00 | enrolled | — |
 | 2026_07_GB_DET | GB at DET | 2026-10-25T20:25:00+00:00 | enrolled | — |
 | 2026_07_IND_MIN | IND at MIN | 2026-10-25T17:00:00+00:00 | enrolled | — |
@@ -80,7 +81,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 100. Latest: `20261025T223345876360Z`.
+Audited capture manifests: 101. Latest: `20261026T011107479582Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

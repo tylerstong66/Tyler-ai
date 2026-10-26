@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-25T22:33:53.147503+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
+Evidence through **2026-10-26T01:11:15.871477+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 12 / 9 / 3 |
+| Recorded / settled / pending | 13 / 9 / 4 |
 | Started games in retained official schedules / enrolled | 14 / 12 |
 | Observed missing started games | 2 |
-| Enrollment-time priced forecasts | 8 / 12 |
+| Enrollment-time priced forecasts | 9 / 13 |
 | Settled with enrollment prices / decisive market-paired | 6 / 6 |
 | Separate later quotes recorded prospectively | 1 |
 
@@ -31,10 +31,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-25T22:33:53.147503+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
+As of retained evidence: 2026-10-26T01:11:15.871477+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
+| 849804 | Milwaukee Brewers at Tampa Bay Rays | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -43,6 +44,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | Game | Matchup | Start (UTC) | Decision | Exclusion evidence |
 |---|---|---|---|---|
 | 849802 | Tampa Bay Rays at Milwaukee Brewers | 2026-10-25T00:00:00+00:00 | enrolled | — |
+| 849804 | Milwaukee Brewers at Tampa Bay Rays | 2026-10-27T00:00:00+00:00 | enrolled | — |
 | 849805 | Tampa Bay Rays at Milwaukee Brewers | 2026-10-24T00:00:00+00:00 | enrolled | — |
 | 849808 | Milwaukee Brewers at Los Angeles Dodgers | 2026-10-17T01:00:00+00:00 | enrolled | — |
 | 849809 | Los Angeles Dodgers at Milwaukee Brewers | 2026-10-12T00:00:00+00:00 | enrolled | — |
@@ -59,7 +61,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 96. Latest: `20261025T223350090830Z`.
+Audited capture manifests: 97. Latest: `20261026T011111554508Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

@@ -2,7 +2,7 @@
 
 **NO BET — actual wagers $0.**
 
-Recorded: **12** · Settled: **9** · Pending: **3**
+Recorded: **13** · Settled: **9** · Pending: **4**
 
 100-settlement milestone: **collecting**. This flag requests human review; it does not authorize model promotion or wagering.
 
@@ -16,7 +16,7 @@ Uncertainty unit: Eastern scheduled game date. CIs require at least 5 blocks.
 ## First-100-enrolled checkpoint
 
 Status: **collecting_forecasts**. This is separate from the cumulative 100-settlement flag.
-Selected: 12 / 100; settled among selected: 9; pending among selected: 3.
+Selected: 13 / 100; settled among selected: 9; pending among selected: 4.
 First 100 by recorded_at in UTC, then game_id; never by outcome, price or settlement order.
 
 ## All decisive games — conditional two-way scores
@@ -80,7 +80,7 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/two_way_prospective/mlb/captures/20261025T223350090830Z/manifest.json.
+Latest saved manifest: benchmarks/two_way_prospective/mlb/captures/20261026T011111554508Z/manifest.json.
 Manifest completion field: True. Errors: [{"game_id": "849816", "reason": "Final identity differs from saved forecast"}]. Exclusions: [].
 Optional availability errors: [].
 Newer saved collection failure: null.

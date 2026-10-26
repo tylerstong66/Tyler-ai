@@ -1,6 +1,6 @@
 # Tyler NFL prospective paper test
 
-Recorded: **40/100** · Settled: **36** · Pending: **4**
+Recorded: **41/100** · Settled: **39** · Pending: **2**
 
 **NO BET — actual wagers $0.**
 
@@ -8,9 +8,9 @@ Frozen experimental v2 compared with frozen v1 and market odds observed before k
 
 | Model | Paired games | Brier (lower is better) | Log loss (lower is better) | Accuracy |
 |---|---:|---:|---:|---:|
-| v2 | 35 | 0.5004 | 0.6939 | 57.1% |
-| v1 | 35 | 0.4991 | 0.6919 | 54.3% |
-| market | 35 | 0.4963 | 0.6965 | 60.0% |
+| v2 | 38 | 0.4800 | 0.6727 | 60.5% |
+| v1 | 38 | 0.4801 | 0.6721 | 57.9% |
+| market | 38 | 0.4788 | 0.6780 | 63.2% |
 
 | Game | Kickoff (Eastern) | V2 pick | V2 win probability | Saved (Eastern) |
 |---|---|---|---:|---|
@@ -54,6 +54,7 @@ Frozen experimental v2 compared with frozen v1 and market odds observed before k
 | GB at DET | Oct 25 04:25 PM | DET | 62.3% | Oct 24 06:29 PM |
 | LA at LV | Oct 25 04:25 PM | LA | 63.2% | Oct 24 06:29 PM |
 | KC at SEA | Oct 25 08:20 PM | SEA | 59.2% | Oct 24 09:10 PM |
+| DAL at PHI | Oct 26 08:15 PM | PHI | 54.3% | Oct 25 09:11 PM |
 
 Probabilities include a small tie allowance. These picks are experimental model outputs, not wagering recommendations. Source timing and scheduling delays can leave coverage gaps; missed games are logged rather than backfilled after kickoff.
 
