@@ -13,7 +13,7 @@ from pathlib import Path
 
 import requests
 import sports_expansion_observer as observer
-from sports_expansion_audit import archive_path, bounded_gzip_read, MAX_BLOB_SIZE
+from sports_expansion_audit import archive_path, bounded_gzip_read, strict_json_loads, MAX_BLOB_SIZE
 
 ROOT=Path("benchmarks/college_nba_history_v1")
 # Explicit complete-date REQUEST windows, not a declaration that every event
@@ -72,7 +72,7 @@ def verify_existing(base, sport, split, day, *, as_of=None):
         raise ValueError("Historical source missing one sealed archive component")
     if receipt.stat().st_size > MAX_BLOB_SIZE:
         raise ValueError('Oversized historical provider receipt')
-    r=json.loads(receipt.read_text())
+    r=strict_json_loads(receipt.read_bytes())
     if as_of is not None and (observer.utc(r["recorded_at_utc"]) > as_of.astimezone(timezone.utc)):
         raise ValueError("Saved historical receipt has future observation timestamp")
     if (r.get("schema")!="college-nba-history-provider-day-v1"
@@ -90,7 +90,7 @@ def verify_existing(base, sport, split, day, *, as_of=None):
     raw=bounded_gzip_read(artifact.read_bytes())
     if hashlib.sha256(raw).hexdigest()!=r["original_response_sha256"]:
         raise ValueError("Original historical source bytes no longer match receipt")
-    parsed=observer.parse_scoreboard(json.loads(raw),sport)
+    parsed=observer.parse_scoreboard(strict_json_loads(raw),sport)
     if parsed!=r["parsed_provider_scoreboard"]:
         raise ValueError("Historical parsed ESPN records differ from retained source")
     return True
@@ -163,7 +163,7 @@ def capture(fetch,*,base=Path("."),now=None,per_league=20,date_plan=None):
         raw=fetch(url)
         if not isinstance(raw,bytes) or not raw or len(raw)>8_000_000:
             raise ValueError("Historical provider source unavailable or oversized")
-        parsed=observer.parse_scoreboard(json.loads(raw),sport)
+        parsed=observer.parse_scoreboard(strict_json_loads(raw),sport)
         receipt={
             "schema":"college-nba-history-provider-day-v1",
             "league":sport,"split":split,"source_date":day,

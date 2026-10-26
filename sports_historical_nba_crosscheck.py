@@ -11,7 +11,21 @@ import sports_nba_historical_owned as owned
 import sports_nba_official_schedule_audit as nba
 import sports_nba_final_receipts as finals
 import sports_expansion_observer as source
-from sports_expansion_audit import bounded_gzip_read
+from sports_expansion_audit import bounded_gzip_read, strict_json_loads
+
+
+def _provider_events(raw):
+    """Recheck raw ESPN identities at the historical NBA join boundary."""
+    payload = strict_json_loads(raw)
+    if not isinstance(payload, dict) or not isinstance(payload.get('events'), list):
+        raise ValueError('Missing historical NBA provider event slate')
+    events = {}
+    for event in payload['events']:
+        game_id = source._numeric_identity(event['id'], 'provider game')
+        if game_id in events:
+            raise ValueError('Repeated NBA provider event in historical crosscheck')
+        events[game_id] = event
+    return events
 
 
 def build(base=Path('.'),*,split='train',now=None,exact_tipoff_identity=False):
@@ -31,7 +45,7 @@ def build(base=Path('.'),*,split='train',now=None,exact_tipoff_identity=False):
         raw=bounded_gzip_read((folder/(day+'.json.gz')).read_bytes())
         if hashlib.sha256(raw).hexdigest()!=saved['original_response_sha256']:
             raise ValueError('NBA provider response changed during source replay')
-        events={str(event['id']):event for event in json.loads(raw)['events']}
+        events=_provider_events(raw)
         ref={'source_date':day,'receipt_sha256':hashlib.sha256(receipt_bytes).hexdigest(),
              'response_sha256':saved['original_response_sha256'],'observed_at_utc':saved['recorded_at_utc']}
         for game in saved['parsed_provider_scoreboard']['games']:

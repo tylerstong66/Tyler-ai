@@ -155,6 +155,61 @@ class HistoricalCaptureTests(unittest.TestCase):
                     h.capture(lambda _: self.fail('No network allowed'),
                               base=root, now=CLOCK, date_plan=PLAN)
 
+    def test_new_historical_provider_json_rejects_duplicate_keys_and_nonfinite(self):
+        valid = payload()
+        for name, raw in (
+            ('duplicate_events', b'{"events":[],"events":' +
+             json.dumps(json.loads(valid)['events']).encode() + b',"count":1}'),
+            ('nonfinite_metadata', valid[:-1] + b',"unexpected":NaN}'),
+        ):
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as td:
+                calls = []
+                def fetch(url):
+                    calls.append(url)
+                    return raw
+                with self.assertRaisesRegex(ValueError, 'Duplicate key|Non-finite'):
+                    h.capture(fetch, base=td, now=CLOCK, date_plan=PLAN)
+                self.assertEqual(len(calls), 1)
+                self.assertFalse((Path(td) / h.ROOT).exists())
+
+    def test_rehashed_ambiguous_historical_original_blocks_replay_and_append(self):
+        valid = payload()
+        forged = (b'{"events":[],"events":' +
+                  json.dumps(json.loads(valid)['events']).encode() + b',"count":1}')
+        for sport in h.ORDER:
+            with self.subTest(sport=sport), tempfile.TemporaryDirectory() as td:
+                root = Path(td)
+                h.capture(lambda _: valid, base=root, now=CLOCK,
+                          per_league=1, date_plan=PLAN)
+                folder = root / h.ROOT / 'sources' / sport / 'train'
+                archive = folder / '2024-10-22.json.gz'
+                receipt = folder / '2024-10-22.receipt.json'
+                archive.write_bytes(gzip.compress(forged, mtime=0))
+                saved = json.loads(receipt.read_bytes())
+                saved['original_response_sha256'] = hashlib.sha256(forged).hexdigest()
+                receipt.write_text(json.dumps(saved))
+                with self.assertRaisesRegex(ValueError, 'Duplicate key'):
+                    h.verify_existing(root, sport, 'train', '2024-10-22', as_of=CLOCK)
+                calls = []
+                with self.assertRaisesRegex(ValueError, 'Duplicate key'):
+                    h.capture(lambda url: (calls.append(url), valid)[1],
+                              base=root, now=CLOCK, date_plan=PLAN)
+                self.assertEqual(calls, [])
+                self.assertFalse((root / h.ROOT / 'sources' / sport /
+                                  'validation').exists())
+
+    def test_ambiguous_receipt_json_is_not_accepted_as_valid_archive(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            h.capture(lambda _: payload(), base=root, now=CLOCK,
+                      per_league=1, date_plan=PLAN)
+            receipt = (root / h.ROOT / 'sources' / 'NBA' / 'train' /
+                       '2024-10-22.receipt.json')
+            original = receipt.read_bytes()
+            receipt.write_bytes(original.rstrip()[:-1] + b',"NO_BET":true}')
+            with self.assertRaisesRegex(ValueError, 'Duplicate key'):
+                h.verify_existing(root, 'NBA', 'train', '2024-10-22', as_of=CLOCK)
+
     def test_default_budget_is_20_new_source_days_per_league(self):
         # Synthetic plan keeps the network call count deterministic.
         dates=[f"2024-10-{day:02d}" for day in range(1,22)]

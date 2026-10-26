@@ -14,6 +14,20 @@ from test_sports_nba_official_schedule_audit import espn_event
 
 
 class HistoricalNbaCrosscheckTests(unittest.TestCase):
+    def test_direct_nba_historical_join_rejects_ambiguous_provider_identity(self):
+        event = espn_event()
+        valid = json.dumps({'events': [event]}).encode()
+        self.assertEqual(list(check._provider_events(valid)), [str(event['id'])])
+        forged = (
+            b'{"events":[],"events":[' + json.dumps(event).encode() + b']}',
+            json.dumps({'events': [event, event]}).encode(),
+            valid[:-1] + b',"unexpected":Infinity}',
+            json.dumps({'events': [{**event, 'id': '４０１２３４５６７'}]}).encode(),
+        )
+        for raw in forged:
+            with self.subTest(raw=raw[:80]), self.assertRaises(ValueError):
+                check._provider_events(raw)
+
     def repeat_fixture(self, *, second_hours=48, offset_minutes=0):
         import sports_nba_official_schedule_audit as nba
         obj=json.loads(original());games=obj['leagueSchedule']['gameDates'][0]['games']
