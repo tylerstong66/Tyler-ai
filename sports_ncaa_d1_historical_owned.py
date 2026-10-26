@@ -9,7 +9,7 @@ import sports_ncaa_official_source as ncaa
 import sports_ncaa_historical_owned as common
 import sports_expansion_historical_capture as history
 import sports_expansion_observer as source
-from sports_expansion_audit import archive_path, bounded_gzip_read, MAX_BLOB_SIZE
+from sports_expansion_audit import archive_path, bounded_gzip_read, strict_json_loads, MAX_BLOB_SIZE
 
 ROOT = history.ROOT / 'ncaa_owned' / 'NCAAM_D1'
 YEARS = dict(common.YEARS)
@@ -44,7 +44,7 @@ def _parse_with_quarantine(raw, split, day, observed):
         return _rows(raw, split, day, observed), []
     except ncaa.TiedNcaaFinalError:
         pass
-    payload = json.loads(raw)
+    payload = strict_json_loads(raw)
     rows = []; quarantined = []; seen = set()
     for contest in payload['data']['contests']:
         game_id = ncaa._positive_id(contest.get('contestId'), 'contest ID')
@@ -90,7 +90,7 @@ def verify(base, split, day, *, now=None):
         raise ValueError('Missing NCAA D1 sealed source component')
     if path.stat().st_size > MAX_BLOB_SIZE:
         raise ValueError('Oversized NCAA D1 historical receipt')
-    saved = json.loads(path.read_bytes())
+    saved = strict_json_loads(path.read_bytes())
     if (saved.get('schema') not in ('tyler-ncaa-owned-d1-history-day-v1',
                                          'tyler-ncaa-owned-d1-history-day-v2')
             or saved.get('league') != 'NCAAM_D1' or saved.get('split') != split
