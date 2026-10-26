@@ -1,6 +1,9 @@
 """Historical independent result joins cannot borrow 2026 alias assumptions."""
 from pathlib import Path
+import gzip
+import hashlib
 import json
+from unittest.mock import patch
 import tempfile
 import unittest
 from datetime import datetime, timezone
@@ -66,6 +69,38 @@ class HistoricalFbsCrosscheckTests(unittest.TestCase):
                 self.seed(Path(td), **kwargs); out = crosscheck.build(td, now=NOW)
                 self.assertEqual(out['two_source_final_agreements'], 0)
                 self.assertTrue(all(row['reason'] == reason for row in out['pending']))
+
+    def test_direct_join_rejects_rehashed_duplicate_key_source(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td); self.seed(root)
+            folder = root/history.ROOT/'sources'/'NCAAF_FBS'/'train'
+            source = next(folder.glob('*.json.gz'))
+            receipt = next(folder.glob('*.receipt.json'))
+            raw = gzip.decompress(source.read_bytes())
+            self.assertTrue(raw.endswith(b'}'))
+            tampered = raw[:-1] + b',"count":1}'
+            source.write_bytes(gzip.compress(tampered, mtime=0))
+            saved = json.loads(receipt.read_bytes())
+            saved['original_response_sha256'] = hashlib.sha256(tampered).hexdigest()
+            receipt.write_text(json.dumps(saved))
+            def skip_first_verification(base, league, split, day, *, as_of=None):
+                return (Path(base)/history.ROOT/'sources'/league/split/(day+'.receipt.json')).is_file()
+            with patch.object(history, 'verify_existing', side_effect=skip_first_verification):
+                with self.assertRaises(ValueError):
+                    crosscheck.build(root, now=NOW)
+
+    def test_direct_join_rejects_duplicate_key_receipt(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td); self.seed(root)
+            folder = root/history.ROOT/'sources'/'NCAAF_FBS'/'train'
+            receipt = next(folder.glob('*.receipt.json'))
+            raw = receipt.read_bytes()
+            receipt.write_bytes(raw[:-1] + b',"NO_BET":true}')
+            def skip_first_verification(base, league, split, day, *, as_of=None):
+                return (Path(base)/history.ROOT/'sources'/league/split/(day+'.receipt.json')).is_file()
+            with patch.object(history, 'verify_existing', side_effect=skip_first_verification):
+                with self.assertRaises(ValueError):
+                    crosscheck.build(root, now=NOW)
 
     def test_modified_independent_source_rejected(self):
         with tempfile.TemporaryDirectory() as td:
