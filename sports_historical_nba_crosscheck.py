@@ -41,10 +41,27 @@ def build(base=Path('.'),*,split='train',now=None,exact_tipoff_identity=False):
     for day in history.dates_by_league()['NBA'][split]:
         if not history.verify_existing(base,'NBA',split,day,as_of=now): continue
         folder=base/history.ROOT/'sources'/'NBA'/split
-        path=folder/(day+'.receipt.json');receipt_bytes=path.read_bytes();saved=json.loads(receipt_bytes)
+        path=folder/(day+'.receipt.json');receipt_bytes=path.read_bytes()
+        saved=strict_json_loads(receipt_bytes)
         raw=bounded_gzip_read((folder/(day+'.json.gz')).read_bytes())
         if hashlib.sha256(raw).hexdigest()!=saved['original_response_sha256']:
             raise ValueError('NBA provider response changed during source replay')
+        # Upstream archive verification and this read are separate operations.
+        # Revalidate the exact bytes consumed by this direct historical join.
+        if (saved.get('schema')!='college-nba-history-provider-day-v1'
+                or saved.get('league')!='NBA' or saved.get('split')!=split
+                or saved.get('source_date')!=day
+                or saved.get('source_url')!=source.scoreboard_url('NBA',day)
+                or saved.get('NO_BET') is not True
+                or type(saved.get('actual_wagers')) is not int
+                or saved.get('actual_wagers')!=0
+                or saved.get('promotion_allowed') is not False
+                or saved.get('independently_verified_official_scores') is not False
+                or saved.get('historical_results_are_not_pregame_forecasts') is not True
+                or source.utc(saved['recorded_at_utc'])>now):
+            raise ValueError('NBA historical provider receipt scope or chronology changed during join')
+        if source.parse_scoreboard(strict_json_loads(raw),'NBA')!=saved['parsed_provider_scoreboard']:
+            raise ValueError('NBA historical provider normalized scores changed during join')
         events=_provider_events(raw)
         ref={'source_date':day,'receipt_sha256':hashlib.sha256(receipt_bytes).hexdigest(),
              'response_sha256':saved['original_response_sha256'],'observed_at_utc':saved['recorded_at_utc']}
