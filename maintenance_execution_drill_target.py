@@ -4,7 +4,7 @@ The production value in this file must remain ``base``. The v2.14.1 drill
 publishes a proposal that changes it only on a newly-created review branch.
 """
 
-DRILL_MARKER = "base"
+DRILL_MARKER = "review-branch-test"
 
 
 def drill_marker():
