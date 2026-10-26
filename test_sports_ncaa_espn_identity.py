@@ -244,6 +244,69 @@ class CollegeIdentityTests(unittest.TestCase):
                 identity.run(base=root,now=AT+timedelta(minutes=10))
             self.assertFalse((root/identity.ROOT).exists())
 
+    def test_two_espn_ids_cannot_claim_one_ncaa_contest_in_either_league(self):
+        for league in ("NCAAF_FBS", "NCAAM_D1"):
+            with self.subTest(league=league):
+                nc={"league":league,"ncaa_game_id":"654321",
+                    "home_name":"Tulsa","away_name":"Rice",
+                    "source_start_time_epoch":str(KICKOFF_EPOCH),
+                    "provider_reported_final":False}
+                first={"league":league,"espn_game_id":"401100001",
+                       "scheduled_start_utc":KICKOFF,
+                       "school_names":{"home":"tulsa","away":"rice"},
+                       "home_name":"Tulsa","away_name":"Rice",
+                       "provider_completed":False}
+                second={**first,"espn_game_id":"401100002"}
+                result=identity.reconcile([nc],[first,second])
+                self.assertEqual(result["espn_games_examined"],2)
+                self.assertEqual(result["unique_source_game_identity_matches"],0)
+                self.assertEqual(result["unverified_game_identifiers"],2)
+                self.assertEqual(
+                    {r["espn_game_id"] for r in result["unverified"]},
+                    {"401100001","401100002"})
+                self.assertTrue(all(
+                    r["reason"]=="NON_BIJECTIVE_GAME_IDENTITY"
+                    and r["ncaa_game_id"]=="654321"
+                    for r in result["unverified"]))
+                self.assertTrue(result["NO_BET"])
+                self.assertFalse(result["official_final_scoring_enabled"])
+
+    def test_duplicate_claim_quarantine_preserves_unrelated_match(self):
+        base={"league":"NCAAF_FBS","home_name":"Tulsa","away_name":"Rice",
+              "provider_reported_final":False}
+        n1={**base,"ncaa_game_id":"654321",
+            "source_start_time_epoch":str(KICKOFF_EPOCH)}
+        n2={**base,"ncaa_game_id":"654322",
+            "source_start_time_epoch":str(KICKOFF_EPOCH+4*86400)}
+        e1={"league":"NCAAF_FBS","espn_game_id":"401100001",
+            "scheduled_start_utc":KICKOFF,
+            "school_names":{"home":"tulsa","away":"rice"},
+            "home_name":"Tulsa","away_name":"Rice","provider_completed":False}
+        e2={**e1,"espn_game_id":"401100002"}
+        later=(datetime.fromtimestamp(KICKOFF_EPOCH+4*86400,timezone.utc)
+               .isoformat())
+        e3={**e1,"espn_game_id":"401100003","scheduled_start_utc":later}
+        out=identity.reconcile([n1,n2],[e1,e2,e3])
+        self.assertEqual(out["unique_source_game_identity_matches"],1)
+        self.assertEqual(out["matched"][0]["ncaa_game_id"],"654322")
+        self.assertEqual(out["unverified_game_identifiers"],2)
+
+    def test_ncaa_game_id_reuse_across_leagues_is_not_cross_claim(self):
+        nc=[];es=[]
+        for league in ("NCAAF_FBS","NCAAM_D1"):
+            nc.append({"league":league,"ncaa_game_id":"654321",
+                       "home_name":"Tulsa","away_name":"Rice",
+                       "source_start_time_epoch":str(KICKOFF_EPOCH),
+                       "provider_reported_final":False})
+            es.append({"league":league,"espn_game_id":"401100001",
+                       "scheduled_start_utc":KICKOFF,
+                       "school_names":{"home":"tulsa","away":"rice"},
+                       "home_name":"Tulsa","away_name":"Rice",
+                       "provider_completed":False})
+        out=identity.reconcile(nc,es)
+        self.assertEqual(out["unique_source_game_identity_matches"],2)
+        self.assertEqual(out["unverified_game_identifiers"],0)
+
     def test_duplicated_official_fixture_candidates_are_never_chosen(self):
         ncaa_entries=[{
             "league":"NCAAF_FBS","ncaa_game_id":str(i),
