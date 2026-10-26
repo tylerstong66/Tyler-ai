@@ -102,6 +102,25 @@ class CollegeIdentityTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "Duplicate key" if kind=="duplicate" else "Non-finite"):
                     identity.verify_espn(folder,manifest)
 
+    def test_direct_crosswalk_rejects_ambiguous_source_manifests(self):
+        for provider in ("ncaa", "espn"):
+            for kind, prefix, expected in (
+                ("duplicate", b'{"NO_BET":false,', "Duplicate key"),
+                ("nonfinite", b'{"unused":NaN,', "Non-finite"),
+            ):
+                with self.subTest(provider=provider,kind=kind):
+                    with tempfile.TemporaryDirectory() as td:
+                        root=Path(td); self.seed(root)
+                        module=ncaa if provider=="ncaa" else espn
+                        folder=next((root/module.ROOT/"captures").iterdir())
+                        path=folder/"manifest.json"
+                        original=path.read_bytes()
+                        self.assertTrue(original.startswith(b"{"))
+                        path.write_bytes(prefix+original[1:])
+                        with self.assertRaisesRegex(ValueError,expected):
+                            identity.run(base=root,now=AT+timedelta(minutes=10))
+                        self.assertFalse((root/identity.ROOT).exists())
+
     def test_real_source_replay_and_exact_match_both_providers(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td);self.seed(root)
