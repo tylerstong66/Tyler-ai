@@ -60,9 +60,24 @@ def audit(base=Path('.'), *, now=None):
                 receipts.append(ref); counts[(league, split)] += 1
                 for row in receipt['parsed_provider_scoreboard']['games']:
                     games[(league, row['game_id'])].append((row, ref, receipt['recorded_at_utc']))
+    # One real matchup at one exact UTC start cannot count as two distinct
+    # provider games merely because a later source day relabelled its ID.
+    # Treat swapped home/away labels as ambiguous too; never choose a winner.
+    fingerprints = defaultdict(set)
+    for (league, game_id), found in games.items():
+        for row, _, _ in found:
+            fingerprint = (league, row['scheduled_start_utc'],
+                           tuple(sorted((row['home_team_id'], row['away_team_id']))))
+            fingerprints[fingerprint].add(game_id)
+    relabelled = set()
+    for (league, _, _), ids in fingerprints.items():
+        if len(ids) > 1:
+            relabelled.update((league, game_id) for game_id in ids)
     quarantine = []; clean = Counter(); duplicate_observations = 0
     for (league, game_id), found in sorted(games.items()):
         reasons = set(); first = found[0][0]
+        if (league, game_id) in relabelled:
+            reasons.add('SAME_EVENT_FINGERPRINT_MULTIPLE_GAME_IDS')
         duplicate_observations += len(found) - 1
         if len({ref['split'] for _, ref, _ in found}) != 1:
             reasons.add('GAME_ID_PRESENT_IN_TRAIN_AND_VALIDATION')
@@ -89,6 +104,7 @@ def audit(base=Path('.'), *, now=None):
             'verified_source_days': len(receipts), 'receipt_provenance': receipts,
             'unique_provider_game_ids': len(games),
             'repeated_same_game_observations': duplicate_observations,
+            'quarantined_relabelled_game_ids': len(relabelled),
             'quarantined_game_ids': len(quarantine), 'quarantined': quarantine,
             'cohorts': {league: {split: {
                 'source_dates_verified': counts[(league, split)],
