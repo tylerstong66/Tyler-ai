@@ -1,8 +1,8 @@
 {
   "benchmark": {
-    "distinct_official_game_ids": 7,
+    "distinct_official_game_ids": 8,
     "distinct_official_game_ids_with_eligible_settlements": 6,
-    "frozen_player_game_forecasts": 43,
+    "frozen_player_game_forecasts": 49,
     "independent_github_commit_time_attestation_included": false,
     "ineligible": 4,
     "limitations": [
@@ -80,7 +80,7 @@
     },
     "model_is_calibrated": false,
     "no_wagers": true,
-    "pending": 16,
+    "pending": 22,
     "pending_examples_truncated": false,
     "pending_player_game_examples": [
       {
@@ -194,6 +194,48 @@
         "hitter_name": "Cedric Mullins",
         "scheduled_first_pitch_utc": "2026-10-25T00:00:00+00:00",
         "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
+      },
+      {
+        "game_id": "849803",
+        "hitter_id": "592885",
+        "hitter_name": "Christian Yelich",
+        "scheduled_first_pitch_utc": "2026-10-28T00:00:00+00:00",
+        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
+      },
+      {
+        "game_id": "849803",
+        "hitter_id": "596142",
+        "hitter_name": "Gary S\u00e1nchez",
+        "scheduled_first_pitch_utc": "2026-10-28T00:00:00+00:00",
+        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
+      },
+      {
+        "game_id": "849803",
+        "hitter_id": "622761",
+        "hitter_name": "Jorge Mateo",
+        "scheduled_first_pitch_utc": "2026-10-28T00:00:00+00:00",
+        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
+      },
+      {
+        "game_id": "849803",
+        "hitter_id": "641343",
+        "hitter_name": "Jake Bauers",
+        "scheduled_first_pitch_utc": "2026-10-28T00:00:00+00:00",
+        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
+      },
+      {
+        "game_id": "849803",
+        "hitter_id": "650490",
+        "hitter_name": "Yandy D\u00edaz",
+        "scheduled_first_pitch_utc": "2026-10-28T00:00:00+00:00",
+        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
+      },
+      {
+        "game_id": "849803",
+        "hitter_id": "656775",
+        "hitter_name": "Cedric Mullins",
+        "scheduled_first_pitch_utc": "2026-10-28T00:00:00+00:00",
+        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
       }
     ],
     "per_game": {
@@ -202,6 +244,12 @@
         "pending": 3,
         "predictions": 6,
         "scored": 3
+      },
+      "849803": {
+        "ineligible": 0,
+        "pending": 6,
+        "predictions": 6,
+        "scored": 0
       },
       "849804": {
         "ineligible": 1,
@@ -244,8 +292,8 @@
     "scored": 23,
     "status": "PROSPECTIVE_FREEZE_SCORING_DIAGNOSTIC_NO_BET"
   },
-  "benchmark_last_changed_at_utc": "2026-10-27T09:05:35.889149+00:00",
-  "benchmark_sha256": "075215cc95100809d986a0d0fd839628a1979edef7063dea5b8fcc18ac55f46f",
+  "benchmark_last_changed_at_utc": "2026-10-27T21:32:35.220897+00:00",
+  "benchmark_sha256": "3d1101524728a426b157872c5bfbf38c1eb24a27dcaa15ac9202322fa6d7335b",
   "limitations": [
     "The feed reports only the GitHub repository snapshot as of its publication time.",
     "GitHub scheduled jobs may run late, so actual final results may appear later.",
@@ -255,10 +303,10 @@
     "Git commit metadata is not independent proof of publication timestamp."
   ],
   "no_wagers": true,
-  "published_at_utc": "2026-10-27T15:24:22.917557+00:00",
+  "published_at_utc": "2026-10-27T21:32:35.220897+00:00",
   "schema": "tyler_mlb_shadow_public_scoreboard_v1",
   "source": "public_github_main_scheduled_snapshot",
-  "source_git_revision": "722c1901cccc5e8e48fcce10f9c4d84cfab4f121",
+  "source_git_revision": "b23d6eea1498de97b3b18636c50702ba602ba6a5",
   "source_is_not_live_official_MLB_api": true,
-  "source_refresh_kind": "unchanged_saved_evidence_heartbeat"
+  "source_refresh_kind": "benchmark_changed"
 }
