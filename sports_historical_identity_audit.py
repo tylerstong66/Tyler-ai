@@ -7,6 +7,7 @@ import json
 
 import sports_expansion_historical_capture as history
 import sports_expansion_observer as source
+from sports_expansion_audit import archive_path, bounded_gzip_read, strict_json_loads, MAX_BLOB_SIZE
 
 FIELDS = ('scheduled_start_utc', 'home_team_id', 'away_team_id',
           'season_stage', 'state', 'neutral_site', 'provider_completed', 'home_score', 'away_score')
@@ -30,8 +31,29 @@ def audit(base=Path('.'), *, now=None):
             for day in days:
                 if not history.verify_existing(base, league, split, day, as_of=now):
                     continue
-                path = root / league / split / (day + '.receipt.json')
-                raw = path.read_bytes(); receipt = json.loads(raw)
+                path = archive_path(root / league / split / (day + '.receipt.json'))
+                blob = archive_path(root / league / split / (day + '.json.gz'))
+                if path.stat().st_size > MAX_BLOB_SIZE or blob.stat().st_size > MAX_BLOB_SIZE:
+                    raise ValueError('Historical identity audit archive exceeds bound')
+                raw = path.read_bytes()
+                receipt = strict_json_loads(raw)
+                original = bounded_gzip_read(blob.read_bytes())
+                if (receipt.get('schema') != 'college-nba-history-provider-day-v1'
+                        or receipt.get('league') != league or receipt.get('split') != split
+                        or receipt.get('source_date') != day
+                        or receipt.get('source_url') != source.scoreboard_url(league, day)
+                        or receipt.get('NO_BET') is not True
+                        or type(receipt.get('actual_wagers')) is not int
+                        or receipt.get('actual_wagers') != 0
+                        or receipt.get('promotion_allowed') is not False
+                        or receipt.get('independently_verified_official_scores') is not False
+                        or receipt.get('historical_results_are_not_pregame_forecasts') is not True
+                        or source.utc(receipt['recorded_at_utc']) > now):
+                    raise ValueError('Historical identity receipt scope changed during audit')
+                if (hashlib.sha256(original).hexdigest() != receipt['original_response_sha256']
+                        or source.parse_scoreboard(strict_json_loads(original), league)
+                        != receipt['parsed_provider_scoreboard']):
+                    raise ValueError('Historical identity receipt or normalized source changed during audit')
                 ref = {'league': league, 'split': split, 'source_date': day,
                        'receipt_sha256': hashlib.sha256(raw).hexdigest(),
                        'response_sha256': receipt['original_response_sha256']}

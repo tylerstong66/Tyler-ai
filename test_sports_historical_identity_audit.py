@@ -2,6 +2,7 @@
 import json
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 from test_sports_expansion_historical_capture import CLOCK, payload
 from datetime import datetime, timedelta
@@ -82,6 +83,33 @@ class HistoricalIdentityAuditTests(unittest.TestCase):
                 if drift:
                     self.assertTrue(all('CONFLICTING_ARCHIVED_GAME_OBSERVATIONS' in row['reasons']
                                         for row in out['quarantined']))
+
+    def test_direct_identity_audit_rejects_replaced_receipt_after_verification(self):
+        for tamper in ('duplicate_key', 'forged_score', 'future_observation'):
+            with self.subTest(tamper=tamper), tempfile.TemporaryDirectory() as td:
+                root=Path(td); self.seed(root)
+                day=history.SEASONS['NBA']['train'][0]
+                receipt=root/history.ROOT/'sources'/'NBA'/'train'/(day+'.receipt.json')
+                saved=json.loads(receipt.read_bytes())
+                if tamper=='duplicate_key':
+                    raw=receipt.read_bytes().rstrip()
+                    receipt.write_bytes(raw[:-1]+b',"NO_BET":true}')
+                elif tamper=='forged_score':
+                    saved['parsed_provider_scoreboard']['games'][0]['home_score']=999
+                    receipt.write_text(json.dumps(saved))
+                else:
+                    saved['recorded_at_utc']='2030-01-01T00:00:00Z'
+                    receipt.write_text(json.dumps(saved))
+                # The first archive check has already passed; simulate replacement
+                # before the audit's own read without weakening other source checks.
+                original_verify=history.verify_existing
+                def prior_check(base, league, split, selected_day, *, as_of=None):
+                    if (league, split, selected_day)==('NBA','train',day):
+                        return True
+                    return original_verify(base,league,split,selected_day,as_of=as_of)
+                with patch.object(history,'verify_existing',side_effect=prior_check):
+                    with self.assertRaises(ValueError):
+                        audit.audit(root,now=CLOCK)
 
     def test_source_corruption_aborts_audit(self):
         with tempfile.TemporaryDirectory() as td:
