@@ -1,4 +1,14 @@
-# Sports Betting Analyst v1 — verified handoff (2026-10-26)
+# Sports Betting Analyst v1 — verified handoff (2026-10-27)
+
+## October 27 — direct historical replay and relabelled-game quarantine
+
+PR #279 merged at `65b6dbb637407f7b59f138b2543ee0a3b5a8cad0` after all 13 exact-head CI workflows passed. The direct NBA/FBS/D1 historical identity audit now replays bounded, regular-file, strict-JSON original source bytes and receipt metadata after its initial verification, rejecting a post-verification receipt replacement, forged score, ambiguous duplicate key or future observation before drawing cross-split identity conclusions. The exact post-merge historical source workflow [40505365355](https://github.com/tylerstong66/Tyler-ai/actions/runs/40505365355) succeeded on that merge head and its publisher returned `{"NO_BET":true,"attempts":1,"source_revision":"65b6dbb637407f7b59f138b2543ee0a3b5a8cad0","status":"UNCHANGED"}`. This is verified no-op source replay, **not** a new independent official final.
+
+PR #280 merged at `c71a8b6e232e061e07fd3a472fc8d237b07dc77a` after all 13 exact-head CI workflows passed. The historical provider identity audit now quarantines **every** distinct provider game ID sharing one league, exact UTC start and unordered team pair, instead of treating a relabelled single event as two independent historical games. The adversarial regression distinguishes same-event ID relabelling from a genuine rematch with a different start. The exact-head integrated sports run passed **1,115 tests**, including the new collision regression, and archived college receipt checks also passed. Post-#280 main integration and historical source workflow verification are pending at the time of this handoff; do not misstate their completion.
+
+The latest saved college/NBA source status at 2026-10-27 10:35:38 UTC reports **54 frozen native-v2 NBA feature observations**, 21 retained source-agreement observations, 33 pending and zero enrolled outcomes. The saved source status explicitly sets `independent_official_final_results_verified=false`, `forecasting_enabled=false` and `NO_BET=true`; NBA official-page endpoints are partly unavailable. Historical ESPN date retrieval remains 490 NBA / 302 FBS / 312 D1, but independent governing-body completeness and training-ready labels remain unverified. The existing NHL sportsbook quote blocker #217 and MLB cross-cohort schedule drift #98 remain separate; do not duplicate the hourly NFL/NHL/MLB results monitor.
+
+Next: verify exact post-#280 main source workflow and original receipts; continue independently qualifying governing-body finals, game/season/postseason identity, reschedules, completeness and publication chronology before any league-specific time-split model fit or forward-only paper forecasts. Keep `NO_BET=true`, zero actual wagers, training/forecasting/promotion disabled for all three expansion cohorts, and Render production unchanged.
 
 ## October 26 continuation — race-safe historical source publication verified on main
 
