@@ -1,0 +1,67 @@
+{
+  "actual_wager": 0,
+  "condition": "at_least_one_official_at_bat",
+  "conditional_at_bat_probabilities": {
+    "hit": 0.43,
+    "hr": 0.066
+  },
+  "event_start_utc": "2026-10-28T00:00:00+00:00",
+  "frozen_at_utc": "2026-10-27T19:29:32.558707+00:00",
+  "game_id": 849803,
+  "historical_input_sha256": "94fe1672007cedd919e3adb5fdfbb5a00c4ae624a795219fdf246a22d7caf6c5",
+  "hitter_id": 622761,
+  "hitter_name": "Jorge Mateo",
+  "hitter_side": "home",
+  "hitter_team_id": 139,
+  "model": "mlb_hitter_game_frequency_shadow_v1",
+  "model_calibrated": false,
+  "official_historical_at_bat_eligible_games": 106,
+  "official_historical_games_observed": 139,
+  "opponent_team_id": 158,
+  "record_digest_sha256": "170fc2df46fe0546cd6e79a964a9bc52a8c48afc0f5852980841cf15704bfaa3",
+  "schema": "mlb_hit_prop_shadow_ledger_v1",
+  "source_capture_started_at_utc": "2026-10-27T19:29:32.265171+00:00",
+  "source_receipts": {
+    "active_roster": {
+      "data_through": "2026-10-27T19:29:32.364698+00:00",
+      "original_response_archive_schema": "mlb-original-response-archive-v1",
+      "original_response_sha256": "0d8632b229592e4461abd56a31ef855e3eaf0d8f927fd22089789c32b5c53386",
+      "response_sha256": "dabad11a0872e94bbab1a44936e04e8f268c7a4bd686351f4e8931de983eba82",
+      "retrieved_at": "2026-10-27T19:29:32.364698+00:00",
+      "source_archive_file": "0d8632b229592e4461abd56a31ef855e3eaf0d8f927fd22089789c32b5c53386.json.gz",
+      "source_url": "https://statsapi.mlb.com/api/v1/teams/139/roster?date=2026-10-27&rosterType=active"
+    },
+    "hitter_game_logs": [
+      {
+        "data_through": "2026-10-27T19:29:32.463752+00:00",
+        "original_response_archive_schema": "mlb-original-response-archive-v1",
+        "original_response_sha256": "ca148df4cf7bd311c9fbffee260177988c9b801bffe6b7cfda9d57f6c4f97258",
+        "response_sha256": "7a6be7e6c7a0c81ca24eca8af5c214c414a778ebefa1cdb93a55dfa863905ed2",
+        "retrieved_at": "2026-10-27T19:29:32.463752+00:00",
+        "source_archive_file": "ca148df4cf7bd311c9fbffee260177988c9b801bffe6b7cfda9d57f6c4f97258.json.gz",
+        "source_url": "https://statsapi.mlb.com/api/v1/people/622761/stats?gameType=R&group=hitting&season=2025&stats=gameLog"
+      },
+      {
+        "data_through": "2026-10-27T19:29:32.546281+00:00",
+        "original_response_archive_schema": "mlb-original-response-archive-v1",
+        "original_response_sha256": "f2d855d639de990dc846a7350912fba704e797c173116f0136fb2a5e68752290",
+        "response_sha256": "a41e8d0d9ae68037bb88be5fd58c4a9cff090dfec7dbb4e9694d242d05090381",
+        "retrieved_at": "2026-10-27T19:29:32.546281+00:00",
+        "source_archive_file": "f2d855d639de990dc846a7350912fba704e797c173116f0136fb2a5e68752290.json.gz",
+        "source_url": "https://statsapi.mlb.com/api/v1/people/622761/stats?gameType=R&group=hitting&season=2026&stats=gameLog"
+      }
+    ],
+    "pregame_game": {
+      "data_through": "2026-10-27T19:29:32.306797+00:00",
+      "original_response_archive_schema": "mlb-original-response-archive-v1",
+      "original_response_sha256": "2060d0032125c3ade0371ed075b4fdd56f1a3dd60d8f816db9bbfc2dee4d0136",
+      "response_sha256": "98d078290ab6cd7f75923cc904de622881c68849d03ee73d5cdc09972b71b392",
+      "retrieved_at": "2026-10-27T19:29:32.306797+00:00",
+      "source_archive_file": "2060d0032125c3ade0371ed075b4fdd56f1a3dd60d8f816db9bbfc2dee4d0136.json.gz",
+      "source_url": "https://statsapi.mlb.com/api/v1.1/game/849803/feed/live"
+    }
+  },
+  "sportsbook_wager_eligible": false,
+  "status": "IMMUTABLE_PREGAME_SHADOW_NO_BET",
+  "training_game_day_before": "2026-10-27"
+}
