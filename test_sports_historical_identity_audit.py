@@ -84,6 +84,55 @@ class HistoricalIdentityAuditTests(unittest.TestCase):
                     self.assertTrue(all('CONFLICTING_ARCHIVED_GAME_OBSERVATIONS' in row['reasons']
                                         for row in out['quarantined']))
 
+    def test_relabelled_same_matchup_at_exact_start_quarantines_both_ids(self):
+        for collision in (True, False):
+            with self.subTest(collision=collision), tempfile.TemporaryDirectory() as td:
+                root = Path(td)
+                plan = {sport: {split: [bounds[0]] for split, bounds in splits.items()}
+                        for sport, splits in history.SEASONS.items()}
+                nba_first = datetime.fromisoformat(plan['NBA']['train'][0])
+                nba_second = (nba_first + timedelta(days=1)).date().isoformat()
+                plan['NBA']['train'].append(nba_second)
+                def fetch(url):
+                    sport = next(s for s, cfg in source.LEAGUES.items()
+                                 if cfg['path'] in url)
+                    day = datetime.strptime(parse_qs(urlparse(url).query)['dates'][0],
+                                            '%Y%m%d').date().isoformat()
+                    obj = json.loads(payload())
+                    game = obj['events'][0]
+                    if sport == 'NBA' and day in plan['NBA']['train']:
+                        game['id'] = ('401000125' if day == nba_second else '401000123')
+                        if collision or day != nba_second:
+                            game['date'] = nba_second + 'T00:30:00Z'
+                        else:
+                            game['date'] = nba_second + 'T23:00:00Z'
+                    else:
+                        game['id'] = '401000124' if day.startswith('2025') else '401000123'
+                        game['date'] = day + 'T23:00:00Z'
+                    return json.dumps(obj).encode()
+                history.capture(fetch, base=root, now=CLOCK, per_league=3,
+                                date_plan=plan)
+                out = audit.audit(root, now=CLOCK)
+                self.assertEqual(out['quarantined_game_ids'], 2 if collision else 0)
+                self.assertEqual(out['quarantined_relabelled_game_ids'],
+                                 2 if collision else 0)
+                if collision:
+                    self.assertEqual(
+                        {r['game_id'] for r in out['quarantined']},
+                        {'401000123', '401000125'})
+                    self.assertTrue(all(
+                        'SAME_EVENT_FINGERPRINT_MULTIPLE_GAME_IDS' in r['reasons']
+                        for r in out['quarantined']))
+                    self.assertEqual(
+                        out['cohorts']['NBA']['train']['nonconflicting_provider_game_ids'],
+                        0)
+                else:
+                    self.assertEqual(
+                        out['cohorts']['NBA']['train']['nonconflicting_provider_game_ids'],
+                        2)
+                self.assertFalse(out['training_allowed'])
+                self.assertTrue(out['NO_BET'])
+
     def test_direct_identity_audit_rejects_replaced_receipt_after_verification(self):
         for tamper in ('duplicate_key', 'forged_score', 'future_observation'):
             with self.subTest(tamper=tamper), tempfile.TemporaryDirectory() as td:
