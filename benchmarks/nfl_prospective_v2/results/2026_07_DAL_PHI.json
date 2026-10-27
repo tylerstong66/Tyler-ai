@@ -1,0 +1,67 @@
+{
+  "away_score": 38,
+  "event_id": "401873009",
+  "game_id": "2026_07_DAL_PHI",
+  "home_score": 21,
+  "outcome": "away",
+  "prediction_sha256": "25d3ed242709e065e286a19689ed7e23ac826aef3b0beed3dff32b65a0b3a7a0",
+  "scores": {
+    "market": {
+      "binary_brier": 0.22626516871984453,
+      "conditional_log_loss": 0.4100032034166525,
+      "correct": true
+    },
+    "v1": {
+      "binary_brier": 0.7109846898679948,
+      "conditional_log_loss": 0.9069142981597186,
+      "correct": false,
+      "full_brier": 0.7101681342935586,
+      "full_log_loss": 0.910566793741293
+    },
+    "v2": {
+      "binary_brier": 0.5947241843912899,
+      "conditional_log_loss": 0.7881375881385005,
+      "correct": false,
+      "full_brier": 0.5943838593130824,
+      "full_log_loss": 0.7917900837200749
+    }
+  },
+  "season": 2026,
+  "source_snapshots": [
+    {
+      "commit": "1c7d8d4a5ffc25c8d1b7db24959643d90f2020f1",
+      "path": "benchmarks/nfl_prospective_v2/snapshots/a5159f4b3789130e45a8d70b69fdb26978fbdf4d26922cb308019a0cbee379a9.csv",
+      "response_sha256": "7c7a77f342fc4927adbd84ec2b94997b587cfbf9db4496c02e163cf1483b686f",
+      "retrieved_at": "2026-10-27T06:17:15.950957+00:00",
+      "sha256": "a5159f4b3789130e45a8d70b69fdb26978fbdf4d26922cb308019a0cbee379a9",
+      "source_url": "https://raw.githubusercontent.com/nflverse/nfldata/1c7d8d4a5ffc25c8d1b7db24959643d90f2020f1/data/games.csv"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/91058a59d894855377b2f39f40c4e7bdbeef96d12144289dc68215209a1c93cb.csv",
+      "release_digest": "sha256:91058a59d894855377b2f39f40c4e7bdbeef96d12144289dc68215209a1c93cb",
+      "response_sha256": "91058a59d894855377b2f39f40c4e7bdbeef96d12144289dc68215209a1c93cb",
+      "retrieved_at": "2026-10-27T06:17:16.868738+00:00",
+      "sha256": "91058a59d894855377b2f39f40c4e7bdbeef96d12144289dc68215209a1c93cb",
+      "source_url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2025.csv",
+      "updated_at": "2026-08-13T16:51:24Z"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/6aa41bab88d6d4e042f4269c0deda349efb9f934beac18287f1bcebbf5a0035f.csv",
+      "release_digest": "sha256:6aa41bab88d6d4e042f4269c0deda349efb9f934beac18287f1bcebbf5a0035f",
+      "response_sha256": "6aa41bab88d6d4e042f4269c0deda349efb9f934beac18287f1bcebbf5a0035f",
+      "retrieved_at": "2026-10-27T06:17:17.050579+00:00",
+      "sha256": "6aa41bab88d6d4e042f4269c0deda349efb9f934beac18287f1bcebbf5a0035f",
+      "source_url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2026.csv",
+      "updated_at": "2026-10-27T04:46:36Z"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/797c5c74d59bae0089a238f6cc3837e045de04d16184edce793a5dd9708f3c22.json",
+      "response_sha256": "69f9780dc095ab06aefca0149076dc52b74ab038c8c7de4cae26d26bdcbd4f5c",
+      "retrieved_at": "2026-10-27T06:17:17.313450+00:00",
+      "sha256": "797c5c74d59bae0089a238f6cc3837e045de04d16184edce793a5dd9708f3c22",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=20261026"
+    }
+  ],
+  "verified_at": "2026-10-27T06:17:17.318281+00:00",
+  "week": 7
+}
