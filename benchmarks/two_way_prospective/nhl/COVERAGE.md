@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-26T20:29:43.506898+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-27T00:25:59.894689+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 103 / 100 / 3 |
-| Started games in retained official schedules / enrolled | 101 / 100 |
+| Recorded / settled / pending | 110 / 100 / 10 |
+| Started games in retained official schedules / enrolled | 102 / 101 |
 | Observed missing started games | 1 |
-| Enrollment-time priced forecasts | 103 / 103 |
+| Enrollment-time priced forecasts | 110 / 110 |
 | Settled with enrollment prices / decisive market-paired | 100 / 100 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -23,13 +23,19 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-26T20:29:43.506898+00:00. Ready: 3 / 3 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-27T00:25:59.894689+00:00. Ready: 9 / 9 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020185 | LAK at NYR | True | False | True | None |
 | 2026020186 | TOR at CGY | True | False | True | None |
 | 2026020187 | DET at EDM | True | False | True | None |
+| 2026020188 | CBJ at PHI | True | False | True | None |
+| 2026020189 | BOS at CAR | True | False | True | None |
+| 2026020190 | LAK at CHI | True | False | True | None |
+| 2026020191 | MTL at STL | True | False | True | None |
+| 2026020192 | NYI at NSH | True | False | True | None |
+| 2026020193 | NJD at DAL | True | False | True | None |
+| 2026020194 | FLA at WPG | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -141,10 +147,17 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020185 | LAK at NYR | 2026-10-26T23:00:00+00:00 | enrolled | — |
 | 2026020186 | TOR at CGY | 2026-10-27T00:30:00+00:00 | enrolled | — |
 | 2026020187 | DET at EDM | 2026-10-27T01:30:00+00:00 | enrolled | — |
+| 2026020188 | CBJ at PHI | 2026-10-27T23:00:00+00:00 | enrolled | — |
+| 2026020189 | BOS at CAR | 2026-10-28T00:00:00+00:00 | enrolled | — |
+| 2026020190 | LAK at CHI | 2026-10-28T00:00:00+00:00 | enrolled | — |
+| 2026020191 | MTL at STL | 2026-10-28T00:00:00+00:00 | enrolled | — |
+| 2026020192 | NYI at NSH | 2026-10-28T00:00:00+00:00 | enrolled | — |
+| 2026020193 | NJD at DAL | 2026-10-28T00:00:00+00:00 | enrolled | — |
+| 2026020194 | FLA at WPG | 2026-10-28T00:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 102. Latest: `20261026T202941924375Z`.
+Audited capture manifests: 103. Latest: `20261027T002558463731Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

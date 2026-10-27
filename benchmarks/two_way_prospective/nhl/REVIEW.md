@@ -2,7 +2,7 @@
 
 **NO BET — actual wagers $0.**
 
-Recorded: **103** · Settled: **100** · Pending: **3**
+Recorded: **110** · Settled: **100** · Pending: **10**
 
 100-settlement milestone: **ready_for_human_review**. This flag requests human review; it does not authorize model promotion or wagering.
 
@@ -81,7 +81,7 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/two_way_prospective/nhl/captures/20261026T202941924375Z/manifest.json.
+Latest saved manifest: benchmarks/two_way_prospective/nhl/captures/20261027T002558463731Z/manifest.json.
 Manifest completion field: True. Errors: []. Exclusions: [].
 Optional availability errors: [].
 Newer saved collection failure: null.

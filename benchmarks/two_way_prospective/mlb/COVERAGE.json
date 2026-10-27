@@ -1,8 +1,8 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-10-26T20:29:47.916639+00:00",
-  "capture_count": 100,
+  "as_of_evidence_at": "2026-10-27T00:26:03.097982+00:00",
+  "capture_count": 101,
   "cohort_started_at": "2026-10-11T15:59:30.281973+00:00",
   "completion_note": "Only manifests without an explicit incomplete state are audited; legacy manifests are retained.",
   "decisive_market_paired": 6,
@@ -35,6 +35,25 @@
     {
       "away": "Milwaukee Brewers",
       "exclusion_reasons": [],
+      "first_observed_in_window": "2026-10-27T00:26:02.923059+00:00",
+      "game_id": "849803",
+      "home": "Tampa Bay Rays",
+      "kickoff": "2026-10-28T00:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-10-27T00:26:03.101570+00:00",
+        "decision": "enrolled",
+        "game_id": "849803",
+        "priced": false
+      },
+      "lead_hours": 23.565792380277777,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-10-27T00:26:03.147431+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
+      "away": "Milwaukee Brewers",
+      "exclusion_reasons": [],
       "first_observed_in_window": "2026-10-26T01:11:15.652984+00:00",
       "game_id": "849804",
       "home": "Tampa Bay Rays",
@@ -46,7 +65,7 @@
       "lead_hours": 22.812249503055558,
       "pregame_schedule_observations_in_window": 7,
       "recorded_at": "2026-10-26T01:11:15.901789+00:00",
-      "started_by_as_of": false,
+      "started_by_as_of": true,
       "status": "enrolled"
     },
     {
@@ -268,7 +287,7 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "9bb159113bb07afe49af3dc02a630bc11a3a8488e1a26c0b2df081a4f4527bcc",
+  "input_digest": "a296a242d6021562aa4836f23f90fc3aed245cd34446a65afa2aaf78908efdb4",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -297,8 +316,8 @@
       "to": "2026-10-19T15:36:32.421267+00:00"
     }
   ],
-  "latest_attempted_capture": "20261026T202943581163Z",
-  "latest_capture": "20261026T202943581163Z",
+  "latest_attempted_capture": "20261027T002600107612Z",
+  "latest_capture": "20261027T002600107612Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
@@ -313,14 +332,15 @@
       "game_id": "849804"
     },
     {
-      "checked_at": "2026-10-26T20:29:47.918424+00:00",
-      "decision": "outside_24h_window",
-      "game_id": "849803"
+      "checked_at": "2026-10-27T00:26:03.101570+00:00",
+      "decision": "enrolled",
+      "game_id": "849803",
+      "priced": false
     }
   ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": true,
-  "latest_official_schedule_observed_at": "2026-10-26T20:29:47.656395+00:00",
+  "latest_official_schedule_observed_at": "2026-10-27T00:26:02.923059+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [
     {
@@ -354,6 +374,21 @@
         "usage": "historical_evidence_only_not_backfilled"
       },
       "settled": true
+    },
+    {
+      "away": "MIL",
+      "enrollment_diagnosis": {
+        "issues": [],
+        "provider_records": 0,
+        "status": "no_provider_odds",
+        "usable_pairs": 0
+      },
+      "forecast_recorded_at": "2026-10-27T00:26:03.147431+00:00",
+      "game_id": "849803",
+      "home": "TB",
+      "kickoff": "2026-10-28T00:00:00+00:00",
+      "later_archived_pregame_quote": null,
+      "settled": false
     },
     {
       "away": "MIL",
@@ -472,33 +507,36 @@
     }
   ],
   "official_daily_conflicted_capture_count": 14,
-  "pending": 4,
+  "pending": 5,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-10-26T20:29:47.916639+00:00",
+    "as_of_evidence_at": "2026-10-27T00:26:03.097982+00:00",
     "games": [
       {
         "away": "Milwaukee Brewers",
         "enrolled": true,
-        "enrollment_priced": true,
-        "game_id": "849804",
+        "enrollment_priced": false,
+        "game_id": "849803",
         "home": "Tampa Bay Rays",
-        "issues": [],
-        "kickoff": "2026-10-27T00:00:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-26T20:29:47.482715+00:00",
-        "latest_scoreboard_priced": true,
-        "ready": true,
+        "issues": [
+          "latest_scoreboard_market_pair_missing",
+          "pregame_market_evidence_not_recorded"
+        ],
+        "kickoff": "2026-10-28T00:00:00+00:00",
+        "latest_scoreboard_observed_at": "2026-10-27T00:26:03.040250+00:00",
+        "latest_scoreboard_priced": false,
+        "ready": false,
         "saved_vs_latest_official_start": null,
         "separate_followup_recorded": false
       }
     ],
     "limitation": "Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.",
     "observed_games": 1,
-    "ready_games": 1,
-    "status": "ready_as_of_snapshot",
+    "ready_games": 0,
+    "status": "attention",
     "window_hours": 24
   },
   "report_version": "prospective-coverage-v1",
-  "saved": 13,
+  "saved": 14,
   "saved_collector_errors": [
     {
       "capture": "20261016T071034966948Z",
@@ -925,6 +963,11 @@
       "capture": "20261026T202943581163Z",
       "game_id": "849816",
       "reason": "Final identity differs from saved forecast"
+    },
+    {
+      "capture": "20261027T002600107612Z",
+      "game_id": "849816",
+      "reason": "Final identity differs from saved forecast"
     }
   ],
   "saved_exclusions": [
@@ -970,6 +1013,6 @@
   "settled_enrollment_priced": 6,
   "settled_ties_with_prices": 0,
   "sport": "MLB",
-  "started_schedule_games_enrolled": 12,
-  "started_schedule_games_in_scope": 14
+  "started_schedule_games_enrolled": 13,
+  "started_schedule_games_in_scope": 15
 }
