@@ -1,0 +1,34 @@
+{
+  "actual_wager": 0,
+  "conditional_binary_scoring": {
+    "hit": {
+      "brier_error": 0.16,
+      "frozen_probability": 0.6,
+      "observed_binary_event": 1
+    },
+    "hr": {
+      "brier_error": 0.009216,
+      "frozen_probability": 0.096,
+      "observed_binary_event": 0
+    }
+  },
+  "final_official_batting_stats": {
+    "at_bats": 3,
+    "hits": 2,
+    "home_runs": 0
+  },
+  "game_id": 849804,
+  "hitter_id": 592885,
+  "official_final_source": {
+    "data_through": "2026-10-27T09:05:32.963028+00:00",
+    "response_sha256": "9cc779cfcf6357cbf7f218b124c5bffe1f0ee1f74e30f8c82dd2ab68a250c51b",
+    "retrieved_at": "2026-10-27T09:05:32.963028+00:00",
+    "source_url": "https://statsapi.mlb.com/api/v1.1/game/849804/feed/live"
+  },
+  "prediction_digest_sha256": "2e27939e543f88656a8f4596c6bd92cf0becd200789025ca0c87822bfd9b4dd1",
+  "record_digest_sha256": "65fec81c0487ec195c53d9073a17fecc9f1f1692e587f9e9d4f9f28720e3b5b6",
+  "schema": "mlb_hit_prop_shadow_settlement_v1",
+  "settled_at_utc": "2026-10-27T09:05:33.015777+00:00",
+  "sportsbook_settlement": null,
+  "status": "SETTLED_CONDITIONAL"
+}
