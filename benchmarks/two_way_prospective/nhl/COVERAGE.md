@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-27T22:57:17.212594+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-28T02:15:59.083609+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 114 / 103 / 11 |
-| Started games in retained official schedules / enrolled | 104 / 103 |
+| Recorded / settled / pending | 118 / 104 / 14 |
+| Started games in retained official schedules / enrolled | 114 / 113 |
 | Observed missing started games | 1 |
-| Enrollment-time priced forecasts | 114 / 114 |
-| Settled with enrollment prices / decisive market-paired | 103 / 103 |
+| Enrollment-time priced forecasts | 118 / 118 |
+| Settled with enrollment prices / decisive market-paired | 104 / 104 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,21 +23,15 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-27T22:57:17.212594+00:00. Ready: 11 / 11 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-28T02:15:59.083609+00:00. Ready: 5 / 5 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020188 | CBJ at PHI | True | False | True | None |
-| 2026020189 | BOS at CAR | True | False | True | None |
-| 2026020190 | LAK at CHI | True | False | True | None |
-| 2026020191 | MTL at STL | True | False | True | None |
-| 2026020192 | NYI at NSH | True | False | True | None |
-| 2026020193 | NJD at DAL | True | False | True | None |
-| 2026020194 | FLA at WPG | True | False | True | None |
-| 2026020195 | MIN at UTA | True | False | True | None |
-| 2026020196 | OTT at VGK | True | False | True | None |
-| 2026020197 | VAN at ANA | True | False | True | None |
 | 2026020198 | BUF at SJS | True | False | True | None |
+| 2026020199 | PHI at WSH | True | False | True | None |
+| 2026020200 | CGY at EDM | True | False | True | None |
+| 2026020201 | NJD at COL | True | False | True | None |
+| 2026020202 | TOR at SEA | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -160,10 +154,14 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020196 | OTT at VGK | 2026-10-28T02:00:00+00:00 | enrolled | — |
 | 2026020197 | VAN at ANA | 2026-10-28T02:00:00+00:00 | enrolled | — |
 | 2026020198 | BUF at SJS | 2026-10-28T02:30:00+00:00 | enrolled | — |
+| 2026020199 | PHI at WSH | 2026-10-28T23:30:00+00:00 | enrolled | — |
+| 2026020200 | CGY at EDM | 2026-10-29T00:30:00+00:00 | enrolled | — |
+| 2026020201 | NJD at COL | 2026-10-29T01:00:00+00:00 | enrolled | — |
+| 2026020202 | TOR at SEA | 2026-10-29T02:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 107. Latest: `20261027T225715008668Z`.
+Audited capture manifests: 108. Latest: `20261028T021557056278Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

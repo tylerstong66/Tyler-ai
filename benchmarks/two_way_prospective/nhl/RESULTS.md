@@ -1,6 +1,6 @@
 # Tyler NHL prospective paper test
 
-Recorded: **114** · Settled: **103** · Pending: **11**
+Recorded: **118** · Settled: **104** · Pending: **14**
 
 **NO BET — actual wagers $0.**
 
@@ -8,9 +8,9 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 
 | Model | Paired games | Brier | Log loss | Accuracy |
 |---|---:|---:|---:|---:|
-| model | 103 | 0.4841 | 0.6772 | 60.2% |
-| fixed_elo | 103 | 0.4726 | 0.6654 | 59.2% |
-| market | 103 | 0.4712 | 0.6633 | 55.3% |
+| model | 104 | 0.4846 | 0.6777 | 59.6% |
+| fixed_elo | 104 | 0.4739 | 0.6667 | 58.7% |
+| market | 104 | 0.4711 | 0.6631 | 55.8% |
 
 | Game | Start (Eastern) | Model pick | Win probability |
 |---|---|---|---:|
@@ -128,6 +128,10 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | OTT at VGK | Oct 27 10:00 PM | VGK | 52.7% |
 | VAN at ANA | Oct 27 10:00 PM | ANA | 58.7% |
 | BUF at SJS | Oct 27 10:30 PM | SJS | 50.6% |
+| PHI at WSH | Oct 28 07:30 PM | WSH | 55.9% |
+| CGY at EDM | Oct 28 08:30 PM | EDM | 54.6% |
+| NJD at COL | Oct 28 09:00 PM | COL | 53.1% |
+| TOR at SEA | Oct 28 10:00 PM | SEA | 52.9% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
 

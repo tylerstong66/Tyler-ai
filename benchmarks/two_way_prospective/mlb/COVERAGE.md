@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-27T22:57:21.539533+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
+Evidence through **2026-10-28T02:16:02.164576+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 14 / 10 / 4 |
-| Started games in retained official schedules / enrolled | 15 / 13 |
+| Recorded / settled / pending | 15 / 10 / 5 |
+| Started games in retained official schedules / enrolled | 16 / 14 |
 | Observed missing started games | 2 |
-| Enrollment-time priced forecasts | 9 / 14 |
+| Enrollment-time priced forecasts | 9 / 15 |
 | Settled with enrollment prices / decisive market-paired | 7 / 7 |
 | Separate later quotes recorded prospectively | 2 |
 
@@ -17,6 +17,7 @@ Evidence through **2026-10-27T22:57:21.539533+00:00**; cohort began 2026-10-11T1
 
 | Game | Matchup | Settled | Enrollment evidence | First later archived pregame pair (UTC) |
 |---|---|---|---|---|
+| 849799 | MIL at TB | False | no provider odds | Unavailable |
 | 849802 | TB at MIL | True | no provider odds | 2026-10-24T07:18:05.977332+00:00 |
 | 849803 | MIL at TB | False | no provider odds | 2026-10-27T06:17:23.031943+00:00 |
 | 849808 | MIL at LAD | False | no provider odds | Unavailable |
@@ -32,11 +33,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-27T22:57:21.539533+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-28T02:16:02.164576+00:00. Ready: 0 / 1 observed games. Status: attention.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 849803 | Milwaukee Brewers at Tampa Bay Rays | False | True | True | None |
+| 849799 | Milwaukee Brewers at Tampa Bay Rays | False | False | False | latest_scoreboard_market_pair_missing, pregame_market_evidence_not_recorded |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -44,6 +45,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 | Game | Matchup | Start (UTC) | Decision | Exclusion evidence |
 |---|---|---|---|---|
+| 849799 | Milwaukee Brewers at Tampa Bay Rays | 2026-10-29T00:00:00+00:00 | enrolled | — |
 | 849802 | Tampa Bay Rays at Milwaukee Brewers | 2026-10-25T00:00:00+00:00 | enrolled | — |
 | 849803 | Milwaukee Brewers at Tampa Bay Rays | 2026-10-28T00:00:00+00:00 | enrolled | — |
 | 849804 | Milwaukee Brewers at Tampa Bay Rays | 2026-10-27T00:00:00+00:00 | enrolled | — |
@@ -63,7 +65,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 105. Latest: `20261027T225717300540Z`.
+Audited capture manifests: 106. Latest: `20261028T021559208607Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
