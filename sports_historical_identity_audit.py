@@ -73,11 +73,27 @@ def audit(base=Path('.'), *, now=None):
     for (league, _, _), ids in fingerprints.items():
         if len(ids) > 1:
             relabelled.update((league, game_id) for game_id in ids)
+    # One team cannot play two distinct regular/postseason games at the same
+    # exact UTC start. The opponents may differ when a provider duplicates or
+    # relabels an event, so the whole-matchup fingerprint above is insufficient.
+    # Scope team IDs to each league; never select a preferred provider game.
+    team_slots = defaultdict(set)
+    for (league, game_id), found in games.items():
+        for row, _, _ in found:
+            for side in ('home_team_id', 'away_team_id'):
+                slot = (league, row['scheduled_start_utc'], row[side])
+                team_slots[slot].add(game_id)
+    simultaneous_team_ids = set()
+    for (league, _, _), ids in team_slots.items():
+        if len(ids) > 1:
+            simultaneous_team_ids.update((league, game_id) for game_id in ids)
     quarantine = []; clean = Counter(); duplicate_observations = 0
     for (league, game_id), found in sorted(games.items()):
         reasons = set(); first = found[0][0]
         if (league, game_id) in relabelled:
             reasons.add('SAME_EVENT_FINGERPRINT_MULTIPLE_GAME_IDS')
+        if (league, game_id) in simultaneous_team_ids:
+            reasons.add('TEAM_SCHEDULED_IN_SIMULTANEOUS_GAME_IDS')
         duplicate_observations += len(found) - 1
         if len({ref['split'] for _, ref, _ in found}) != 1:
             reasons.add('GAME_ID_PRESENT_IN_TRAIN_AND_VALIDATION')
@@ -105,6 +121,7 @@ def audit(base=Path('.'), *, now=None):
             'unique_provider_game_ids': len(games),
             'repeated_same_game_observations': duplicate_observations,
             'quarantined_relabelled_game_ids': len(relabelled),
+            'quarantined_simultaneous_team_game_ids': len(simultaneous_team_ids),
             'quarantined_game_ids': len(quarantine), 'quarantined': quarantine,
             'cohorts': {league: {split: {
                 'source_dates_verified': counts[(league, split)],
