@@ -1,4 +1,12 @@
-# Sports Betting Analyst v1 — verified handoff (2026-10-27)
+# Sports Betting Analyst v1 — verified handoff (2026-10-28)
+
+## October 28 — simultaneous-team historical source identity quarantine
+
+PR #281 merged at `7588904861194582b54737e4310a4708f22f6f37` after all **13 exact-head CI workflows passed**. The integrated sports suite passed **1,116 tests** on head `e04544e1b445c330368a4e6dcc52cf35c8c93b17`; archived college final receipt checks also passed. The historical NBA/FBS/D1 ESPN provider identity audit now quarantines *all* distinct game IDs that place the same league-scoped team at the same exact UTC start, even if the provider changed the opponent or flipped home/away. This closes an ambiguity not covered by the prior identical-team-pair fingerprint. Adversarial tests cover shared home and away identities, unrelated same-time games, and a legitimate later game. No source archive was rewritten, and no outcome or forecast was enrolled.
+
+The most recent saved college/NBA collector status **before this merge** (2026-10-28 11:23:31 UTC, [workflow 40678877699](https://github.com/tylerstong66/Tyler-ai/actions/runs/40678877699)) reports **57** frozen NBA native-v2 feature observations, **21** retained source agreements, **36** pending and **zero** enrolled outcomes. It reports `independent_official_final_results_verified=false`, `forecasting_enabled=false`, partial source availability and `NO_BET=true`. This saved collector report predates #281; it is **not** post-merge live collection verification. The PR's full archived-source replay and integrated regression passed, but a subsequent main-branch collector run remains to be verified separately. ESPN replay is not independent NCAA/NBA governing-body final certification.
+
+Historical declared ESPN source dates remain 490 NBA / 302 FBS / 312 D1; official-result completeness, sport-specific historical training labels and forward-only model forecasts are still unverified/disabled. NHL sportsbook-specific quote evidence blocker #217 and MLB cross-cohort schedule drift #98 remain separate. Do not duplicate the existing hourly NFL/NHL/MLB results monitor. Next: verify a new post-#281 main collector and exact receipts, then advance independent official-result season/postseason/reschedule and completeness qualification without changing frozen evidence. Keep `NO_BET=true`, actual wagers zero, no model promotion or Render production deployment.
 
 ## October 27 — direct historical replay and relabelled-game quarantine
 
