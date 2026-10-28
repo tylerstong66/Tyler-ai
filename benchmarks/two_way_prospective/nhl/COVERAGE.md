@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-28T02:15:59.083609+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-28T09:40:39.411630+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 118 / 104 / 14 |
-| Started games in retained official schedules / enrolled | 114 / 113 |
+| Recorded / settled / pending | 118 / 114 / 4 |
+| Started games in retained official schedules / enrolled | 115 / 114 |
 | Observed missing started games | 1 |
 | Enrollment-time priced forecasts | 118 / 118 |
-| Settled with enrollment prices / decisive market-paired | 104 / 104 |
+| Settled with enrollment prices / decisive market-paired | 114 / 114 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,11 +23,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-28T02:15:59.083609+00:00. Ready: 5 / 5 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-28T09:40:39.411630+00:00. Ready: 4 / 4 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020198 | BUF at SJS | True | False | True | None |
 | 2026020199 | PHI at WSH | True | False | True | None |
 | 2026020200 | CGY at EDM | True | False | True | None |
 | 2026020201 | NJD at COL | True | False | True | None |
@@ -161,7 +160,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 108. Latest: `20261028T021557056278Z`.
+Audited capture manifests: 109. Latest: `20261028T094038078416Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
@@ -169,7 +168,7 @@ Audited capture manifests: 108. Latest: `20261028T021557056278Z`.
 | 2026-10-13T07:43:05.893709+00:00 | 2026-10-13T15:59:35.151837+00:00 | 8.27 |
 | 2026-10-26T06:16:44.569912+00:00 | 2026-10-26T14:16:48.607579+00:00 | 8.00 |
 | 2026-10-19T07:47:14.074418+00:00 | 2026-10-19T15:36:30.557349+00:00 | 7.82 |
-| 2026-10-13T00:40:34.119783+00:00 | 2026-10-13T07:43:05.893709+00:00 | 7.04 |
+| 2026-10-28T02:15:57.056278+00:00 | 2026-10-28T09:40:38.078416+00:00 | 7.41 |
 
 Historical exclusions and collector errors, including resolved ones, are retained in [COVERAGE.json](COVERAGE.json); these are not all current errors.
 

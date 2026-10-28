@@ -1,13 +1,18 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-10-28T02:16:02.164576+00:00",
-  "capture_count": 106,
+  "as_of_evidence_at": "2026-10-28T09:40:43.311596+00:00",
+  "capture_count": 107,
   "cohort_started_at": "2026-10-11T15:59:30.281973+00:00",
   "completion_note": "Only manifests without an explicit incomplete state are audited; legacy manifests are retained.",
   "decisive_market_paired": 7,
   "enrollment_priced": 9,
   "followup_quotes_separate_from_original_metrics": [
+    {
+      "game_id": "849799",
+      "observed_at": "2026-10-28T09:40:43.151445+00:00",
+      "recorded_at": "2026-10-28T09:40:43.313644+00:00"
+    },
     {
       "game_id": "849802",
       "observed_at": "2026-10-24T07:18:05.977332+00:00",
@@ -28,13 +33,11 @@
       "home": "Tampa Bay Rays",
       "kickoff": "2026-10-29T00:00:00+00:00",
       "latest_saved_decision": {
-        "checked_at": "2026-10-28T02:16:02.167485+00:00",
-        "decision": "enrolled",
-        "game_id": "849799",
-        "priced": false
+        "decision": "already_enrolled",
+        "game_id": "849799"
       },
       "lead_hours": 21.732721073055558,
-      "pregame_schedule_observations_in_window": 1,
+      "pregame_schedule_observations_in_window": 3,
       "recorded_at": "2026-10-28T02:16:02.204137+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -309,7 +312,7 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "70f5fb3bc2fb2ebb12e5e8e2b00803525ea0501af3a59a5d37c96b1b2d368244",
+  "input_digest": "c02d76e06b854294ded62da172304a734be4e17867ce25d08233c3b32cc89885",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -338,8 +341,8 @@
       "to": "2026-10-19T15:36:32.421267+00:00"
     }
   ],
-  "latest_attempted_capture": "20261028T021559208607Z",
-  "latest_capture": "20261028T021559208607Z",
+  "latest_attempted_capture": "20261028T094039509687Z",
+  "latest_capture": "20261028T094039509687Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
@@ -354,15 +357,13 @@
       "game_id": "849803"
     },
     {
-      "checked_at": "2026-10-28T02:16:02.167485+00:00",
-      "decision": "enrolled",
-      "game_id": "849799",
-      "priced": false
+      "decision": "already_enrolled",
+      "game_id": "849799"
     }
   ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": true,
-  "latest_official_schedule_observed_at": "2026-10-28T02:16:01.892716+00:00",
+  "latest_official_schedule_observed_at": "2026-10-28T09:40:43.273910+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [
     {
@@ -377,7 +378,24 @@
       "game_id": "849799",
       "home": "TB",
       "kickoff": "2026-10-29T00:00:00+00:00",
-      "later_archived_pregame_quote": null,
+      "later_archived_pregame_quote": {
+        "market": {
+          "away_moneyline": -148,
+          "conditional_home_probability": 0.4290360528683136,
+          "home_moneyline": 123,
+          "provider": "DraftKings",
+          "quote_kind": "observed_current_quote_not_verified_closing_line"
+        },
+        "observed_at": "2026-10-28T09:40:43.151445+00:00",
+        "source_snapshot": {
+          "path": "benchmarks/two_way_prospective/mlb/snapshots/bfd2d731b0fe0388a9dbe584593684cb06c5f3c38a86e230b5dc3cc5f6529a6b.json",
+          "response_sha256": "71ffd16dcc6b97ef94aca590eda5a63110d33140b0473cf581509c420a6b1132",
+          "retrieved_at": "2026-10-28T09:40:43.151445+00:00",
+          "sha256": "bfd2d731b0fe0388a9dbe584593684cb06c5f3c38a86e230b5dc3cc5f6529a6b",
+          "source_url": "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20261028"
+        },
+        "usage": "historical_evidence_only_not_backfilled"
+      },
       "settled": false
     },
     {
@@ -442,7 +460,7 @@
         },
         "usage": "historical_evidence_only_not_backfilled"
       },
-      "settled": false
+      "settled": true
     },
     {
       "away": "MIL",
@@ -561,9 +579,9 @@
     }
   ],
   "official_daily_conflicted_capture_count": 14,
-  "pending": 5,
+  "pending": 4,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-10-28T02:16:02.164576+00:00",
+    "as_of_evidence_at": "2026-10-28T09:40:43.311596+00:00",
     "games": [
       {
         "away": "Milwaukee Brewers",
@@ -571,22 +589,19 @@
         "enrollment_priced": false,
         "game_id": "849799",
         "home": "Tampa Bay Rays",
-        "issues": [
-          "latest_scoreboard_market_pair_missing",
-          "pregame_market_evidence_not_recorded"
-        ],
+        "issues": [],
         "kickoff": "2026-10-29T00:00:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-28T02:16:02.107617+00:00",
-        "latest_scoreboard_priced": false,
-        "ready": false,
+        "latest_scoreboard_observed_at": "2026-10-28T09:40:43.151445+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
         "saved_vs_latest_official_start": null,
-        "separate_followup_recorded": false
+        "separate_followup_recorded": true
       }
     ],
     "limitation": "Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.",
     "observed_games": 1,
-    "ready_games": 0,
-    "status": "attention",
+    "ready_games": 1,
+    "status": "ready_as_of_snapshot",
     "window_hours": 24
   },
   "report_version": "prospective-coverage-v1",
@@ -1047,6 +1062,11 @@
       "capture": "20261028T021559208607Z",
       "game_id": "849816",
       "reason": "Final identity differs from saved forecast"
+    },
+    {
+      "capture": "20261028T094039509687Z",
+      "game_id": "849816",
+      "reason": "Final identity differs from saved forecast"
     }
   ],
   "saved_exclusions": [
@@ -1088,7 +1108,7 @@
       "observed_at": "2026-10-17T09:22:18.157861+00:00"
     }
   ],
-  "settled": 10,
+  "settled": 11,
   "settled_enrollment_priced": 7,
   "settled_ties_with_prices": 0,
   "sport": "MLB",

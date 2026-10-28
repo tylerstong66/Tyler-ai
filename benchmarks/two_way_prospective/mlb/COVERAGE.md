@@ -2,24 +2,24 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-28T02:16:02.164576+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
+Evidence through **2026-10-28T09:40:43.311596+00:00**; cohort began 2026-10-11T15:59:30.281973+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 15 / 10 / 5 |
+| Recorded / settled / pending | 15 / 11 / 4 |
 | Started games in retained official schedules / enrolled | 16 / 14 |
 | Observed missing started games | 2 |
 | Enrollment-time priced forecasts | 9 / 15 |
 | Settled with enrollment prices / decisive market-paired | 7 / 7 |
-| Separate later quotes recorded prospectively | 2 |
+| Separate later quotes recorded prospectively | 3 |
 
 ## Missing enrollment-time prices
 
 | Game | Matchup | Settled | Enrollment evidence | First later archived pregame pair (UTC) |
 |---|---|---|---|---|
-| 849799 | MIL at TB | False | no provider odds | Unavailable |
+| 849799 | MIL at TB | False | no provider odds | 2026-10-28T09:40:43.151445+00:00 |
 | 849802 | TB at MIL | True | no provider odds | 2026-10-24T07:18:05.977332+00:00 |
-| 849803 | MIL at TB | False | no provider odds | 2026-10-27T06:17:23.031943+00:00 |
+| 849803 | MIL at TB | True | no provider odds | 2026-10-27T06:17:23.031943+00:00 |
 | 849808 | MIL at LAD | False | no provider odds | Unavailable |
 | 849812 | LAD at MIL | True | no usable pair in reduced snapshot raw schema unavailable | 2026-10-12T07:21:49.547508+00:00 |
 | 849813 | CLE at TB | True | no usable pair in reduced snapshot raw schema unavailable | 2026-10-13T07:43:09.630071+00:00 |
@@ -33,11 +33,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-28T02:16:02.164576+00:00. Ready: 0 / 1 observed games. Status: attention.
+As of retained evidence: 2026-10-28T09:40:43.311596+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 849799 | Milwaukee Brewers at Tampa Bay Rays | False | False | False | latest_scoreboard_market_pair_missing, pregame_market_evidence_not_recorded |
+| 849799 | Milwaukee Brewers at Tampa Bay Rays | False | True | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -65,7 +65,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 106. Latest: `20261028T021559208607Z`.
+Audited capture manifests: 107. Latest: `20261028T094039509687Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

@@ -2,11 +2,11 @@
 
 **NO BET — actual wagers $0.**
 
-Recorded: **15** · Settled: **10** · Pending: **5**
+Recorded: **15** · Settled: **11** · Pending: **4**
 
 100-settlement milestone: **collecting**. This flag requests human review; it does not authorize model promotion or wagering.
 
-Latest result verified: 2026-10-27T06:17:23.341492+00:00 (UTC).
+Latest result verified: 2026-10-28T09:40:43.315900+00:00 (UTC).
 
 Brier is the sum over outcomes (range 0–2); lower Brier and log loss are better.
 Accuracy uses the highest-probability outcome. Two-way ties at 50% select home; NFL three-way ties in probability use home, away, tie order.
@@ -16,15 +16,15 @@ Uncertainty unit: Eastern scheduled game date. CIs require at least 5 blocks.
 ## First-100-enrolled checkpoint
 
 Status: **collecting_forecasts**. This is separate from the cumulative 100-settlement flag.
-Selected: 15 / 100; settled among selected: 10; pending among selected: 5.
+Selected: 15 / 100; settled among selected: 11; pending among selected: 4.
 First 100 by recorded_at in UTC, then game_id; never by outcome, price or settlement order.
 
 ## All decisive games — conditional two-way scores
 
 | Model | Games | Blocks | Brier | Log loss | Accuracy | 95% Brier CI | 95% Log loss CI | 95% Accuracy CI |
 |---|---:|---:|---:|---:|---:|---|---|---|
-| model | 10 | 8 | 0.4568 | 0.6497 | 60.0% | 0.3930 to 0.5026 | 0.5853 to 0.6960 | 36.4% to 87.5% |
-| fixed_elo | 10 | 8 | 0.4377 | 0.6304 | 80.0% | 0.3552 to 0.4968 | 0.5470 to 0.6903 | 61.5% to 100.0% |
+| model | 11 | 9 | 0.4607 | 0.6536 | 63.6% | 0.4069 to 0.5031 | 0.5993 to 0.6963 | 41.7% to 88.9% |
+| fixed_elo | 11 | 9 | 0.4511 | 0.6438 | 72.7% | 0.3790 to 0.5064 | 0.5708 to 0.6999 | 53.8% to 90.0% |
 
 ## Same-game comparisons with saved market odds — decisive games only
 
@@ -42,7 +42,7 @@ Model minus baseline on the same games. Negative Brier/log loss favors the model
 
 | Baseline | Games | Blocks | Brier difference | 95% CI | Log loss difference | 95% CI | Accuracy difference | 95% CI |
 |---|---:|---:|---:|---|---:|---|---:|---|
-| fixed_elo | 10 | 8 | 0.0191 | -0.0014 to 0.0479 | 0.0193 | -0.0016 to 0.0483 | -20.0 pp | -50.0 pp to 0.0 pp |
+| fixed_elo | 11 | 9 | 0.0096 | -0.0169 to 0.0395 | 0.0097 | -0.0171 to 0.0397 | -9.1 pp | -41.7 pp to 20.0 pp |
 | market | 7 | 6 | -0.0613 | -0.1427 to 0.0068 | -0.0621 | -0.1459 to 0.0077 | 0.0 pp | 0.0 pp to 0.0 pp |
 
 ## Forecast probability concentration — same priced decisive games
@@ -64,12 +64,12 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 |---|---|---:|---:|---:|---|
 | model | 0%–20% | 0 | Unavailable | Unavailable | Unavailable |
 | model | 20%–40% | 0 | Unavailable | Unavailable | Unavailable |
-| model | 40%–60% | 10 | 54.7% | 60.0% | 31.3% to 83.2% |
+| model | 40%–60% | 11 | 54.3% | 63.6% | 35.4% to 84.8% |
 | model | 60%–80% | 0 | Unavailable | Unavailable | Unavailable |
 | model | 80%–100% | 0 | Unavailable | Unavailable | Unavailable |
 | fixed_elo | 0%–20% | 0 | Unavailable | Unavailable | Unavailable |
 | fixed_elo | 20%–40% | 0 | Unavailable | Unavailable | Unavailable |
-| fixed_elo | 40%–60% | 8 | 52.7% | 62.5% | 30.6% to 86.3% |
+| fixed_elo | 40%–60% | 9 | 52.0% | 66.7% | 35.4% to 87.9% |
 | fixed_elo | 60%–80% | 2 | 60.7% | 50.0% | 9.5% to 90.5% |
 | fixed_elo | 80%–100% | 0 | Unavailable | Unavailable | Unavailable |
 | market (paired only) | 0%–20% | 0 | Unavailable | Unavailable | Unavailable |
@@ -80,7 +80,7 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/two_way_prospective/mlb/captures/20261028T021559208607Z/manifest.json.
+Latest saved manifest: benchmarks/two_way_prospective/mlb/captures/20261028T094039509687Z/manifest.json.
 Manifest completion field: True. Errors: [{"game_id": "849816", "reason": "Final identity differs from saved forecast"}]. Exclusions: [].
 Optional availability errors: [].
 Newer saved collection failure: null.
