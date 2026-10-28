@@ -1,10 +1,10 @@
 {
   "benchmark": {
     "distinct_official_game_ids": 8,
-    "distinct_official_game_ids_with_eligible_settlements": 6,
+    "distinct_official_game_ids_with_eligible_settlements": 7,
     "frozen_player_game_forecasts": 49,
     "independent_github_commit_time_attestation_included": false,
-    "ineligible": 4,
+    "ineligible": 6,
     "limitations": [
       "A sealed content digest is not independently verified publication time: check GitHub server commit timestamps for genuine prospective evidence.",
       "Player-game outcomes from the same MLB game share conditions and cannot be treated as independent games.",
@@ -16,17 +16,17 @@
     "market_odds_available": false,
     "metrics": {
       "hit": {
-        "brier": 0.248135,
-        "eligible_player_games": 23,
-        "fixed_reference_brier": 0.264348,
-        "fixed_reference_log_loss": 0.722373,
+        "brier": 0.253215,
+        "eligible_player_games": 26,
+        "fixed_reference_brier": 0.267692,
+        "fixed_reference_log_loss": 0.729153,
         "game_cluster_uncertainty": {
           "bootstrap_ci_lower": null,
           "bootstrap_ci_upper": null,
           "bootstrap_replicates": 0,
           "calibrated_prediction_model": false,
-          "distinct_official_games_with_scored_players": 6,
-          "eligible_player_games": 23,
+          "distinct_official_games_with_scored_players": 7,
+          "eligible_player_games": 26,
           "interval_excludes_zero_in_model_favor": null,
           "interval_method": null,
           "limitations": [
@@ -35,29 +35,29 @@
             "Intervals compare only with a fixed exploratory probability and cannot stand in for real sportsbook prices.",
             "Publication and pregame timing remain independently reviewable outside this statistical report."
           ],
-          "mean_fixed_minus_model_brier": 0.016213,
+          "mean_fixed_minus_model_brier": 0.014477,
           "minimum_sample_gate_met": false,
           "preregistered_minimum_games": 30,
           "preregistered_minimum_player_games": 150,
           "profitable_betting_edge_proven": false,
           "prospective_publication_attested": false
         },
-        "log_loss": 0.690013,
+        "log_loss": 0.70024,
         "model_improved_over_fixed_reference": true,
         "predictive_edge_established": false
       },
       "hr": {
-        "brier": 0.078724,
-        "eligible_player_games": 23,
-        "fixed_reference_brier": 0.079443,
-        "fixed_reference_log_loss": 0.29576,
+        "brier": 0.071332,
+        "eligible_player_games": 26,
+        "fixed_reference_brier": 0.071015,
+        "fixed_reference_log_loss": 0.271254,
         "game_cluster_uncertainty": {
           "bootstrap_ci_lower": null,
           "bootstrap_ci_upper": null,
           "bootstrap_replicates": 0,
           "calibrated_prediction_model": false,
-          "distinct_official_games_with_scored_players": 6,
-          "eligible_player_games": 23,
+          "distinct_official_games_with_scored_players": 7,
+          "eligible_player_games": 26,
           "interval_excludes_zero_in_model_favor": null,
           "interval_method": null,
           "limitations": [
@@ -66,21 +66,21 @@
             "Intervals compare only with a fixed exploratory probability and cannot stand in for real sportsbook prices.",
             "Publication and pregame timing remain independently reviewable outside this statistical report."
           ],
-          "mean_fixed_minus_model_brier": 0.00072,
+          "mean_fixed_minus_model_brier": -0.000317,
           "minimum_sample_gate_met": false,
           "preregistered_minimum_games": 30,
           "preregistered_minimum_player_games": 150,
           "profitable_betting_edge_proven": false,
           "prospective_publication_attested": false
         },
-        "log_loss": 0.289517,
-        "model_improved_over_fixed_reference": true,
+        "log_loss": 0.270805,
+        "model_improved_over_fixed_reference": false,
         "predictive_edge_established": false
       }
     },
     "model_is_calibrated": false,
     "no_wagers": true,
-    "pending": 22,
+    "pending": 17,
     "pending_examples_truncated": false,
     "pending_player_game_examples": [
       {
@@ -197,43 +197,8 @@
       },
       {
         "game_id": "849803",
-        "hitter_id": "592885",
-        "hitter_name": "Christian Yelich",
-        "scheduled_first_pitch_utc": "2026-10-28T00:00:00+00:00",
-        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
-      },
-      {
-        "game_id": "849803",
         "hitter_id": "596142",
         "hitter_name": "Gary S\u00e1nchez",
-        "scheduled_first_pitch_utc": "2026-10-28T00:00:00+00:00",
-        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
-      },
-      {
-        "game_id": "849803",
-        "hitter_id": "622761",
-        "hitter_name": "Jorge Mateo",
-        "scheduled_first_pitch_utc": "2026-10-28T00:00:00+00:00",
-        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
-      },
-      {
-        "game_id": "849803",
-        "hitter_id": "641343",
-        "hitter_name": "Jake Bauers",
-        "scheduled_first_pitch_utc": "2026-10-28T00:00:00+00:00",
-        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
-      },
-      {
-        "game_id": "849803",
-        "hitter_id": "650490",
-        "hitter_name": "Yandy D\u00edaz",
-        "scheduled_first_pitch_utc": "2026-10-28T00:00:00+00:00",
-        "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
-      },
-      {
-        "game_id": "849803",
-        "hitter_id": "656775",
-        "hitter_name": "Cedric Mullins",
         "scheduled_first_pitch_utc": "2026-10-28T00:00:00+00:00",
         "status": "NO_SEALED_OFFICIAL_SETTLEMENT_YET"
       }
@@ -246,10 +211,10 @@
         "scored": 3
       },
       "849803": {
-        "ineligible": 0,
-        "pending": 6,
+        "ineligible": 2,
+        "pending": 1,
         "predictions": 6,
-        "scored": 0
+        "scored": 3
       },
       "849804": {
         "ineligible": 1,
@@ -289,11 +254,11 @@
       }
     },
     "proven_betting_edge": false,
-    "scored": 23,
+    "scored": 26,
     "status": "PROSPECTIVE_FREEZE_SCORING_DIAGNOSTIC_NO_BET"
   },
-  "benchmark_last_changed_at_utc": "2026-10-27T21:32:35.220897+00:00",
-  "benchmark_sha256": "3d1101524728a426b157872c5bfbf38c1eb24a27dcaa15ac9202322fa6d7335b",
+  "benchmark_last_changed_at_utc": "2026-10-28T05:49:42.175120+00:00",
+  "benchmark_sha256": "20fcbd888b9c8ac546e2f5fb3bba276d65dc1aa6a093a5d71c55305a6e3740c7",
   "limitations": [
     "The feed reports only the GitHub repository snapshot as of its publication time.",
     "GitHub scheduled jobs may run late, so actual final results may appear later.",
@@ -303,10 +268,10 @@
     "Git commit metadata is not independent proof of publication timestamp."
   ],
   "no_wagers": true,
-  "published_at_utc": "2026-10-28T00:48:19.812741+00:00",
+  "published_at_utc": "2026-10-28T05:49:42.175120+00:00",
   "schema": "tyler_mlb_shadow_public_scoreboard_v1",
   "source": "public_github_main_scheduled_snapshot",
-  "source_git_revision": "f3d0a3a331ea73b9bda78b04ad27893ce21ceef4",
+  "source_git_revision": "4eb1b5b1a8258a53d73fdbe02a305822661fa59d",
   "source_is_not_live_official_MLB_api": true,
-  "source_refresh_kind": "unchanged_saved_evidence_heartbeat"
+  "source_refresh_kind": "benchmark_changed"
 }
