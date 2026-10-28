@@ -133,6 +133,61 @@ class HistoricalIdentityAuditTests(unittest.TestCase):
                 self.assertFalse(out['training_allowed'])
                 self.assertTrue(out['NO_BET'])
 
+    def test_simultaneous_team_in_two_distinct_games_quarantines_both_ids(self):
+        # Same team as home or away is impossible at one exact kickoff.
+        # Independent same-time matchups and a later legitimate game stay clean.
+        for scenario in ('same_home', 'same_away', 'later_start', 'disjoint'):
+            with self.subTest(scenario=scenario), tempfile.TemporaryDirectory() as td:
+                root = Path(td)
+                plan = {sport: {split: [bounds[0]] for split, bounds in splits.items()}
+                        for sport, splits in history.SEASONS.items()}
+                def fetch(url):
+                    sport = next(s for s, cfg in source.LEAGUES.items()
+                                 if cfg['path'] in url)
+                    day = datetime.strptime(
+                        parse_qs(urlparse(url).query)['dates'][0],
+                        '%Y%m%d').date().isoformat()
+                    obj = json.loads(payload())
+                    game = obj['events'][0]
+                    game['id'] = '401000124' if day.startswith('2025') else '401000123'
+                    game['date'] = day + 'T23:00:00Z'
+                    if sport == 'NBA' and day == plan['NBA']['train'][0]:
+                        other = json.loads(json.dumps(game))
+                        other['id'] = '401000125'
+                        opponents = other['competitions'][0]['competitors']
+                        if scenario == 'same_away':
+                            opponents[0]['team']['id'] = '300'
+                            opponents[1]['team']['id'] = '100'
+                        else:
+                            opponents[0]['team']['id'] = (
+                                '400' if scenario == 'disjoint' else '100')
+                            opponents[1]['team']['id'] = '300'
+                        if scenario == 'later_start':
+                            other['date'] = day + 'T23:30:00Z'
+                        obj['events'].append(other)
+                        obj['count'] = 2
+                    return json.dumps(obj).encode()
+                history.capture(fetch, base=root, now=CLOCK, per_league=2,
+                                date_plan=plan)
+                out = audit.audit(root, now=CLOCK)
+                collision = scenario in ('same_home', 'same_away')
+                self.assertEqual(out['quarantined_simultaneous_team_game_ids'],
+                                 2 if collision else 0)
+                self.assertEqual(out['quarantined_game_ids'],
+                                 2 if collision else 0)
+                self.assertEqual(
+                    out['cohorts']['NBA']['train']['nonconflicting_provider_game_ids'],
+                    0 if collision else 2)
+                if collision:
+                    self.assertEqual({row['game_id'] for row in out['quarantined']},
+                                     {'401000123', '401000125'})
+                    self.assertTrue(all(
+                        'TEAM_SCHEDULED_IN_SIMULTANEOUS_GAME_IDS' in row['reasons']
+                        for row in out['quarantined']))
+                self.assertFalse(out['training_allowed'])
+                self.assertFalse(out['forecasting_enabled'])
+                self.assertTrue(out['NO_BET'])
+
     def test_direct_identity_audit_rejects_replaced_receipt_after_verification(self):
         for tamper in ('duplicate_key', 'forged_score', 'future_observation'):
             with self.subTest(tamper=tamper), tempfile.TemporaryDirectory() as td:
