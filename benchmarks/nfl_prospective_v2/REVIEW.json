@@ -84,7 +84,7 @@
     "completion_note": "NFL completion must be corroborated with the successful workflow run.",
     "errors": [],
     "excluded": [],
-    "latest_manifest": "benchmarks/nfl_prospective_v2/captures/20261028T213912886576Z/manifest.json",
+    "latest_manifest": "benchmarks/nfl_prospective_v2/captures/20261029T014827885950Z/manifest.json",
     "newer_saved_collection_failure": null,
     "optional_availability_errors": []
   },
@@ -207,10 +207,10 @@
     }
   },
   "first_100_checkpoint": {
-    "additional_forecasts_needed": 59,
-    "pending_selected": 0,
+    "additional_forecasts_needed": 58,
+    "pending_selected": 1,
     "promotion_allowed": false,
-    "selected_forecasts": 41,
+    "selected_forecasts": 42,
     "selection_rule": "First 100 by recorded_at in UTC, then game_id; never by outcome, price or settlement order.",
     "settled_selected": 41,
     "status": "collecting_forecasts",
@@ -554,7 +554,7 @@
     }
   },
   "input_integrity": "verified",
-  "input_sha256": "68550add24a9b37ab4ddca723064b84447132da4e5a5d410b958ccd863c0ac04",
+  "input_sha256": "19b9bc9465f004a059c48f96cd4428a41eb1698abbe525d1180f7c4a6eb7df0d",
   "latest_result_verified_at": "2026-10-27T06:17:17.318281+00:00",
   "limitation": "Experimental descriptive results. NFL uncertainty uses season/week blocks; NHL/MLB use Eastern game-date blocks. Blocks can still be dependent. Intervals require at least five blocks and are unavailable below that; five blocks or 100 settled games does not establish a betting edge. Repeated monitoring intervals are not sequential significance tests. No model promotion, forecast changes, wagers, or profits are inferred.",
   "paired_differences": {
@@ -739,9 +739,9 @@
       }
     }
   },
-  "pending": 0,
+  "pending": 1,
   "probability_policy": "Saved pregame probabilities only; NFL binary metrics condition on no tie.",
-  "recorded": 41,
+  "recorded": 42,
   "report_version": "prospective-review-v2",
   "review_due": false,
   "review_milestone": 100,

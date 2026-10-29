@@ -1,8 +1,8 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-10-28T21:39:20.535559+00:00",
-  "capture_count": 109,
+  "as_of_evidence_at": "2026-10-29T01:48:38.449870+00:00",
+  "capture_count": 110,
   "cohort_started_at": "2026-10-11T15:59:30.281973+00:00",
   "completion_note": "Only manifests without an explicit incomplete state are audited; legacy manifests are retained.",
   "decisive_market_paired": 7,
@@ -39,7 +39,7 @@
       "lead_hours": 21.732721073055558,
       "pregame_schedule_observations_in_window": 7,
       "recorded_at": "2026-10-28T02:16:02.204137+00:00",
-      "started_by_as_of": false,
+      "started_by_as_of": true,
       "status": "enrolled"
     },
     {
@@ -312,7 +312,7 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "8c2ad1f21c33c75c73a6954c3fc962339374cba937ecc09f0031dddd1cec4252",
+  "input_digest": "ce5a6faaac1a57abb36db2e0c4142b5074e19535f58d2ca800ce92aa6fcb9d4c",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -341,8 +341,8 @@
       "to": "2026-10-19T15:36:32.421267+00:00"
     }
   ],
-  "latest_attempted_capture": "20261028T213917360783Z",
-  "latest_capture": "20261028T213917360783Z",
+  "latest_attempted_capture": "20261029T014834708566Z",
+  "latest_capture": "20261029T014834708566Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
@@ -359,7 +359,7 @@
   ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": true,
-  "latest_official_schedule_observed_at": "2026-10-28T21:39:20.385721+00:00",
+  "latest_official_schedule_observed_at": "2026-10-29T01:48:38.387412+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [
     {
@@ -577,27 +577,12 @@
   "official_daily_conflicted_capture_count": 14,
   "pending": 4,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-10-28T21:39:20.535559+00:00",
-    "games": [
-      {
-        "away": "Milwaukee Brewers",
-        "enrolled": true,
-        "enrollment_priced": false,
-        "game_id": "849799",
-        "home": "Tampa Bay Rays",
-        "issues": [],
-        "kickoff": "2026-10-29T00:00:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-28T21:39:20.321130+00:00",
-        "latest_scoreboard_priced": true,
-        "ready": true,
-        "saved_vs_latest_official_start": null,
-        "separate_followup_recorded": true
-      }
-    ],
+    "as_of_evidence_at": "2026-10-29T01:48:38.449870+00:00",
+    "games": [],
     "limitation": "Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.",
-    "observed_games": 1,
-    "ready_games": 1,
-    "status": "ready_as_of_snapshot",
+    "observed_games": 0,
+    "ready_games": 0,
+    "status": "no_upcoming_games_observed",
     "window_hours": 24
   },
   "report_version": "prospective-coverage-v1",
@@ -1073,6 +1058,11 @@
       "capture": "20261028T213917360783Z",
       "game_id": "849816",
       "reason": "Final identity differs from saved forecast"
+    },
+    {
+      "capture": "20261029T014834708566Z",
+      "game_id": "849816",
+      "reason": "Final identity differs from saved forecast"
     }
   ],
   "saved_exclusions": [
@@ -1118,6 +1108,6 @@
   "settled_enrollment_priced": 7,
   "settled_ties_with_prices": 0,
   "sport": "MLB",
-  "started_schedule_games_enrolled": 14,
-  "started_schedule_games_in_scope": 16
+  "started_schedule_games_enrolled": 15,
+  "started_schedule_games_in_scope": 17
 }
