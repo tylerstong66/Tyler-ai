@@ -1,5 +1,5 @@
 """Audit provider-history game identity and split leakage without model access."""
-from collections import defaultdict, Counter
+from collections import defaultdict, Counter, deque
 from datetime import datetime, timezone, date, timedelta
 from pathlib import Path
 import hashlib
@@ -8,6 +8,8 @@ import json
 import sports_expansion_historical_capture as history
 import sports_expansion_observer as source
 from sports_expansion_audit import archive_path, bounded_gzip_read, strict_json_loads, MAX_BLOB_SIZE
+
+MIN_TEAM_START_SEPARATION = timedelta(hours=4)
 
 FIELDS = ('scheduled_start_utc', 'home_team_id', 'away_team_id',
           'season_stage', 'state', 'neutral_site', 'provider_completed', 'home_score', 'away_score')
@@ -87,6 +89,31 @@ def audit(base=Path('.'), *, now=None):
     for (league, _, _), ids in team_slots.items():
         if len(ids) > 1:
             simultaneous_team_ids.update((league, game_id) for game_id in ids)
+    # Provider IDs and scheduled starts can BOTH change after a reschedule.
+    # Exact-time collision checks cannot detect an event relabelled with a
+    # shifted kickoff. A team cannot safely be treated as playing two separate
+    # NBA/FBS/D1 games whose listed starts are less than four hours apart.
+    # This is a conservative ambiguity quarantine, NOT a source correction or
+    # proof that two provider records are the same actual event.
+    team_timelines = defaultdict(set)
+    for (league, game_id), found in games.items():
+        for row, _, _ in found:
+            for team_id in (row['home_team_id'], row['away_team_id']):
+                team_timelines[(league, team_id)].add(
+                    (row['scheduled_start_utc'], game_id))
+    near_start_team_ids = set()
+    for (league, _), observations in team_timelines.items():
+        ordered = sorted((source.utc(start), game_id)
+                         for start, game_id in observations)
+        active = deque()
+        for start, game_id in ordered:
+            while active and start - active[0][0] >= MIN_TEAM_START_SEPARATION:
+                active.popleft()
+            for _, earlier_id in active:
+                if earlier_id != game_id:
+                    near_start_team_ids.add((league, earlier_id))
+                    near_start_team_ids.add((league, game_id))
+            active.append((start, game_id))
     quarantine = []; clean = Counter(); duplicate_observations = 0
     for (league, game_id), found in sorted(games.items()):
         reasons = set(); first = found[0][0]
@@ -94,6 +121,8 @@ def audit(base=Path('.'), *, now=None):
             reasons.add('SAME_EVENT_FINGERPRINT_MULTIPLE_GAME_IDS')
         if (league, game_id) in simultaneous_team_ids:
             reasons.add('TEAM_SCHEDULED_IN_SIMULTANEOUS_GAME_IDS')
+        if (league, game_id) in near_start_team_ids:
+            reasons.add('TEAM_STARTS_LESS_THAN_FOUR_HOURS_APART_ACROSS_GAME_IDS')
         duplicate_observations += len(found) - 1
         if len({ref['split'] for _, ref, _ in found}) != 1:
             reasons.add('GAME_ID_PRESENT_IN_TRAIN_AND_VALIDATION')
@@ -122,6 +151,7 @@ def audit(base=Path('.'), *, now=None):
             'repeated_same_game_observations': duplicate_observations,
             'quarantined_relabelled_game_ids': len(relabelled),
             'quarantined_simultaneous_team_game_ids': len(simultaneous_team_ids),
+            'quarantined_near_start_team_game_ids': len(near_start_team_ids),
             'quarantined_game_ids': len(quarantine), 'quarantined': quarantine,
             'cohorts': {league: {split: {
                 'source_dates_verified': counts[(league, split)],
