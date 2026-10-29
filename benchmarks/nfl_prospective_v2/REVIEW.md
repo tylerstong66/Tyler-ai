@@ -117,10 +117,10 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/nfl_prospective_v2/captures/20261029T082941790494Z/manifest.json.
+Latest saved manifest: benchmarks/nfl_prospective_v2/captures/20261029T210755700070Z/manifest.json.
 Manifest completion field: True. Errors: []. Exclusions: [].
 Optional availability errors: [].
-Newer saved collection failure: {"collection_completed": false, "error": "Release digest mismatch", "observed_at": "2026-10-29T16:07:52.856648+00:00"}.
+Newer saved collection failure: null.
 NFL completion must be corroborated with the successful workflow run.
 
 Experimental descriptive results. NFL uncertainty uses season/week blocks; NHL/MLB use Eastern game-date blocks. Blocks can still be dependent. Intervals require at least five blocks and are unavailable below that; five blocks or 100 settled games does not establish a betting edge. Repeated monitoring intervals are not sequential significance tests. No model promotion, forecast changes, wagers, or profits are inferred.

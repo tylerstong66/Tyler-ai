@@ -1,8 +1,8 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-10-29T08:29:47.068047+00:00",
-  "capture_count": 115,
+  "as_of_evidence_at": "2026-10-29T21:07:59.947406+00:00",
+  "capture_count": 116,
   "cohort_started_at": "2026-10-11T15:19:59+00:00",
   "completion_note": "Saved NFL manifests before coverage-v1 lack a completion flag; successful workflow corroboration remains required.",
   "decisive_market_paired": 40,
@@ -679,15 +679,20 @@
         "game_id": "2026_08_CAR_GB"
       },
       "lead_hours": 22.441220294444445,
-      "pregame_schedule_observations_in_window": 2,
+      "pregame_schedule_observations_in_window": 3,
       "recorded_at": "2026-10-29T01:48:31.606940+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
     }
   ],
-  "input_digest": "8cfd1957161617b13509d1aa02ae7caf07823b7cd91468f2bd4e3650eff0eaf8",
+  "input_digest": "0c6ecc5dc161f22a52c062a48dffaf3f7fbbee4b54ac0410a6d946152f92454a",
   "input_integrity": "verified",
   "largest_capture_intervals": [
+    {
+      "from": "2026-10-29T08:29:41.790494+00:00",
+      "hours": 12.637197104444445,
+      "to": "2026-10-29T21:07:55.700070+00:00"
+    },
     {
       "from": "2026-10-12T07:21:42.028391+00:00",
       "hours": 10.556199753333333,
@@ -707,15 +712,10 @@
       "from": "2026-10-19T07:47:09.802502+00:00",
       "hours": 7.821590828333333,
       "to": "2026-10-19T15:36:27.529484+00:00"
-    },
-    {
-      "from": "2026-10-28T02:15:52.636429+00:00",
-      "hours": 7.411625265277778,
-      "to": "2026-10-28T09:40:34.487384+00:00"
     }
   ],
-  "latest_attempted_capture": "20261029T082941790494Z",
-  "latest_capture": "20261029T082941790494Z",
+  "latest_attempted_capture": "20261029T210755700070Z",
+  "latest_capture": "20261029T210755700070Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
@@ -724,7 +724,7 @@
   ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": null,
-  "latest_official_schedule_observed_at": "2026-10-29T08:29:44.266938+00:00",
+  "latest_official_schedule_observed_at": "2026-10-29T21:07:57.571632+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [],
   "minimum_forecast_lead_hours": 1.5221828808333333,
@@ -732,7 +732,7 @@
   "official_daily_conflicted_capture_count": 0,
   "pending": 1,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-10-29T08:29:47.068047+00:00",
+    "as_of_evidence_at": "2026-10-29T21:07:59.947406+00:00",
     "games": [
       {
         "away": "CAR",
@@ -742,7 +742,7 @@
         "home": "GB",
         "issues": [],
         "kickoff": "2026-10-30T00:15:00+00:00",
-        "latest_scoreboard_observed_at": "2026-10-29T08:29:46.071805+00:00",
+        "latest_scoreboard_observed_at": "2026-10-29T21:07:58.947132+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
