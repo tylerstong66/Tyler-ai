@@ -81,7 +81,7 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/two_way_prospective/nhl/captures/20261029T082947213247Z/manifest.json.
+Latest saved manifest: benchmarks/two_way_prospective/nhl/captures/20261029T160753020321Z/manifest.json.
 Manifest completion field: True. Errors: []. Exclusions: [].
 Optional availability errors: [].
 Newer saved collection failure: null.
