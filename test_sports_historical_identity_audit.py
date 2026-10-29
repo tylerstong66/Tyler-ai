@@ -163,7 +163,8 @@ class HistoricalIdentityAuditTests(unittest.TestCase):
                                 '400' if scenario == 'disjoint' else '100')
                             opponents[1]['team']['id'] = '300'
                         if scenario == 'later_start':
-                            other['date'] = day + 'T23:30:00Z'
+                            other['date'] = (datetime.strptime(day, '%Y-%m-%d') +
+                                             timedelta(days=1, hours=5)).isoformat() + 'Z'
                         obj['events'].append(other)
                         obj['count'] = 2
                     return json.dumps(obj).encode()
@@ -187,6 +188,75 @@ class HistoricalIdentityAuditTests(unittest.TestCase):
                 self.assertFalse(out['training_allowed'])
                 self.assertFalse(out['forecasting_enabled'])
                 self.assertTrue(out['NO_BET'])
+
+    def test_near_start_provider_id_relabelling_quarantines_both_games(self):
+        # A shifted start defeats the exact-time identity guard. Neither a
+        # changed opponent nor a UTC date boundary can launder the new ID.
+        # Exactly four hours is the conservative noncollision boundary.
+        for scenario in ('same_matchup', 'changed_opponent',
+                         'four_hour_boundary', 'disjoint'):
+            with self.subTest(scenario=scenario), tempfile.TemporaryDirectory() as td:
+                root = Path(td)
+                plan = {sport: {split: [bounds[0]] for split, bounds in splits.items()}
+                        for sport, splits in history.SEASONS.items()}
+                def fetch(url):
+                    sport = next(s for s, cfg in source.LEAGUES.items()
+                                 if cfg['path'] in url)
+                    day = datetime.strptime(
+                        parse_qs(urlparse(url).query)['dates'][0],
+                        '%Y%m%d').date().isoformat()
+                    obj = json.loads(payload())
+                    first = obj['events'][0]
+                    first['id'] = '401000124' if day.startswith('2025') else '401000123'
+                    first['date'] = day + 'T23:00:00Z'
+                    if sport == 'NBA' and day == plan['NBA']['train'][0]:
+                        second = json.loads(json.dumps(first))
+                        second['id'] = '401000125'
+                        hours = 4 if scenario == 'four_hour_boundary' else 2
+                        second['date'] = (
+                            datetime.fromisoformat(day + 'T23:00:00+00:00')
+                            + timedelta(hours=hours)).isoformat()
+                        if scenario in ('changed_opponent', 'disjoint'):
+                            sides = second['competitions'][0]['competitors']
+                            sides[1]['team']['id'] = '300'
+                            if scenario == 'disjoint':
+                                sides[0]['team']['id'] = '400'
+                        obj['events'].append(second)
+                        obj['count'] = 2
+                    return json.dumps(obj).encode()
+                history.capture(fetch, base=root, now=CLOCK, per_league=2,
+                                date_plan=plan)
+                legacy = audit.audit(root, now=CLOCK)
+                out = audit.audit(root, now=CLOCK, near_start_identity=True)
+                self.assertEqual(legacy['schema'],
+                                 'tyler-historical-provider-identity-audit-v1')
+                self.assertNotIn('quarantined_near_start_team_game_ids', legacy)
+                self.assertEqual(legacy['quarantined_game_ids'], 0)
+                self.assertEqual(out['schema'],
+                                 'tyler-historical-provider-identity-audit-v2')
+                collision = scenario in ('same_matchup', 'changed_opponent')
+                self.assertEqual(out['quarantined_simultaneous_team_game_ids'], 0)
+                self.assertEqual(out['quarantined_relabelled_game_ids'], 0)
+                self.assertEqual(out['quarantined_near_start_team_game_ids'],
+                                 2 if collision else 0)
+                self.assertEqual(out['quarantined_game_ids'], 2 if collision else 0)
+                if collision:
+                    self.assertEqual({row['game_id'] for row in out['quarantined']},
+                                     {'401000123', '401000125'})
+                    self.assertTrue(all(
+                        'TEAM_STARTS_LESS_THAN_FOUR_HOURS_APART_ACROSS_GAME_IDS'
+                        in row['reasons'] for row in out['quarantined']))
+                self.assertEqual(
+                    out['cohorts']['NBA']['train']['nonconflicting_provider_game_ids'],
+                    0 if collision else 2)
+                self.assertFalse(out['training_allowed'])
+                self.assertFalse(out['forecasting_enabled'])
+                self.assertTrue(out['NO_BET'])
+
+    def test_near_start_policy_requires_explicit_boolean(self):
+        for bad in (1, 'true', None):
+            with self.subTest(bad=bad), self.assertRaisesRegex(ValueError, 'policy'):
+                audit.audit('.', near_start_identity=bad)
 
     def test_direct_identity_audit_rejects_replaced_receipt_after_verification(self):
         for tamper in ('duplicate_key', 'forged_score', 'future_observation'):
