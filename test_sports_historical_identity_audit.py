@@ -226,7 +226,14 @@ class HistoricalIdentityAuditTests(unittest.TestCase):
                     return json.dumps(obj).encode()
                 history.capture(fetch, base=root, now=CLOCK, per_league=2,
                                 date_plan=plan)
-                out = audit.audit(root, now=CLOCK)
+                legacy = audit.audit(root, now=CLOCK)
+                out = audit.audit(root, now=CLOCK, near_start_identity=True)
+                self.assertEqual(legacy['schema'],
+                                 'tyler-historical-provider-identity-audit-v1')
+                self.assertNotIn('quarantined_near_start_team_game_ids', legacy)
+                self.assertEqual(legacy['quarantined_game_ids'], 0)
+                self.assertEqual(out['schema'],
+                                 'tyler-historical-provider-identity-audit-v2')
                 collision = scenario in ('same_matchup', 'changed_opponent')
                 self.assertEqual(out['quarantined_simultaneous_team_game_ids'], 0)
                 self.assertEqual(out['quarantined_relabelled_game_ids'], 0)
@@ -245,6 +252,11 @@ class HistoricalIdentityAuditTests(unittest.TestCase):
                 self.assertFalse(out['training_allowed'])
                 self.assertFalse(out['forecasting_enabled'])
                 self.assertTrue(out['NO_BET'])
+
+    def test_near_start_policy_requires_explicit_boolean(self):
+        for bad in (1, 'true', None):
+            with self.subTest(bad=bad), self.assertRaisesRegex(ValueError, 'policy'):
+                audit.audit('.', near_start_identity=bad)
 
     def test_direct_identity_audit_rejects_replaced_receipt_after_verification(self):
         for tamper in ('duplicate_key', 'forged_score', 'future_observation'):
