@@ -1,4 +1,15 @@
-# Sports Betting Analyst v1 — verified handoff (2026-10-28)
+# Sports Betting Analyst v1 — verified handoff (2026-10-29)
+
+## October 29 — versioned near-start historical identity quarantine and verified main source replay
+
+PR #282 merged at `c47aebe90b1760613e996bf883005d25c6f1760f` after **all 13 final-head CI checks passed** on `51f51397480134b87f09494fae4a3f0793c6cea0`. The integrated sports suite passed **1,118 tests** and the archived college final receipt checks passed. The new explicitly opted-in `sports_historical_identity_audit.audit(..., near_start_identity=True)` v2 quarantines all distinct provider game IDs that schedule one league-scoped team less than four hours apart, even across a UTC date boundary or after opponent/start relabelling. The exact four-hour boundary, disjoint teams and a later legitimate game remain distinct in adversarial tests. It is a conservative source ambiguity classification, **not** official result certification.
+
+An initial CI attempt failed four frozen NBA feature source-replay tests because applying the stronger rule to the original v1 audit changed a sealed historical reference report hash. This was corrected **without rewriting frozen evidence**: the default v1 report and original downstream feature-reference policy remain unchanged, while the stronger rule is isolated behind an explicit v2 opt-in for future qualification. Final-head integrated and archived-source replay both passed. No live model, training or forecast gate adopted v2 automatically.
+
+The **post-#281** main source workflow [40865751505](https://github.com/tylerstong66/Tyler-ai/actions/runs/40865751505) completed successfully, with saved status at **2026-10-29 11:35:38 UTC** on source revision `4d47cd17a75af7df8476b623bf7d56b8e45d15aa`, independently confirmed to descend from #281's merge. It retains **57** frozen NBA native-v2 features, **21** source agreements, **36** pending, **zero** enrolled outcomes and `independent_official_final_results_verified=false`. Native v3 feature audit still corroborates zero outcomes; native postgame capture succeeded but independent NBA schedule/daily sources remain partly unavailable. This collector run predates #282 and **does not verify a post-#282 live collector**. Successful ESPN/NCAA source replay is not independent governing-body final certification.
+
+Historical source-day retrieval remains 490 NBA / 302 FBS / 312 D1 declared dates, with official completeness unverified. All three expansion cohorts remain source-only: no qualified sport-specific historical training, genuine forward-only paper forecasts, grading, or model promotion. NHL/NFL/MLB prospective research remains separate; #217 (sportsbook-specific NHL price proof) and #98 (MLB cross-cohort schedule drift) remain open. The separate hourly results monitor handles NFL/NHL/MLB settlement updates; do not duplicate it. Next: verify post-#282 main collector when available; run v2 as a read-only diagnostic on retained historical source evidence without altering legacy feature hashes; continue independently qualifying official finals, season/postseason identity, reschedules and completeness. Keep `NO_BET=true`, zero actual wagers, promotion disabled, Render auto-deploy OFF and production unchanged.
+
 
 ## October 28 — simultaneous-team historical source identity quarantine
 
