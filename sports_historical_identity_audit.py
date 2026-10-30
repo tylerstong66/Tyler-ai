@@ -46,7 +46,7 @@ def audit(base=Path('.'), *, now=None, near_start_identity=False, nba_franchise_
     # reference hashes. The stronger quarantine is an explicit v2 research
     # policy, not a silent change to sealed historical dependencies.
     if type(near_start_identity) is not bool or type(nba_franchise_scope) is not bool:
-        raise ValueError('Explicit historical identity policies required')
+        raise ValueError('Explicit historical identity policy flags required')
     if nba_franchise_scope and not near_start_identity:
         raise ValueError('NBA franchise-scope research requires explicit v2 identity audit')
     base = Path(base); now = now or datetime.now(timezone.utc)
