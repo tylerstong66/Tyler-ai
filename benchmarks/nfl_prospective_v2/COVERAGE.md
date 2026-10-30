@@ -2,12 +2,12 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-29T21:07:59.947406+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-10-30T01:00:24.037908+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
 | Recorded / settled / pending | 42 / 41 / 1 |
-| Started games in retained official schedules / enrolled | 41 / 41 |
+| Started games in retained official schedules / enrolled | 42 / 42 |
 | Observed missing started games | 0 |
 | Enrollment-time priced forecasts | 42 / 42 |
 | Settled with enrollment prices / decisive market-paired | 41 / 40 |
@@ -25,11 +25,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-29T21:07:59.947406+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-30T01:00:24.037908+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026_08_CAR_GB | CAR at GB | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -82,7 +81,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 116. Latest: `20261029T210755700070Z`.
+Audited capture manifests: 117. Latest: `20261030T010020695373Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
