@@ -1,5 +1,5 @@
 """Audit provider-history game identity and split leakage without model access."""
-from collections import defaultdict, Counter, deque
+from collections import defaultdict, Counter
 from datetime import datetime, timezone, date, timedelta
 from pathlib import Path
 import hashlib
@@ -13,6 +13,27 @@ MIN_TEAM_START_SEPARATION = timedelta(hours=4)
 
 FIELDS = ('scheduled_start_utc', 'home_team_id', 'away_team_id',
           'season_stage', 'state', 'neutral_site', 'provider_completed', 'home_score', 'away_score')
+
+
+def _near_start_conflicts(team_timelines):
+    """Find all ambiguous game IDs in O(n log n) per team, not quadratic.
+
+    A game ID is implicated by any distinct ID less than four hours away.
+    For sorted starts, every such pair has an adjacent different-ID boundary
+    within that interval; checking adjacent observations is therefore enough
+    to mark *both IDs*, even with repeated observations of one provider ID.
+    """
+    conflicts = set()
+    for (league, _), observations in team_timelines.items():
+        ordered = sorted((source.utc(start), game_id)
+                         for start, game_id in observations)
+        for (first_start, first_id), (next_start, next_id) in zip(
+                ordered, ordered[1:]):
+            if (first_id != next_id
+                    and next_start - first_start < MIN_TEAM_START_SEPARATION):
+                conflicts.add((league, first_id))
+                conflicts.add((league, next_id))
+    return conflicts
 
 
 def audit(base=Path('.'), *, now=None, near_start_identity=False):
@@ -108,19 +129,7 @@ def audit(base=Path('.'), *, now=None, near_start_identity=False):
                 for team_id in (row['home_team_id'], row['away_team_id']):
                     team_timelines[(league, team_id)].add(
                         (row['scheduled_start_utc'], game_id))
-        near_start_team_ids = set()
-        for (league, _), observations in team_timelines.items():
-            ordered = sorted((source.utc(start), game_id)
-                             for start, game_id in observations)
-            active = deque()
-            for start, game_id in ordered:
-                while active and start - active[0][0] >= MIN_TEAM_START_SEPARATION:
-                    active.popleft()
-                for _, earlier_id in active:
-                    if earlier_id != game_id:
-                        near_start_team_ids.add((league, earlier_id))
-                        near_start_team_ids.add((league, game_id))
-                active.append((start, game_id))
+        near_start_team_ids = _near_start_conflicts(team_timelines)
     quarantine = []; clean = Counter(); duplicate_observations = 0
     for (league, game_id), found in sorted(games.items()):
         reasons = set(); first = found[0][0]
