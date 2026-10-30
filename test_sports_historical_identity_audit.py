@@ -279,6 +279,32 @@ class HistoricalIdentityAuditTests(unittest.TestCase):
             ('NCAAM_D1', 'X'), ('NCAAM_D1', 'Y'),
             ('NBA', 'P'), ('NBA', 'Q'), ('NBA', 'R')})
 
+    def test_opt_in_v2_preserves_original_receipt_provenance_and_safety(self):
+        # The separate CI artifact must not silently replace v1 evidence or
+        # promote historical ESPN agreement into independently official labels.
+        with tempfile.TemporaryDirectory() as td:
+            self.seed(Path(td))
+            legacy = audit.audit(td, now=CLOCK)
+            v2 = audit.audit(td, now=CLOCK, near_start_identity=True)
+            self.assertEqual(legacy['schema'],
+                             'tyler-historical-provider-identity-audit-v1')
+            self.assertEqual(v2['schema'],
+                             'tyler-historical-provider-identity-audit-v2')
+            self.assertEqual(legacy['receipt_provenance'], v2['receipt_provenance'])
+            self.assertEqual(legacy['verified_source_days'], v2['verified_source_days'])
+            self.assertLessEqual(
+                {(r['league'], r['game_id']) for r in legacy['quarantined']},
+                {(r['league'], r['game_id']) for r in v2['quarantined']})
+            for report in (legacy, v2):
+                self.assertIs(report['NO_BET'], True)
+                self.assertIs(type(report['actual_wagers']), int)
+                self.assertEqual(report['actual_wagers'], 0)
+                for flag in ('independently_verified_official_results',
+                             'source_scope_complete', 'training_allowed',
+                             'historical_evaluation_enabled',
+                             'forecasting_enabled', 'promotion_allowed'):
+                    self.assertIs(report[flag], False)
+
     def test_near_start_policy_requires_explicit_boolean(self):
         for bad in (1, 'true', None):
             with self.subTest(bad=bad), self.assertRaisesRegex(ValueError, 'policy'):
