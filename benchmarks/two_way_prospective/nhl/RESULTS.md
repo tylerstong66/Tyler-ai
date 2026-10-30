@@ -1,6 +1,6 @@
 # Tyler NHL prospective paper test
 
-Recorded: **136** · Settled: **129** · Pending: **7**
+Recorded: **140** · Settled: **129** · Pending: **11**
 
 **NO BET — actual wagers $0.**
 
@@ -150,6 +150,10 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | STL at DET | Oct 31 01:00 PM | DET | 50.1% |
 | TBL at NSH | Oct 31 02:00 PM | TBL | 53.7% |
 | EDM at NYI | Oct 31 02:00 PM | NYI | 51.0% |
+| BUF at LAK | Oct 31 04:00 PM | BUF | 52.6% |
+| OTT at SJS | Oct 31 04:00 PM | SJS | 50.4% |
+| PIT at MTL | Oct 31 07:00 PM | MTL | 57.1% |
+| TOR at VAN | Oct 31 07:00 PM | TOR | 52.4% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
 

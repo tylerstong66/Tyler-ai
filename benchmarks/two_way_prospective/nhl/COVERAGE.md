@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-30T19:22:58.899714+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-30T23:47:04.905651+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 136 / 129 / 7 |
-| Started games in retained official schedules / enrolled | 130 / 129 |
+| Recorded / settled / pending | 140 / 129 / 11 |
+| Started games in retained official schedules / enrolled | 132 / 131 |
 | Observed missing started games | 1 |
-| Enrollment-time priced forecasts | 136 / 136 |
+| Enrollment-time priced forecasts | 140 / 140 |
 | Settled with enrollment prices / decisive market-paired | 129 / 129 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -23,17 +23,19 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-30T19:22:58.899714+00:00. Ready: 7 / 7 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-30T23:47:04.905651+00:00. Ready: 9 / 9 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020214 | NJD at VGK | True | False | True | None |
-| 2026020215 | WPG at FLA | True | False | True | None |
 | 2026020216 | SEA at CGY | True | False | True | None |
 | 2026020217 | CHI at BOS | True | False | True | None |
 | 2026020218 | STL at DET | True | False | True | None |
 | 2026020219 | TBL at NSH | True | False | True | None |
 | 2026020220 | EDM at NYI | True | False | True | None |
+| 2026020221 | BUF at LAK | True | False | True | None |
+| 2026020222 | OTT at SJS | True | False | True | None |
+| 2026020223 | PIT at MTL | True | False | True | None |
+| 2026020224 | TOR at VAN | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -178,10 +180,14 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020218 | STL at DET | 2026-10-31T17:00:00+00:00 | enrolled | — |
 | 2026020219 | TBL at NSH | 2026-10-31T18:00:00+00:00 | enrolled | — |
 | 2026020220 | EDM at NYI | 2026-10-31T18:00:00+00:00 | enrolled | — |
+| 2026020221 | BUF at LAK | 2026-10-31T20:00:00+00:00 | enrolled | — |
+| 2026020222 | OTT at SJS | 2026-10-31T20:00:00+00:00 | enrolled | — |
+| 2026020223 | PIT at MTL | 2026-10-31T23:00:00+00:00 | enrolled | — |
+| 2026020224 | TOR at VAN | 2026-10-31T23:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 119. Latest: `20261030T192257613396Z`.
+Audited capture manifests: 120. Latest: `20261030T234702965677Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
