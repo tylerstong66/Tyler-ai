@@ -305,6 +305,65 @@ class HistoricalIdentityAuditTests(unittest.TestCase):
                              'forecasting_enabled', 'promotion_allowed'):
                     self.assertIs(report[flag], False)
 
+    def test_opt_in_v3_quarantines_nonfranchise_nba_ids_only(self):
+        # ESPN labels some All-Star mini-games season_stage=2. Such squads
+        # cannot silently enter a regular-franchise historical training pool.
+        with tempfile.TemporaryDirectory() as td:
+            self.seed(Path(td))
+            legacy = audit.audit(td, now=CLOCK)
+            v2 = audit.audit(td, now=CLOCK, near_start_identity=True)
+            v3 = audit.audit(td, now=CLOCK, near_start_identity=True,
+                             nba_franchise_scope=True)
+            self.assertEqual(legacy['quarantined_game_ids'], 0)
+            self.assertEqual(v2['quarantined_game_ids'], 0)
+            self.assertEqual(v3['schema'],
+                             'tyler-historical-provider-identity-audit-v3')
+            self.assertEqual(v3['quarantined_nba_nonfranchise_game_ids'], 2)
+            self.assertEqual({q['league'] for q in v3['quarantined']}, {'NBA'})
+            self.assertTrue(all(
+                'NBA_TEAM_OUTSIDE_ESPN_FRANCHISE_ID_RESEARCH_ALLOWLIST'
+                in q['reasons'] for q in v3['quarantined']))
+            self.assertEqual(v3['receipt_provenance'], v2['receipt_provenance'])
+            self.assertFalse(v3['nba_franchise_scope_independently_certified'])
+            self.assertFalse(v3['training_allowed'])
+            self.assertFalse(v3['forecasting_enabled'])
+            self.assertTrue(v3['NO_BET'])
+            self.assertEqual(v3['actual_wagers'], 0)
+
+    def test_v3_allows_known_provider_franchise_ids_without_certifying_results(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            plan = {sport: {split: [bounds[0]] for split, bounds in splits.items()}
+                    for sport, splits in history.SEASONS.items()}
+            def fetch(url):
+                sport = next(s for s, cfg in source.LEAGUES.items()
+                             if cfg['path'] in url)
+                obj = json.loads(payload())
+                day = parse_qs(urlparse(url).query)['dates'][0]
+                obj['events'][0]['date'] = datetime.strptime(
+                    day, '%Y%m%d').strftime('%Y-%m-%dT23:00:00Z')
+                if sport == 'NBA':
+                    sides = obj['events'][0]['competitions'][0]['competitors']
+                    sides[0]['team']['id'] = '1'
+                    sides[1]['team']['id'] = '30'
+                return json.dumps(obj).encode()
+            history.capture(fetch, base=root, now=CLOCK, per_league=2,
+                            date_plan=plan)
+            v3 = audit.audit(root, now=CLOCK, near_start_identity=True,
+                             nba_franchise_scope=True)
+            self.assertEqual(v3['quarantined_nba_nonfranchise_game_ids'], 0)
+            self.assertFalse(v3['independently_verified_official_results'])
+            self.assertFalse(v3['source_scope_complete'])
+            self.assertFalse(v3['training_allowed'])
+
+    def test_v3_requires_explicit_v2_and_boolean_policy(self):
+        for value in (1, 'true', None):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                audit.audit('.', near_start_identity=True,
+                            nba_franchise_scope=value)
+        with self.assertRaisesRegex(ValueError, 'requires explicit v2'):
+            audit.audit('.', nba_franchise_scope=True)
+
     def test_near_start_policy_requires_explicit_boolean(self):
         for bad in (1, 'true', None):
             with self.subTest(bad=bad), self.assertRaisesRegex(ValueError, 'policy'):

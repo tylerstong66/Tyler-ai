@@ -10,6 +10,11 @@ import sports_expansion_observer as source
 from sports_expansion_audit import archive_path, bounded_gzip_read, strict_json_loads, MAX_BLOB_SIZE
 
 MIN_TEAM_START_SEPARATION = timedelta(hours=4)
+# Research-only ESPN franchise-ID allowlist, not independently certified NBA
+# membership. IDs outside the 30-team provider range can include All-Star
+# mini-tournament squads, which ESPN may label season_stage=2. Never train
+# on them or treat IDs within the range as official-result certification.
+NBA_ESPN_FRANCHISE_IDS = frozenset(str(i) for i in range(1, 31))
 
 FIELDS = ('scheduled_start_utc', 'home_team_id', 'away_team_id',
           'season_stage', 'state', 'neutral_site', 'provider_completed', 'home_score', 'away_score')
@@ -36,12 +41,14 @@ def _near_start_conflicts(team_timelines):
     return conflicts
 
 
-def audit(base=Path('.'), *, now=None, near_start_identity=False):
+def audit(base=Path('.'), *, now=None, near_start_identity=False, nba_franchise_scope=False):
     # Preserve the original v1 historical report used by frozen NBA feature
     # reference hashes. The stronger quarantine is an explicit v2 research
     # policy, not a silent change to sealed historical dependencies.
-    if type(near_start_identity) is not bool:
-        raise ValueError('Explicit historical near-start identity policy required')
+    if type(near_start_identity) is not bool or type(nba_franchise_scope) is not bool:
+        raise ValueError('Explicit historical identity policy flags required')
+    if nba_franchise_scope and not near_start_identity:
+        raise ValueError('NBA franchise-scope research requires explicit v2 identity audit')
     base = Path(base); now = now or datetime.now(timezone.utc)
     if now.tzinfo is None:
         raise ValueError('Aware historical audit clock required')
@@ -131,6 +138,7 @@ def audit(base=Path('.'), *, now=None, near_start_identity=False):
                         (row['scheduled_start_utc'], game_id))
         near_start_team_ids = _near_start_conflicts(team_timelines)
     quarantine = []; clean = Counter(); duplicate_observations = 0
+    nonfranchise_nba_ids = set()
     for (league, game_id), found in sorted(games.items()):
         reasons = set(); first = found[0][0]
         if (league, game_id) in relabelled:
@@ -139,6 +147,12 @@ def audit(base=Path('.'), *, now=None, near_start_identity=False):
             reasons.add('TEAM_SCHEDULED_IN_SIMULTANEOUS_GAME_IDS')
         if near_start_identity and (league, game_id) in near_start_team_ids:
             reasons.add('TEAM_STARTS_LESS_THAN_FOUR_HOURS_APART_ACROSS_GAME_IDS')
+        if nba_franchise_scope and league == 'NBA' and any(
+                row['home_team_id'] not in NBA_ESPN_FRANCHISE_IDS
+                or row['away_team_id'] not in NBA_ESPN_FRANCHISE_IDS
+                for row, _, _ in found):
+            nonfranchise_nba_ids.add((league, game_id))
+            reasons.add('NBA_TEAM_OUTSIDE_ESPN_FRANCHISE_ID_RESEARCH_ALLOWLIST')
         duplicate_observations += len(found) - 1
         if len({ref['split'] for _, ref, _ in found}) != 1:
             reasons.add('GAME_ID_PRESENT_IN_TRAIN_AND_VALIDATION')
@@ -180,6 +194,11 @@ def audit(base=Path('.'), *, now=None, near_start_identity=False):
         report['schema'] = 'tyler-historical-provider-identity-audit-v2'
         report['identity_policy'] = 'LEAGUE_SCOPED_TEAM_STARTS_AT_LEAST_FOUR_HOURS_APART'
         report['quarantined_near_start_team_game_ids'] = len(near_start_team_ids)
+    if nba_franchise_scope:
+        report['schema'] = 'tyler-historical-provider-identity-audit-v3'
+        report['identity_policy'] += '_AND_ESPN_NBA_FRANCHISE_ID_RANGE'
+        report['quarantined_nba_nonfranchise_game_ids'] = len(nonfranchise_nba_ids)
+        report['nba_franchise_scope_independently_certified'] = False
     return report
 
 

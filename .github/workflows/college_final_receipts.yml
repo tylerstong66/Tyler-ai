@@ -143,6 +143,45 @@ jobs:
           name: historical-provider-identity-audit-v2-research-only
           path: historical-identity-audit-v2.json
           retention-days: 30
+      - name: Audit NBA nonfranchise squads separately without changing sealed v1 or v2
+        run: |
+          python - <<'PYCODE' > historical-identity-audit-v3.json
+          import json
+          from sports_historical_identity_audit import audit
+          with open('historical-identity-audit-v2.json', encoding='utf-8') as f:
+              v2 = json.load(f)
+          v3 = audit(near_start_identity=True, nba_franchise_scope=True)
+          assert v3['schema'] == 'tyler-historical-provider-identity-audit-v3'
+          assert v3['verified_source_days'] == v2['verified_source_days']
+          assert v3['receipt_provenance'] == v2['receipt_provenance']
+          old_ids = {(q['league'], q['game_id']) for q in v2['quarantined']}
+          new_ids = {(q['league'], q['game_id']) for q in v3['quarantined']}
+          assert old_ids <= new_ids
+          # Retained ESPN records explicitly show NBA All-Star mini-tournament
+          # squads, even though ESPN labels these events season_stage=2.
+          all_star = {'401752955', '401752956', '401752957',
+                      '401838140', '401838141', '401838142', '401838143'}
+          quarantined = {q['game_id'] for q in v3['quarantined']
+                         if q['league'] == 'NBA' and
+                         'NBA_TEAM_OUTSIDE_ESPN_FRANCHISE_ID_RESEARCH_ALLOWLIST'
+                         in q['reasons']}
+          assert all_star <= quarantined
+          assert v3['quarantined_nba_nonfranchise_game_ids'] >= len(all_star)
+          assert v3['nba_franchise_scope_independently_certified'] is False
+          for flag in ('independently_verified_official_results',
+                       'source_scope_complete', 'training_allowed',
+                       'historical_evaluation_enabled', 'forecasting_enabled',
+                       'promotion_allowed'):
+              assert v3[flag] is False
+          assert v3['NO_BET'] is True
+          assert type(v3['actual_wagers']) is int and v3['actual_wagers'] == 0
+          print(json.dumps(v3, sort_keys=True, indent=2))
+          PYCODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: historical-provider-identity-audit-v3-research-only
+          path: historical-identity-audit-v3.json
+          retention-days: 30
       - name: Replay every retained independent NCAA historical week
         run: |
           python - <<'PYCODE'
