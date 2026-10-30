@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-30T01:00:26.023906+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-30T07:07:06.195559+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 132 / 118 / 14 |
-| Started games in retained official schedules / enrolled | 127 / 126 |
+| Recorded / settled / pending | 132 / 129 / 3 |
+| Started games in retained official schedules / enrolled | 130 / 129 |
 | Observed missing started games | 1 |
 | Enrollment-time priced forecasts | 132 / 132 |
-| Settled with enrollment prices / decisive market-paired | 118 / 118 |
+| Settled with enrollment prices / decisive market-paired | 129 / 129 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,13 +23,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-30T01:00:26.023906+00:00. Ready: 6 / 6 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-30T07:07:06.195559+00:00. Ready: 3 / 3 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020211 | BUF at ANA | True | False | True | None |
-| 2026020212 | OTT at LAK | True | False | True | None |
-| 2026020213 | VAN at SJS | True | False | True | None |
 | 2026020214 | NJD at VGK | True | False | True | None |
 | 2026020215 | WPG at FLA | True | False | True | None |
 | 2026020216 | SEA at CGY | True | False | True | None |
@@ -176,7 +173,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 116. Latest: `20261030T010024165824Z`.
+Audited capture manifests: 117. Latest: `20261030T070704938714Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
