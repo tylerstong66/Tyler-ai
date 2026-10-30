@@ -1,4 +1,14 @@
-# Sports Betting Analyst v1 — verified handoff (2026-10-29)
+# Sports Betting Analyst v1 — verified handoff (2026-10-30)
+
+## October 30 — bounded historical v2 identity audit and live source-only replay
+
+PR #283 merged at `52d39dadcad37b6513804d42735d7caa527dfe04` after all **13 exact-head CI checks passed**, including **1,120 integrated sports regression tests** and the complete archived college final receipt replay. The explicitly opted-in historical near-start v2 identity quarantine now uses sorted adjacent different-ID boundaries rather than comparing every pair of observations inside a four-hour window. It retains the same ambiguity membership while bounding the sweep to sorting plus linear comparisons; adversarial tests include 4,000 simultaneous relabelled IDs, repeated IDs, exactly four-hour boundaries, cross-league isolation and collision chains. The original v1 report and its frozen NBA reference hashes remain unchanged.
+
+The **post-#282** main college/NBA source workflow [41047506317](https://github.com/tylerstong66/Tyler-ai/actions/runs/41047506317) succeeded at **2026-10-30 11:30:13 UTC** on source revision `64ace084198bd36dd8a8c467e774936b3c9e0f3e`, verified to descend from #282's merge. Its saved status reports **64** retained native-v2 NBA features, **24** source agreements, **40** pending, **zero enrolled outcomes**, and `independent_official_final_results_verified=false`. The separate D1 current-season ESPN collection has begun and source-only replay succeeded; this is not official result certification. Historical declared ESPN dates remain NBA 490, FBS 302, D1 312; independent official completeness is unverified. This collector predates #283 and does not verify a post-#283 collector.
+
+Next: run the opt-in v2 audit on actual retained historical archives as a **separate read-only CI artifact**, assert quarantine is a superset of legacy v1 with identical source receipt provenance, and keep v1's sealed downstream feature references unchanged. Continue separately qualifying governing-body official finals, season/postseason identity, reschedules, completeness and chronology before any sport-specific time-split fitting or forward-only forecasts. NFL/NHL/MLB original benchmarks remain isolated; #217 (NHL sportsbook price proof) and #98 (MLB cross-cohort schedule drift) remain open, with a separate hourly results monitor. Maintain `NO_BET=true`, actual wagers zero, training/forecasting/promotion disabled for expansion cohorts, Render auto-deploy OFF and production unchanged.
+
+
 
 ## October 29 — versioned near-start historical identity quarantine and verified main source replay
 
