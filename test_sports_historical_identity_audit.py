@@ -253,6 +253,32 @@ class HistoricalIdentityAuditTests(unittest.TestCase):
                 self.assertFalse(out['forecasting_enabled'])
                 self.assertTrue(out['NO_BET'])
 
+    def test_near_start_sweep_handles_dense_provider_id_flood(self):
+        # Adversarial source feed with thousands of simultaneous relabelled
+        # IDs must mark every participant without pairwise quadratic scans.
+        start = '2026-10-30T00:00:00Z'
+        entries = {(start, f'event-{i:05d}') for i in range(4000)}
+        conflicts = audit._near_start_conflicts({('NBA', '100'): entries})
+        self.assertEqual(conflicts,
+                         {('NBA', f'event-{i:05d}') for i in range(4000)})
+
+    def test_near_start_sweep_scopes_repeated_ids_exact_boundary_and_chain(self):
+        def t(hours, minutes=0):
+            return (datetime(2026, 10, 30) + timedelta(
+                hours=hours, minutes=minutes)).isoformat() + 'Z'
+        timelines = {
+            ('NBA', '100'): {(t(0), 'A'), (t(1), 'A'),
+                             (t(4), 'B'), (t(8), 'C')},
+            ('NBA', '200'): {(t(0), 'Z'), (t(1), 'Z')},
+            ('NCAAF_FBS', '100'): {(t(0), 'X'), (t(5), 'Y')},
+            ('NCAAM_D1', '100'): {(t(0), 'X'), (t(3), 'Y')},
+            ('NBA', '300'): {(t(0), 'P'), (t(3), 'Q'), (t(6), 'R')},
+        }
+        self.assertEqual(audit._near_start_conflicts(timelines), {
+            ('NBA', 'A'), ('NBA', 'B'),
+            ('NCAAM_D1', 'X'), ('NCAAM_D1', 'Y'),
+            ('NBA', 'P'), ('NBA', 'Q'), ('NBA', 'R')})
+
     def test_near_start_policy_requires_explicit_boolean(self):
         for bad in (1, 'true', None):
             with self.subTest(bad=bad), self.assertRaisesRegex(ValueError, 'policy'):
