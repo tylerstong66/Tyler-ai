@@ -41,6 +41,21 @@ class HistoricalFbsCrosscheckTests(unittest.TestCase):
             return json.dumps({'events': events, 'count': len(events)}).encode()
         history.capture(fetch, base=root, now=NOW, per_league=1, date_plan=plan)
 
+    @staticmethod
+    def skip_first_verification(base, league, split, day, *, as_of=None,
+                                return_verified_hashes=False):
+        # Simulate a prior successful verifier so the direct audit must reject
+        # malformed original JSON independently of the upstream parser.
+        folder = Path(base) / history.ROOT / 'sources' / league / split
+        receipt = folder / (day + '.receipt.json')
+        archive = folder / (day + '.json.gz')
+        if not receipt.is_file() or not archive.is_file():
+            return False
+        if return_verified_hashes:
+            return {'receipt_sha256': hashlib.sha256(receipt.read_bytes()).hexdigest(),
+                    'archive_sha256': hashlib.sha256(archive.read_bytes()).hexdigest()}
+        return True
+
     def test_original_archives_join_with_two_hash_linked_sources(self):
         with tempfile.TemporaryDirectory() as td:
             self.seed(Path(td)); out = crosscheck.build(td, now=NOW)
@@ -83,9 +98,8 @@ class HistoricalFbsCrosscheckTests(unittest.TestCase):
             saved = json.loads(receipt.read_bytes())
             saved['original_response_sha256'] = hashlib.sha256(tampered).hexdigest()
             receipt.write_text(json.dumps(saved))
-            def skip_first_verification(base, league, split, day, *, as_of=None):
-                return (Path(base)/history.ROOT/'sources'/league/split/(day+'.receipt.json')).is_file()
-            with patch.object(history, 'verify_existing', side_effect=skip_first_verification):
+            with patch.object(history, 'verify_existing',
+                              side_effect=self.skip_first_verification):
                 with self.assertRaises(ValueError):
                     crosscheck.build(root, now=NOW)
 
@@ -96,9 +110,8 @@ class HistoricalFbsCrosscheckTests(unittest.TestCase):
             receipt = next(folder.glob('*.receipt.json'))
             raw = receipt.read_bytes()
             receipt.write_bytes(raw[:-1] + b',"NO_BET":true}')
-            def skip_first_verification(base, league, split, day, *, as_of=None):
-                return (Path(base)/history.ROOT/'sources'/league/split/(day+'.receipt.json')).is_file()
-            with patch.object(history, 'verify_existing', side_effect=skip_first_verification):
+            with patch.object(history, 'verify_existing',
+                              side_effect=self.skip_first_verification):
                 with self.assertRaises(ValueError):
                     crosscheck.build(root, now=NOW)
 
