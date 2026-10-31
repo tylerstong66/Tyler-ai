@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-30T23:47:04.905651+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-31T05:42:05.426781+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 140 / 129 / 11 |
-| Started games in retained official schedules / enrolled | 132 / 131 |
+| Recorded / settled / pending | 142 / 132 / 10 |
+| Started games in retained official schedules / enrolled | 133 / 132 |
 | Observed missing started games | 1 |
-| Enrollment-time priced forecasts | 140 / 140 |
-| Settled with enrollment prices / decisive market-paired | 129 / 129 |
+| Enrollment-time priced forecasts | 142 / 142 |
+| Settled with enrollment prices / decisive market-paired | 132 / 132 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,11 +23,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-30T23:47:04.905651+00:00. Ready: 9 / 9 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-31T05:42:05.426781+00:00. Ready: 10 / 10 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020216 | SEA at CGY | True | False | True | None |
 | 2026020217 | CHI at BOS | True | False | True | None |
 | 2026020218 | STL at DET | True | False | True | None |
 | 2026020219 | TBL at NSH | True | False | True | None |
@@ -36,6 +35,8 @@ As of retained evidence: 2026-10-30T23:47:04.905651+00:00. Ready: 9 / 9 observed
 | 2026020222 | OTT at SJS | True | False | True | None |
 | 2026020223 | PIT at MTL | True | False | True | None |
 | 2026020224 | TOR at VAN | True | False | True | None |
+| 2026020225 | CBJ at DAL | True | False | True | None |
+| 2026020226 | CGY at COL | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -184,10 +185,12 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020222 | OTT at SJS | 2026-10-31T20:00:00+00:00 | enrolled | — |
 | 2026020223 | PIT at MTL | 2026-10-31T23:00:00+00:00 | enrolled | — |
 | 2026020224 | TOR at VAN | 2026-10-31T23:00:00+00:00 | enrolled | — |
+| 2026020225 | CBJ at DAL | 2026-11-01T00:00:00+00:00 | enrolled | — |
+| 2026020226 | CGY at COL | 2026-11-01T02:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 120. Latest: `20261030T234702965677Z`.
+Audited capture manifests: 121. Latest: `20261031T054204470671Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
