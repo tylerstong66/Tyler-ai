@@ -1,5 +1,7 @@
 """NBA result joins replay raw originals with each game's actual observation time."""
 from datetime import timedelta
+import hashlib
+import gzip
 from pathlib import Path
 import json
 import tempfile
@@ -125,6 +127,16 @@ class HistoricalNbaCrosscheckTests(unittest.TestCase):
                 self.assertEqual(out['two_source_final_agreements'],0)
                 self.assertEqual(out['pending'][0]['reason'],reason)
 
+    @staticmethod
+    def mock_verified_source(base, league, split, day, as_of=None, return_verified_hashes=False):
+        if (league, split, day) != ('NBA', 'train', '2024-10-22'):
+            return False
+        folder = Path(base) / history.ROOT / 'sources' / league / split
+        receipt = (folder / (day + '.receipt.json')).read_bytes()
+        archive = (folder / (day + '.json.gz')).read_bytes()
+        return {'receipt_sha256': hashlib.sha256(receipt).hexdigest(),
+                'archive_sha256': hashlib.sha256(archive).hexdigest()}
+
     def test_direct_join_rejects_ambiguous_receipt_after_first_verification(self):
         with tempfile.TemporaryDirectory() as td:
             self.seed(td)
@@ -135,8 +147,7 @@ class HistoricalNbaCrosscheckTests(unittest.TestCase):
             # Reproduce an archive replacement after the upstream verification.
             with patch.object(check.audit,'audit',return_value={'quarantined':[]}), \
                  patch.object(history,'verify_existing',
-                              side_effect=lambda base,league,split,day,as_of=None:
-                              league=='NBA' and split=='train' and day=='2024-10-22'):
+                              side_effect=self.mock_verified_source):
                 with self.assertRaisesRegex(ValueError,'Duplicate key'):
                     check.build(td,now=NOW)
 
@@ -154,8 +165,7 @@ class HistoricalNbaCrosscheckTests(unittest.TestCase):
                 receipt.write_text(json.dumps(saved))
                 with patch.object(check.audit,'audit',return_value={'quarantined':[]}), \
                      patch.object(history,'verify_existing',
-                                  side_effect=lambda base,league,split,day,as_of=None:
-                                  league=='NBA' and split=='train' and day=='2024-10-22'):
+                                  side_effect=self.mock_verified_source):
                     with self.assertRaises(ValueError):
                         check.build(td,now=NOW)
 
@@ -170,8 +180,7 @@ class HistoricalNbaCrosscheckTests(unittest.TestCase):
             receipt.symlink_to(outside)
             with patch.object(check.audit, 'audit', return_value={'quarantined': []}), \
                  patch.object(history, 'verify_existing',
-                              side_effect=lambda base, league, split, day, as_of=None:
-                              league == 'NBA' and split == 'train' and day == '2024-10-22'):
+                              side_effect=self.mock_verified_source):
                 with self.assertRaisesRegex(ValueError, 'Symlink'):
                     check.build(td, now=NOW)
 
@@ -183,8 +192,7 @@ class HistoricalNbaCrosscheckTests(unittest.TestCase):
             blob.write_bytes(b'x' * (check.MAX_BLOB_SIZE + 1))
             with patch.object(check.audit, 'audit', return_value={'quarantined': []}), \
                  patch.object(history, 'verify_existing',
-                              side_effect=lambda base, league, split, day, as_of=None:
-                              league == 'NBA' and split == 'train' and day == '2024-10-22'):
+                              side_effect=self.mock_verified_source):
                 with self.assertRaisesRegex(ValueError, 'Oversized NBA historical'):
                     check.build(td, now=NOW)
 
