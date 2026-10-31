@@ -253,7 +253,7 @@ class HistoricalNbaCrosscheckTests(unittest.TestCase):
                 verified = original_verify(base, split, now=now,
                                            return_receipt_sha256=return_receipt_sha256)
                 receipt = Path(base) / owned.ROOT / split / (owned.season(split) + '.receipt.json')
-                receipt.write_bytes(receipt.read_bytes() + b'\\n')
+                receipt.write_bytes(receipt.read_bytes() + b'\n')
                 return verified
             with patch.object(check.owned, 'verify', side_effect=verified_then_replace):
                 with self.assertRaisesRegex(ValueError, 'receipt bytes changed during direct crosscheck'):
