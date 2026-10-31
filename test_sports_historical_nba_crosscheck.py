@@ -159,6 +159,51 @@ class HistoricalNbaCrosscheckTests(unittest.TestCase):
                     with self.assertRaises(ValueError):
                         check.build(td,now=NOW)
 
+    def test_direct_join_rejects_static_receipt_symlink_after_upstream_verification(self):
+        with tempfile.TemporaryDirectory() as td:
+            self.seed(td)
+            folder = Path(td) / history.ROOT / 'sources' / 'NBA' / 'train'
+            receipt = next(folder.glob('*.receipt.json'))
+            outside = Path(td) / 'outside-receipt.json'
+            outside.write_bytes(receipt.read_bytes())
+            receipt.unlink()
+            receipt.symlink_to(outside)
+            with patch.object(check.audit, 'audit', return_value={'quarantined': []}), \
+                 patch.object(history, 'verify_existing',
+                              side_effect=lambda base, league, split, day, as_of=None:
+                              league == 'NBA' and split == 'train' and day == '2024-10-22'):
+                with self.assertRaisesRegex(ValueError, 'Symlink'):
+                    check.build(td, now=NOW)
+
+    def test_direct_join_rejects_oversized_compressed_source_before_decompression(self):
+        with tempfile.TemporaryDirectory() as td:
+            self.seed(td)
+            folder = Path(td) / history.ROOT / 'sources' / 'NBA' / 'train'
+            blob = next(folder.glob('*.json.gz'))
+            blob.write_bytes(b'x' * (check.MAX_BLOB_SIZE + 1))
+            with patch.object(check.audit, 'audit', return_value={'quarantined': []}), \
+                 patch.object(history, 'verify_existing',
+                              side_effect=lambda base, league, split, day, as_of=None:
+                              league == 'NBA' and split == 'train' and day == '2024-10-22'):
+                with self.assertRaisesRegex(ValueError, 'Oversized NBA historical'):
+                    check.build(td, now=NOW)
+
+    def test_direct_join_rejects_official_receipt_symlink_after_owned_verification(self):
+        with tempfile.TemporaryDirectory() as td:
+            self.seed(td)
+            original_verify = owned.verify
+            def verified_then_replace(base, split, *, now=None):
+                saved = original_verify(base, split, now=now)
+                receipt = Path(base) / owned.ROOT / split / (owned.season(split) + '.receipt.json')
+                outside = Path(td) / 'outside-official-receipt.json'
+                outside.write_bytes(receipt.read_bytes())
+                receipt.unlink()
+                receipt.symlink_to(outside)
+                return saved
+            with patch.object(check.owned, 'verify', side_effect=verified_then_replace):
+                with self.assertRaisesRegex(ValueError, 'Symlink'):
+                    check.build(td, now=NOW)
+
     def test_per_game_time_cannot_borrow_a_later_unrelated_observation(self):
         with tempfile.TemporaryDirectory() as td:
             self.seed(td);out=check.build(td,now=NOW)

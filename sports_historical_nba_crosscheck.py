@@ -11,7 +11,21 @@ import sports_nba_historical_owned as owned
 import sports_nba_official_schedule_audit as nba
 import sports_nba_final_receipts as finals
 import sports_expansion_observer as source
-from sports_expansion_audit import bounded_gzip_read, strict_json_loads
+from sports_expansion_audit import archive_path, bounded_gzip_read, strict_json_loads, MAX_BLOB_SIZE
+
+
+def _read_bounded_original(path):
+    """Recheck static archive paths and bound the exact bytes consumed here.
+
+    Earlier receipt verification is not a substitute for a safe second read.
+    This does not claim protection from concurrent filesystem mutation.
+    """
+    file = archive_path(path)
+    with file.open('rb') as stream:
+        raw = stream.read(MAX_BLOB_SIZE + 1)
+    if len(raw) > MAX_BLOB_SIZE:
+        raise ValueError('Oversized NBA historical crosscheck archive')
+    return raw
 
 
 def _provider_events(raw):
@@ -41,9 +55,9 @@ def build(base=Path('.'),*,split='train',now=None,exact_tipoff_identity=False):
     for day in history.dates_by_league()['NBA'][split]:
         if not history.verify_existing(base,'NBA',split,day,as_of=now): continue
         folder=base/history.ROOT/'sources'/'NBA'/split
-        path=folder/(day+'.receipt.json');receipt_bytes=path.read_bytes()
+        path=folder/(day+'.receipt.json');receipt_bytes=_read_bounded_original(path)
         saved=strict_json_loads(receipt_bytes)
-        raw=bounded_gzip_read((folder/(day+'.json.gz')).read_bytes())
+        raw=bounded_gzip_read(_read_bounded_original(folder/(day+'.json.gz')))
         if hashlib.sha256(raw).hexdigest()!=saved['original_response_sha256']:
             raise ValueError('NBA provider response changed during source replay')
         # Upstream archive verification and this read are separate operations.
@@ -109,7 +123,7 @@ def build(base=Path('.'),*,split='train',now=None,exact_tipoff_identity=False):
     report['pending'].extend(unsupported_pending)
     report['pending_or_quarantined']=len(report['pending'])
     path=base/owned.ROOT/split/(owned.season(split)+'.receipt.json')
-    receipt_digest=hashlib.sha256(path.read_bytes()).hexdigest()
+    receipt_digest=hashlib.sha256(_read_bounded_original(path)).hexdigest()
     for row in report['corroborated_research_only']:
         row['nba_receipt_sha256']=receipt_digest
         row['nba_response_sha256']=official['original_response_sha256']
