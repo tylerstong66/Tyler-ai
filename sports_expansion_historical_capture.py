@@ -50,7 +50,9 @@ def dates_by_league():
         for sport in ORDER}
 
 
-def verify_existing(base, sport, split, day, *, as_of=None):
+def verify_existing(base, sport, split, day, *, as_of=None, return_verified_hashes=False):
+    if type(return_verified_hashes) is not bool:
+        raise ValueError('Explicit historical verification result mode required')
     if (sport not in ORDER or split not in ('train', 'validation')
             or not isinstance(day, str)):
         raise ValueError('Invalid historical provider receipt scope')
@@ -72,7 +74,8 @@ def verify_existing(base, sport, split, day, *, as_of=None):
         raise ValueError("Historical source missing one sealed archive component")
     if receipt.stat().st_size > MAX_BLOB_SIZE:
         raise ValueError('Oversized historical provider receipt')
-    r=strict_json_loads(receipt.read_bytes())
+    receipt_bytes=receipt.read_bytes()
+    r=strict_json_loads(receipt_bytes)
     if as_of is not None and (observer.utc(r["recorded_at_utc"]) > as_of.astimezone(timezone.utc)):
         raise ValueError("Saved historical receipt has future observation timestamp")
     if (r.get("schema")!="college-nba-history-provider-day-v1"
@@ -87,12 +90,16 @@ def verify_existing(base, sport, split, day, *, as_of=None):
         raise ValueError("Historical source identity, split or safety metadata changed")
     if artifact.stat().st_size > MAX_BLOB_SIZE:
         raise ValueError("Historical compressed source exceeds maximum archive size")
-    raw=bounded_gzip_read(artifact.read_bytes())
+    archive_bytes=artifact.read_bytes()
+    raw=bounded_gzip_read(archive_bytes)
     if hashlib.sha256(raw).hexdigest()!=r["original_response_sha256"]:
         raise ValueError("Original historical source bytes no longer match receipt")
     parsed=observer.parse_scoreboard(strict_json_loads(raw),sport)
     if parsed!=r["parsed_provider_scoreboard"]:
         raise ValueError("Historical parsed ESPN records differ from retained source")
+    if return_verified_hashes:
+        return {'receipt_sha256': hashlib.sha256(receipt_bytes).hexdigest(),
+                'archive_sha256': hashlib.sha256(archive_bytes).hexdigest()}
     return True
 
 
