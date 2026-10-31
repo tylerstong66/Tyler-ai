@@ -53,11 +53,18 @@ def build(base=Path('.'),*,split='train',now=None,exact_tipoff_identity=False):
     excluded={row['game_id'] for row in integrity['quarantined'] if row['league']=='NBA'}
     evidence=defaultdict(list);rows=defaultdict(list);unsupported=set()
     for day in history.dates_by_league()['NBA'][split]:
-        if not history.verify_existing(base,'NBA',split,day,as_of=now): continue
+        verified=history.verify_existing(base,'NBA',split,day,as_of=now,
+                                         return_verified_hashes=True)
+        if not verified: continue
         folder=base/history.ROOT/'sources'/'NBA'/split
         path=folder/(day+'.receipt.json');receipt_bytes=_read_bounded_original(path)
+        archive_bytes=_read_bounded_original(folder/(day+'.json.gz'))
+        if (not isinstance(verified,dict)
+                or hashlib.sha256(receipt_bytes).hexdigest()!=verified.get('receipt_sha256')
+                or hashlib.sha256(archive_bytes).hexdigest()!=verified.get('archive_sha256')):
+            raise ValueError('Historical NBA ESPN originals changed during direct crosscheck')
         saved=strict_json_loads(receipt_bytes)
-        raw=bounded_gzip_read(_read_bounded_original(folder/(day+'.json.gz')))
+        raw=bounded_gzip_read(archive_bytes)
         if hashlib.sha256(raw).hexdigest()!=saved['original_response_sha256']:
             raise ValueError('NBA provider response changed during source replay')
         # Upstream archive verification and this read are separate operations.
