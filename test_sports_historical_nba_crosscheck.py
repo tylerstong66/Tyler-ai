@@ -204,6 +204,25 @@ class HistoricalNbaCrosscheckTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'Symlink'):
                     check.build(td, now=NOW)
 
+    def test_direct_join_rejects_replaced_owned_receipt_even_when_valid_json(self):
+        for mutation in ('transport', 'guard'):
+            with self.subTest(mutation=mutation), tempfile.TemporaryDirectory() as td:
+                self.seed(td)
+                original_verify = owned.verify
+                def verified_then_replace(base, split, *, now=None):
+                    verified = original_verify(base, split, now=now)
+                    receipt = Path(base) / owned.ROOT / split / (owned.season(split) + '.receipt.json')
+                    replaced = json.loads(receipt.read_bytes())
+                    if mutation == 'transport':
+                        replaced['transport_profile'] = 'forged_provenance'
+                    else:
+                        replaced['model_training_enabled'] = True
+                    receipt.write_text(json.dumps(replaced))
+                    return verified
+                with patch.object(check.owned, 'verify', side_effect=verified_then_replace):
+                    with self.assertRaisesRegex(ValueError, 'receipt changed during direct crosscheck'):
+                        check.build(td, now=NOW)
+
     def test_per_game_time_cannot_borrow_a_later_unrelated_observation(self):
         with tempfile.TemporaryDirectory() as td:
             self.seed(td);out=check.build(td,now=NOW)
