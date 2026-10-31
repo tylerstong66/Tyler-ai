@@ -41,6 +41,19 @@ def _near_start_conflicts(team_timelines):
     return conflicts
 
 
+def _read_bounded_original(path):
+    """Bound the exact original bytes consumed by this direct identity audit.
+
+    Recheck static symlinks. Concurrent filesystem mutation is not protected.
+    """
+    file = archive_path(path)
+    with file.open('rb') as stream:
+        raw = stream.read(MAX_BLOB_SIZE + 1)
+    if len(raw) > MAX_BLOB_SIZE:
+        raise ValueError('Historical identity archive exceeds bound')
+    return raw
+
+
 def audit(base=Path('.'), *, now=None, near_start_identity=False, nba_franchise_scope=False):
     # Preserve the original v1 historical report used by frozen NBA feature
     # reference hashes. The stronger quarantine is an explicit v2 research
@@ -64,15 +77,20 @@ def audit(base=Path('.'), *, now=None, near_start_identity=False, nba_franchise_
     for league in history.ORDER:
         for split, days in plan[league].items():
             for day in days:
-                if not history.verify_existing(base, league, split, day, as_of=now):
+                verified = history.verify_existing(
+                    base, league, split, day, as_of=now, return_verified_hashes=True)
+                if not verified:
                     continue
-                path = archive_path(root / league / split / (day + '.receipt.json'))
-                blob = archive_path(root / league / split / (day + '.json.gz'))
-                if path.stat().st_size > MAX_BLOB_SIZE or blob.stat().st_size > MAX_BLOB_SIZE:
-                    raise ValueError('Historical identity audit archive exceeds bound')
-                raw = path.read_bytes()
+                path = root / league / split / (day + '.receipt.json')
+                blob = root / league / split / (day + '.json.gz')
+                raw = _read_bounded_original(path)
+                compressed = _read_bounded_original(blob)
+                if (not isinstance(verified, dict)
+                        or hashlib.sha256(raw).hexdigest() != verified.get('receipt_sha256')
+                        or hashlib.sha256(compressed).hexdigest() != verified.get('archive_sha256')):
+                    raise ValueError('Historical identity originals changed after verification')
                 receipt = strict_json_loads(raw)
-                original = bounded_gzip_read(blob.read_bytes())
+                original = bounded_gzip_read(compressed)
                 if (receipt.get('schema') != 'college-nba-history-provider-day-v1'
                         or receipt.get('league') != league or receipt.get('split') != split
                         or receipt.get('source_date') != day
