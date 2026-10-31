@@ -123,7 +123,10 @@ def build(base=Path('.'),*,split='train',now=None,exact_tipoff_identity=False):
     report['pending'].extend(unsupported_pending)
     report['pending_or_quarantined']=len(report['pending'])
     path=base/owned.ROOT/split/(owned.season(split)+'.receipt.json')
-    receipt_digest=hashlib.sha256(_read_bounded_original(path)).hexdigest()
+    receipt_bytes=_read_bounded_original(path)
+    if strict_json_loads(receipt_bytes)!=official:
+        raise ValueError('NBA-owned historical receipt changed during direct crosscheck')
+    receipt_digest=hashlib.sha256(receipt_bytes).hexdigest()
     for row in report['corroborated_research_only']:
         row['nba_receipt_sha256']=receipt_digest
         row['nba_response_sha256']=official['original_response_sha256']
