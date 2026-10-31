@@ -52,7 +52,9 @@ def parse(raw,split,observed):
     return rows
 
 
-def verify(base,split,*,now=None):
+def verify(base,split,*,now=None,return_receipt_sha256=False):
+    if type(return_receipt_sha256) is not bool:
+        raise ValueError('Explicit NBA historical verification result mode required')
     selected=season(split);now=now or datetime.now(timezone.utc)
     if now.tzinfo is None:
         raise ValueError('Aware NBA historical audit clock required')
@@ -67,7 +69,8 @@ def verify(base,split,*,now=None):
         raise ValueError('NBA historical receipt must be a regular file')
     if path.stat().st_size > MAX_BLOB_SIZE:
         raise ValueError('Oversized NBA historical receipt')
-    saved=strict_json_loads(path.read_bytes())
+    receipt_bytes=path.read_bytes()
+    saved=strict_json_loads(receipt_bytes)
     if (saved.get('schema')!='tyler-nba-owned-historical-season-v1'
             or saved.get('league')!='NBA' or saved.get('split')!=split
             or saved.get('season')!=selected or saved.get('source_url')!=url(split)
@@ -84,6 +87,8 @@ def verify(base,split,*,now=None):
         raise ValueError('NBA historical original response digest mismatch')
     if parse(raw,split,at)!=saved['parsed_nba_games']:
         raise ValueError('NBA historical normalization differs from raw source')
+    if return_receipt_sha256:
+        return saved, hashlib.sha256(receipt_bytes).hexdigest()
     return saved
 
 
