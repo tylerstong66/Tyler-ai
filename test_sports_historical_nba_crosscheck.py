@@ -200,8 +200,9 @@ class HistoricalNbaCrosscheckTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             self.seed(td)
             original_verify = owned.verify
-            def verified_then_replace(base, split, *, now=None):
-                saved = original_verify(base, split, now=now)
+            def verified_then_replace(base, split, *, now=None, return_receipt_sha256=False):
+                saved = original_verify(base, split, now=now,
+                                           return_receipt_sha256=return_receipt_sha256)
                 receipt = Path(base) / owned.ROOT / split / (owned.season(split) + '.receipt.json')
                 outside = Path(td) / 'outside-official-receipt.json'
                 outside.write_bytes(receipt.read_bytes())
@@ -217,8 +218,9 @@ class HistoricalNbaCrosscheckTests(unittest.TestCase):
             with self.subTest(mutation=mutation), tempfile.TemporaryDirectory() as td:
                 self.seed(td)
                 original_verify = owned.verify
-                def verified_then_replace(base, split, *, now=None):
-                    verified = original_verify(base, split, now=now)
+                def verified_then_replace(base, split, *, now=None, return_receipt_sha256=False):
+                    verified = original_verify(base, split, now=now,
+                                           return_receipt_sha256=return_receipt_sha256)
                     receipt = Path(base) / owned.ROOT / split / (owned.season(split) + '.receipt.json')
                     replaced = json.loads(receipt.read_bytes())
                     if mutation == 'transport':
@@ -228,8 +230,34 @@ class HistoricalNbaCrosscheckTests(unittest.TestCase):
                     receipt.write_text(json.dumps(replaced))
                     return verified
                 with patch.object(check.owned, 'verify', side_effect=verified_then_replace):
-                    with self.assertRaisesRegex(ValueError, 'receipt changed during direct crosscheck'):
+                    with self.assertRaisesRegex(ValueError, 'receipt bytes changed during direct crosscheck'):
                         check.build(td, now=NOW)
+
+    def test_nba_owned_verified_receipt_digest_is_opt_in(self):
+        with tempfile.TemporaryDirectory() as td:
+            self.seed(td)
+            saved = owned.verify(td, 'train', now=NOW)
+            verified, digest = owned.verify(td, 'train', now=NOW,
+                                            return_receipt_sha256=True)
+            self.assertEqual(verified, saved)
+            path = Path(td) / owned.ROOT / 'train' / (owned.season('train') + '.receipt.json')
+            self.assertEqual(digest, hashlib.sha256(path.read_bytes()).hexdigest())
+            with self.assertRaisesRegex(ValueError, 'verification result mode'):
+                owned.verify(td, 'train', now=NOW, return_receipt_sha256=1)
+
+    def test_direct_join_rejects_whitespace_only_official_receipt_replacement(self):
+        with tempfile.TemporaryDirectory() as td:
+            self.seed(td)
+            original_verify = owned.verify
+            def verified_then_replace(base, split, *, now=None, return_receipt_sha256=False):
+                verified = original_verify(base, split, now=now,
+                                           return_receipt_sha256=return_receipt_sha256)
+                receipt = Path(base) / owned.ROOT / split / (owned.season(split) + '.receipt.json')
+                receipt.write_bytes(receipt.read_bytes() + b'\\n')
+                return verified
+            with patch.object(check.owned, 'verify', side_effect=verified_then_replace):
+                with self.assertRaisesRegex(ValueError, 'receipt bytes changed during direct crosscheck'):
+                    check.build(td, now=NOW)
 
     def test_historical_provider_verified_hashes_are_opt_in(self):
         with tempfile.TemporaryDirectory() as td:
