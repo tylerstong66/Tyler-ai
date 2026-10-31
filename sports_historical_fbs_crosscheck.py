@@ -11,7 +11,17 @@ import sports_historical_identity_audit as historical_audit
 import sports_expansion_observer as espn
 import sports_ncaa_espn_identity as identity
 import sports_college_dual_source_finals as finals
-from sports_expansion_audit import bounded_gzip_read, strict_json_loads
+from sports_expansion_audit import archive_path, bounded_gzip_read, strict_json_loads, MAX_BLOB_SIZE
+
+
+def _read_bounded_original(path):
+    """Read only bounded regular original bytes; reject static archive symlinks."""
+    file = archive_path(path)
+    with file.open('rb') as stream:
+        raw = stream.read(MAX_BLOB_SIZE + 1)
+    if len(raw) > MAX_BLOB_SIZE:
+        raise ValueError('Oversized college historical crosscheck archive')
+    return raw
 
 
 def _owned_sources(base, league, split, now):
@@ -57,12 +67,20 @@ def build(base=Path('.'), *, split='train', now=None, league='NCAAF_FBS', verifi
                  if game_id not in ncaa_conflicts and game_id not in quarantined_ncaa_ids]
     provider = defaultdict(list); erefs = defaultdict(list)
     for day in history.dates_by_league()[league][split]:
-        if not history.verify_existing(base, league, split, day, as_of=now):
+        verified = history.verify_existing(
+            base, league, split, day, as_of=now, return_verified_hashes=True)
+        if not verified:
             continue
         folder = base / history.ROOT / 'sources' / league / split
-        path = folder / (day + '.receipt.json'); raw_receipt = path.read_bytes()
+        path = folder / (day + '.receipt.json')
+        raw_receipt = _read_bounded_original(path)
+        compressed = _read_bounded_original(folder / (day + '.json.gz'))
+        if (not isinstance(verified, dict)
+                or hashlib.sha256(raw_receipt).hexdigest() != verified.get('receipt_sha256')
+                or hashlib.sha256(compressed).hexdigest() != verified.get('archive_sha256')):
+            raise ValueError('College ESPN historical originals changed during direct join')
         saved = strict_json_loads(raw_receipt)
-        raw = bounded_gzip_read((folder / (day + '.json.gz')).read_bytes())
+        raw = bounded_gzip_read(compressed)
         if hashlib.sha256(raw).hexdigest() != saved['original_response_sha256']:
             raise ValueError('ESPN historical response changed during crosscheck')
         events_raw = strict_json_loads(raw)['events']
