@@ -106,7 +106,7 @@ def build(base=Path('.'),*,split='train',now=None,exact_tipoff_identity=False):
             evidence[game_id].append(ref)
     conflicts={game_id for game_id,items in rows.items() if any(row!=items[0] for row in items[1:])}
     provider={game_id:items[0] for game_id,items in rows.items() if game_id not in conflicts and game_id not in unsupported}
-    official=owned.verify(base,split,now=now)
+    verified_official=owned.verify(base,split,now=now,return_receipt_sha256=True)
     guards={'source_scope_complete':False,'independent_official_final_certification_complete':False,
             'historical_evaluation_enabled':False,'model_training_enabled':False,'training_allowed':False,
             'forecasting_enabled':False,'promotion_allowed':False,'NO_BET':True,'actual_wagers':0}
@@ -114,12 +114,13 @@ def build(base=Path('.'),*,split='train',now=None,exact_tipoff_identity=False):
                          for game_id in sorted(unsupported)]
     if exact_tipoff_identity:
         guards['game_identity_policy']='EXACT_UTC_TIPOFF_UNIQUE_WITHIN_30_MINUTES'
-    if official is None:
+    if verified_official is None:
         return {'schema':schema,'league':'NBA','split':split,
                 'independent_nba_source_available':False,'two_source_final_agreements':0,
                 'corroborated_research_only':[],'pending_or_quarantined':len(provider)+len(unsupported),
                 'pending':[{'espn_game_id':game_id,'reason':'NO_ARCHIVED_INDEPENDENT_NBA_SEASON'}
                            for game_id in sorted(provider)]+unsupported_pending,**guards}
+    official,verified_receipt_digest=verified_official
     times={game_id:min(source.utc(ref['observed_at_utc']) for ref in evidence[game_id]).isoformat()
            for game_id in provider}
     report=finals.classify(official['parsed_nba_games'],provider,
@@ -131,6 +132,8 @@ def build(base=Path('.'),*,split='train',now=None,exact_tipoff_identity=False):
     report['pending_or_quarantined']=len(report['pending'])
     path=base/owned.ROOT/split/(owned.season(split)+'.receipt.json')
     receipt_bytes=_read_bounded_original(path)
+    if hashlib.sha256(receipt_bytes).hexdigest()!=verified_receipt_digest:
+        raise ValueError('NBA-owned historical receipt bytes changed during direct crosscheck')
     if strict_json_loads(receipt_bytes)!=official:
         raise ValueError('NBA-owned historical receipt changed during direct crosscheck')
     receipt_digest=hashlib.sha256(receipt_bytes).hexdigest()
