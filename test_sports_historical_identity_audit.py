@@ -1,5 +1,7 @@
 """Cross-date and cross-split provider contamination stays excluded."""
 import json
+import gzip
+import hashlib
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -388,13 +390,63 @@ class HistoricalIdentityAuditTests(unittest.TestCase):
                 # The first archive check has already passed; simulate replacement
                 # before the audit's own read without weakening other source checks.
                 original_verify=history.verify_existing
-                def prior_check(base, league, split, selected_day, *, as_of=None):
+                def prior_check(base, league, split, selected_day, *, as_of=None,
+                                return_verified_hashes=False):
                     if (league, split, selected_day)==('NBA','train',day):
+                        if return_verified_hashes:
+                            blob = receipt.with_name(day+'.json.gz')
+                            return {'receipt_sha256': hashlib.sha256(receipt.read_bytes()).hexdigest(),
+                                    'archive_sha256': hashlib.sha256(blob.read_bytes()).hexdigest()}
                         return True
-                    return original_verify(base,league,split,selected_day,as_of=as_of)
+                    return original_verify(base,league,split,selected_day,as_of=as_of,
+                                           return_verified_hashes=return_verified_hashes)
                 with patch.object(history,'verify_existing',side_effect=prior_check):
                     with self.assertRaises(ValueError):
                         audit.audit(root,now=CLOCK)
+
+    def test_direct_identity_audit_rejects_postverification_byte_replacements(self):
+        # A self-consistent valid JSON receipt or identical decompressed ESPN
+        # source must not be silently re-published with new original-byte hashes.
+        for mutation in ('receipt_whitespace', 'archive_recompressed',
+                         'receipt_symlink', 'oversized_archive'):
+            with self.subTest(mutation=mutation), tempfile.TemporaryDirectory() as td:
+                root = Path(td); self.seed(root)
+                day = history.SEASONS['NBA']['train'][0]
+                folder = root / history.ROOT / 'sources' / 'NBA' / 'train'
+                receipt = folder / (day + '.receipt.json')
+                archive = folder / (day + '.json.gz')
+                original_verify = history.verify_existing
+                replaced = False
+
+                def checked_then_replace(base, league, split, selected_day, *,
+                                         as_of=None, return_verified_hashes=False):
+                    nonlocal replaced
+                    verified = original_verify(base, league, split, selected_day,
+                                               as_of=as_of,
+                                               return_verified_hashes=return_verified_hashes)
+                    if (not replaced and (league, split, selected_day)
+                            == ('NBA', 'train', day)):
+                        replaced = True
+                        if mutation == 'receipt_whitespace':
+                            receipt.write_bytes(receipt.read_bytes() + b'\\n')
+                        elif mutation == 'archive_recompressed':
+                            archive.write_bytes(gzip.compress(
+                                gzip.decompress(archive.read_bytes()), mtime=1))
+                        elif mutation == 'receipt_symlink':
+                            outside = root / 'external-receipt.json'
+                            outside.write_bytes(receipt.read_bytes())
+                            receipt.unlink()
+                            receipt.symlink_to(outside)
+                        else:
+                            archive.write_bytes(b'x' * (audit.MAX_BLOB_SIZE + 1))
+                    return verified
+
+                with patch.object(history, 'verify_existing',
+                                  side_effect=checked_then_replace):
+                    with self.assertRaises(ValueError):
+                        audit.audit(root, now=CLOCK, near_start_identity=True,
+                                    nba_franchise_scope=True)
+                self.assertTrue(replaced)
 
     def test_source_corruption_aborts_audit(self):
         with tempfile.TemporaryDirectory() as td:
