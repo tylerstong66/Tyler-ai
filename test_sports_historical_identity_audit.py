@@ -428,7 +428,7 @@ class HistoricalIdentityAuditTests(unittest.TestCase):
                             == ('NBA', 'train', day)):
                         replaced = True
                         if mutation == 'receipt_whitespace':
-                            receipt.write_bytes(receipt.read_bytes() + b'\\n')
+                            receipt.write_bytes(receipt.read_bytes() + b'\n')
                         elif mutation == 'archive_recompressed':
                             archive.write_bytes(gzip.compress(
                                 gzip.decompress(archive.read_bytes()), mtime=1))
