@@ -168,7 +168,7 @@ class HistoricalNbaCrosscheckTests(unittest.TestCase):
             outside.write_bytes(receipt.read_bytes())
             receipt.unlink()
             receipt.symlink_to(outside)
-            with patch.object(check.audit, 'audit', return_value={'quarantined': []}), \\
+            with patch.object(check.audit, 'audit', return_value={'quarantined': []}), \
                  patch.object(history, 'verify_existing',
                               side_effect=lambda base, league, split, day, as_of=None:
                               league == 'NBA' and split == 'train' and day == '2024-10-22'):
@@ -181,7 +181,7 @@ class HistoricalNbaCrosscheckTests(unittest.TestCase):
             folder = Path(td) / history.ROOT / 'sources' / 'NBA' / 'train'
             blob = next(folder.glob('*.json.gz'))
             blob.write_bytes(b'x' * (check.MAX_BLOB_SIZE + 1))
-            with patch.object(check.audit, 'audit', return_value={'quarantined': []}), \\
+            with patch.object(check.audit, 'audit', return_value={'quarantined': []}), \
                  patch.object(history, 'verify_existing',
                               side_effect=lambda base, league, split, day, as_of=None:
                               league == 'NBA' and split == 'train' and day == '2024-10-22'):
