@@ -2,12 +2,12 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-31T12:30:33.147904+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-10-31T17:44:10.634665+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
 | Recorded / settled / pending | 142 / 132 / 10 |
-| Started games in retained official schedules / enrolled | 133 / 132 |
+| Started games in retained official schedules / enrolled | 135 / 134 |
 | Observed missing started games | 1 |
 | Enrollment-time priced forecasts | 142 / 142 |
 | Settled with enrollment prices / decisive market-paired | 132 / 132 |
@@ -23,12 +23,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-31T12:30:33.147904+00:00. Ready: 10 / 10 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-10-31T17:44:10.634665+00:00. Ready: 8 / 8 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020217 | CHI at BOS | True | False | True | None |
-| 2026020218 | STL at DET | True | False | True | None |
 | 2026020219 | TBL at NSH | True | False | True | None |
 | 2026020220 | EDM at NYI | True | False | True | None |
 | 2026020221 | BUF at LAK | True | False | True | None |
@@ -190,7 +188,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 122. Latest: `20261031T123031922362Z`.
+Audited capture manifests: 123. Latest: `20261031T174409525947Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
