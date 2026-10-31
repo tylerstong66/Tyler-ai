@@ -269,7 +269,7 @@ class HistoricalNbaCrosscheckTests(unittest.TestCase):
                             blob.write_bytes(gzip.compress(gzip.decompress(blob.read_bytes()),
                                                            mtime=1))
                     return verified
-                with patch.object(check.audit, 'audit', return_value={'quarantined': []}), \\
+                with patch.object(check.audit, 'audit', return_value={'quarantined': []}), \
                      patch.object(check.history, 'verify_existing',
                                   side_effect=verified_then_replace):
                     with self.assertRaisesRegex(
