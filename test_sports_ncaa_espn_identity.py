@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from datetime import datetime,timezone,timedelta
 from pathlib import Path
+from unittest.mock import patch
 
 import sports_expansion_observer as espn
 import sports_ncaa_official_source as ncaa
@@ -120,6 +121,50 @@ class CollegeIdentityTests(unittest.TestCase):
                         with self.assertRaisesRegex(ValueError,expected):
                             identity.run(base=root,now=AT+timedelta(minutes=10))
                         self.assertFalse((root/identity.ROOT).exists())
+
+    def test_crosswalk_provenance_pins_the_exact_parsed_manifest_bytes(self):
+        # A changed manifest after successful source verification must never
+        # cause a new hash to be attached to the already parsed original.
+        for provider in ('ncaa', 'espn'):
+            with self.subTest(provider=provider), tempfile.TemporaryDirectory() as td:
+                root=Path(td); self.seed(root)
+                module=ncaa if provider=='ncaa' else espn
+                folder=next((root/module.ROOT/'captures').iterdir())
+                path=folder/'manifest.json'
+                original_bytes=path.read_bytes()
+                verify_name='verify_ncaa' if provider=='ncaa' else 'verify_espn'
+                original_verify=getattr(identity,verify_name)
+                mutated=False
+
+                def verify_then_mutate(*args,**kwargs):
+                    nonlocal mutated
+                    result=original_verify(*args,**kwargs)
+                    path.write_bytes(original_bytes+b'\n')
+                    mutated=True
+                    return result
+
+                with patch.object(identity,verify_name,side_effect=verify_then_mutate):
+                    saved=identity.run(base=root,now=AT+timedelta(minutes=10))
+                self.assertTrue(mutated)
+                digest_key=provider+'_manifest_sha256'
+                self.assertEqual(saved[digest_key],
+                                 hashlib.sha256(original_bytes).hexdigest())
+                self.assertNotEqual(saved[digest_key],
+                                    hashlib.sha256(path.read_bytes()).hexdigest())
+                self.assertTrue(saved['NO_BET'])
+                self.assertFalse(saved['report']['forecasting_enabled'])
+
+    def test_crosswalk_rejects_oversized_original_manifest_before_replay(self):
+        for provider in ('ncaa', 'espn'):
+            with self.subTest(provider=provider), tempfile.TemporaryDirectory() as td:
+                root=Path(td); self.seed(root)
+                module=ncaa if provider=='ncaa' else espn
+                folder=next((root/module.ROOT/'captures').iterdir())
+                (folder/'manifest.json').write_bytes(
+                    b' ' * (identity.MAX_BLOB_SIZE+1))
+                with self.assertRaisesRegex(ValueError,'Oversized college identity source manifest'):
+                    identity.run(base=root,now=AT+timedelta(minutes=10))
+                self.assertFalse((root/identity.ROOT).exists())
 
     def test_direct_source_replay_requires_exact_no_wager_research_flags(self):
         changes=(

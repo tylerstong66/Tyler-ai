@@ -271,6 +271,20 @@ def reconcile(source_rows,espn_rows,*,use_curated_fbs_aliases=True):
     }
 
 
+def _read_manifest_original(path):
+    """Pin bounded exact manifest bytes once for parsing and provenance.
+
+    Static symlinks are rejected; concurrent filesystem changes cannot be
+    prevented, but a later read cannot relabel the parsed original digest.
+    """
+    file = archive_path(path)
+    with file.open('rb') as stream:
+        raw = stream.read(MAX_BLOB_SIZE + 1)
+    if len(raw) > MAX_BLOB_SIZE:
+        raise ValueError('Oversized college identity source manifest')
+    return raw
+
+
 def run(*,base=Path("."),now=None):
     base=Path(base);now=now or datetime.now(timezone.utc)
     if now.tzinfo is None:
@@ -282,11 +296,13 @@ def run(*,base=Path("."),now=None):
     if not espn_files or not ncaa_files:
         raise ValueError("Missing NCAA/ESPN independent sources")
     ef=archive_path(espn_files[-1]); nf=archive_path(ncaa_files[-1])
-    if max(ef.stat().st_size, nf.stat().st_size) > MAX_BLOB_SIZE:
-        raise ValueError('Oversized college identity source manifest')
+    # The exact bounded manifest bytes parsed here also determine the
+    # published digest. Never re-read the path after source verification.
+    espn_manifest_bytes = _read_manifest_original(ef)
+    ncaa_manifest_bytes = _read_manifest_original(nf)
     # Reject ambiguous receipt JSON at this direct crosswalk boundary, even if
     # the linked source bytes and receipt hashes were otherwise recomputed.
-    es=strict_json_loads(ef.read_bytes());ns=strict_json_loads(nf.read_bytes())
+    es=strict_json_loads(espn_manifest_bytes);ns=strict_json_loads(ncaa_manifest_bytes)
     for src in (es,ns):
         elapsed=now-espn.utc(src["recorded_at_utc"])
         if elapsed<timedelta(seconds=-60) or elapsed>timedelta(hours=12):
@@ -302,9 +318,9 @@ def run(*,base=Path("."),now=None):
         "schema":"ncaa-espn-strict-college-game-identity-v1",
         "recorded_at_utc":now.astimezone(timezone.utc).isoformat(),
         "ncaa_capture":nf.parent.name,
-        "ncaa_manifest_sha256":hashlib.sha256(nf.read_bytes()).hexdigest(),
+        "ncaa_manifest_sha256":hashlib.sha256(ncaa_manifest_bytes).hexdigest(),
         "espn_capture":ef.parent.name,
-        "espn_manifest_sha256":hashlib.sha256(ef.read_bytes()).hexdigest(),
+        "espn_manifest_sha256":hashlib.sha256(espn_manifest_bytes).hexdigest(),
         "report":report,"NO_BET":True,"actual_wagers":0,
         "promotion_allowed":False,
     }
