@@ -1,11 +1,11 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-11-01T19:40:53.007919+00:00",
-  "capture_count": 129,
+  "as_of_evidence_at": "2026-11-01T23:36:13.571860+00:00",
+  "capture_count": 130,
   "cohort_started_at": "2026-10-11T15:19:59+00:00",
   "completion_note": "Saved NFL manifests before coverage-v1 lack a completion flag; successful workflow corroboration remains required.",
-  "decisive_market_paired": 41,
+  "decisive_market_paired": 49,
   "enrollment_priced": 54,
   "followup_quotes_separate_from_original_metrics": [],
   "games": [
@@ -783,7 +783,7 @@
       "lead_hours": 23.823472487222222,
       "pregame_schedule_observations_in_window": 5,
       "recorded_at": "2026-10-31T21:35:35.499046+00:00",
-      "started_by_as_of": false,
+      "started_by_as_of": true,
       "status": "enrolled"
     },
     {
@@ -800,7 +800,7 @@
       "lead_hours": 23.490155136666665,
       "pregame_schedule_observations_in_window": 5,
       "recorded_at": "2026-10-31T21:35:35.441508+00:00",
-      "started_by_as_of": false,
+      "started_by_as_of": true,
       "status": "enrolled"
     },
     {
@@ -851,7 +851,7 @@
       "lead_hours": 23.82345646638889,
       "pregame_schedule_observations_in_window": 5,
       "recorded_at": "2026-10-31T21:35:35.556721+00:00",
-      "started_by_as_of": false,
+      "started_by_as_of": true,
       "status": "enrolled"
     },
     {
@@ -866,7 +866,7 @@
         "game_id": "2026_08_PHI_WAS"
       },
       "lead_hours": 17.766110252222223,
-      "pregame_schedule_observations_in_window": 3,
+      "pregame_schedule_observations_in_window": 4,
       "recorded_at": "2026-11-01T07:34:02.003092+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -889,7 +889,7 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "633543a0777524c63f1913931bb224c603903307c76f7789c085a344ecb17667",
+  "input_digest": "fb12456e59ec11a6dc9bd650c5f75195a53492c1d075da69cdb1beebc425927f",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -918,8 +918,8 @@
       "to": "2026-10-19T15:36:27.529484+00:00"
     }
   ],
-  "latest_attempted_capture": "20261101T194047974030Z",
-  "latest_capture": "20261101T194047974030Z",
+  "latest_attempted_capture": "20261101T233610272301Z",
+  "latest_capture": "20261101T233610272301Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
@@ -972,58 +972,16 @@
   ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": null,
-  "latest_official_schedule_observed_at": "2026-11-01T19:40:49.885620+00:00",
+  "latest_official_schedule_observed_at": "2026-11-01T23:36:10.999849+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [],
   "minimum_forecast_lead_hours": 1.5221828808333333,
   "observed_missing_started_games": [],
   "official_daily_conflicted_capture_count": 0,
-  "pending": 12,
+  "pending": 4,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-11-01T19:40:53.007919+00:00",
+    "as_of_evidence_at": "2026-11-01T23:36:13.571860+00:00",
     "games": [
-      {
-        "away": "KC",
-        "enrolled": true,
-        "enrollment_priced": true,
-        "game_id": "2026_08_KC_DEN",
-        "home": "DEN",
-        "issues": [],
-        "kickoff": "2026-11-01T21:25:00+00:00",
-        "latest_scoreboard_observed_at": "2026-11-01T19:40:51.589392+00:00",
-        "latest_scoreboard_priced": true,
-        "ready": true,
-        "saved_vs_latest_official_start": null,
-        "separate_followup_recorded": false
-      },
-      {
-        "away": "LAC",
-        "enrolled": true,
-        "enrollment_priced": true,
-        "game_id": "2026_08_LAC_LA",
-        "home": "LA",
-        "issues": [],
-        "kickoff": "2026-11-01T21:05:00+00:00",
-        "latest_scoreboard_observed_at": "2026-11-01T19:40:51.589392+00:00",
-        "latest_scoreboard_priced": true,
-        "ready": true,
-        "saved_vs_latest_official_start": null,
-        "separate_followup_recorded": false
-      },
-      {
-        "away": "NE",
-        "enrolled": true,
-        "enrollment_priced": true,
-        "game_id": "2026_08_NE_MIA",
-        "home": "MIA",
-        "issues": [],
-        "kickoff": "2026-11-01T21:25:00+00:00",
-        "latest_scoreboard_observed_at": "2026-11-01T19:40:51.589392+00:00",
-        "latest_scoreboard_priced": true,
-        "ready": true,
-        "saved_vs_latest_official_start": null,
-        "separate_followup_recorded": false
-      },
       {
         "away": "PHI",
         "enrolled": true,
@@ -1032,7 +990,7 @@
         "home": "WAS",
         "issues": [],
         "kickoff": "2026-11-02T01:20:00+00:00",
-        "latest_scoreboard_observed_at": "2026-11-01T19:40:51.589392+00:00",
+        "latest_scoreboard_observed_at": "2026-11-01T23:36:12.275368+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
@@ -1040,8 +998,8 @@
       }
     ],
     "limitation": "Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.",
-    "observed_games": 4,
-    "ready_games": 4,
+    "observed_games": 1,
+    "ready_games": 1,
     "status": "ready_as_of_snapshot",
     "window_hours": 24
   },
@@ -1108,10 +1066,10 @@
       "observed_at": "2026-10-29T16:07:52.856648+00:00"
     }
   ],
-  "settled": 42,
-  "settled_enrollment_priced": 42,
+  "settled": 50,
+  "settled_enrollment_priced": 50,
   "settled_ties_with_prices": 1,
   "sport": "NFL",
-  "started_schedule_games_enrolled": 50,
-  "started_schedule_games_in_scope": 50
+  "started_schedule_games_enrolled": 53,
+  "started_schedule_games_in_scope": 53
 }
