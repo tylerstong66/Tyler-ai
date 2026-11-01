@@ -132,7 +132,7 @@ class HistoricalCollegeFeatureTests(unittest.TestCase):
                             if (verified and kwargs.get('return_verified_hashes') and not changed):
                                 changed=True
                                 if mutation=='receipt_whitespace':
-                                    receipt.write_bytes(receipt.read_bytes()+b'\\n')
+                                    receipt.write_bytes(receipt.read_bytes()+b'\n')
                                 else:
                                     archive.write_bytes(gzip.compress(
                                         gzip.decompress(archive.read_bytes()),mtime=1))
