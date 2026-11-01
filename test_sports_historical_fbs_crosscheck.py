@@ -115,6 +115,50 @@ class HistoricalFbsCrosscheckTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     crosscheck.build(root, now=NOW)
 
+    def test_direct_college_join_rejects_postverification_espn_byte_swaps(self):
+        # The shared historical identity audit has already replayed this day.
+        # Swap only after the direct FBS/D1 join's own upstream verification.
+        for league in ('NCAAF_FBS', 'NCAAM_D1'):
+            for mutation in ('receipt_whitespace', 'archive_recompressed',
+                             'receipt_symlink', 'oversized_archive'):
+                with self.subTest(league=league, mutation=mutation), tempfile.TemporaryDirectory() as td:
+                    root = Path(td); self.seed(root)
+                    day = history.SEASONS[league]['train'][0]
+                    folder = root / history.ROOT / 'sources' / league / 'train'
+                    receipt = folder / (day + '.receipt.json')
+                    archive = folder / (day + '.json.gz')
+                    original_verify = history.verify_existing
+                    seen = 0
+
+                    def verified_then_replace(base, sport, split, selected_day, *,
+                                              as_of=None, return_verified_hashes=False):
+                        nonlocal seen
+                        verified = original_verify(
+                            base, sport, split, selected_day, as_of=as_of,
+                            return_verified_hashes=return_verified_hashes)
+                        if (sport, split, selected_day) == (league, 'train', day):
+                            seen += 1
+                            if seen == 2:
+                                if mutation == 'receipt_whitespace':
+                                    receipt.write_bytes(receipt.read_bytes() + b'\n')
+                                elif mutation == 'archive_recompressed':
+                                    archive.write_bytes(gzip.compress(
+                                        gzip.decompress(archive.read_bytes()), mtime=1))
+                                elif mutation == 'receipt_symlink':
+                                    outside = root / 'outside-college-receipt.json'
+                                    outside.write_bytes(receipt.read_bytes())
+                                    receipt.unlink()
+                                    receipt.symlink_to(outside)
+                                else:
+                                    archive.write_bytes(b'x' * (8_500_000 + 1))
+                        return verified
+
+                    with patch.object(history, 'verify_existing',
+                                      side_effect=verified_then_replace):
+                        with self.assertRaises(ValueError):
+                            crosscheck.build(root, now=NOW, league=league)
+                    self.assertEqual(seen, 2)
+
     def test_modified_independent_source_rejected(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td); self.seed(root)
