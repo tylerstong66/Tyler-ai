@@ -57,6 +57,54 @@ class CollegeIdentityTests(unittest.TestCase):
                 verify = identity.verify_ncaa if kind == 'ncaa' else identity.verify_espn
                 with self.assertRaisesRegex(ValueError, 'Symlink'): verify(folder, manifest)
 
+    def test_direct_identity_replay_never_uses_unbounded_archive_read_bytes(self):
+        # The direct verifier must bound compressed input while consuming it,
+        # not merely stat() a file before an unrestricted read_bytes().
+        for kind in ('ncaa', 'espn'):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as td:
+                root = Path(td); self.seed(root)
+                module = ncaa if kind == 'ncaa' else espn
+                folder = next((root/module.ROOT/'captures').iterdir())
+                manifest = json.loads((folder/'manifest.json').read_bytes())
+                verify = identity.verify_ncaa if kind == 'ncaa' else identity.verify_espn
+                original_read_bytes = Path.read_bytes
+
+                def forbid_unbounded_archive_read(path):
+                    if path.suffix == '.gz':
+                        raise AssertionError('Unbounded direct compressed archive read')
+                    return original_read_bytes(path)
+
+                with patch.object(Path, 'read_bytes', new=forbid_unbounded_archive_read):
+                    self.assertTrue(verify(folder, manifest))
+
+    def test_direct_identity_replay_rejects_archive_growth_despite_stale_stat(self):
+        # Model a compressed source that grew after a size check. A stale stat
+        # cannot authorize unbounded allocation or decompression of that file.
+        for kind in ('ncaa', 'espn'):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as td:
+                root = Path(td); self.seed(root)
+                module = ncaa if kind == 'ncaa' else espn
+                folder = next((root/module.ROOT/'captures').iterdir())
+                manifest = json.loads((folder/'manifest.json').read_bytes())
+                target = next(folder.glob('NCAAF_FBS_*.json.gz'))
+                previous_stat = target.stat()
+                max_bytes = (ncaa.MAX_BYTES+1_000_000 if kind == 'ncaa'
+                             else identity.MAX_BLOB_SIZE)
+                target.write_bytes(b'x' * (max_bytes+1))
+                original_stat = Path.stat
+
+                def stale_stat(path, *args, **kwargs):
+                    if path == target:
+                        return previous_stat
+                    return original_stat(path, *args, **kwargs)
+
+                verify = identity.verify_ncaa if kind == 'ncaa' else identity.verify_espn
+                expected = ('Missing NCAA archived source' if kind == 'ncaa'
+                            else 'Oversized saved ESPN college source file')
+                with patch.object(Path, 'stat', new=stale_stat):
+                    with self.assertRaisesRegex(ValueError, expected):
+                        verify(folder, manifest)
+
     def test_direct_identity_replay_rejects_absolute_archive_reference(self):
         for kind in ('ncaa', 'espn'):
             with self.subTest(kind=kind), tempfile.TemporaryDirectory() as td:

@@ -88,6 +88,21 @@ def _source_safety(manifest):
             and manifest["actual_wagers"] == 0)
 
 
+def _read_bounded_source_archive(path, *, max_bytes, oversized_message):
+    """Bound exact compressed bytes consumed by direct source replay.
+
+    A prior stat size check is not sufficient: a source may grow between
+    that check and read_bytes(). This protects allocation, not concurrent
+    filesystem integrity or independent publication chronology.
+    """
+    file = archive_path(path)
+    with file.open('rb') as stream:
+        compressed = stream.read(max_bytes + 1)
+    if len(compressed) > max_bytes:
+        raise ValueError(oversized_message)
+    return compressed
+
+
 def verify_ncaa(folder, manifest):
     folder=archive_path(folder, directory=True)
     if (manifest.get("schema")!="ncaa-owned-2026-source-observations-v1"
@@ -102,9 +117,10 @@ def verify_ncaa(folder, manifest):
         if snap['source_file'] != filename or '/' in filename or '..' in filename:
             raise ValueError('Invalid NCAA identity archive filename')
         compressed=archive_path(folder/filename)
-        if not compressed.is_file() or compressed.stat().st_size>ncaa.MAX_BYTES+1_000_000:
-            raise ValueError("Missing NCAA archived source")
-        raw=bounded_gzip_read(compressed.read_bytes(),limit=ncaa.MAX_BYTES)
+        raw=bounded_gzip_read(_read_bounded_source_archive(
+            compressed, max_bytes=ncaa.MAX_BYTES+1_000_000,
+            oversized_message="Missing NCAA archived source"),
+            limit=ncaa.MAX_BYTES)
         if hashlib.sha256(raw).hexdigest()!=snap["source_sha256"]:
             raise ValueError("NCAA original archived source SHA mismatch")
         rows=ncaa.official_scoreboard(raw,league)
@@ -143,9 +159,9 @@ def verify_espn(folder,manifest):
         if snap['compressed_file'] != filename or '/' in filename or '..' in filename:
             raise ValueError('Invalid ESPN college identity archive filename')
         path=archive_path(folder/filename)
-        if path.stat().st_size > MAX_BLOB_SIZE:
-            raise ValueError('Oversized saved ESPN college source file')
-        raw=bounded_gzip_read(path.read_bytes())
+        raw=bounded_gzip_read(_read_bounded_source_archive(
+            path, max_bytes=MAX_BLOB_SIZE,
+            oversized_message='Oversized saved ESPN college source file'))
         if hashlib.sha256(raw).hexdigest()!=snap["original_response_sha256"]:
             raise ValueError("ESPN college source raw digest mismatch")
         payload=strict_json_loads(raw)
