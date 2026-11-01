@@ -24,18 +24,20 @@ def _read_bounded_original(path):
     return raw
 
 
-def _owned_sources(base, league, split, now):
+def _owned_sources(base, league, split, now, *, with_verified_hashes=False):
     if league == 'NCAAF_FBS':
         for week in owned.WEEKS:
             verified = owned.verify(base, split, week, now=now, return_verified_hashes=True)
             if verified is not None:
-                yield verified['saved'], base/owned.ROOT/split/f'week-{week:02d}.receipt.json', {'week': week}, verified
+                item = (verified['saved'], base/owned.ROOT/split/f'week-{week:02d}.receipt.json', {'week': week})
+                yield (*item, verified) if with_verified_hashes else item
     else:
         import sports_ncaa_d1_historical_owned as d1
         for day in d1.DATES[split]:
             verified = d1.verify(base, split, day, now=now, return_verified_hashes=True)
             if verified is not None:
-                yield verified['saved'], base/d1.ROOT/split/(day+'.receipt.json'), {'source_date': day}, verified
+                item = (verified['saved'], base/d1.ROOT/split/(day+'.receipt.json'), {'source_date': day})
+                yield (*item, verified) if with_verified_hashes else item
 
 
 def build(base=Path('.'), *, split='train', now=None, league='NCAAF_FBS', verified_school_aliases=False):
@@ -51,7 +53,7 @@ def build(base=Path('.'), *, split='train', now=None, league='NCAAF_FBS', verifi
     excluded_provider_ids = {row['game_id'] for row in audit['quarantined']
                              if row['league'] == league}
     official = defaultdict(list); nrefs = defaultdict(list); source_quarantines = []
-    for saved, path, period, verified in _owned_sources(base, league, split, now):
+    for saved, path, period, verified in _owned_sources(base, league, split, now, with_verified_hashes=True):
         receipt_bytes = _read_bounded_original(path)
         archive_bytes = _read_bounded_original(path.with_name(path.name.replace('.receipt.json', '.json.gz')))
         if (hashlib.sha256(receipt_bytes).hexdigest() != verified['receipt_sha256']
