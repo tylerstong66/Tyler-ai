@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-10-31T21:35:37.611847+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-01T01:10:56.528169+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 145 / 136 / 9 |
-| Started games in retained official schedules / enrolled | 139 / 138 |
+| Recorded / settled / pending | 147 / 138 / 9 |
+| Started games in retained official schedules / enrolled | 142 / 141 |
 | Observed missing started games | 1 |
-| Enrollment-time priced forecasts | 145 / 145 |
-| Settled with enrollment prices / decisive market-paired | 136 / 136 |
+| Enrollment-time priced forecasts | 147 / 147 |
+| Settled with enrollment prices / decisive market-paired | 138 / 138 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,17 +23,16 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-10-31T21:35:37.611847+00:00. Ready: 7 / 7 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-01T01:10:56.528169+00:00. Ready: 6 / 6 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020223 | PIT at MTL | True | False | True | None |
-| 2026020224 | TOR at VAN | True | False | True | None |
-| 2026020225 | CBJ at DAL | True | False | True | None |
 | 2026020226 | CGY at COL | True | False | True | None |
 | 2026020227 | WPG at CAR | True | False | True | None |
 | 2026020228 | MIN at WSH | True | False | True | None |
 | 2026020229 | UTA at PHI | True | False | True | None |
+| 2026020230 | EDM at NYR | True | False | True | None |
+| 2026020231 | OTT at ANA | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -187,10 +186,12 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020227 | WPG at CAR | 2026-11-01T18:00:00+00:00 | enrolled | — |
 | 2026020228 | MIN at WSH | 2026-11-01T20:30:00+00:00 | enrolled | — |
 | 2026020229 | UTA at PHI | 2026-11-01T21:00:00+00:00 | enrolled | — |
+| 2026020230 | EDM at NYR | 2026-11-01T23:00:00+00:00 | enrolled | — |
+| 2026020231 | OTT at ANA | 2026-11-02T01:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 124. Latest: `20261031T213535704102Z`.
+Audited capture manifests: 125. Latest: `20261101T011054851724Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
