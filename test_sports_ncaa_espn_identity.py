@@ -139,7 +139,7 @@ class CollegeIdentityTests(unittest.TestCase):
                 def verify_then_mutate(*args,**kwargs):
                     nonlocal mutated
                     result=original_verify(*args,**kwargs)
-                    path.write_bytes(original_bytes+b'\\n')
+                    path.write_bytes(original_bytes+b'\n')
                     mutated=True
                     return result
 
