@@ -15,6 +15,7 @@ import sports_expansion_observer as source
 import sports_historical_content_seal as original_seal
 import sports_historical_extension_seal as independent_seal
 import sports_historical_fbs_crosscheck as crosscheck
+from sports_expansion_audit import strict_json_loads
 
 PROTOCOLS={league:{'league':league,'prior_game_window':window,
     'feature_fields':['prior_games','mean_points_for','mean_points_against','mean_margin','days_since_prior_start'],
@@ -106,19 +107,34 @@ def _records(base,league,split,now,report):
         if key in target and target[key]!=row:
             raise ValueError('College feature source identity changed during replay')
         target[key]=row
-    for saved,path,period in crosscheck._owned_sources(base,league,split,now):
+    for saved,path,period,verified in crosscheck._owned_sources(
+            base,league,split,now,with_verified_hashes=True):
+        receipt_bytes=crosscheck._read_bounded_original(path)
+        compressed=crosscheck._read_bounded_original(
+            path.with_name(path.name.replace('.receipt.json','.json.gz')))
+        if (hashlib.sha256(receipt_bytes).hexdigest()!=verified['receipt_sha256']
+                or hashlib.sha256(compressed).hexdigest()!=verified['archive_sha256']):
+            raise ValueError('College feature NCAA originals changed during replay')
         ref=(period.get('week',period.get('source_date')),
-             hashlib.sha256(path.read_bytes()).hexdigest(),saved['original_response_sha256'])
+             verified['receipt_sha256'],saved['original_response_sha256'])
         for row in saved['parsed_ncaa_games']:
             if row['ncaa_game_id'] in wanted_n:
                 if ref not in expected_n[row['ncaa_game_id']]:
                     raise ValueError('College feature NCAA receipt changed during replay')
                 retain(ncaa,row['ncaa_game_id'],row)
     for day in history.dates_by_league()[league][split]:
-        if not history.verify_existing(base,league,split,day,as_of=now):continue
+        verified=history.verify_existing(base,league,split,day,as_of=now,
+                                         return_verified_hashes=True)
+        if not verified:continue
         path=base/history.ROOT/'sources'/league/split/(day+'.receipt.json')
-        saved=json.loads(path.read_bytes())
-        ref=(day,hashlib.sha256(path.read_bytes()).hexdigest(),saved['original_response_sha256'])
+        receipt_bytes=crosscheck._read_bounded_original(path)
+        compressed=crosscheck._read_bounded_original(
+            path.with_name(path.name.replace('.receipt.json','.json.gz')))
+        if (hashlib.sha256(receipt_bytes).hexdigest()!=verified['receipt_sha256']
+                or hashlib.sha256(compressed).hexdigest()!=verified['archive_sha256']):
+            raise ValueError('College feature ESPN originals changed during replay')
+        saved=strict_json_loads(receipt_bytes)
+        ref=(day,verified['receipt_sha256'],saved['original_response_sha256'])
         for row in saved['parsed_provider_scoreboard']['games']:
             if row['game_id'] in wanted_e:
                 if ref not in expected_e[row['game_id']]:
