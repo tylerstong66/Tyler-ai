@@ -27,16 +27,20 @@ def _read_bounded_original(path):
 def _owned_sources(base, league, split, now, *, with_verified_hashes=False):
     if league == 'NCAAF_FBS':
         for week in owned.WEEKS:
-            verified = owned.verify(base, split, week, now=now, return_verified_hashes=True)
+            verified = (owned.verify(base, split, week, now=now, return_verified_hashes=True)
+                        if with_verified_hashes else owned.verify(base, split, week, now=now))
             if verified is not None:
-                item = (verified['saved'], base/owned.ROOT/split/f'week-{week:02d}.receipt.json', {'week': week})
+                item = (verified['saved'] if with_verified_hashes else verified,
+                        base/owned.ROOT/split/f'week-{week:02d}.receipt.json', {'week': week})
                 yield (*item, verified) if with_verified_hashes else item
     else:
         import sports_ncaa_d1_historical_owned as d1
         for day in d1.DATES[split]:
-            verified = d1.verify(base, split, day, now=now, return_verified_hashes=True)
+            verified = (d1.verify(base, split, day, now=now, return_verified_hashes=True)
+                        if with_verified_hashes else d1.verify(base, split, day, now=now))
             if verified is not None:
-                item = (verified['saved'], base/d1.ROOT/split/(day+'.receipt.json'), {'source_date': day})
+                item = (verified['saved'] if with_verified_hashes else verified,
+                        base/d1.ROOT/split/(day+'.receipt.json'), {'source_date': day})
                 yield (*item, verified) if with_verified_hashes else item
 
 
