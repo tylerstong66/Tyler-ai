@@ -10,6 +10,8 @@ from datetime import datetime, timezone
 
 import sports_expansion_historical_capture as history
 import sports_ncaa_historical_owned as owned
+import sports_ncaa_d1_historical_owned as d1
+from test_sports_ncaa_d1_historical_owned import fetch as d1_fetch
 import sports_historical_fbs_crosscheck as crosscheck
 from test_sports_ncaa_espn_identity import official_game, espn_game
 
@@ -158,6 +160,48 @@ class HistoricalFbsCrosscheckTests(unittest.TestCase):
                         with self.assertRaises(ValueError):
                             crosscheck.build(root, now=NOW, league=league)
                     self.assertEqual(seen, 2)
+
+    def test_direct_college_join_rejects_postverification_owned_byte_swaps(self):
+        # A successfully verified NCAA-owned receipt cannot be replaced before
+        # the direct join publishes its provenance, even with equivalent JSON.
+        for league in ('NCAAF_FBS', 'NCAAM_D1'):
+            for mutation in ('receipt_whitespace', 'archive_recompressed',
+                             'receipt_symlink', 'oversized_archive'):
+                with self.subTest(league=league, mutation=mutation), tempfile.TemporaryDirectory() as td:
+                    root = Path(td)
+                    self.seed(root)
+                    module = owned if league == 'NCAAF_FBS' else d1
+                    if league == 'NCAAM_D1':
+                        d1.capture(d1_fetch, base=root, now=NOW, per_run=1)
+                    folder = root / module.ROOT / 'train'
+                    receipt = next(folder.glob('*.receipt.json'))
+                    archive = next(folder.glob('*.json.gz'))
+                    original_verify = module.verify
+                    changed = False
+
+                    def verified_then_replace(*args, **kwargs):
+                        nonlocal changed
+                        verified = original_verify(*args, **kwargs)
+                        if verified is not None and kwargs.get('return_verified_hashes') and not changed:
+                            changed = True
+                            if mutation == 'receipt_whitespace':
+                                receipt.write_bytes(receipt.read_bytes() + b'\\n')
+                            elif mutation == 'archive_recompressed':
+                                archive.write_bytes(gzip.compress(
+                                    gzip.decompress(archive.read_bytes()), mtime=1))
+                            elif mutation == 'receipt_symlink':
+                                outside = root / 'outside-ncaa-receipt.json'
+                                outside.write_bytes(receipt.read_bytes())
+                                receipt.unlink()
+                                receipt.symlink_to(outside)
+                            else:
+                                archive.write_bytes(b'x' * (8_500_000 + 1))
+                        return verified
+
+                    with patch.object(module, 'verify', side_effect=verified_then_replace):
+                        with self.assertRaises(ValueError):
+                            crosscheck.build(root, now=NOW, league=league)
+                    self.assertTrue(changed)
 
     def test_modified_independent_source_rejected(self):
         with tempfile.TemporaryDirectory() as td:

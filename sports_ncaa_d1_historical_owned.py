@@ -76,7 +76,7 @@ def _parse_with_quarantine(raw, split, day, observed):
     return rows, quarantined
 
 
-def verify(base, split, day, *, now=None):
+def verify(base, split, day, *, now=None, return_verified_hashes=False):
     day = _scope(split, day); now = now or datetime.now(timezone.utc)
     if now.tzinfo is None:
         raise ValueError('Aware NCAA D1 audit clock required')
@@ -90,7 +90,8 @@ def verify(base, split, day, *, now=None):
         raise ValueError('Missing NCAA D1 sealed source component')
     if path.stat().st_size > MAX_BLOB_SIZE:
         raise ValueError('Oversized NCAA D1 historical receipt')
-    saved = strict_json_loads(path.read_bytes())
+    receipt_bytes = path.read_bytes()
+    saved = strict_json_loads(receipt_bytes)
     if (saved.get('schema') not in ('tyler-ncaa-owned-d1-history-day-v1',
                                          'tyler-ncaa-owned-d1-history-day-v2')
             or saved.get('league') != 'NCAAM_D1' or saved.get('split') != split
@@ -107,7 +108,8 @@ def verify(base, split, day, *, now=None):
         raise ValueError('NCAA D1 source observation is future-dated')
     if blob.stat().st_size > MAX_BLOB_SIZE:
         raise ValueError('Oversized compressed NCAA D1 source')
-    raw = bounded_gzip_read(blob.read_bytes(), limit=ncaa.MAX_BYTES)
+    compressed_bytes = blob.read_bytes()
+    raw = bounded_gzip_read(compressed_bytes, limit=ncaa.MAX_BYTES)
     if hashlib.sha256(raw).hexdigest() != saved['original_response_sha256']:
         raise ValueError('NCAA D1 original response digest mismatch')
     if saved['schema']=='tyler-ncaa-owned-d1-history-day-v2':
@@ -120,6 +122,10 @@ def verify(base, split, day, *, now=None):
             raise ValueError('Legacy NCAA D1 source cannot contain unverified quarantine')
     if rows != saved['parsed_ncaa_games']:
         raise ValueError('NCAA D1 original normalization changed')
+    if return_verified_hashes:
+        return {'saved': saved,
+                'receipt_sha256': hashlib.sha256(receipt_bytes).hexdigest(),
+                'archive_sha256': hashlib.sha256(compressed_bytes).hexdigest()}
     return saved
 
 

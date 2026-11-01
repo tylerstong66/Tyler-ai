@@ -42,7 +42,7 @@ def _rows(raw, split, observed, *, league='NCAAF_FBS'):
     return rows
 
 
-def verify(base, split, week, *, now=None):
+def verify(base, split, week, *, now=None, return_verified_hashes=False):
     stem = _scope(split, week)
     now = now or datetime.now(timezone.utc)
     if now.tzinfo is None:
@@ -57,7 +57,8 @@ def verify(base, split, week, *, now=None):
         raise ValueError('Missing sealed NCAA historical archive component')
     if path.stat().st_size > MAX_BLOB_SIZE:
         raise ValueError('Oversized NCAA historical receipt')
-    saved = strict_json_loads(path.read_bytes())
+    receipt_bytes = path.read_bytes()
+    saved = strict_json_loads(receipt_bytes)
     if (saved.get('schema') != 'tyler-ncaa-owned-history-week-v1'
             or saved.get('league') != 'NCAAF_FBS' or saved.get('split') != split
             or saved.get('season_year') != YEARS[split] or saved.get('week') != week
@@ -73,11 +74,16 @@ def verify(base, split, week, *, now=None):
         raise ValueError('NCAA historical observation is future-dated')
     if blob.stat().st_size > MAX_BLOB_SIZE:
         raise ValueError('Oversized compressed NCAA historical source')
-    raw = bounded_gzip_read(blob.read_bytes(), limit=ncaa.MAX_BYTES)
+    compressed_bytes = blob.read_bytes()
+    raw = bounded_gzip_read(compressed_bytes, limit=ncaa.MAX_BYTES)
     if hashlib.sha256(raw).hexdigest() != saved['original_response_sha256']:
         raise ValueError('NCAA historical original response digest mismatch')
     if _rows(raw, split, observed) != saved['parsed_ncaa_games']:
         raise ValueError('NCAA historical normalization differs from raw archive')
+    if return_verified_hashes:
+        return {'saved': saved,
+                'receipt_sha256': hashlib.sha256(receipt_bytes).hexdigest(),
+                'archive_sha256': hashlib.sha256(compressed_bytes).hexdigest()}
     return saved
 
 
