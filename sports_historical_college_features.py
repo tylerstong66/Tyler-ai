@@ -132,7 +132,7 @@ def _records(base,league,split,now,report):
             path.with_name(path.name.replace('.receipt.json','.json.gz')))
         if (hashlib.sha256(receipt_bytes).hexdigest()!=verified['receipt_sha256']
                 or hashlib.sha256(compressed).hexdigest()!=verified['archive_sha256']):
-            raise ValueError('College feature ESPN originals changed during replay')
+            raise ValueError('College feature ESPN receipt changed or source archive changed during replay')
         saved=strict_json_loads(receipt_bytes)
         ref=(day,verified['receipt_sha256'],saved['original_response_sha256'])
         for row in saved['parsed_provider_scoreboard']['games']:
