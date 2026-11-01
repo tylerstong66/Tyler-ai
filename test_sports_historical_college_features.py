@@ -1,5 +1,6 @@
 """College feature diagnostics isolate sports, seasons and availability views."""
 import copy
+import gzip
 from datetime import datetime,timedelta,timezone
 from pathlib import Path
 import json
@@ -9,6 +10,9 @@ from unittest.mock import patch
 
 import sports_historical_college_features as features
 import test_sports_historical_d1_crosscheck as fixtures
+from test_sports_historical_fbs_crosscheck import HistoricalFbsCrosscheckTests
+import sports_ncaa_historical_owned as fbs_owned
+import sports_ncaa_d1_historical_owned as d1_owned
 
 
 def game(index,*,league='NCAAF_FBS',days=None):
@@ -96,6 +100,48 @@ class HistoricalCollegeFeatureTests(unittest.TestCase):
             path.write_bytes(features.source.canonical(saved))
             with self.assertRaisesRegex(ValueError,'ESPN receipt changed'):
                 features._records(root,'NCAAM_D1','train',fixtures.NOW,report)
+
+    def test_feature_adapter_rejects_postverification_source_byte_substitution(self):
+        for league in ('NCAAF_FBS', 'NCAAM_D1'):
+            for provider in ('ncaa', 'espn'):
+                for mutation in ('receipt_whitespace', 'archive_recompressed'):
+                    with self.subTest(league=league, provider=provider, mutation=mutation), \
+                            tempfile.TemporaryDirectory() as td:
+                        root=Path(td)
+                        if league=='NCAAF_FBS':
+                            HistoricalFbsCrosscheckTests().seed(root)
+                        else:
+                            fixtures.HistoricalD1CrosscheckTests().seed(root)
+                        report=features.crosscheck.build(root,league=league,now=fixtures.NOW)
+                        if provider=='ncaa':
+                            module=fbs_owned if league=='NCAAF_FBS' else d1_owned
+                            folder=root/module.ROOT/'train'
+                            verify_name='verify'
+                        else:
+                            module=features.history
+                            folder=root/module.ROOT/'sources'/league/'train'
+                            verify_name='verify_existing'
+                        receipt=next(folder.glob('*.receipt.json'))
+                        archive=next(folder.glob('*.json.gz'))
+                        original=getattr(module,verify_name)
+                        changed=False
+
+                        def verified_then_replace(*args,**kwargs):
+                            nonlocal changed
+                            verified=original(*args,**kwargs)
+                            if (verified and kwargs.get('return_verified_hashes') and not changed):
+                                changed=True
+                                if mutation=='receipt_whitespace':
+                                    receipt.write_bytes(receipt.read_bytes()+b'\\n')
+                                else:
+                                    archive.write_bytes(gzip.compress(
+                                        gzip.decompress(archive.read_bytes()),mtime=1))
+                            return verified
+
+                        with patch.object(module,verify_name,side_effect=verified_then_replace):
+                            with self.assertRaises(ValueError):
+                                features._records(root,league,'train',fixtures.NOW,report)
+                        self.assertTrue(changed)
 
     def test_build_verifies_seals_and_keeps_all_eligibility_guards(self):
         rows=[game(0),game(1)]
