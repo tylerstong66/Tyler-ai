@@ -1,4 +1,16 @@
-# Sports Betting Analyst v1 — verified handoff (2026-10-30)
+# Sports Betting Analyst v1 — verified handoff (2026-11-01)
+
+## November 1 — direct college historical source-byte provenance, no training
+
+Recovered main and reviewed open sports issues (#98 MLB cross-cohort reschedule identity and #217 NHL sportsbook-specific future price/close proof), source-only historical FBS/D1/NBA cohorts, the saved October 31 collector evidence and active PR #291. No new independently certified governing-body finals, training-ready historical cohort or forward-only college/NBA predictions were established.
+
+PR #291 merged at `9ac46e2ddf4e72b99600692bc36d6f3823d1a4b5` after **all 13 exact-head PR CI workflows succeeded**. The direct historical FBS/D1 ESPN two-source join now binds its bounded receipt and compressed-original second reads to the verifier's exact SHA-256 digests, rejecting whitespace-only valid-JSON receipt substitutions, recompressed archives, symlinks and oversized replacements. The shared historical identity audit already had this guard under #290; #291 closes the separate direct college join path.
+
+PR #292 merged at `8b7f2fbacc70fb55bac090fcdc28c4f7f58d6bfe` after **all 13 exact-head CI workflows succeeded**, including integrated sports regression and archived college final receipt replay. The separate FBS and D1 NCAA-owned historical verifiers now optionally expose the exact verified receipt and compressed-archive digests. The direct college join checks its bounded second reads against those digests before publishing NCAA-owned provenance. Adversarial tests for both leagues mutate receipt whitespace, recompress an archive, substitute a receipt symlink and replace an archive with oversized bytes after verification. The first CI attempt revealed six downstream consumers relying on the original three-item source iterator; the implementation was corrected to preserve their legacy interface and verifier call shape, and all checks passed on final head `057de4e32123b371670d834c3ded41e7b013a329`. No immutable original was rewritten. Static file checks do not independently attest publication or prevent concurrent filesystem mutation.
+
+The latest independently checked saved source workflow remains the October 31 post-#285 run: **68** NBA frozen feature observations, **24** source-agreement observations, **44** pending and **zero enrolled outcomes**. No post-#291/#292 **main-branch live collector** has yet been verified; passing PR CI and archived replay must not be relabelled as that verification. Independent NCAA/NBA official-final certification and season/postseason/completeness qualification remain incomplete; training, historical grading, prospective forecasting and promotion remain disabled. NHL/NFL/MLB research and the separate hourly results monitor remain isolated.
+
+Next: verify the next main-branch integrated and college/NBA source collector workflows on the merged #292 code and exact saved receipts; inspect remaining NCAA-owned original-source and source-identity qualification gaps without changing frozen originals. Advance governing-body official finals, season/postseason/rescheduling/completeness and source chronology before any sport-specific time-split fitting or genuine future paper predictions. Maintain `NO_BET=true`, zero actual wagers, no model promotion, no sportsbook claims, Render auto-deploy OFF and production unchanged.
 
 ## October 31 — post-#285 live source replay and direct historical join hardening
 
