@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-01T23:36:13.571860+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-11-02T06:04:03.545817+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 54 / 50 / 4 |
-| Started games in retained official schedules / enrolled | 53 / 53 |
+| Recorded / settled / pending | 55 / 54 / 1 |
+| Started games in retained official schedules / enrolled | 54 / 54 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 54 / 54 |
-| Settled with enrollment prices / decisive market-paired | 50 / 49 |
+| Enrollment-time priced forecasts | 55 / 55 |
+| Settled with enrollment prices / decisive market-paired | 54 / 53 |
 | Separate later quotes recorded prospectively | 0 |
 
 A priced NFL tie is excluded only from binary decisive market comparisons.
@@ -25,11 +25,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-01T23:36:13.571860+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-02T06:04:03.545817+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026_08_PHI_WAS | PHI at WAS | True | False | True | None |
+| 2026_08_CHI_SEA | CHI at SEA | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -82,6 +82,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026_08_ATL_TB | ATL at TB | 2026-11-01T18:00:00+00:00 | enrolled | — |
 | 2026_08_BAL_BUF | BAL at BUF | 2026-11-01T18:00:00+00:00 | enrolled | — |
 | 2026_08_CAR_GB | CAR at GB | 2026-10-30T00:15:00+00:00 | enrolled | — |
+| 2026_08_CHI_SEA | CHI at SEA | 2026-11-03T01:15:00+00:00 | enrolled | — |
 | 2026_08_CLE_PIT | CLE at PIT | 2026-11-01T18:00:00+00:00 | enrolled | — |
 | 2026_08_IND_JAX | IND at JAX | 2026-11-01T18:00:00+00:00 | enrolled | — |
 | 2026_08_KC_DEN | KC at DEN | 2026-11-01T21:25:00+00:00 | enrolled | — |
@@ -94,7 +95,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 130. Latest: `20261101T233610272301Z`.
+Audited capture manifests: 131. Latest: `20261102T060359458924Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
