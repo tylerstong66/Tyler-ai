@@ -1,11 +1,11 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-11-02T23:30:52.817778+00:00",
-  "capture_count": 133,
+  "as_of_evidence_at": "2026-11-03T06:48:01.504460+00:00",
+  "capture_count": 134,
   "cohort_started_at": "2026-10-11T15:19:59+00:00",
   "completion_note": "Saved NFL manifests before coverage-v1 lack a completion flag; successful workflow corroboration remains required.",
-  "decisive_market_paired": 53,
+  "decisive_market_paired": 54,
   "enrollment_priced": 55,
   "followup_quotes_separate_from_original_metrics": [],
   "games": [
@@ -749,7 +749,7 @@
       "lead_hours": 19.18233201861111,
       "pregame_schedule_observations_in_window": 3,
       "recorded_at": "2026-11-02T06:04:03.604733+00:00",
-      "started_by_as_of": false,
+      "started_by_as_of": true,
       "status": "enrolled"
     },
     {
@@ -906,7 +906,7 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "2ae17b255054f0da9d0e8a4afb0a8c6a162512730bcbeccc602443cb32bf2f8b",
+  "input_digest": "6f954cfbce4f7273904d681b7deef47c48deaf5f5a8b97f8368e2f19caf9543d",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -935,13 +935,9 @@
       "to": "2026-10-26T14:16:43.923315+00:00"
     }
   ],
-  "latest_attempted_capture": "20261102T233049780111Z",
-  "latest_capture": "20261102T233049780111Z",
+  "latest_attempted_capture": "20261103T064758159261Z",
+  "latest_capture": "20261103T064758159261Z",
   "latest_enrollment_decisions": [
-    {
-      "decision": "already_enrolled",
-      "game_id": "2026_08_PHI_WAS"
-    },
     {
       "decision": "already_enrolled",
       "game_id": "2026_08_CHI_SEA"
@@ -949,35 +945,20 @@
   ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": null,
-  "latest_official_schedule_observed_at": "2026-11-02T23:30:50.512802+00:00",
+  "latest_official_schedule_observed_at": "2026-11-03T06:47:59.992409+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [],
   "minimum_forecast_lead_hours": 1.5221828808333333,
   "observed_missing_started_games": [],
   "official_daily_conflicted_capture_count": 0,
-  "pending": 1,
+  "pending": 0,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-11-02T23:30:52.817778+00:00",
-    "games": [
-      {
-        "away": "CHI",
-        "enrolled": true,
-        "enrollment_priced": true,
-        "game_id": "2026_08_CHI_SEA",
-        "home": "SEA",
-        "issues": [],
-        "kickoff": "2026-11-03T01:15:00+00:00",
-        "latest_scoreboard_observed_at": "2026-11-02T23:30:51.830209+00:00",
-        "latest_scoreboard_priced": true,
-        "ready": true,
-        "saved_vs_latest_official_start": null,
-        "separate_followup_recorded": false
-      }
-    ],
+    "as_of_evidence_at": "2026-11-03T06:48:01.504460+00:00",
+    "games": [],
     "limitation": "Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.",
-    "observed_games": 1,
-    "ready_games": 1,
-    "status": "ready_as_of_snapshot",
+    "observed_games": 0,
+    "ready_games": 0,
+    "status": "no_upcoming_games_observed",
     "window_hours": 24
   },
   "report_version": "prospective-coverage-v1",
@@ -1043,10 +1024,10 @@
       "observed_at": "2026-10-29T16:07:52.856648+00:00"
     }
   ],
-  "settled": 54,
-  "settled_enrollment_priced": 54,
+  "settled": 55,
+  "settled_enrollment_priced": 55,
   "settled_ties_with_prices": 1,
   "sport": "NFL",
-  "started_schedule_games_enrolled": 54,
-  "started_schedule_games_in_scope": 54
+  "started_schedule_games_enrolled": 55,
+  "started_schedule_games_in_scope": 55
 }

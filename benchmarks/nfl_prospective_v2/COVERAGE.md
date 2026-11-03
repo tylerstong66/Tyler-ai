@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-02T23:30:52.817778+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-11-03T06:48:01.504460+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 55 / 54 / 1 |
-| Started games in retained official schedules / enrolled | 54 / 54 |
+| Recorded / settled / pending | 55 / 55 / 0 |
+| Started games in retained official schedules / enrolled | 55 / 55 |
 | Observed missing started games | 0 |
 | Enrollment-time priced forecasts | 55 / 55 |
-| Settled with enrollment prices / decisive market-paired | 54 / 53 |
+| Settled with enrollment prices / decisive market-paired | 55 / 54 |
 | Separate later quotes recorded prospectively | 0 |
 
 A priced NFL tie is excluded only from binary decisive market comparisons.
@@ -25,11 +25,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-02T23:30:52.817778+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-03T06:48:01.504460+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026_08_CHI_SEA | CHI at SEA | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -95,7 +94,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 133. Latest: `20261102T233049780111Z`.
+Audited capture manifests: 134. Latest: `20261103T064758159261Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
