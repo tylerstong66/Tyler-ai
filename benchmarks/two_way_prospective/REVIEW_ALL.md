@@ -5,7 +5,7 @@
 | Sport | Settled | Recorded | Pending | Market-paired | 100-game review | Report |
 |---|---:|---:|---:|---:|---|---|
 | NFL | 55 | 55 | 0 | 54 | collecting | [Review](../nfl_prospective_v2/REVIEW.md) |
-| NHL | 151 | 164 | 13 | 151 | ready_for_human_review | [Review](nhl/REVIEW.md) |
+| NHL | 162 | 166 | 4 | 162 | ready_for_human_review | [Review](nhl/REVIEW.md) |
 | MLB | 12 | 15 | 3 | 7 | collecting | [Review](mlb/REVIEW.md) |
 
 ## First-100-enrolled checkpoints
