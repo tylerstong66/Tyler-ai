@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-03T21:00:09.979966+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-04T01:22:23.984260+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 162 / 151 / 11 |
-| Started games in retained official schedules / enrolled | 152 / 151 |
+| Recorded / settled / pending | 164 / 151 / 13 |
+| Started games in retained official schedules / enrolled | 162 / 161 |
 | Observed missing started games | 1 |
-| Enrollment-time priced forecasts | 162 / 162 |
+| Enrollment-time priced forecasts | 164 / 164 |
 | Settled with enrollment prices / decisive market-paired | 151 / 151 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -23,21 +23,13 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-03T21:00:09.979966+00:00. Ready: 11 / 11 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-04T01:22:23.984260+00:00. Ready: 3 / 3 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020236 | UTA at TOR | True | False | True | None |
-| 2026020237 | WPG at MTL | True | False | True | None |
-| 2026020238 | DET at TBL | True | False | True | None |
-| 2026020239 | EDM at NJD | True | False | True | None |
-| 2026020240 | STL at NYR | True | False | True | None |
-| 2026020241 | MIN at PHI | True | False | True | None |
-| 2026020242 | VGK at PIT | True | False | True | None |
-| 2026020243 | DAL at WSH | True | False | True | None |
-| 2026020244 | COL at CBJ | True | False | True | None |
-| 2026020245 | CAR at NSH | True | False | True | None |
 | 2026020246 | ANA at VAN | True | False | True | None |
+| 2026020247 | OTT at BUF | True | False | True | None |
+| 2026020248 | CHI at FLA | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -208,10 +200,12 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020244 | COL at CBJ | 2026-11-04T00:00:00+00:00 | enrolled | — |
 | 2026020245 | CAR at NSH | 2026-11-04T01:00:00+00:00 | enrolled | — |
 | 2026020246 | ANA at VAN | 2026-11-04T02:00:00+00:00 | enrolled | — |
+| 2026020247 | OTT at BUF | 2026-11-05T00:30:00+00:00 | enrolled | — |
+| 2026020248 | CHI at FLA | 2026-11-05T00:30:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 135. Latest: `20261103T210008768007Z`.
+Audited capture manifests: 136. Latest: `20261104T012222180391Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
