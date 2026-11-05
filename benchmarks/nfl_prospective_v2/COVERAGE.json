@@ -1,12 +1,12 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-11-04T23:39:58.189424+00:00",
-  "capture_count": 140,
+  "as_of_evidence_at": "2026-11-05T06:47:30.464090+00:00",
+  "capture_count": 141,
   "cohort_started_at": "2026-10-11T15:19:59+00:00",
   "completion_note": "Saved NFL manifests before coverage-v1 lack a completion flag; successful workflow corroboration remains required.",
   "decisive_market_paired": 54,
-  "enrollment_priced": 55,
+  "enrollment_priced": 56,
   "followup_quotes_separate_from_original_metrics": [],
   "games": [
     {
@@ -904,9 +904,28 @@
       "recorded_at": "2026-10-31T21:35:35.384712+00:00",
       "started_by_as_of": true,
       "status": "enrolled"
+    },
+    {
+      "away": "JAX",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-11-05T06:47:28.701820+00:00",
+      "game_id": "2026_09_JAX_BAL",
+      "home": "BAL",
+      "kickoff": "2026-11-06T01:15:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-11-05T06:47:30.465547+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_09_JAX_BAL",
+        "priced": true
+      },
+      "lead_hours": 18.45819246,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-11-05T06:47:30.507144+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
     }
   ],
-  "input_digest": "33c12347969b4f073d93bf31426e693c219c44f3b6c1d9394e857b21a9caac60",
+  "input_digest": "99db5117a32a357cf9e595a6dded729713031d85f62772dcb9d8a4767fb838b6",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -935,29 +954,51 @@
       "to": "2026-10-13T15:59:32.638363+00:00"
     }
   ],
-  "latest_attempted_capture": "20261104T233955799779Z",
-  "latest_capture": "20261104T233955799779Z",
-  "latest_enrollment_decisions": [],
+  "latest_attempted_capture": "20261105T064727948154Z",
+  "latest_capture": "20261105T064727948154Z",
+  "latest_enrollment_decisions": [
+    {
+      "checked_at": "2026-11-05T06:47:30.465547+00:00",
+      "decision": "enrolled",
+      "game_id": "2026_09_JAX_BAL",
+      "priced": true
+    }
+  ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": null,
-  "latest_official_schedule_observed_at": "2026-11-04T23:39:56.650511+00:00",
+  "latest_official_schedule_observed_at": "2026-11-05T06:47:28.701820+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [],
   "minimum_forecast_lead_hours": 1.5221828808333333,
   "observed_missing_started_games": [],
   "official_daily_conflicted_capture_count": 0,
-  "pending": 0,
+  "pending": 1,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-11-04T23:39:58.189424+00:00",
-    "games": [],
+    "as_of_evidence_at": "2026-11-05T06:47:30.464090+00:00",
+    "games": [
+      {
+        "away": "JAX",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_09_JAX_BAL",
+        "home": "BAL",
+        "issues": [],
+        "kickoff": "2026-11-06T01:15:00+00:00",
+        "latest_scoreboard_observed_at": "2026-11-05T06:47:29.855202+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      }
+    ],
     "limitation": "Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.",
-    "observed_games": 0,
-    "ready_games": 0,
-    "status": "no_upcoming_games_observed",
+    "observed_games": 1,
+    "ready_games": 1,
+    "status": "ready_as_of_snapshot",
     "window_hours": 24
   },
   "report_version": "prospective-coverage-v1",
-  "saved": 55,
+  "saved": 56,
   "saved_collector_errors": [
     {
       "capture": "20261011T201726017233Z",
