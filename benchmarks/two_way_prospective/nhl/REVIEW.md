@@ -81,7 +81,7 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/two_way_prospective/nhl/captures/20261105T152748995319Z/manifest.json.
+Latest saved manifest: benchmarks/two_way_prospective/nhl/captures/20261105T215911632883Z/manifest.json.
 Manifest completion field: True. Errors: []. Exclusions: [{"game_id": "2026020259", "reason": "Exact official/ESPN matchup and kickoff match required"}].
 Optional availability errors: [].
 Newer saved collection failure: null.
