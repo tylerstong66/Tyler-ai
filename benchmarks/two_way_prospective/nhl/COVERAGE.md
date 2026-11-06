@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-06T10:53:13.798943+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-06T17:57:56.511007+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 179 / 176 / 3 |
+| Recorded / settled / pending | 180 / 176 / 4 |
 | Started games in retained official schedules / enrolled | 178 / 176 |
 | Observed missing started games | 2 |
-| Enrollment-time priced forecasts | 179 / 179 |
+| Enrollment-time priced forecasts | 180 / 180 |
 | Settled with enrollment prices / decisive market-paired | 176 / 176 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -23,13 +23,14 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-06T10:53:13.798943+00:00. Ready: 3 / 3 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-06T17:57:56.511007+00:00. Ready: 4 / 4 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
 | 2026020262 | CBJ at BUF | True | False | True | None |
 | 2026020263 | SJS at MIN | True | False | True | None |
 | 2026020264 | ANA at CGY | True | False | True | None |
+| 2026020265 | FLA at WSH | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -218,10 +219,11 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020262 | CBJ at BUF | 2026-11-07T00:00:00+00:00 | enrolled | — |
 | 2026020263 | SJS at MIN | 2026-11-07T01:00:00+00:00 | enrolled | — |
 | 2026020264 | ANA at CGY | 2026-11-07T01:00:00+00:00 | enrolled | — |
+| 2026020265 | FLA at WSH | 2026-11-07T17:30:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 144. Latest: `20261106T105312600006Z`.
+Audited capture manifests: 145. Latest: `20261106T175755344477Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
