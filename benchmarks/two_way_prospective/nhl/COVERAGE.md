@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-06T02:27:06.111755+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-06T10:53:13.798943+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 179 / 166 / 13 |
-| Started games in retained official schedules / enrolled | 177 / 175 |
-| Observed missing started games | 1 |
+| Recorded / settled / pending | 179 / 176 / 3 |
+| Started games in retained official schedules / enrolled | 178 / 176 |
+| Observed missing started games | 2 |
 | Enrollment-time priced forecasts | 179 / 179 |
-| Settled with enrollment prices / decisive market-paired | 166 / 166 |
+| Settled with enrollment prices / decisive market-paired | 176 / 176 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,11 +23,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-06T02:27:06.111755+00:00. Ready: 4 / 4 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-06T10:53:13.798943+00:00. Ready: 3 / 3 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020261 | NSH at COL | True | False | True | None |
 | 2026020262 | CBJ at BUF | True | False | True | None |
 | 2026020263 | SJS at MIN | True | False | True | None |
 | 2026020264 | ANA at CGY | True | False | True | None |
@@ -213,7 +212,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020256 | PHI at NYR | 2026-11-06T00:00:00+00:00 | enrolled | — |
 | 2026020257 | BOS at PIT | 2026-11-06T00:00:00+00:00 | enrolled | — |
 | 2026020258 | DAL at CBJ | 2026-11-06T00:00:00+00:00 | enrolled | — |
-| 2026020259 | VAN at WPG | 2026-11-06T00:00:00+00:00 | unverified or not normally scheduled | Exact official/ESPN matchup and kickoff match required |
+| 2026020259 | VAN at WPG | 2026-11-06T00:00:00+00:00 | missed despite pregame schedule observation | Exact official/ESPN matchup and kickoff match required |
 | 2026020260 | ANA at EDM | 2026-11-06T01:00:00+00:00 | enrolled | — |
 | 2026020261 | NSH at COL | 2026-11-06T02:30:00+00:00 | enrolled | — |
 | 2026020262 | CBJ at BUF | 2026-11-07T00:00:00+00:00 | enrolled | — |
@@ -222,15 +221,15 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 143. Latest: `20261106T022703948886Z`.
+Audited capture manifests: 144. Latest: `20261106T105312600006Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
 | 2026-10-12T07:21:45.218639+00:00 | 2026-10-12T17:55:07.856333+00:00 | 10.56 |
 | 2026-11-02T06:04:03.744078+00:00 | 2026-11-02T15:54:25.612358+00:00 | 9.84 |
 | 2026-11-05T06:47:30.616742+00:00 | 2026-11-05T15:27:48.995319+00:00 | 8.67 |
+| 2026-11-06T02:27:03.948886+00:00 | 2026-11-06T10:53:12.600006+00:00 | 8.44 |
 | 2026-11-03T06:48:01.636568+00:00 | 2026-11-03T15:08:26.843385+00:00 | 8.34 |
-| 2026-10-13T07:43:05.893709+00:00 | 2026-10-13T15:59:35.151837+00:00 | 8.27 |
 
 Historical exclusions and collector errors, including resolved ones, are retained in [COVERAGE.json](COVERAGE.json); these are not all current errors.
 

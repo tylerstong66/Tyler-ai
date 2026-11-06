@@ -4,46 +4,49 @@
   "availability_records": 158,
   "full_three_outcome_metrics": {
     "v1": {
-      "full_brier": 0.4755623299280052,
-      "full_log_loss": 0.7407555268803676
+      "full_brier": 0.472500373057627,
+      "full_log_loss": 0.7364055195443575
     },
     "v2": {
-      "full_brier": 0.4678564857734204,
-      "full_log_loss": 0.7329796319806108
+      "full_brier": 0.4647017207989127,
+      "full_log_loss": 0.7285246439480847
     }
   },
   "injury_effect_enabled": false,
   "paired_metrics": {
     "market": {
-      "binary_brier": 0.4426416968410905,
-      "conditional_log_loss": 0.6373315456968714,
-      "correct": 0.6666666666666666
+      "binary_brier": 0.43598643899033407,
+      "conditional_log_loss": 0.6297035491613332,
+      "correct": 0.6727272727272727
     },
     "v1": {
-      "binary_brier": 0.4568067091565808,
-      "conditional_log_loss": 0.6468546092786795,
-      "correct": 0.6111111111111112
+      "binary_brier": 0.45401831232076373,
+      "conditional_log_loss": 0.6440663913005621,
+      "correct": 0.6181818181818182
     },
     "v2": {
-      "binary_brier": 0.4489214332699331,
-      "conditional_log_loss": 0.6389347163252234,
-      "correct": 0.6481481481481481
+      "binary_brier": 0.4460412000760106,
+      "conditional_log_loss": 0.6360422270570845,
+      "correct": 0.6545454545454545
     }
   },
-  "paired_priced_decisive_games": 54,
-  "pending": 1,
+  "paired_priced_decisive_games": 55,
+  "pending": 0,
   "recorded": 56,
-  "settled": 55,
+  "settled": 56,
   "state": "collecting",
   "target": 100,
   "week_block_brier_difference": {
-    "approximate_95_percent_interval": null,
-    "blocks": 4,
-    "draws": 0,
-    "limitation": "No confidence interval below five season/week blocks; point estimate is descriptive, not a demonstrated edge.",
-    "mean_model_minus_market": 0.006279736428842608,
+    "approximate_95_percent_interval": [
+      -0.013619118539786312,
+      0.04551455013628129
+    ],
+    "blocks": 5,
+    "draws": 2000,
+    "limitation": "Descriptive season/week-cluster bootstrap only; five blocks are not proof of significance, calibration or profitable sports betting.",
+    "mean_model_minus_market": 0.010054761085676586,
     "minimum_blocks": 5,
     "seed": 1729,
-    "uncertainty_status": "insufficient_blocks"
+    "uncertainty_status": "available_descriptive"
   }
 }
