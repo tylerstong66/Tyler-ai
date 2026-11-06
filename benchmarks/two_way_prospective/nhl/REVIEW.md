@@ -2,7 +2,7 @@
 
 **NO BET — actual wagers $0.**
 
-Recorded: **176** · Settled: **166** · Pending: **10**
+Recorded: **179** · Settled: **166** · Pending: **13**
 
 100-settlement milestone: **ready_for_human_review**. This flag requests human review; it does not authorize model promotion or wagering.
 
@@ -81,8 +81,8 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/two_way_prospective/nhl/captures/20261105T215911632883Z/manifest.json.
-Manifest completion field: True. Errors: []. Exclusions: [{"game_id": "2026020259", "reason": "Exact official/ESPN matchup and kickoff match required"}].
+Latest saved manifest: benchmarks/two_way_prospective/nhl/captures/20261106T022703948886Z/manifest.json.
+Manifest completion field: True. Errors: []. Exclusions: [].
 Optional availability errors: [].
 Newer saved collection failure: null.
 Manifest completion alone does not imply absence of per-game errors.
