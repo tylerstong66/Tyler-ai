@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-06T17:57:56.511007+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-07T02:48:47.584126+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 180 / 176 / 4 |
-| Started games in retained official schedules / enrolled | 178 / 176 |
+| Recorded / settled / pending | 190 / 177 / 13 |
+| Started games in retained official schedules / enrolled | 181 / 179 |
 | Observed missing started games | 2 |
-| Enrollment-time priced forecasts | 180 / 180 |
-| Settled with enrollment prices / decisive market-paired | 176 / 176 |
+| Enrollment-time priced forecasts | 190 / 190 |
+| Settled with enrollment prices / decisive market-paired | 177 / 177 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,14 +23,21 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-06T17:57:56.511007+00:00. Ready: 4 / 4 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-07T02:48:47.584126+00:00. Ready: 11 / 11 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020262 | CBJ at BUF | True | False | True | None |
-| 2026020263 | SJS at MIN | True | False | True | None |
-| 2026020264 | ANA at CGY | True | False | True | None |
 | 2026020265 | FLA at WSH | True | False | True | None |
+| 2026020266 | STL at NSH | True | False | True | None |
+| 2026020267 | NYR at SEA | True | False | True | None |
+| 2026020268 | MTL at TOR | True | False | True | None |
+| 2026020269 | UTA at OTT | True | False | True | None |
+| 2026020270 | NJD at NYI | True | False | True | None |
+| 2026020271 | CHI at CAR | True | False | True | None |
+| 2026020272 | SJS at DAL | True | False | True | None |
+| 2026020273 | TBL at MIN | True | False | True | None |
+| 2026020274 | DET at COL | True | False | True | None |
+| 2026020275 | PIT at LAK | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -220,18 +227,28 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020263 | SJS at MIN | 2026-11-07T01:00:00+00:00 | enrolled | — |
 | 2026020264 | ANA at CGY | 2026-11-07T01:00:00+00:00 | enrolled | — |
 | 2026020265 | FLA at WSH | 2026-11-07T17:30:00+00:00 | enrolled | — |
+| 2026020266 | STL at NSH | 2026-11-07T18:00:00+00:00 | enrolled | — |
+| 2026020267 | NYR at SEA | 2026-11-07T22:00:00+00:00 | enrolled | — |
+| 2026020268 | MTL at TOR | 2026-11-08T00:00:00+00:00 | enrolled | — |
+| 2026020269 | UTA at OTT | 2026-11-08T00:00:00+00:00 | enrolled | — |
+| 2026020270 | NJD at NYI | 2026-11-08T00:00:00+00:00 | enrolled | — |
+| 2026020271 | CHI at CAR | 2026-11-08T01:00:00+00:00 | enrolled | — |
+| 2026020272 | SJS at DAL | 2026-11-08T01:00:00+00:00 | enrolled | — |
+| 2026020273 | TBL at MIN | 2026-11-08T01:00:00+00:00 | enrolled | — |
+| 2026020274 | DET at COL | 2026-11-08T02:00:00+00:00 | enrolled | — |
+| 2026020275 | PIT at LAK | 2026-11-08T02:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 145. Latest: `20261106T175755344477Z`.
+Audited capture manifests: 146. Latest: `20261107T024845655720Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
 | 2026-10-12T07:21:45.218639+00:00 | 2026-10-12T17:55:07.856333+00:00 | 10.56 |
 | 2026-11-02T06:04:03.744078+00:00 | 2026-11-02T15:54:25.612358+00:00 | 9.84 |
+| 2026-11-06T17:57:55.344477+00:00 | 2026-11-07T02:48:45.655720+00:00 | 8.85 |
 | 2026-11-05T06:47:30.616742+00:00 | 2026-11-05T15:27:48.995319+00:00 | 8.67 |
 | 2026-11-06T02:27:03.948886+00:00 | 2026-11-06T10:53:12.600006+00:00 | 8.44 |
-| 2026-11-03T06:48:01.636568+00:00 | 2026-11-03T15:08:26.843385+00:00 | 8.34 |
 
 Historical exclusions and collector errors, including resolved ones, are retained in [COVERAGE.json](COVERAGE.json); these are not all current errors.
 

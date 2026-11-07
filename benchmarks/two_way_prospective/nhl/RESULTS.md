@@ -1,6 +1,6 @@
 # Tyler NHL prospective paper test
 
-Recorded: **180** · Settled: **176** · Pending: **4**
+Recorded: **190** · Settled: **177** · Pending: **13**
 
 **NO BET — actual wagers $0.**
 
@@ -8,9 +8,9 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 
 | Model | Paired games | Brier | Log loss | Accuracy |
 |---|---:|---:|---:|---:|
-| model | 176 | 0.4822 | 0.6752 | 59.1% |
-| fixed_elo | 176 | 0.4702 | 0.6626 | 58.0% |
-| market | 176 | 0.4615 | 0.6531 | 56.8% |
+| model | 177 | 0.4818 | 0.6749 | 59.3% |
+| fixed_elo | 177 | 0.4691 | 0.6614 | 58.2% |
+| market | 177 | 0.4606 | 0.6522 | 57.1% |
 
 | Game | Start (Eastern) | Model pick | Win probability |
 |---|---|---|---:|
@@ -194,6 +194,16 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | SJS at MIN | Nov 06 08:00 PM | MIN | 58.2% |
 | ANA at CGY | Nov 06 08:00 PM | CGY | 52.0% |
 | FLA at WSH | Nov 07 12:30 PM | WSH | 53.3% |
+| STL at NSH | Nov 07 01:00 PM | NSH | 51.5% |
+| NYR at SEA | Nov 07 05:00 PM | SEA | 52.7% |
+| MTL at TOR | Nov 07 07:00 PM | MTL | 53.7% |
+| UTA at OTT | Nov 07 07:00 PM | OTT | 52.7% |
+| NJD at NYI | Nov 07 07:00 PM | NJD | 51.3% |
+| CHI at CAR | Nov 07 08:00 PM | CAR | 65.3% |
+| SJS at DAL | Nov 07 08:00 PM | DAL | 56.9% |
+| TBL at MIN | Nov 07 08:00 PM | MIN | 52.6% |
+| DET at COL | Nov 07 09:00 PM | COL | 56.3% |
+| PIT at LAK | Nov 07 09:00 PM | LAK | 51.9% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
 
