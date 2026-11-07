@@ -1,6 +1,6 @@
 # Tyler NHL prospective paper test
 
-Recorded: **191** · Settled: **179** · Pending: **12**
+Recorded: **193** · Settled: **181** · Pending: **12**
 
 **NO BET — actual wagers $0.**
 
@@ -8,9 +8,9 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 
 | Model | Paired games | Brier | Log loss | Accuracy |
 |---|---:|---:|---:|---:|
-| model | 179 | 0.4814 | 0.6744 | 59.2% |
-| fixed_elo | 179 | 0.4683 | 0.6605 | 58.1% |
-| market | 179 | 0.4596 | 0.6511 | 57.0% |
+| model | 181 | 0.4811 | 0.6741 | 59.7% |
+| fixed_elo | 181 | 0.4671 | 0.6593 | 58.6% |
+| market | 181 | 0.4597 | 0.6512 | 57.5% |
 
 | Game | Start (Eastern) | Model pick | Win probability |
 |---|---|---|---:|
@@ -205,6 +205,8 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | DET at COL | Nov 07 09:00 PM | COL | 56.3% |
 | PIT at LAK | Nov 07 09:00 PM | LAK | 51.9% |
 | VAN at EDM | Nov 07 10:00 PM | EDM | 61.4% |
+| FLA at BOS | Nov 08 01:00 PM | BOS | 55.0% |
+| VGK at BUF | Nov 08 03:30 PM | BUF | 51.7% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
 
