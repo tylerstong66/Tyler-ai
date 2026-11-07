@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-07T10:10:09.929372+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-11-07T16:27:18.694696+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 56 / 56 / 0 |
+| Recorded / settled / pending | 57 / 56 / 1 |
 | Started games in retained official schedules / enrolled | 56 / 56 |
 | Observed missing started games | 0 |
-| Enrollment-time priced forecasts | 56 / 56 |
+| Enrollment-time priced forecasts | 57 / 57 |
 | Settled with enrollment prices / decisive market-paired | 56 / 55 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -25,10 +25,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-07T10:10:09.929372+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
+As of retained evidence: 2026-11-07T16:27:18.694696+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
+| 2026_09_CIN_ATL | CIN at ATL | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -91,11 +92,12 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026_08_NE_MIA | NE at MIA | 2026-11-01T21:25:00+00:00 | enrolled | — |
 | 2026_08_PHI_WAS | PHI at WAS | 2026-11-02T01:20:00+00:00 | enrolled | — |
 | 2026_08_TEN_CIN | TEN at CIN | 2026-11-01T18:00:00+00:00 | enrolled | — |
+| 2026_09_CIN_ATL | CIN at ATL | 2026-11-08T14:30:00+00:00 | enrolled | — |
 | 2026_09_JAX_BAL | JAX at BAL | 2026-11-06T01:15:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 148. Latest: `20261107T101008463199Z`.
+Audited capture manifests: 149. Latest: `20261107T162715675124Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
