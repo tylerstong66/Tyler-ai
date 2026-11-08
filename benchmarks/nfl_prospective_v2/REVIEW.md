@@ -117,7 +117,7 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/nfl_prospective_v2/captures/20261108T072118211327Z/manifest.json.
+Latest saved manifest: benchmarks/nfl_prospective_v2/captures/20261108T151240144598Z/manifest.json.
 Manifest completion field: True. Errors: []. Exclusions: [{"game_id": "2026_09_LV_SF", "reason": "Exact schedule/ESPN team and kickoff match required"}].
 Optional availability errors: [].
 Newer saved collection failure: null.

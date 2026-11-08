@@ -2,12 +2,12 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-08T07:21:21.274778+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-11-08T15:12:42.963105+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
 | Recorded / settled / pending | 68 / 56 / 12 |
-| Started games in retained official schedules / enrolled | 56 / 56 |
+| Started games in retained official schedules / enrolled | 57 / 57 |
 | Observed missing started games | 0 |
 | Enrollment-time priced forecasts | 68 / 68 |
 | Settled with enrollment prices / decisive market-paired | 56 / 55 |
@@ -25,12 +25,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-08T07:21:21.274778+00:00. Ready: 12 / 13 observed games. Status: attention.
+As of retained evidence: 2026-11-08T15:12:42.963105+00:00. Ready: 11 / 12 observed games. Status: attention.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
 | 2026_09_ARI_SEA | ARI at SEA | True | False | True | None |
-| 2026_09_CIN_ATL | CIN at ATL | True | False | True | None |
 | 2026_09_CLE_NO | CLE at NO | True | False | True | None |
 | 2026_09_DAL_IND | DAL at IND | True | False | True | None |
 | 2026_09_DEN_CAR | DEN at CAR | True | False | True | None |
@@ -121,7 +120,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 152. Latest: `20261108T072118211327Z`.
+Audited capture manifests: 153. Latest: `20261108T151240144598Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
