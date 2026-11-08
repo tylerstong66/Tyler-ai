@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-08T19:43:47.003303+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-11-08T23:43:18.052770+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 68 / 57 / 11 |
-| Started games in retained official schedules / enrolled | 64 / 64 |
-| Observed missing started games | 0 |
+| Recorded / settled / pending | 68 / 64 / 4 |
+| Started games in retained official schedules / enrolled | 68 / 67 |
+| Observed missing started games | 1 |
 | Enrollment-time priced forecasts | 68 / 68 |
-| Settled with enrollment prices / decisive market-paired | 57 / 56 |
+| Settled with enrollment prices / decisive market-paired | 64 / 63 |
 | Separate later quotes recorded prospectively | 0 |
 
 A priced NFL tie is excluded only from binary decisive market comparisons.
@@ -25,14 +25,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-08T19:43:47.003303+00:00. Ready: 4 / 5 observed games. Status: attention.
+As of retained evidence: 2026-11-08T23:43:18.052770+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026_09_ARI_SEA | ARI at SEA | True | False | True | None |
-| 2026_09_GB_NE | GB at NE | True | False | True | None |
-| 2026_09_HOU_LAC | HOU at LAC | True | False | True | None |
-| 2026_09_LV_SF | LV at SF | False | False | False | forecast_not_enrolled, latest_scoreboard_event_missing_or_ambiguous |
 | 2026_09_TB_CHI | TB at CHI | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
@@ -106,14 +102,14 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026_09_HOU_LAC | HOU at LAC | 2026-11-08T21:05:00+00:00 | enrolled | — |
 | 2026_09_JAX_BAL | JAX at BAL | 2026-11-06T01:15:00+00:00 | enrolled | — |
 | 2026_09_LA_WAS | LA at WAS | 2026-11-08T18:00:00+00:00 | enrolled | — |
-| 2026_09_LV_SF | LV at SF | 2026-11-08T21:05:00+00:00 | awaiting enrollment | Exact schedule/ESPN team and kickoff match required |
+| 2026_09_LV_SF | LV at SF | 2026-11-08T21:05:00+00:00 | missed despite pregame schedule observation | Exact schedule/ESPN team and kickoff match required, already_started |
 | 2026_09_NYG_PHI | NYG at PHI | 2026-11-08T18:00:00+00:00 | enrolled | — |
 | 2026_09_NYJ_KC | NYJ at KC | 2026-11-08T18:00:00+00:00 | enrolled | — |
 | 2026_09_TB_CHI | TB at CHI | 2026-11-09T01:20:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 154. Latest: `20261108T194343807944Z`.
+Audited capture manifests: 155. Latest: `20261108T234315474574Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

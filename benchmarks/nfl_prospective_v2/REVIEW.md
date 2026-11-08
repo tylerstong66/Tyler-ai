@@ -2,11 +2,11 @@
 
 **NO BET — actual wagers $0.**
 
-Recorded: **68** · Settled: **57** · Pending: **11**
+Recorded: **68** · Settled: **64** · Pending: **4**
 
 100-settlement milestone: **collecting**. This flag requests human review; it does not authorize model promotion or wagering.
 
-Latest result verified: 2026-11-08T19:43:47.011919+00:00 (UTC).
+Latest result verified: 2026-11-08T23:43:18.067703+00:00 (UTC).
 
 Brier is the sum over outcomes (range 0–2); lower Brier and log loss are better.
 Accuracy uses the highest-probability outcome. Two-way ties at 50% select home; NFL three-way ties in probability use home, away, tie order.
@@ -16,30 +16,30 @@ Uncertainty unit: season/week. CIs require at least 5 blocks.
 ## First-100-enrolled checkpoint
 
 Status: **collecting_forecasts**. This is separate from the cumulative 100-settlement flag.
-Selected: 68 / 100; settled among selected: 57; pending among selected: 11.
+Selected: 68 / 100; settled among selected: 64; pending among selected: 4.
 First 100 by recorded_at in UTC, then game_id; never by outcome, price or settlement order.
 
 ## All settled games — three outcomes, including NFL ties
 
 | Model | Games | Blocks | Brier | Log loss | Accuracy | 95% Brier CI | 95% Log loss CI | 95% Accuracy CI |
 |---|---:|---:|---:|---:|---:|---|---|---|
-| v2 | 57 | 5 | 0.4616 | 0.7242 | 64.9% | 0.3850 to 0.5305 | 0.5738 to 0.8763 | 55.2% to 77.8% |
-| v1 | 57 | 5 | 0.4699 | 0.7325 | 61.4% | 0.4021 to 0.5298 | 0.5914 to 0.8857 | 50.9% to 73.3% |
+| v2 | 64 | 5 | 0.4426 | 0.6969 | 68.8% | 0.3547 to 0.5126 | 0.5506 to 0.8452 | 56.5% to 83.6% |
+| v1 | 64 | 5 | 0.4523 | 0.7067 | 65.6% | 0.3759 to 0.5145 | 0.5691 to 0.8562 | 52.9% to 81.5% |
 
 ## All decisive games — conditional two-way scores
 
 | Model | Games | Blocks | Brier | Log loss | Accuracy | 95% Brier CI | 95% Log loss CI | 95% Accuracy CI |
 |---|---:|---:|---:|---:|---:|---|---|---|
-| v2 | 56 | 5 | 0.4432 | 0.6332 | 66.1% | 0.3658 to 0.5167 | 0.5505 to 0.7120 | 55.2% to 79.5% |
-| v1 | 56 | 5 | 0.4517 | 0.6417 | 62.5% | 0.3862 to 0.5160 | 0.5725 to 0.7106 | 51.4% to 76.2% |
+| v2 | 63 | 5 | 0.4259 | 0.6152 | 69.8% | 0.3469 to 0.5060 | 0.5313 to 0.6998 | 57.1% to 84.5% |
+| v1 | 63 | 5 | 0.4358 | 0.6251 | 66.7% | 0.3672 to 0.5068 | 0.5527 to 0.7009 | 53.8% to 83.0% |
 
 ## Same-game comparisons with saved market odds — decisive games only
 
 | Model | Games | Blocks | Brier | Log loss | Accuracy | 95% Brier CI | 95% Log loss CI | 95% Accuracy CI |
 |---|---:|---:|---:|---:|---:|---|---|---|
-| v2 | 56 | 5 | 0.4432 | 0.6332 | 66.1% | 0.3658 to 0.5167 | 0.5505 to 0.7120 | 55.2% to 79.5% |
-| v1 | 56 | 5 | 0.4517 | 0.6417 | 62.5% | 0.3862 to 0.5160 | 0.5725 to 0.7106 | 51.4% to 76.2% |
-| market | 56 | 5 | 0.4335 | 0.6271 | 67.9% | 0.3620 to 0.4833 | 0.5449 to 0.6854 | 62.1% to 75.0% |
+| v2 | 63 | 5 | 0.4259 | 0.6152 | 69.8% | 0.3469 to 0.5060 | 0.5313 to 0.6998 | 57.1% to 84.5% |
+| v1 | 63 | 5 | 0.4358 | 0.6251 | 66.7% | 0.3672 to 0.5068 | 0.5527 to 0.7009 | 53.8% to 83.0% |
+| market | 63 | 5 | 0.4122 | 0.6041 | 71.4% | 0.3266 to 0.4797 | 0.5106 to 0.6803 | 62.9% to 84.9% |
 
 NFL ties are included in three-outcome scores and excluded from all decisive and market-paired metrics. Unpriced games remain in the all-game model evaluation.
 
@@ -49,8 +49,8 @@ Model minus baseline on the same games. Negative Brier/log loss favors the model
 
 | Baseline | Games | Blocks | Brier difference | 95% CI | Log loss difference | 95% CI | Accuracy difference | 95% CI |
 |---|---:|---:|---:|---|---:|---|---:|---|
-| v1 | 56 | 5 | -0.0085 | -0.0204 to 0.0007 | -0.0085 | -0.0220 to 0.0020 | 3.6 pp | 0.0 pp to 6.9 pp |
-| market | 56 | 5 | 0.0097 | -0.0136 to 0.0433 | 0.0061 | -0.0179 to 0.0410 | -1.8 pp | -10.9 pp to 7.4 pp |
+| v1 | 63 | 5 | -0.0099 | -0.0206 to -0.0007 | -0.0100 | -0.0219 to 0.0002 | 3.2 pp | 0.0 pp to 6.2 pp |
+| market | 63 | 5 | 0.0137 | -0.0136 to 0.0438 | 0.0110 | -0.0179 to 0.0447 | -1.6 pp | -10.0 pp to 6.6 pp |
 
 ## Forecast probability concentration — same priced decisive games
 
@@ -58,9 +58,9 @@ Home-win spread is descriptive only. Forecasts nearer 50% are not inherently bet
 
 | Source | Games | Minimum | Maximum | Mean distance from 50% | Share at 40–60% |
 |---|---:|---:|---:|---:|---:|
-| v2 | 56 | 25.3% | 83.8% | 13.8% | 35.7% |
-| v1 | 56 | 27.0% | 83.5% | 13.9% | 33.9% |
-| market | 56 | 19.6% | 84.7% | 13.8% | 42.9% |
+| v2 | 63 | 25.3% | 83.8% | 13.7% | 36.5% |
+| v1 | 63 | 27.0% | 83.5% | 13.6% | 36.5% |
+| market | 63 | 19.6% | 84.7% | 14.1% | 42.9% |
 
 ## Calibration
 
@@ -70,46 +70,46 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 | Model / outcome | Probability bin | Games | Mean probability | Observed rate | Wilson 95% observed-rate interval |
 |---|---|---:|---:|---:|---|
 | v2 | 0%–20% | 0 | Unavailable | Unavailable | Unavailable |
-| v2 | 20%–40% | 15 | 34.8% | 20.0% | 7.0% to 45.2% |
-| v2 | 40%–60% | 20 | 51.7% | 50.0% | 29.9% to 70.1% |
-| v2 | 60%–80% | 18 | 69.4% | 55.6% | 33.7% to 75.4% |
+| v2 | 20%–40% | 18 | 34.9% | 16.7% | 5.8% to 39.2% |
+| v2 | 40%–60% | 23 | 51.3% | 47.8% | 29.2% to 67.0% |
+| v2 | 60%–80% | 19 | 69.8% | 57.9% | 36.3% to 76.9% |
 | v2 | 80%–100% | 3 | 82.0% | 66.7% | 20.8% to 93.9% |
 | v1 | 0%–20% | 0 | Unavailable | Unavailable | Unavailable |
-| v1 | 20%–40% | 13 | 34.2% | 23.1% | 8.2% to 50.3% |
-| v1 | 40%–60% | 19 | 49.5% | 42.1% | 23.1% to 63.7% |
-| v1 | 60%–80% | 20 | 67.1% | 55.0% | 34.2% to 74.2% |
+| v1 | 20%–40% | 15 | 33.9% | 20.0% | 7.0% to 45.2% |
+| v1 | 40%–60% | 23 | 49.0% | 39.1% | 22.2% to 59.2% |
+| v1 | 60%–80% | 21 | 67.6% | 57.1% | 36.5% to 75.5% |
 | v1 | 80%–100% | 4 | 81.2% | 75.0% | 30.1% to 95.4% |
 | market (paired only) | 0%–20% | 1 | 19.6% | 0.0% | 0.0% to 79.3% |
-| market (paired only) | 20%–40% | 10 | 32.3% | 0.0% | 0.0% to 27.8% |
-| market (paired only) | 40%–60% | 24 | 50.2% | 50.0% | 31.4% to 68.6% |
+| market (paired only) | 20%–40% | 13 | 32.1% | 0.0% | 0.0% to 22.8% |
+| market (paired only) | 40%–60% | 27 | 49.9% | 48.1% | 30.7% to 66.0% |
 | market (paired only) | 60%–80% | 19 | 68.9% | 63.2% | 41.0% to 80.9% |
-| market (paired only) | 80%–100% | 2 | 84.2% | 50.0% | 9.5% to 90.5% |
+| market (paired only) | 80%–100% | 3 | 83.1% | 66.7% | 20.8% to 93.9% |
 | v2 full home | 0%–20% | 0 | Unavailable | Unavailable | Unavailable |
-| v2 full home | 20%–40% | 15 | 34.7% | 20.0% | 7.0% to 45.2% |
-| v2 full home | 40%–60% | 21 | 51.4% | 47.6% | 28.3% to 67.6% |
-| v2 full home | 60%–80% | 18 | 69.1% | 55.6% | 33.7% to 75.4% |
+| v2 full home | 20%–40% | 18 | 34.7% | 16.7% | 5.8% to 39.2% |
+| v2 full home | 40%–60% | 24 | 51.0% | 45.8% | 27.9% to 64.9% |
+| v2 full home | 60%–80% | 19 | 69.6% | 57.9% | 36.3% to 76.9% |
 | v2 full home | 80%–100% | 3 | 81.7% | 66.7% | 20.8% to 93.9% |
 | v2 full away | 0%–20% | 3 | 17.9% | 33.3% | 6.1% to 79.2% |
-| v2 full away | 20%–40% | 18 | 30.5% | 44.4% | 24.6% to 66.3% |
-| v2 full away | 40%–60% | 21 | 48.3% | 47.6% | 28.3% to 67.6% |
-| v2 full away | 60%–80% | 15 | 65.0% | 80.0% | 54.8% to 93.0% |
+| v2 full away | 20%–40% | 19 | 30.1% | 42.1% | 23.1% to 63.7% |
+| v2 full away | 40%–60% | 24 | 48.7% | 50.0% | 31.4% to 68.6% |
+| v2 full away | 60%–80% | 18 | 64.9% | 83.3% | 60.8% to 94.2% |
 | v2 full away | 80%–100% | 0 | Unavailable | Unavailable | Unavailable |
-| v2 full tie | 0%–20% | 57 | 0.4% | 1.8% | 0.3% to 9.3% |
+| v2 full tie | 0%–20% | 64 | 0.4% | 1.6% | 0.3% to 8.3% |
 | v2 full tie | 20%–40% | 0 | Unavailable | Unavailable | Unavailable |
 | v2 full tie | 40%–60% | 0 | Unavailable | Unavailable | Unavailable |
 | v2 full tie | 60%–80% | 0 | Unavailable | Unavailable | Unavailable |
 | v2 full tie | 80%–100% | 0 | Unavailable | Unavailable | Unavailable |
 | v1 full home | 0%–20% | 0 | Unavailable | Unavailable | Unavailable |
-| v1 full home | 20%–40% | 14 | 34.5% | 21.4% | 7.6% to 47.6% |
-| v1 full home | 40%–60% | 20 | 50.3% | 40.0% | 21.9% to 61.3% |
-| v1 full home | 60%–80% | 21 | 68.5% | 57.1% | 36.5% to 75.5% |
+| v1 full home | 20%–40% | 16 | 34.2% | 18.8% | 6.6% to 43.0% |
+| v1 full home | 40%–60% | 24 | 49.7% | 37.5% | 21.2% to 57.3% |
+| v1 full home | 60%–80% | 22 | 68.9% | 59.1% | 38.7% to 76.7% |
 | v1 full home | 80%–100% | 2 | 81.9% | 100.0% | 34.2% to 100.0% |
 | v1 full away | 0%–20% | 4 | 18.7% | 25.0% | 4.6% to 69.9% |
-| v1 full away | 20%–40% | 20 | 32.7% | 45.0% | 25.8% to 65.8% |
-| v1 full away | 40%–60% | 20 | 50.4% | 55.0% | 34.2% to 74.2% |
-| v1 full away | 60%–80% | 13 | 65.6% | 76.9% | 49.7% to 91.8% |
+| v1 full away | 20%–40% | 21 | 32.3% | 42.9% | 24.5% to 63.5% |
+| v1 full away | 40%–60% | 24 | 50.8% | 58.3% | 38.8% to 75.5% |
+| v1 full away | 60%–80% | 15 | 65.9% | 80.0% | 54.8% to 93.0% |
 | v1 full away | 80%–100% | 0 | Unavailable | Unavailable | Unavailable |
-| v1 full tie | 0%–20% | 57 | 0.4% | 1.8% | 0.3% to 9.3% |
+| v1 full tie | 0%–20% | 64 | 0.4% | 1.6% | 0.3% to 8.3% |
 | v1 full tie | 20%–40% | 0 | Unavailable | Unavailable | Unavailable |
 | v1 full tie | 40%–60% | 0 | Unavailable | Unavailable | Unavailable |
 | v1 full tie | 60%–80% | 0 | Unavailable | Unavailable | Unavailable |
@@ -117,8 +117,8 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/nfl_prospective_v2/captures/20261108T194343807944Z/manifest.json.
-Manifest completion field: True. Errors: []. Exclusions: [{"game_id": "2026_09_LV_SF", "reason": "Exact schedule/ESPN team and kickoff match required"}].
+Latest saved manifest: benchmarks/nfl_prospective_v2/captures/20261108T234315474574Z/manifest.json.
+Manifest completion field: True. Errors: []. Exclusions: [{"game_id": "2026_09_LV_SF", "reason": "already_started"}].
 Optional availability errors: [].
 Newer saved collection failure: null.
 NFL completion must be corroborated with the successful workflow run.
