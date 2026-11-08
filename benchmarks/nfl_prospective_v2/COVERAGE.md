@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-08T15:12:42.963105+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-11-08T19:43:47.003303+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 68 / 56 / 12 |
-| Started games in retained official schedules / enrolled | 57 / 57 |
+| Recorded / settled / pending | 68 / 57 / 11 |
+| Started games in retained official schedules / enrolled | 64 / 64 |
 | Observed missing started games | 0 |
 | Enrollment-time priced forecasts | 68 / 68 |
-| Settled with enrollment prices / decisive market-paired | 56 / 55 |
+| Settled with enrollment prices / decisive market-paired | 57 / 56 |
 | Separate later quotes recorded prospectively | 0 |
 
 A priced NFL tie is excluded only from binary decisive market comparisons.
@@ -25,21 +25,14 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-08T15:12:42.963105+00:00. Ready: 11 / 12 observed games. Status: attention.
+As of retained evidence: 2026-11-08T19:43:47.003303+00:00. Ready: 4 / 5 observed games. Status: attention.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
 | 2026_09_ARI_SEA | ARI at SEA | True | False | True | None |
-| 2026_09_CLE_NO | CLE at NO | True | False | True | None |
-| 2026_09_DAL_IND | DAL at IND | True | False | True | None |
-| 2026_09_DEN_CAR | DEN at CAR | True | False | True | None |
-| 2026_09_DET_MIA | DET at MIA | True | False | True | None |
 | 2026_09_GB_NE | GB at NE | True | False | True | None |
 | 2026_09_HOU_LAC | HOU at LAC | True | False | True | None |
-| 2026_09_LA_WAS | LA at WAS | True | False | True | None |
 | 2026_09_LV_SF | LV at SF | False | False | False | forecast_not_enrolled, latest_scoreboard_event_missing_or_ambiguous |
-| 2026_09_NYG_PHI | NYG at PHI | True | False | True | None |
-| 2026_09_NYJ_KC | NYJ at KC | True | False | True | None |
 | 2026_09_TB_CHI | TB at CHI | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
@@ -120,7 +113,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 153. Latest: `20261108T151240144598Z`.
+Audited capture manifests: 154. Latest: `20261108T194343807944Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
