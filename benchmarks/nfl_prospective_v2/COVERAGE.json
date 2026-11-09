@@ -1,8 +1,8 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-11-09T06:30:05.658420+00:00",
-  "capture_count": 156,
+  "as_of_evidence_at": "2026-11-09T17:30:00.875712+00:00",
+  "capture_count": 157,
   "cohort_started_at": "2026-10-11T15:19:59+00:00",
   "completion_note": "Saved NFL manifests before coverage-v1 lack a completion flag; successful workflow corroboration remains required.",
   "decisive_market_paired": 67,
@@ -930,13 +930,11 @@
       "home": "MIN",
       "kickoff": "2026-11-10T01:15:00+00:00",
       "latest_saved_decision": {
-        "checked_at": "2026-11-09T06:30:05.660230+00:00",
-        "decision": "enrolled",
-        "game_id": "2026_09_BUF_MIN",
-        "priced": true
+        "decision": "already_enrolled",
+        "game_id": "2026_09_BUF_MIN"
       },
       "lead_hours": 18.748411775833333,
-      "pregame_schedule_observations_in_window": 1,
+      "pregame_schedule_observations_in_window": 2,
       "recorded_at": "2026-11-09T06:30:05.717607+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -1105,7 +1103,7 @@
       "home": "SF",
       "kickoff": "2026-11-08T21:05:00+00:00",
       "latest_saved_decision": {
-        "checked_at": "2026-11-09T06:30:05.660177+00:00",
+        "checked_at": "2026-11-09T17:30:00.877277+00:00",
         "decision": "already_started",
         "game_id": "2026_09_LV_SF"
       },
@@ -1167,13 +1165,18 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "f0fb0fa7505ef11efb4efe40e6d4e54cd4518e7a4ff7ec7baa357084173b82ea",
+  "input_digest": "9adb1546320b8085d28ee618b79a7c59bf830173394e0860a34c16458497dde9",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
       "from": "2026-10-29T08:29:41.790494+00:00",
       "hours": 12.637197104444445,
       "to": "2026-10-29T21:07:55.700070+00:00"
+    },
+    {
+      "from": "2026-11-09T06:29:55.212507+00:00",
+      "hours": 11.000710600833333,
+      "to": "2026-11-09T17:29:57.770670+00:00"
     },
     {
       "from": "2026-10-12T07:21:42.028391+00:00",
@@ -1189,20 +1192,11 @@
       "from": "2026-11-06T17:57:51.723130+00:00",
       "hours": 8.847774719722223,
       "to": "2026-11-07T02:48:43.712121+00:00"
-    },
-    {
-      "from": "2026-11-05T06:47:27.948154+00:00",
-      "hours": 8.6697308375,
-      "to": "2026-11-05T15:27:38.979169+00:00"
     }
   ],
-  "latest_attempted_capture": "20261109T062955212507Z",
-  "latest_capture": "20261109T062955212507Z",
+  "latest_attempted_capture": "20261109T172957770670Z",
+  "latest_capture": "20261109T172957770670Z",
   "latest_enrollment_decisions": [
-    {
-      "decision": "already_enrolled",
-      "game_id": "2026_09_CIN_ATL"
-    },
     {
       "decision": "already_enrolled",
       "game_id": "2026_09_CLE_NO"
@@ -1236,7 +1230,7 @@
       "game_id": "2026_09_HOU_LAC"
     },
     {
-      "checked_at": "2026-11-09T06:30:05.660177+00:00",
+      "checked_at": "2026-11-09T17:30:00.877277+00:00",
       "decision": "already_started",
       "game_id": "2026_09_LV_SF"
     },
@@ -1253,15 +1247,13 @@
       "game_id": "2026_09_TB_CHI"
     },
     {
-      "checked_at": "2026-11-09T06:30:05.660230+00:00",
-      "decision": "enrolled",
-      "game_id": "2026_09_BUF_MIN",
-      "priced": true
+      "decision": "already_enrolled",
+      "game_id": "2026_09_BUF_MIN"
     }
   ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": null,
-  "latest_official_schedule_observed_at": "2026-11-09T06:29:57.046066+00:00",
+  "latest_official_schedule_observed_at": "2026-11-09T17:29:59.201905+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [],
   "minimum_forecast_lead_hours": 1.5221828808333333,
@@ -1277,7 +1269,7 @@
       "home": "SF",
       "kickoff": "2026-11-08T21:05:00+00:00",
       "latest_saved_decision": {
-        "checked_at": "2026-11-09T06:30:05.660177+00:00",
+        "checked_at": "2026-11-09T17:30:00.877277+00:00",
         "decision": "already_started",
         "game_id": "2026_09_LV_SF"
       },
@@ -1291,7 +1283,7 @@
   "official_daily_conflicted_capture_count": 0,
   "pending": 1,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-11-09T06:30:05.658420+00:00",
+    "as_of_evidence_at": "2026-11-09T17:30:00.875712+00:00",
     "games": [
       {
         "away": "BUF",
@@ -1301,7 +1293,7 @@
         "home": "MIN",
         "issues": [],
         "kickoff": "2026-11-10T01:15:00+00:00",
-        "latest_scoreboard_observed_at": "2026-11-09T06:30:05.068077+00:00",
+        "latest_scoreboard_observed_at": "2026-11-09T17:30:00.210560+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
@@ -1391,6 +1383,11 @@
     },
     {
       "capture": "20261109T062955212507Z",
+      "game_id": "2026_09_LV_SF",
+      "reason": "already_started"
+    },
+    {
+      "capture": "20261109T172957770670Z",
       "game_id": "2026_09_LV_SF",
       "reason": "already_started"
     }

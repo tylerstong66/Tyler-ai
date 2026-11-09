@@ -1,8 +1,8 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-11-09T06:30:11.003619+00:00",
-  "capture_count": 153,
+  "as_of_evidence_at": "2026-11-09T17:30:04.701210+00:00",
+  "capture_count": 154,
   "cohort_started_at": "2026-10-11T15:59:30.281973+00:00",
   "completion_note": "Only manifests without an explicit incomplete state are audited; legacy manifests are retained.",
   "decisive_market_paired": 7,
@@ -312,13 +312,18 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "2c5ad9413ce750487543305689b78f290478aa3e8e792d914b630175488290fc",
+  "input_digest": "daa78f20cbd77fd323a1c11d29f29cbd72e99289848177c27b826351fd1c43af",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
       "from": "2026-10-16T23:36:15.539073+00:00",
       "hours": 12.520169851111111,
       "to": "2026-10-17T12:07:28.150537+00:00"
+    },
+    {
+      "from": "2026-11-09T06:30:07.356398+00:00",
+      "hours": 10.998591015277778,
+      "to": "2026-11-09T17:30:02.284053+00:00"
     },
     {
       "from": "2026-10-12T07:21:47.631288+00:00",
@@ -334,15 +339,10 @@
       "from": "2026-11-06T17:57:56.615973+00:00",
       "hours": 8.847567909722223,
       "to": "2026-11-07T02:48:47.860448+00:00"
-    },
-    {
-      "from": "2026-11-05T06:47:33.379103+00:00",
-      "hours": 8.671477423611112,
-      "to": "2026-11-05T15:27:50.697828+00:00"
     }
   ],
-  "latest_attempted_capture": "20261109T063007356398Z",
-  "latest_capture": "20261109T063007356398Z",
+  "latest_attempted_capture": "20261109T173002284053Z",
+  "latest_capture": "20261109T173002284053Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
@@ -355,7 +355,7 @@
   ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": true,
-  "latest_official_schedule_observed_at": "2026-11-09T06:30:10.951676+00:00",
+  "latest_official_schedule_observed_at": "2026-11-09T17:30:04.662360+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [
     {
@@ -573,7 +573,7 @@
   "official_daily_conflicted_capture_count": 14,
   "pending": 3,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-11-09T06:30:11.003619+00:00",
+    "as_of_evidence_at": "2026-11-09T17:30:04.701210+00:00",
     "games": [],
     "limitation": "Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.",
     "observed_games": 0,
@@ -1272,6 +1272,11 @@
     },
     {
       "capture": "20261109T063007356398Z",
+      "game_id": "849816",
+      "reason": "Final identity differs from saved forecast"
+    },
+    {
+      "capture": "20261109T173002284053Z",
       "game_id": "849816",
       "reason": "Final identity differs from saved forecast"
     }
