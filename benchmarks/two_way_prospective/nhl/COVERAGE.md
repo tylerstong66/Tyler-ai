@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-08T23:43:19.096979+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-09T06:30:07.209128+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 197 / 193 / 4 |
-| Started games in retained official schedules / enrolled | 196 / 194 |
+| Recorded / settled / pending | 200 / 197 / 3 |
+| Started games in retained official schedules / enrolled | 199 / 197 |
 | Observed missing started games | 2 |
-| Enrollment-time priced forecasts | 197 / 197 |
-| Settled with enrollment prices / decisive market-paired | 193 / 193 |
+| Enrollment-time priced forecasts | 200 / 200 |
+| Settled with enrollment prices / decisive market-paired | 197 / 197 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,13 +23,13 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-08T23:43:19.096979+00:00. Ready: 3 / 3 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-09T06:30:07.209128+00:00. Ready: 3 / 3 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020279 | NJD at TOR | True | False | True | None |
-| 2026020281 | PHI at CGY | True | False | True | None |
-| 2026020282 | PIT at ANA | True | False | True | None |
+| 2026020283 | NYR at EDM | True | False | True | None |
+| 2026020284 | PHI at VAN | True | False | True | None |
+| 2026020285 | NYI at SJS | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -236,10 +236,13 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020280 | TBL at WPG | 2026-11-08T23:00:00+00:00 | enrolled | — |
 | 2026020281 | PHI at CGY | 2026-11-09T00:00:00+00:00 | enrolled | — |
 | 2026020282 | PIT at ANA | 2026-11-09T01:00:00+00:00 | enrolled | — |
+| 2026020283 | NYR at EDM | 2026-11-10T01:00:00+00:00 | enrolled | — |
+| 2026020284 | PHI at VAN | 2026-11-10T02:30:00+00:00 | enrolled | — |
+| 2026020285 | NYI at SJS | 2026-11-10T03:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 154. Latest: `20261108T234318288825Z`.
+Audited capture manifests: 155. Latest: `20261109T063005998433Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
