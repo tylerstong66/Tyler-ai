@@ -117,8 +117,8 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/nfl_prospective_v2/captures/20261109T172957770670Z/manifest.json.
-Manifest completion field: True. Errors: []. Exclusions: [{"game_id": "2026_09_LV_SF", "reason": "already_started"}].
+Latest saved manifest: benchmarks/nfl_prospective_v2/captures/20261110T013207892853Z/manifest.json.
+Manifest completion field: True. Errors: []. Exclusions: [].
 Optional availability errors: [].
 Newer saved collection failure: null.
 NFL completion must be corroborated with the successful workflow run.
