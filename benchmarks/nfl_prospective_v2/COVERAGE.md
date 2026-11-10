@@ -2,7 +2,7 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-10T17:51:02.957417+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-11-10T23:22:41.916356+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
@@ -25,7 +25,7 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-10T17:51:02.957417+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
+As of retained evidence: 2026-11-10T23:22:41.916356+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
@@ -102,14 +102,14 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026_09_HOU_LAC | HOU at LAC | 2026-11-08T21:05:00+00:00 | enrolled | — |
 | 2026_09_JAX_BAL | JAX at BAL | 2026-11-06T01:15:00+00:00 | enrolled | — |
 | 2026_09_LA_WAS | LA at WAS | 2026-11-08T18:00:00+00:00 | enrolled | — |
-| 2026_09_LV_SF | LV at SF | 2026-11-08T21:05:00+00:00 | missed despite pregame schedule observation | Exact schedule/ESPN team and kickoff match required, already_started |
+| 2026_09_LV_SF | LV at SF | 2026-11-08T21:25:00+00:00 | missed despite pregame schedule observation | Exact schedule/ESPN team and kickoff match required, already_started |
 | 2026_09_NYG_PHI | NYG at PHI | 2026-11-08T18:00:00+00:00 | enrolled | — |
 | 2026_09_NYJ_KC | NYJ at KC | 2026-11-08T18:00:00+00:00 | enrolled | — |
 | 2026_09_TB_CHI | TB at CHI | 2026-11-09T01:20:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 160. Latest: `20261110T175100652427Z`.
+Audited capture manifests: 161. Latest: `20261110T232238189460Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
