@@ -2,11 +2,11 @@
 
 **NO BET — actual wagers $0.**
 
-Recorded: **206** · Settled: **197** · Pending: **9**
+Recorded: **207** · Settled: **200** · Pending: **7**
 
 100-settlement milestone: **ready_for_human_review**. This flag requests human review; it does not authorize model promotion or wagering.
 
-Latest result verified: 2026-11-09T06:30:07.280752+00:00 (UTC).
+Latest result verified: 2026-11-10T09:51:37.648072+00:00 (UTC).
 
 Brier is the sum over outcomes (range 0–2); lower Brier and log loss are better.
 Accuracy uses the highest-probability outcome. Two-way ties at 50% select home; NFL three-way ties in probability use home, away, tie order.
@@ -24,16 +24,16 @@ First 100 by recorded_at in UTC, then game_id; never by outcome, price or settle
 
 | Model | Games | Blocks | Brier | Log loss | Accuracy | 95% Brier CI | 95% Log loss CI | 95% Accuracy CI |
 |---|---:|---:|---:|---:|---:|---|---|---|
-| model | 197 | 29 | 0.4781 | 0.6710 | 60.4% | 0.4663 to 0.4902 | 0.6591 to 0.6833 | 54.1% to 66.8% |
-| fixed_elo | 197 | 29 | 0.4603 | 0.6517 | 59.4% | 0.4288 to 0.4932 | 0.6183 to 0.6866 | 52.6% to 65.9% |
+| model | 200 | 30 | 0.4776 | 0.6706 | 61.0% | 0.4652 to 0.4899 | 0.6581 to 0.6830 | 54.5% to 67.3% |
+| fixed_elo | 200 | 30 | 0.4588 | 0.6502 | 60.0% | 0.4268 to 0.4917 | 0.6160 to 0.6854 | 52.9% to 66.7% |
 
 ## Same-game comparisons with saved market odds — decisive games only
 
 | Model | Games | Blocks | Brier | Log loss | Accuracy | 95% Brier CI | 95% Log loss CI | 95% Accuracy CI |
 |---|---:|---:|---:|---:|---:|---|---|---|
-| model | 197 | 29 | 0.4781 | 0.6710 | 60.4% | 0.4663 to 0.4902 | 0.6591 to 0.6833 | 54.1% to 66.8% |
-| fixed_elo | 197 | 29 | 0.4603 | 0.6517 | 59.4% | 0.4288 to 0.4932 | 0.6183 to 0.6866 | 52.6% to 65.9% |
-| market | 197 | 29 | 0.4542 | 0.6454 | 58.9% | 0.4319 to 0.4768 | 0.6220 to 0.6689 | 51.7% to 65.7% |
+| model | 200 | 30 | 0.4776 | 0.6706 | 61.0% | 0.4652 to 0.4899 | 0.6581 to 0.6830 | 54.5% to 67.3% |
+| fixed_elo | 200 | 30 | 0.4588 | 0.6502 | 60.0% | 0.4268 to 0.4917 | 0.6160 to 0.6854 | 52.9% to 66.7% |
+| market | 200 | 30 | 0.4542 | 0.6454 | 59.0% | 0.4312 to 0.4761 | 0.6212 to 0.6681 | 52.4% to 66.1% |
 
 NFL ties are included in three-outcome scores and excluded from all decisive and market-paired metrics. Unpriced games remain in the all-game model evaluation.
 
@@ -43,8 +43,8 @@ Model minus baseline on the same games. Negative Brier/log loss favors the model
 
 | Baseline | Games | Blocks | Brier difference | 95% CI | Log loss difference | 95% CI | Accuracy difference | 95% CI |
 |---|---:|---:|---:|---|---:|---|---:|---|
-| fixed_elo | 197 | 29 | 0.0177 | -0.0030 to 0.0377 | 0.0193 | -0.0033 to 0.0410 | 1.0 pp | -1.0 pp to 2.9 pp |
-| market | 197 | 29 | 0.0238 | 0.0105 to 0.0368 | 0.0257 | 0.0116 to 0.0393 | 1.5 pp | -4.6 pp to 7.6 pp |
+| fixed_elo | 200 | 30 | 0.0188 | -0.0018 to 0.0388 | 0.0203 | -0.0021 to 0.0422 | 1.0 pp | -0.9 pp to 2.9 pp |
+| market | 200 | 30 | 0.0234 | 0.0105 to 0.0363 | 0.0252 | 0.0115 to 0.0389 | 2.0 pp | -3.8 pp to 8.0 pp |
 
 ## Forecast probability concentration — same priced decisive games
 
@@ -52,9 +52,9 @@ Home-win spread is descriptive only. Forecasts nearer 50% are not inherently bet
 
 | Source | Games | Minimum | Maximum | Mean distance from 50% | Share at 40–60% |
 |---|---:|---:|---:|---:|---:|
-| model | 197 | 39.1% | 65.3% | 3.7% | 97.0% |
-| fixed_elo | 197 | 22.7% | 86.1% | 10.4% | 56.9% |
-| market | 197 | 28.6% | 78.2% | 8.2% | 66.5% |
+| model | 200 | 39.1% | 65.3% | 3.7% | 97.0% |
+| fixed_elo | 200 | 22.7% | 86.1% | 10.4% | 57.0% |
+| market | 200 | 28.6% | 78.2% | 8.2% | 67.0% |
 
 ## Calibration
 
@@ -65,23 +65,23 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 |---|---|---:|---:|---:|---|
 | model | 0%–20% | 0 | Unavailable | Unavailable | Unavailable |
 | model | 20%–40% | 1 | 39.1% | 0.0% | 0.0% to 79.3% |
-| model | 40%–60% | 191 | 51.9% | 56.5% | 49.5% to 63.4% |
+| model | 40%–60% | 194 | 51.9% | 56.7% | 49.7% to 63.5% |
 | model | 60%–80% | 5 | 62.3% | 100.0% | 56.6% to 100.0% |
 | model | 80%–100% | 0 | Unavailable | Unavailable | Unavailable |
 | fixed_elo | 0%–20% | 0 | Unavailable | Unavailable | Unavailable |
 | fixed_elo | 20%–40% | 9 | 32.7% | 22.2% | 6.3% to 54.7% |
-| fixed_elo | 40%–60% | 112 | 51.0% | 51.8% | 42.6% to 60.8% |
-| fixed_elo | 60%–80% | 74 | 67.1% | 68.9% | 57.7% to 78.3% |
+| fixed_elo | 40%–60% | 114 | 50.9% | 51.8% | 42.7% to 60.7% |
+| fixed_elo | 60%–80% | 75 | 67.0% | 69.3% | 58.2% to 78.6% |
 | fixed_elo | 80%–100% | 2 | 84.1% | 100.0% | 34.2% to 100.0% |
 | market (paired only) | 0%–20% | 0 | Unavailable | Unavailable | Unavailable |
 | market (paired only) | 20%–40% | 15 | 36.0% | 40.0% | 19.8% to 64.3% |
-| market (paired only) | 40%–60% | 131 | 50.8% | 51.9% | 43.4% to 60.3% |
+| market (paired only) | 40%–60% | 134 | 50.8% | 52.2% | 43.8% to 60.5% |
 | market (paired only) | 60%–80% | 51 | 66.2% | 76.5% | 63.2% to 86.0% |
 | market (paired only) | 80%–100% | 0 | Unavailable | Unavailable | Unavailable |
 
 ## Collection evidence
 
-Latest saved manifest: benchmarks/two_way_prospective/nhl/captures/20261110T013211547055Z/manifest.json.
+Latest saved manifest: benchmarks/two_way_prospective/nhl/captures/20261110T095136798796Z/manifest.json.
 Manifest completion field: True. Errors: []. Exclusions: [].
 Optional availability errors: [].
 Newer saved collection failure: null.
