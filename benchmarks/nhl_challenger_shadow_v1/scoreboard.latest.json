@@ -279,7 +279,7 @@
       "uncertainty_status": "available_descriptive"
     }
   },
-  "as_of_utc": "2026-11-12T11:11:25.561052+00:00",
+  "as_of_utc": "2026-11-12T18:57:30.663331+00:00",
   "candidate": "ridge_recipe",
   "enrolled": 187,
   "first_100_enrolled": {
@@ -298,7 +298,7 @@
   },
   "input_digest": "cdd1b4d5609a6cb3c18c8eef659691f44f6d84a714323e47841c4d741a362a2f",
   "limitation": "Research only; all results are descriptive. No candidate selection, model promotion, bets, odds backfills or claims of an edge.",
-  "newly_enrolled": 1,
+  "newly_enrolled": 0,
   "paired_challenger_minus_baseline": {
     "fixed_elo": {
       "blocks": 26,
@@ -2282,27 +2282,6 @@
     "actual_wagers": 0,
     "games": [
       {
-        "archived_forecast_recorded_at_utc": "2026-11-11T21:59:49.425117+00:00",
-        "away": "CAR",
-        "event_id": "401891808",
-        "game_id": "2026020309",
-        "home": "SEA",
-        "home_win_probabilities": {
-          "challenger": 0.42927061254975385,
-          "fixed_elo": 0.26509593189762626,
-          "original_model": 0.4329322749913245,
-          "saved_market": 0.28644876973925815
-        },
-        "live_market_quote": false,
-        "result_eligible_to_score_now": false,
-        "saved_market_observed_at_utc": "2026-11-11T21:59:45.219739+00:00",
-        "saved_market_provider": "Draft Kings",
-        "scheduled_start_utc": "2026-11-12T17:00:00+00:00",
-        "shadow_forecast_sha256": "6724250e09369bcfcde6906a1e510e25bd833b2f2f3efe1b2d5d9e5272dbce83",
-        "source_forecast_sha256": "5ffed05f7320491c6f3f3c670c566c27a0c74ea488cbe4a7ac79d96f7c0cfc48",
-        "source_generated_at_utc": "2026-11-11T21:59:45.654303+00:00"
-      },
-      {
         "archived_forecast_recorded_at_utc": "2026-11-12T02:59:53.016632+00:00",
         "away": "MTL",
         "event_id": "401892696",
@@ -2517,8 +2496,8 @@
     "quote_warning": "Market probability is a saved pregame quote from the original forecast, NOT current odds or a verified closing line.",
     "scope": "earliest_future_frozen_nhl_challenger_games",
     "selection": "scheduled_start_utc ascending, then game_id; never based on result or model confidence",
-    "shown": 11,
-    "total_future_enrolled": 11
+    "shown": 10,
+    "total_future_enrolled": 10
   },
   "version": "nhl-forward-challenger-shadow-v1"
 }
