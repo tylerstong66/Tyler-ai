@@ -1,6 +1,6 @@
 # Tyler NHL prospective paper test
 
-Recorded: **226** · Settled: **224** · Pending: **2**
+Recorded: **228** · Settled: **224** · Pending: **4**
 
 **NO BET — actual wagers $0.**
 
@@ -240,6 +240,8 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | NYI at LAK | Nov 12 10:00 PM | LAK | 50.2% |
 | NYR at VAN | Nov 13 09:00 PM | NYR | 56.0% |
 | NSH at VGK | Nov 13 10:00 PM | VGK | 55.0% |
+| SEA at CAR | Nov 14 01:00 PM | CAR | 61.6% |
+| WPG at CHI | Nov 14 03:30 PM | WPG | 52.8% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
 

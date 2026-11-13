@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-13T16:24:47.789763+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-13T22:38:21.868963+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 226 / 224 / 2 |
+| Recorded / settled / pending | 228 / 224 / 4 |
 | Started games in retained official schedules / enrolled | 226 / 224 |
 | Observed missing started games | 2 |
-| Enrollment-time priced forecasts | 226 / 226 |
+| Enrollment-time priced forecasts | 228 / 228 |
 | Settled with enrollment prices / decisive market-paired | 224 / 224 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -23,12 +23,14 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-13T16:24:47.789763+00:00. Ready: 2 / 2 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-13T22:38:21.868963+00:00. Ready: 4 / 4 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
 | 2026020310 | NYR at VAN | True | False | True | None |
 | 2026020311 | NSH at VGK | True | False | True | None |
+| 2026020312 | WPG at CHI | True | False | True | None |
+| 2026020321 | SEA at CAR | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -264,10 +266,12 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020309 | CAR at SEA | 2026-11-12T17:00:00+00:00 | enrolled | — |
 | 2026020310 | NYR at VAN | 2026-11-14T02:00:00+00:00 | enrolled | — |
 | 2026020311 | NSH at VGK | 2026-11-14T03:00:00+00:00 | enrolled | — |
+| 2026020312 | WPG at CHI | 2026-11-14T20:30:00+00:00 | enrolled | — |
+| 2026020321 | SEA at CAR | 2026-11-14T18:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 169. Latest: `20261113T162446112971Z`.
+Audited capture manifests: 170. Latest: `20261113T223820126650Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
