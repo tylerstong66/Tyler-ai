@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-12T18:57:27.074877+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-13T00:25:31.918094+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 224 / 213 / 11 |
-| Started games in retained official schedules / enrolled | 216 / 214 |
+| Recorded / settled / pending | 224 / 214 / 10 |
+| Started games in retained official schedules / enrolled | 221 / 219 |
 | Observed missing started games | 2 |
 | Enrollment-time priced forecasts | 224 / 224 |
-| Settled with enrollment prices / decisive market-paired | 213 / 213 |
+| Settled with enrollment prices / decisive market-paired | 214 / 214 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,16 +23,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-12T18:57:27.074877+00:00. Ready: 10 / 10 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-13T00:25:31.918094+00:00. Ready: 5 / 5 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020299 | MTL at BOS | True | False | True | None |
-| 2026020300 | MIN at TOR | True | False | True | None |
-| 2026020301 | COL at OTT | True | False | True | None |
 | 2026020302 | DET at FLA | True | False | True | None |
-| 2026020303 | WSH at NJD | True | False | True | None |
-| 2026020304 | TBL at CBJ | True | False | True | None |
 | 2026020305 | BUF at CHI | True | False | True | None |
 | 2026020306 | WPG at DAL | True | False | True | None |
 | 2026020307 | STL at UTA | True | False | True | None |
@@ -273,7 +268,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 166. Latest: `20261112T185725884729Z`.
+Audited capture manifests: 167. Latest: `20261113T002530210954Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
