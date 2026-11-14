@@ -1,6 +1,6 @@
 # Tyler NHL prospective paper test
 
-Recorded: **228** · Settled: **224** · Pending: **4**
+Recorded: **240** · Settled: **224** · Pending: **16**
 
 **NO BET — actual wagers $0.**
 
@@ -242,6 +242,18 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | NSH at VGK | Nov 13 10:00 PM | VGK | 55.0% |
 | SEA at CAR | Nov 14 01:00 PM | CAR | 61.6% |
 | WPG at CHI | Nov 14 03:30 PM | WPG | 52.8% |
+| MIN at BOS | Nov 14 07:00 PM | BOS | 51.2% |
+| EDM at TOR | Nov 14 07:00 PM | EDM | 53.9% |
+| COL at MTL | Nov 14 07:00 PM | MTL | 54.1% |
+| DET at TBL | Nov 14 07:00 PM | TBL | 59.6% |
+| OTT at PIT | Nov 14 07:00 PM | OTT | 51.3% |
+| NJD at WSH | Nov 14 07:00 PM | WSH | 51.1% |
+| PHI at CBJ | Nov 14 07:00 PM | CBJ | 54.0% |
+| FLA at STL | Nov 14 07:00 PM | STL | 52.1% |
+| BUF at DAL | Nov 14 08:00 PM | DAL | 53.6% |
+| SJS at UTA | Nov 14 09:00 PM | UTA | 55.2% |
+| NYI at ANA | Nov 14 10:00 PM | ANA | 53.3% |
+| CGY at LAK | Nov 14 10:00 PM | LAK | 50.0% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
 

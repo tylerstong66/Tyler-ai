@@ -1,0 +1,387 @@
+{
+  "NO_BET": true,
+  "actual_wagers": 0,
+  "availability": {
+    "confirmed_starting_goalies": {
+      "away": null,
+      "home": null
+    },
+    "effect_enabled": false,
+    "goalie_comparison_is_not_starter_confirmation": true,
+    "original_response_sha256": "1efe42e047cccb4149e23d526abda83910e80807cd25fd4298049e780b0f1f36",
+    "retrieved_at": "2026-11-14T03:16:59.184563+00:00",
+    "source_url": "https://api-web.nhle.com/v1/gamecenter/2026020318/landing"
+  },
+  "away": "NJD",
+  "away_id": "1",
+  "event_id": "401892714",
+  "features": [
+    1.0,
+    -0.11576100844850884
+  ],
+  "fixed_elo": {
+    "away": 0.4614396336726372,
+    "home": 0.5385603663273628
+  },
+  "game_id": "2026020318",
+  "generated_at": "2026-11-14T03:16:59.947536+00:00",
+  "home": "WSH",
+  "home_id": "15",
+  "kickoff": "2026-11-15T00:00:00+00:00",
+  "market": {
+    "away_moneyline": -120,
+    "conditional_home_probability": 0.4782608695652174,
+    "home_moneyline": 100,
+    "provider": "DraftKings",
+    "quote_kind": "observed_current_quote_not_verified_closing_line"
+  },
+  "market_observed_at": "2026-11-14T03:16:58.514067+00:00",
+  "model": {
+    "away": 0.48930252425234433,
+    "home": 0.5106974757476557
+  },
+  "model_sha256": "3ea760cc52051c9c094ffe33a9a2580256bb2881ef0bc375fe78ee027b85bef1",
+  "prior_results_used": 3101,
+  "recorded_at": "2026-11-14T03:16:59.958344+00:00",
+  "season": 2026,
+  "sha256": "6e8a45c0ed2e5d80797635779f12c6911fdac2733766532b4294c52f340f2c7e",
+  "source_snapshots": [
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/e282c09415f1178a09c5863f9021b827bdf11c01b4ffbae0a50884e4b190bbeb.json",
+      "response_sha256": "a2344c2e4e5ba1b66e77d226983f006fadb22a1a285487a2e0e9c581c18569ef",
+      "retrieved_at": "2026-11-14T03:16:57.154688+00:00",
+      "sha256": "e282c09415f1178a09c5863f9021b827bdf11c01b4ffbae0a50884e4b190bbeb",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/BUF/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/28ecd008f1d7b024f099825451464896078c6d250807e01ef6f6a3b51cf0a781.json",
+      "response_sha256": "6affaa8553efe3984bf72e6b08dd209f33803982915eeefb785fc3fae054ffcd",
+      "retrieved_at": "2026-11-14T03:16:57.158455+00:00",
+      "sha256": "28ecd008f1d7b024f099825451464896078c6d250807e01ef6f6a3b51cf0a781",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/BOS/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/c15fe6d7ca4ebaa12779db4253b2ce018eb1fd5424c67df81e9f6fa00fd19fbc.json",
+      "response_sha256": "a055065f707b7769827b35d9c82322fe43d408668bff8784a9c6985fbb6516fd",
+      "retrieved_at": "2026-11-14T03:16:57.173071+00:00",
+      "sha256": "c15fe6d7ca4ebaa12779db4253b2ce018eb1fd5424c67df81e9f6fa00fd19fbc",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/CGY/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/5f5047b75559fa95dd3736205d27f5bc9b328cc2bf6a095da5534305b1efda38.json",
+      "response_sha256": "40e32550640564abad316f4623dd2a19af09259cbcb22b4719c854d30ed0e634",
+      "retrieved_at": "2026-11-14T03:16:57.183449+00:00",
+      "sha256": "5f5047b75559fa95dd3736205d27f5bc9b328cc2bf6a095da5534305b1efda38",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/CBJ/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/1f8f6089403622bb4cc7bc9a71b01d8cf0e9dfecf67ba4da2d2c4d152ff757ae.json",
+      "response_sha256": "dac4692f9b1867dd6ecf9aa720127a2928b512517895c9ae3ca29fadc0f62600",
+      "retrieved_at": "2026-11-14T03:16:57.187146+00:00",
+      "sha256": "1f8f6089403622bb4cc7bc9a71b01d8cf0e9dfecf67ba4da2d2c4d152ff757ae",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/CAR/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/406f670b7813516b2dfd712397513db6a3a28cdb8af752a79673303305aea582.json",
+      "response_sha256": "30dab62a9096d150724b6291e2e3cca15afb4a80e23b491be1175863a3920ae1",
+      "retrieved_at": "2026-11-14T03:16:57.209529+00:00",
+      "sha256": "406f670b7813516b2dfd712397513db6a3a28cdb8af752a79673303305aea582",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/DAL/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/8457ab27201921679b18e13bc41affbe80e7a4a677eb4dbfeef44d28ced90e97.json",
+      "response_sha256": "4ee7150963308da9ffb7df09c8f17faf0ed512809402c9a8f2399461f327ea5d",
+      "retrieved_at": "2026-11-14T03:16:57.277807+00:00",
+      "sha256": "8457ab27201921679b18e13bc41affbe80e7a4a677eb4dbfeef44d28ced90e97",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/CHI/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/619f78ea2d192eb2298ee073565bc090c75af003f82d9ee85a5afb963f04ea55.json",
+      "response_sha256": "bdfb5eb19d2b6470ee0edbf27753db3b803b66f80ebe88e7d4bf2e5deeeaefa7",
+      "retrieved_at": "2026-11-14T03:16:57.284057+00:00",
+      "sha256": "619f78ea2d192eb2298ee073565bc090c75af003f82d9ee85a5afb963f04ea55",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/COL/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/db53d98744d96d679c8f12bd740a46311f8506782cf4c8b3b0ab9a9832f36222.json",
+      "response_sha256": "bc43a35e0460adfa2af6a01bdf53b63a3c016c39bd93b2d1ee481f658dfbb9f9",
+      "retrieved_at": "2026-11-14T03:16:57.292756+00:00",
+      "sha256": "db53d98744d96d679c8f12bd740a46311f8506782cf4c8b3b0ab9a9832f36222",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/DET/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/19aa82e17a0b6a7ce3e645a5f9b30ec951f43f659275fb953d3d501a4782a68d.json",
+      "response_sha256": "716deeffc27ebc95b65abc374c7ee0e7aaf78519144d22aa6833d80352a80b13",
+      "retrieved_at": "2026-11-14T03:16:57.301425+00:00",
+      "sha256": "19aa82e17a0b6a7ce3e645a5f9b30ec951f43f659275fb953d3d501a4782a68d",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/ANA/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/90ed65d979f2a7754b35e85f961b638fd5014229f032f5e4709d2840d53dcb65.json",
+      "response_sha256": "a0a8a4ffbcf71e0636efbaf97edb7462f6596b6a1e9cb6e757cee7d4523709d3",
+      "retrieved_at": "2026-11-14T03:16:57.307744+00:00",
+      "sha256": "90ed65d979f2a7754b35e85f961b638fd5014229f032f5e4709d2840d53dcb65",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/EDM/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/f5fe52f407fd6860c3d4987b16b8db9b7db413b1ea9ec28cb58688c8e9968b12.json",
+      "response_sha256": "a99df10fde80ed5f5e1d09a57f7e5df595d34a33dd34310ec8c2ff957b50d65c",
+      "retrieved_at": "2026-11-14T03:16:57.334640+00:00",
+      "sha256": "f5fe52f407fd6860c3d4987b16b8db9b7db413b1ea9ec28cb58688c8e9968b12",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/FLA/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/e27b5e8032cd4e301b18a8fffd9fe64d8dac86d80f1229570b752fe6a2085776.json",
+      "response_sha256": "0f4ee89dce3fb959c07121c4e76866031d90afafa5ed7f6ae61f87f0a66f0909",
+      "retrieved_at": "2026-11-14T03:16:57.337912+00:00",
+      "sha256": "e27b5e8032cd4e301b18a8fffd9fe64d8dac86d80f1229570b752fe6a2085776",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/NJD/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/d554cafa55987fe14fc83d46d54c5450d3d84cccea465b977e07c8483dda0943.json",
+      "response_sha256": "d0969723265d7770c5c7260b88e60f045a1a5b5a56980f2bccdac4efd76e5431",
+      "retrieved_at": "2026-11-14T03:16:57.400774+00:00",
+      "sha256": "d554cafa55987fe14fc83d46d54c5450d3d84cccea465b977e07c8483dda0943",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/LAK/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/33a360f17ee7cac51f34e6a5ff9cbf5bb71d82c617c62e294e6eb087e1962063.json",
+      "response_sha256": "a6966e002a5002909b1b011451c3afc33b1008d97001456bb1e8ed2b4b1ed306",
+      "retrieved_at": "2026-11-14T03:16:57.404541+00:00",
+      "sha256": "33a360f17ee7cac51f34e6a5ff9cbf5bb71d82c617c62e294e6eb087e1962063",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/MTL/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/fe0405b9cab77c5202e3bd87b7bf3f7178cb9ffa744852a67c6e73aab04283f9.json",
+      "response_sha256": "491ee7104fd0f94e2f84c26a12ae3cf9ca5697100fce34252718d0308f6714dc",
+      "retrieved_at": "2026-11-14T03:16:57.406849+00:00",
+      "sha256": "fe0405b9cab77c5202e3bd87b7bf3f7178cb9ffa744852a67c6e73aab04283f9",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/MIN/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/45bc9d6ea6217d15887d0b414df7caf7257259dbf1b16f06c2536f60eb213f29.json",
+      "response_sha256": "d445a19563adbd42a6c0e300479d3680dd89d6564d5deed58bf77a658885ccba",
+      "retrieved_at": "2026-11-14T03:16:57.410572+00:00",
+      "sha256": "45bc9d6ea6217d15887d0b414df7caf7257259dbf1b16f06c2536f60eb213f29",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/NSH/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/b84cddeaf6334afc3dcefaf02a8d1e6ed7cdb0be9fa9389d6dfb928c2023c152.json",
+      "response_sha256": "35e18a9190c3ae10164b420a4e656215b090af8b99d87904dee01d4c3c442c3b",
+      "retrieved_at": "2026-11-14T03:16:57.447019+00:00",
+      "sha256": "b84cddeaf6334afc3dcefaf02a8d1e6ed7cdb0be9fa9389d6dfb928c2023c152",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/NYR/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/7d79dc03058f1017e87c16697fd86d073eb499951c3bb524a13d0188d94d89c1.json",
+      "response_sha256": "55f1b9f5b80f957cba0588585741ee3104a767d32f3bce3bf24b01a813b6d4c1",
+      "retrieved_at": "2026-11-14T03:16:57.451411+00:00",
+      "sha256": "7d79dc03058f1017e87c16697fd86d073eb499951c3bb524a13d0188d94d89c1",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/NYI/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/5a68733d5ff7be88226da73e1c02e829136494d5d77b24f6c9d2deac64e655aa.json",
+      "response_sha256": "64f4a1e33f43b84a3e24c0cfba80f920270fd72740cfde49e0d1bc7b8c3e08ed",
+      "retrieved_at": "2026-11-14T03:16:57.510505+00:00",
+      "sha256": "5a68733d5ff7be88226da73e1c02e829136494d5d77b24f6c9d2deac64e655aa",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/PHI/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/09b9ab880a0bdb4fa933a1a67d8fd1ceb1e8d080008db8afe08a865fda576d5f.json",
+      "response_sha256": "a616e3092cf1a1834cdee38c5a171f91c9244e2a9ca90bb07c1b0683642b4c70",
+      "retrieved_at": "2026-11-14T03:16:57.521390+00:00",
+      "sha256": "09b9ab880a0bdb4fa933a1a67d8fd1ceb1e8d080008db8afe08a865fda576d5f",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/OTT/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/d4d05eef9a9fb7121ec2397d0c63d7d67e669a99794cb9b4327da76a2466c794.json",
+      "response_sha256": "773aceef9292720634201db206e7ba08b04a7c19771948ed5b2984c6d578bf4f",
+      "retrieved_at": "2026-11-14T03:16:57.525215+00:00",
+      "sha256": "d4d05eef9a9fb7121ec2397d0c63d7d67e669a99794cb9b4327da76a2466c794",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/SEA/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/e9f296f1ec1e726c05cb9c1bf69ce0acbc603a13452647adffd317c449f04313.json",
+      "response_sha256": "fd12e771cfab8f3a687ed9fabec26495dbe078e22428c20e6d181bf899f38025",
+      "retrieved_at": "2026-11-14T03:16:57.539283+00:00",
+      "sha256": "e9f296f1ec1e726c05cb9c1bf69ce0acbc603a13452647adffd317c449f04313",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/PIT/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/b275e9a67159e7f11105b84bf001eae5c9547c443aa15f869497f3288c5b57df.json",
+      "response_sha256": "a212c230f198ef23b7de65d96a33cec497810361d693f1093eaf2478999f1b01",
+      "retrieved_at": "2026-11-14T03:16:57.575947+00:00",
+      "sha256": "b275e9a67159e7f11105b84bf001eae5c9547c443aa15f869497f3288c5b57df",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/STL/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/e48e8b9082ff92bc5cecea1750c78a275f08b9568dc1fcd64f1f1664a881b01f.json",
+      "response_sha256": "3409aeb6ea576aa7a747b174957f734dc45b6140738d38f9962fd16ad048be51",
+      "retrieved_at": "2026-11-14T03:16:57.579142+00:00",
+      "sha256": "e48e8b9082ff92bc5cecea1750c78a275f08b9568dc1fcd64f1f1664a881b01f",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/SJS/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/2af502c7e6a4512cc32ab028461629cd9ce9a09f78fce8af7b91dae7ce9be5fe.json",
+      "response_sha256": "6dd59762133f53b79733c67c9b1d8d6b9fda2caa9a85d16ce1f06bf79ac2810b",
+      "retrieved_at": "2026-11-14T03:16:57.625855+00:00",
+      "sha256": "2af502c7e6a4512cc32ab028461629cd9ce9a09f78fce8af7b91dae7ce9be5fe",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/TBL/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/7e0f11c2aa9b3222474dbb8c0f6fe486ce5fc75e26a335aeb3fbc72b6cee3a3d.json",
+      "response_sha256": "ec4ab29a10545a1f7304d21bef8cda9a17895342a0e0dc12b662036647cf5ba1",
+      "retrieved_at": "2026-11-14T03:16:57.633554+00:00",
+      "sha256": "7e0f11c2aa9b3222474dbb8c0f6fe486ce5fc75e26a335aeb3fbc72b6cee3a3d",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/UTA/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/95911ee3230ee5e8c307f964faebc0091dac01c938b220f721f2b3d24d17018c.json",
+      "response_sha256": "6704e761d6ff3cf21cf4560c2f62c315476a387f3ba8fada6780652f1d9a0c02",
+      "retrieved_at": "2026-11-14T03:16:57.636456+00:00",
+      "sha256": "95911ee3230ee5e8c307f964faebc0091dac01c938b220f721f2b3d24d17018c",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/TOR/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/1b5c3fa4b8a83fe50e4ce0031a781daf6ba4f10854699f4d95a2fdb7eea68f07.json",
+      "response_sha256": "2a29e77828a73758a701b37cbbe5845da518be0134074d86987aa31edddf4120",
+      "retrieved_at": "2026-11-14T03:16:57.650855+00:00",
+      "sha256": "1b5c3fa4b8a83fe50e4ce0031a781daf6ba4f10854699f4d95a2fdb7eea68f07",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/VAN/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/429485db9561dacad69c50a0fbdc986b47c7da6cab25eca0bba2683a2cc8ca6b.json",
+      "response_sha256": "fd9868e436f31026b84d826883a280d4dd4ed61dbb1b2ea17d64ea7a57108df8",
+      "retrieved_at": "2026-11-14T03:16:57.694866+00:00",
+      "sha256": "429485db9561dacad69c50a0fbdc986b47c7da6cab25eca0bba2683a2cc8ca6b",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/VGK/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/a2cc563b1d932dbb34ff9e7f017a3d0f52054514a1f9e179c20701a6c3e71b5b.json",
+      "response_sha256": "eaac78dfd1b38173a48b19d5f85c569508dbe4846cd23b032220bc0b94dbcb92",
+      "retrieved_at": "2026-11-14T03:16:57.705124+00:00",
+      "sha256": "a2cc563b1d932dbb34ff9e7f017a3d0f52054514a1f9e179c20701a6c3e71b5b",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/WPG/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/db9f3b88a6db028dd29f0ca2a80229daf16cc196cb2ce0cefd2d9877d35d7a54.json",
+      "response_sha256": "3569a2d6e49aac534972ab060939d1e7218ed0f714c02950c3c44a44a28e9cf8",
+      "retrieved_at": "2026-11-14T03:16:57.744648+00:00",
+      "sha256": "db9f3b88a6db028dd29f0ca2a80229daf16cc196cb2ce0cefd2d9877d35d7a54",
+      "source_url": "https://api-web.nhle.com/v1/club-schedule-season/WSH/20262027"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/4da78a85ee2e65275305b0174dbeb5407ced4b6c367322cdd41e2c7bef6b8ab4.json",
+      "response_sha256": "3635be76ef3f9e0c7de810081dbd0926548293eb6b16d040f755706bd8fafb48",
+      "retrieved_at": "2026-11-14T03:16:57.795231+00:00",
+      "sha256": "4da78a85ee2e65275305b0174dbeb5407ced4b6c367322cdd41e2c7bef6b8ab4",
+      "source_url": "https://api-web.nhle.com/v1/schedule/2026-11-13"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/dc0202a78a3154cc8a282b0e1e7753ce0ee31448ae8fd34d5889a89e9d7179ae.json",
+      "response_sha256": "8c2f3ff0218d9840b5c28a58cbc3383e93bbe2eb51077dca739e074f7ff8ecdd",
+      "retrieved_at": "2026-11-14T03:16:58.080628+00:00",
+      "sha256": "dc0202a78a3154cc8a282b0e1e7753ce0ee31448ae8fd34d5889a89e9d7179ae",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261113"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/ea438fd5656b88eb75cef619e206c4cb074a1c17110599aaa5f448fba31c8294.json",
+      "response_sha256": "b9725d09b67ae5da5337c2453cd5baf781dad78ca1b358152d2feb096984efa2",
+      "retrieved_at": "2026-11-14T03:16:58.115155+00:00",
+      "sha256": "ea438fd5656b88eb75cef619e206c4cb074a1c17110599aaa5f448fba31c8294",
+      "source_url": "https://api-web.nhle.com/v1/schedule/2026-11-14"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/928e80af4a3a18ec6331cf5a63acc1b3da8242f00862c99144712db808f0d1a8.json",
+      "response_sha256": "de659e55805d28482c53ee8caa74bb80cf69bdb36e26592e7b7130915020e811",
+      "retrieved_at": "2026-11-14T03:16:58.514067+00:00",
+      "sha256": "928e80af4a3a18ec6331cf5a63acc1b3da8242f00862c99144712db808f0d1a8",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20261114"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/95f1df4eef23116db9fa9838f4aaf73302a35de5c313b97fb3470d698d465ff5.json",
+      "response_sha256": "0acf38ccb51b11c632a26e3dae8d62b70cea21da7280d7845a82e36290c7c68d",
+      "retrieved_at": "2026-11-14T03:16:58.625189+00:00",
+      "sha256": "95f1df4eef23116db9fa9838f4aaf73302a35de5c313b97fb3470d698d465ff5",
+      "source_url": "https://api-web.nhle.com/v1/gamecenter/2026020313/landing"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/ce66c405b2057a6a217eefd9536cc7e5de2405c205223317e6f740c79c6050c5.json",
+      "response_sha256": "ade8cbbd4466b70df0182e0ce56ad7585cfffb6e45cb2141160c6fb27d42ab12",
+      "retrieved_at": "2026-11-14T03:16:58.731024+00:00",
+      "sha256": "ce66c405b2057a6a217eefd9536cc7e5de2405c205223317e6f740c79c6050c5",
+      "source_url": "https://api-web.nhle.com/v1/gamecenter/2026020314/landing"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/06baf523e12039fcef6417a6ae4ba98afaa96bffe2d74b7cc6da94b971ecaca7.json",
+      "response_sha256": "68616c121a18551692235bb0e4fb08a62f800067fb1b65ba1c096334c12bac91",
+      "retrieved_at": "2026-11-14T03:16:58.843048+00:00",
+      "sha256": "06baf523e12039fcef6417a6ae4ba98afaa96bffe2d74b7cc6da94b971ecaca7",
+      "source_url": "https://api-web.nhle.com/v1/gamecenter/2026020315/landing"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/696068dc46971120d76ff3be8fc3d16d256760553fe1718de155ad5b72facf29.json",
+      "response_sha256": "91adb19651363940b8b90f4f734bceb6f857e80834c08fa0e9803337dba87177",
+      "retrieved_at": "2026-11-14T03:16:58.945764+00:00",
+      "sha256": "696068dc46971120d76ff3be8fc3d16d256760553fe1718de155ad5b72facf29",
+      "source_url": "https://api-web.nhle.com/v1/gamecenter/2026020316/landing"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/b0ec344eeb44df9ae22d54dab1bd61d1547299e6328532f87de164c395c53614.json",
+      "response_sha256": "cd86a88cae406a056c1e40e12bd01ad3d33ad68e741c080186bb0cf225e270bd",
+      "retrieved_at": "2026-11-14T03:16:59.058490+00:00",
+      "sha256": "b0ec344eeb44df9ae22d54dab1bd61d1547299e6328532f87de164c395c53614",
+      "source_url": "https://api-web.nhle.com/v1/gamecenter/2026020317/landing"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/e04885e87b83cdf372c3e1d69f36b7096e818f7a3b7ac848eb34f014435ee011.json",
+      "response_sha256": "1efe42e047cccb4149e23d526abda83910e80807cd25fd4298049e780b0f1f36",
+      "retrieved_at": "2026-11-14T03:16:59.184563+00:00",
+      "sha256": "e04885e87b83cdf372c3e1d69f36b7096e818f7a3b7ac848eb34f014435ee011",
+      "source_url": "https://api-web.nhle.com/v1/gamecenter/2026020318/landing"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/d1f1565fb90bad22f7637c0c6b305cd76179484ae86cf8e8d66d65ed1210ad41.json",
+      "response_sha256": "63ae60e02016140ee2c49725bbc30704151d98a1e16eb27427513196a0c4ed65",
+      "retrieved_at": "2026-11-14T03:16:59.297340+00:00",
+      "sha256": "d1f1565fb90bad22f7637c0c6b305cd76179484ae86cf8e8d66d65ed1210ad41",
+      "source_url": "https://api-web.nhle.com/v1/gamecenter/2026020319/landing"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/d26b6c47aa7e7ff8904c2fa72d1851fb24f2012c0228ff84859ff39b9ae15b17.json",
+      "response_sha256": "064b609ff9b20730b5a1c6c89f53fcc1dd015386c9585b3d432d86c4a4cef73a",
+      "retrieved_at": "2026-11-14T03:16:59.423611+00:00",
+      "sha256": "d26b6c47aa7e7ff8904c2fa72d1851fb24f2012c0228ff84859ff39b9ae15b17",
+      "source_url": "https://api-web.nhle.com/v1/gamecenter/2026020320/landing"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/af90c72bd2ef1d98eaad08cb6a0a48d43897df7099c085bd02a5a230fc4ac55d.json",
+      "response_sha256": "36781cc48a976c5240426097d78e6aa0adb687710a039673c3410ba8f766bf09",
+      "retrieved_at": "2026-11-14T03:16:59.521745+00:00",
+      "sha256": "af90c72bd2ef1d98eaad08cb6a0a48d43897df7099c085bd02a5a230fc4ac55d",
+      "source_url": "https://api-web.nhle.com/v1/gamecenter/2026020322/landing"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/83452e1535dcdddd7c10969bf70c1b10a36260ff084018bdbff6c420f8222c49.json",
+      "response_sha256": "f38413f11d83a81633cd5c61a38e38ae4d393a34d3190ceb48b8d973a584b6d7",
+      "retrieved_at": "2026-11-14T03:16:59.662915+00:00",
+      "sha256": "83452e1535dcdddd7c10969bf70c1b10a36260ff084018bdbff6c420f8222c49",
+      "source_url": "https://api-web.nhle.com/v1/gamecenter/2026020323/landing"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/0e5715908a90f63692c2784849e13c02aca44f19c2fece44b21ff7906f982f76.json",
+      "response_sha256": "e8c14379f471e274ac4352167a9b1090090e2badeddf60f8af010ad71fa68430",
+      "retrieved_at": "2026-11-14T03:16:59.775378+00:00",
+      "sha256": "0e5715908a90f63692c2784849e13c02aca44f19c2fece44b21ff7906f982f76",
+      "source_url": "https://api-web.nhle.com/v1/gamecenter/2026020324/landing"
+    },
+    {
+      "path": "benchmarks/two_way_prospective/nhl/snapshots/75b7245718891014da3886334920b6aa49d4372454e50aaca5d60270254da3fb.json",
+      "response_sha256": "16606b186b0428d35d158a55ec4299b608d5236bc881a6ff742d8d699351e236",
+      "retrieved_at": "2026-11-14T03:16:59.889518+00:00",
+      "sha256": "75b7245718891014da3886334920b6aa49d4372454e50aaca5d60270254da3fb",
+      "source_url": "https://api-web.nhle.com/v1/gamecenter/2026020325/landing"
+    }
+  ],
+  "sport": "NHL"
+}
