@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-14T11:28:24.039302+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-11-14T18:01:50.721659+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 70 / 70 / 0 |
+| Recorded / settled / pending | 78 / 70 / 8 |
 | Started games in retained official schedules / enrolled | 71 / 70 |
 | Observed missing started games | 1 |
-| Enrollment-time priced forecasts | 70 / 70 |
+| Enrollment-time priced forecasts | 78 / 78 |
 | Settled with enrollment prices / decisive market-paired | 70 / 69 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -25,10 +25,18 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-14T11:28:24.039302+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
+As of retained evidence: 2026-11-14T18:01:50.721659+00:00. Ready: 8 / 8 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
+| 2026_10_BUF_NYJ | BUF at NYJ | True | False | True | None |
+| 2026_10_CAR_NO | CAR at NO | True | False | True | None |
+| 2026_10_HOU_CLE | HOU at CLE | True | False | True | None |
+| 2026_10_JAX_TEN | JAX at TEN | True | False | True | None |
+| 2026_10_KC_ATL | KC at ATL | True | False | True | None |
+| 2026_10_MIA_IND | MIA at IND | True | False | True | None |
+| 2026_10_MIN_GB | MIN at GB | True | False | True | None |
+| 2026_10_NE_DET | NE at DET | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -106,11 +114,19 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026_09_NYG_PHI | NYG at PHI | 2026-11-08T18:00:00+00:00 | enrolled | — |
 | 2026_09_NYJ_KC | NYJ at KC | 2026-11-08T18:00:00+00:00 | enrolled | — |
 | 2026_09_TB_CHI | TB at CHI | 2026-11-09T01:20:00+00:00 | enrolled | — |
+| 2026_10_BUF_NYJ | BUF at NYJ | 2026-11-15T18:00:00+00:00 | enrolled | — |
+| 2026_10_CAR_NO | CAR at NO | 2026-11-15T18:00:00+00:00 | enrolled | — |
+| 2026_10_HOU_CLE | HOU at CLE | 2026-11-15T18:00:00+00:00 | enrolled | — |
+| 2026_10_JAX_TEN | JAX at TEN | 2026-11-15T18:00:00+00:00 | enrolled | — |
+| 2026_10_KC_ATL | KC at ATL | 2026-11-15T18:00:00+00:00 | enrolled | — |
+| 2026_10_MIA_IND | MIA at IND | 2026-11-15T18:00:00+00:00 | enrolled | — |
+| 2026_10_MIN_GB | MIN at GB | 2026-11-15T18:00:00+00:00 | enrolled | — |
+| 2026_10_NE_DET | NE at DET | 2026-11-15T14:30:00+00:00 | enrolled | — |
 | 2026_10_WAS_NYG | WAS at NYG | 2026-11-13T01:15:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 173. Latest: `20261114T112822630123Z`.
+Audited capture manifests: 174. Latest: `20261114T180147784608Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

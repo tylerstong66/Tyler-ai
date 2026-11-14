@@ -1,0 +1,96 @@
+{
+  "NO_BET": true,
+  "actual_wagers": 0,
+  "availability": {
+    "coverage": "unknown",
+    "injury_effect_enabled": false,
+    "observations": []
+  },
+  "away": "MIA",
+  "cutoff": "2026-11-14T18:01:51.062664+00:00",
+  "efficiency_prior_games": [
+    16,
+    16
+  ],
+  "event_id": "401873059",
+  "features": [
+    1.0,
+    0.024680600971167907,
+    1.0,
+    0.0,
+    0.24107142857142858,
+    -0.026701932854538056,
+    0.00891489484034004
+  ],
+  "game_id": "2026_10_MIA_IND",
+  "generated_at": "2026-11-14T18:01:51.062664+00:00",
+  "home": "IND",
+  "kickoff": "2026-11-15T18:00:00+00:00",
+  "latest_result_available_at": "2026-11-14T01:15:00+00:00",
+  "market": {
+    "away_moneyline": 180,
+    "conditional_home_probability": 0.6574752261956054,
+    "home_moneyline": -218,
+    "provider": "DraftKings",
+    "quote_kind": "observed_current_quote_not_verified_closing_line"
+  },
+  "market_observed_at": "2026-11-14T18:01:49.692894+00:00",
+  "prior_results_used": 4500,
+  "recorded_at": "2026-11-14T18:01:51.117421+00:00",
+  "season": 2026,
+  "sha256": "e661aa38d9ff453133f7e2dd27030aa11ec33aaf9d51fc9cd556463918727131",
+  "source_snapshots": [
+    {
+      "commit": "e214a456d3ef92eb3497bf8bfee6e8f7cc53eded",
+      "path": "benchmarks/nfl_prospective_v2/snapshots/afc4706a41168d5d8721ce3ec3eb2c60dacf55605db82cb8c6e3eae749513dfb.csv",
+      "response_sha256": "18a6aa6318f8483c4f2898a6f5d224a2910d333b9a19b08b87ce4fd7d9860453",
+      "retrieved_at": "2026-11-14T18:01:48.228838+00:00",
+      "sha256": "afc4706a41168d5d8721ce3ec3eb2c60dacf55605db82cb8c6e3eae749513dfb",
+      "source_url": "https://raw.githubusercontent.com/nflverse/nfldata/e214a456d3ef92eb3497bf8bfee6e8f7cc53eded/data/games.csv"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/91058a59d894855377b2f39f40c4e7bdbeef96d12144289dc68215209a1c93cb.csv",
+      "release_digest": "sha256:91058a59d894855377b2f39f40c4e7bdbeef96d12144289dc68215209a1c93cb",
+      "response_sha256": "91058a59d894855377b2f39f40c4e7bdbeef96d12144289dc68215209a1c93cb",
+      "retrieved_at": "2026-11-14T18:01:49.183754+00:00",
+      "sha256": "91058a59d894855377b2f39f40c4e7bdbeef96d12144289dc68215209a1c93cb",
+      "source_url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2025.csv",
+      "updated_at": "2026-08-13T16:51:24Z"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/53e15e7c0f527824f127a4232f2a7cd88014e5bcb2461fd8972952103189d127.csv",
+      "release_digest": "sha256:53e15e7c0f527824f127a4232f2a7cd88014e5bcb2461fd8972952103189d127",
+      "response_sha256": "53e15e7c0f527824f127a4232f2a7cd88014e5bcb2461fd8972952103189d127",
+      "retrieved_at": "2026-11-14T18:01:49.384664+00:00",
+      "sha256": "53e15e7c0f527824f127a4232f2a7cd88014e5bcb2461fd8972952103189d127",
+      "source_url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2026.csv",
+      "updated_at": "2026-11-14T15:48:36Z"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/38d457c1f7daf5a60bf8b97a0b65a96ca97d73a5eb344d3b3886324aeccd83ff.json",
+      "response_sha256": "bd52f2a957a3ca1037453e6d15d32e81304e0989cea6933fd6b2adfe1ccea933",
+      "retrieved_at": "2026-11-14T18:01:49.692894+00:00",
+      "sha256": "38d457c1f7daf5a60bf8b97a0b65a96ca97d73a5eb344d3b3886324aeccd83ff",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=20261115"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/eb0129fb5e59b005d178d8ea88d6abf4604bdd42889a64545d4205e40b40c045.json",
+      "retrieved_at": "2026-11-14T18:01:50.721659+00:00",
+      "sha256": "eb0129fb5e59b005d178d8ea88d6abf4604bdd42889a64545d4205e40b40c045",
+      "source_url": "https://www.nfl.com/news/nfl-week-10-injury-report-player-statuses-for-all-15-games"
+    }
+  ],
+  "v1": {
+    "away": 0.40348222858510957,
+    "home": 0.592871938081557,
+    "tie": 0.0036458333333333334
+  },
+  "v1_model_sha256": "4366a2eb5958142f1e9166ca435ecde111c90ad4c1df3cdb21d61a9dcfbecf2a",
+  "v2": {
+    "away": 0.41681138325391737,
+    "home": 0.5795427834127493,
+    "tie": 0.0036458333333333334
+  },
+  "v2_model_sha256": "546cf523ec2fbed38b61595b029119ef0bc699b6d6bbd303a1d979d79ab73a69",
+  "week": 10
+}
