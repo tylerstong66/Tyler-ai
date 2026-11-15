@@ -1,0 +1,73 @@
+{
+  "away_score": 24,
+  "event_id": "401873056",
+  "game_id": "2026_10_HOU_CLE",
+  "home_score": 27,
+  "outcome": "home",
+  "prediction_sha256": "2fce2abba8f78fb6d9bd1d6635b8909178bae0186bf5e9f2f0d041286d0d60e9",
+  "scores": {
+    "market": {
+      "binary_brier": 0.9113343688405487,
+      "conditional_log_loss": 1.1240262458760688,
+      "correct": false
+    },
+    "v1": {
+      "binary_brier": 0.5941541640481703,
+      "conditional_log_loss": 0.787562875609041,
+      "correct": false,
+      "full_brier": 0.593816088759843,
+      "full_log_loss": 0.7912153711906155
+    },
+    "v2": {
+      "binary_brier": 0.6329050219304643,
+      "conditional_log_loss": 0.8267725646987881,
+      "correct": false,
+      "full_brier": 0.6324119939397824,
+      "full_log_loss": 0.8304250602803624
+    }
+  },
+  "season": 2026,
+  "source_snapshots": [
+    {
+      "commit": "db37779d790053d55a8cdf7db99c766d1450abac",
+      "path": "benchmarks/nfl_prospective_v2/snapshots/3a1972422b96ff2875a07613500eeb752b6420a14a6ee84229096eb29a9be975.csv",
+      "response_sha256": "7eb9194c185304b2df04d2e92cd5a0ef8335247ab238b4eb7eb7c4ed38dc4818",
+      "retrieved_at": "2026-11-15T22:48:55.500217+00:00",
+      "sha256": "3a1972422b96ff2875a07613500eeb752b6420a14a6ee84229096eb29a9be975",
+      "source_url": "https://raw.githubusercontent.com/nflverse/nfldata/db37779d790053d55a8cdf7db99c766d1450abac/data/games.csv"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/91058a59d894855377b2f39f40c4e7bdbeef96d12144289dc68215209a1c93cb.csv",
+      "release_digest": "sha256:91058a59d894855377b2f39f40c4e7bdbeef96d12144289dc68215209a1c93cb",
+      "response_sha256": "91058a59d894855377b2f39f40c4e7bdbeef96d12144289dc68215209a1c93cb",
+      "retrieved_at": "2026-11-15T22:48:56.165374+00:00",
+      "sha256": "91058a59d894855377b2f39f40c4e7bdbeef96d12144289dc68215209a1c93cb",
+      "source_url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2025.csv",
+      "updated_at": "2026-08-13T16:51:24Z"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/5aa36b47ff9774e72b92252a6f47d9c62a6ed81bfdcdb24dbd7563ec63c23c96.csv",
+      "release_digest": "sha256:5aa36b47ff9774e72b92252a6f47d9c62a6ed81bfdcdb24dbd7563ec63c23c96",
+      "response_sha256": "5aa36b47ff9774e72b92252a6f47d9c62a6ed81bfdcdb24dbd7563ec63c23c96",
+      "retrieved_at": "2026-11-15T22:48:56.378560+00:00",
+      "sha256": "5aa36b47ff9774e72b92252a6f47d9c62a6ed81bfdcdb24dbd7563ec63c23c96",
+      "source_url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2026.csv",
+      "updated_at": "2026-11-15T22:05:17Z"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/6c0d71aa7febbc09a5036a3e9517dd1bc6097f0d9c8412f9dfd2f9edb0fc341d.json",
+      "response_sha256": "0eb9746ca0e9cb8fca20ebe852889cf8e86d9575b01c168a9fec8ece7fab3b31",
+      "retrieved_at": "2026-11-15T22:48:56.685992+00:00",
+      "sha256": "6c0d71aa7febbc09a5036a3e9517dd1bc6097f0d9c8412f9dfd2f9edb0fc341d",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=20261115"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/eb0129fb5e59b005d178d8ea88d6abf4604bdd42889a64545d4205e40b40c045.json",
+      "retrieved_at": "2026-11-15T22:48:57.866688+00:00",
+      "sha256": "eb0129fb5e59b005d178d8ea88d6abf4604bdd42889a64545d4205e40b40c045",
+      "source_url": "https://www.nfl.com/news/nfl-week-10-injury-report-player-statuses-for-all-15-games"
+    }
+  ],
+  "verified_at": "2026-11-15T22:48:57.877194+00:00",
+  "week": 10
+}
