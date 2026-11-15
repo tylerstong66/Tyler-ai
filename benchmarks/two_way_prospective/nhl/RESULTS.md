@@ -1,6 +1,6 @@
 # Tyler NHL prospective paper test
 
-Recorded: **240** · Settled: **227** · Pending: **13**
+Recorded: **245** · Settled: **231** · Pending: **14**
 
 **NO BET — actual wagers $0.**
 
@@ -8,9 +8,9 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 
 | Model | Paired games | Brier | Log loss | Accuracy |
 |---|---:|---:|---:|---:|
-| model | 227 | 0.4789 | 0.6719 | 59.5% |
-| fixed_elo | 227 | 0.4631 | 0.6545 | 58.6% |
-| market | 227 | 0.4551 | 0.6462 | 59.0% |
+| model | 231 | 0.4805 | 0.6735 | 58.9% |
+| fixed_elo | 231 | 0.4678 | 0.6596 | 58.0% |
+| market | 231 | 0.4572 | 0.6484 | 58.9% |
 
 | Game | Start (Eastern) | Model pick | Win probability |
 |---|---|---|---:|
@@ -254,6 +254,11 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | SJS at UTA | Nov 14 09:00 PM | UTA | 55.2% |
 | NYI at ANA | Nov 14 10:00 PM | ANA | 53.3% |
 | CGY at LAK | Nov 14 10:00 PM | LAK | 50.0% |
+| EDM at PHI | Nov 15 07:30 PM | EDM | 53.0% |
+| FLA at DAL | Nov 15 08:00 PM | DAL | 53.3% |
+| CGY at ANA | Nov 15 08:00 PM | ANA | 54.2% |
+| VAN at VGK | Nov 15 09:00 PM | VGK | 64.0% |
+| NSH at SJS | Nov 15 09:00 PM | NSH | 52.5% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
 
