@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-15T10:54:09.031332+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-11-15T17:42:46.834231+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 82 / 70 / 12 |
-| Started games in retained official schedules / enrolled | 71 / 70 |
+| Recorded / settled / pending | 82 / 71 / 11 |
+| Started games in retained official schedules / enrolled | 72 / 71 |
 | Observed missing started games | 1 |
 | Enrollment-time priced forecasts | 82 / 82 |
-| Settled with enrollment prices / decisive market-paired | 70 / 69 |
+| Settled with enrollment prices / decisive market-paired | 71 / 70 |
 | Separate later quotes recorded prospectively | 0 |
 
 A priced NFL tie is excluded only from binary decisive market comparisons.
@@ -25,7 +25,7 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-15T10:54:09.031332+00:00. Ready: 12 / 12 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-15T17:42:46.834231+00:00. Ready: 11 / 11 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
@@ -37,7 +37,6 @@ As of retained evidence: 2026-11-15T10:54:09.031332+00:00. Ready: 12 / 12 observ
 | 2026_10_LA_ARI | LA at ARI | True | False | True | None |
 | 2026_10_MIA_IND | MIA at IND | True | False | True | None |
 | 2026_10_MIN_GB | MIN at GB | True | False | True | None |
-| 2026_10_NE_DET | NE at DET | True | False | True | None |
 | 2026_10_PIT_CIN | PIT at CIN | True | False | True | None |
 | 2026_10_SEA_LV | SEA at LV | True | False | True | None |
 | 2026_10_SF_DAL | SF at DAL | True | False | True | None |
@@ -134,7 +133,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 177. Latest: `20261115T105405748499Z`.
+Audited capture manifests: 178. Latest: `20261115T174243109739Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

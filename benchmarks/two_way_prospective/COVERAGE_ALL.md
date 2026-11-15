@@ -4,7 +4,7 @@
 
 | Cohort | Saved | Settled | Market-paired | Observed missing started games | Upcoming ready / observed | Report |
 |---|---:|---:|---:|---:|---|---|
-| NFL | 82 | 70 | 69 | 1 | 12 / 12 (ready_as_of_snapshot) | [Audit](../nfl_prospective_v2/COVERAGE.md) |
+| NFL | 82 | 71 | 70 | 1 | 11 / 11 (ready_as_of_snapshot) | [Audit](../nfl_prospective_v2/COVERAGE.md) |
 | NHL | 245 | 240 | 240 | 2 | 5 / 5 (ready_as_of_snapshot) | [Audit](nhl/COVERAGE.md) |
 | MLB | 15 | 12 | 7 | 2 | 0 / 0 (no_upcoming_games_observed) | [Audit](mlb/COVERAGE.md) |
 
