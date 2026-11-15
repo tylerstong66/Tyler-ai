@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-15T02:39:57.042520+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-15T10:54:09.950785+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 245 / 231 / 14 |
-| Started games in retained official schedules / enrolled | 240 / 238 |
+| Recorded / settled / pending | 245 / 240 / 5 |
+| Started games in retained official schedules / enrolled | 242 / 240 |
 | Observed missing started games | 2 |
 | Enrollment-time priced forecasts | 245 / 245 |
-| Settled with enrollment prices / decisive market-paired | 231 / 231 |
+| Settled with enrollment prices / decisive market-paired | 240 / 240 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,12 +23,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-15T02:39:57.042520+00:00. Ready: 7 / 7 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-15T10:54:09.950785+00:00. Ready: 5 / 5 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020324 | NYI at ANA | True | False | True | None |
-| 2026020325 | CGY at LAK | True | False | True | None |
 | 2026020326 | EDM at PHI | True | False | True | None |
 | 2026020327 | FLA at DAL | True | False | True | None |
 | 2026020328 | CGY at ANA | True | False | True | None |
@@ -291,7 +289,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 175. Latest: `20261115T023955322592Z`.
+Audited capture manifests: 176. Latest: `20261115T105409266328Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

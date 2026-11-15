@@ -7,24 +7,24 @@
       "bootstrap_draws": 2000,
       "ci95": {
         "accuracy": [
-          0.5193761180679786,
-          0.640929115929116
+          0.5076124313495216,
+          0.6335035403050108
         ],
         "brier": [
-          0.43923981504377846,
-          0.49620614225603504
+          0.4419352217110783,
+          0.5015115363395095
         ],
         "log_loss": [
-          0.6293989806595087,
-          0.690036310774111
+          0.6316676276613608,
+          0.6953368985630537
         ]
       },
-      "games": 231,
+      "games": 240,
       "interval_method": "percentile block bootstrap",
       "mean": {
-        "accuracy": 0.5800865800865801,
-        "brier": 0.4677992915741005,
-        "log_loss": 0.6595656505361087
+        "accuracy": 0.5708333333333333,
+        "brier": 0.47150778235517143,
+        "log_loss": 0.6633931499934962
       },
       "minimum_blocks": 5,
       "uncertainty_status": "available_descriptive"
@@ -34,24 +34,24 @@
       "bootstrap_draws": 2000,
       "ci95": {
         "accuracy": [
-          0.5318138665132336,
-          0.6468209827932432
+          0.5175868376972582,
+          0.6413558822195
         ],
         "brier": [
-          0.46985015279977027,
-          0.4910899862893842
+          0.4708535200033078,
+          0.49256381498890806
         ],
         "log_loss": [
-          0.6627400307290036,
-          0.6841423608410474
+          0.6637595138005224,
+          0.6856431578872779
         ]
       },
-      "games": 231,
+      "games": 240,
       "interval_method": "percentile block bootstrap",
       "mean": {
-        "accuracy": 0.5887445887445888,
-        "brier": 0.4804962035191513,
-        "log_loss": 0.6734777078522891
+        "accuracy": 0.5791666666666667,
+        "brier": 0.48180839475915926,
+        "log_loss": 0.674797922779118
       },
       "minimum_blocks": 5,
       "uncertainty_status": "available_descriptive"
@@ -65,7 +65,7 @@
     "completion_note": "Manifest completion alone does not imply absence of per-game errors.",
     "errors": [],
     "excluded": [],
-    "latest_manifest": "benchmarks/two_way_prospective/nhl/captures/20261115T023955322592Z/manifest.json",
+    "latest_manifest": "benchmarks/two_way_prospective/nhl/captures/20261115T105409266328Z/manifest.json",
     "newer_saved_collection_failure": null,
     "optional_availability_errors": []
   },
@@ -81,35 +81,35 @@
           "upper": 0.2
         },
         {
-          "games": 13,
+          "games": 14,
           "lower": 0.2,
-          "mean_probability": 0.3286084557425713,
-          "observed_rate": 0.23076923076923078,
+          "mean_probability": 0.333553327031113,
+          "observed_rate": 0.21428571428571427,
           "observed_rate_wilson95": [
-            0.08179528718498569,
-            0.5025637594672749
+            0.07571386712693184,
+            0.47589230586600295
           ],
           "upper": 0.4
         },
         {
-          "games": 132,
+          "games": 136,
           "lower": 0.4,
-          "mean_probability": 0.5118850033021226,
-          "observed_rate": 0.4696969696969697,
+          "mean_probability": 0.5119843878570325,
+          "observed_rate": 0.45588235294117646,
           "observed_rate_wilson95": [
-            0.38662231037538475,
-            0.5544855070063492
+            0.3745380653137733,
+            0.5396504728980133
           ],
           "upper": 0.6
         },
         {
-          "games": 84,
+          "games": 88,
           "lower": 0.6,
-          "mean_probability": 0.6707342853875821,
-          "observed_rate": 0.6785714285714286,
+          "mean_probability": 0.6684705618807919,
+          "observed_rate": 0.6590909090909091,
           "observed_rate_wilson95": [
-            0.5727856143388975,
-            0.7687387683701526
+            0.5552645553272387,
+            0.7496086507339318
           ],
           "upper": 0.8
         },
@@ -125,7 +125,7 @@
           "upper": 1.0
         }
       ],
-      "games": 231,
+      "games": 240,
       "limitation": "Fixed five bins. Wilson bin intervals assume independent observations; descriptive only."
     },
     "model": {
@@ -150,13 +150,13 @@
           "upper": 0.4
         },
         {
-          "games": 224,
+          "games": 233,
           "lower": 0.4,
-          "mean_probability": 0.5181936824880367,
-          "observed_rate": 0.5267857142857143,
+          "mean_probability": 0.5180605506456423,
+          "observed_rate": 0.5107296137339056,
           "observed_rate_wilson95": [
-            0.461502287589531,
-            0.5911659145107888
+            0.44689203682568185,
+            0.5742191319067543
           ],
           "upper": 0.6
         },
@@ -180,7 +180,7 @@
           "upper": 1.0
         }
       ],
-      "games": 231,
+      "games": 240,
       "limitation": "Fixed five bins. Wilson bin intervals assume independent observations; descriptive only."
     }
   },
@@ -199,8 +199,8 @@
   },
   "full_outcome_calibration": null,
   "input_integrity": "verified",
-  "input_sha256": "cc39b2ff2fab1c0f71120086043e345568c1d0a327837bb43b7389ae935f6008",
-  "latest_result_verified_at": "2026-11-15T02:39:57.160269+00:00",
+  "input_sha256": "8e13b47085808666023c4840850c3c283bb3f63bb8e27f01dad5983db14cc277",
+  "latest_result_verified_at": "2026-11-15T10:54:09.981315+00:00",
   "limitation": "Experimental descriptive results. NFL uncertainty uses season/week blocks; NHL/MLB use Eastern game-date blocks. Blocks can still be dependent. Intervals require at least five blocks and are unavailable below that; five blocks or 100 settled games does not establish a betting edge. Repeated monitoring intervals are not sequential significance tests. No model promotion, forecast changes, wagers, or profits are inferred.",
   "paired_differences": {
     "fixed_elo": {
@@ -208,25 +208,25 @@
       "bootstrap_draws": 2000,
       "ci95": {
         "accuracy": [
-          -0.008130081300813009,
-          0.026457367607810072
+          -0.007843909217230199,
+          0.025735688588740212
         ],
         "brier": [
-          -0.0054899395866584684,
-          0.030885055527329647
+          -0.009075482129136008,
+          0.029053997209366307
         ],
         "log_loss": [
-          -0.006247184114749818,
-          0.0336562288533607
+          -0.009795262070242106,
+          0.032020443702577256
         ]
       },
       "direction": "model minus baseline; negative Brier/log loss favors model; positive accuracy favors model",
-      "games": 231,
+      "games": 240,
       "interval_method": "percentile block bootstrap",
       "mean": {
-        "accuracy": 0.008658008658008658,
-        "brier": 0.012696911945050833,
-        "log_loss": 0.013912057316180395
+        "accuracy": 0.008333333333333333,
+        "brier": 0.010300612403987771,
+        "log_loss": 0.011404772785621757
       },
       "minimum_blocks": 5,
       "uncertainty_status": "available_descriptive"
@@ -236,25 +236,25 @@
       "bootstrap_draws": 2000,
       "ci95": {
         "accuracy": [
-          -0.05929331295825558,
-          0.0609842383801196
+          -0.06767555681656973,
+          0.05678106303983988
         ],
         "brier": [
-          0.011524756068147738,
-          0.034933880161248314
+          0.010792449349277493,
+          0.033692239840099586
         ],
         "log_loss": [
-          0.012748574023940869,
-          0.037360643942675124
+          0.011792932942785975,
+          0.035938033798251307
         ]
       },
       "direction": "model minus baseline; negative Brier/log loss favors model; positive accuracy favors model",
-      "games": 231,
+      "games": 240,
       "interval_method": "percentile block bootstrap",
       "mean": {
-        "accuracy": 0.0,
-        "brier": 0.02328867305693269,
-        "log_loss": 0.025046083121631594
+        "accuracy": -0.008333333333333333,
+        "brier": 0.022226922270670503,
+        "log_loss": 0.023868934827764553
       },
       "minimum_blocks": 5,
       "uncertainty_status": "available_descriptive"
@@ -266,24 +266,24 @@
       "bootstrap_draws": 2000,
       "ci95": {
         "accuracy": [
-          0.5193761180679786,
-          0.640929115929116
+          0.5076124313495216,
+          0.6335035403050108
         ],
         "brier": [
-          0.43923981504377846,
-          0.49620614225603504
+          0.4419352217110783,
+          0.5015115363395095
         ],
         "log_loss": [
-          0.6293989806595087,
-          0.690036310774111
+          0.6316676276613608,
+          0.6953368985630537
         ]
       },
-      "games": 231,
+      "games": 240,
       "interval_method": "percentile block bootstrap",
       "mean": {
-        "accuracy": 0.5800865800865801,
-        "brier": 0.4677992915741005,
-        "log_loss": 0.6595656505361087
+        "accuracy": 0.5708333333333333,
+        "brier": 0.47150778235517143,
+        "log_loss": 0.6633931499934962
       },
       "minimum_blocks": 5,
       "uncertainty_status": "available_descriptive"
@@ -293,24 +293,24 @@
       "bootstrap_draws": 2000,
       "ci95": {
         "accuracy": [
-          0.5234366688829787,
-          0.6518306636155606
+          0.5240280511811024,
+          0.6480706564934032
         ],
         "brier": [
-          0.43736415751893803,
-          0.4763988565633507
+          0.4390542772671813,
+          0.47944803874857556
         ],
         "log_loss": [
-          0.6275889165066962,
-          0.668384632828213
+          0.6296277535990522,
+          0.6715194924636047
         ]
       },
-      "games": 231,
+      "games": 240,
       "interval_method": "percentile block bootstrap",
       "mean": {
-        "accuracy": 0.5887445887445888,
-        "brier": 0.4572075304622187,
-        "log_loss": 0.6484316247306574
+        "accuracy": 0.5875,
+        "brier": 0.4595814724884887,
+        "log_loss": 0.6509289879513533
       },
       "minimum_blocks": 5,
       "uncertainty_status": "available_descriptive"
@@ -320,24 +320,24 @@
       "bootstrap_draws": 2000,
       "ci95": {
         "accuracy": [
-          0.5318138665132336,
-          0.6468209827932432
+          0.5175868376972582,
+          0.6413558822195
         ],
         "brier": [
-          0.46985015279977027,
-          0.4910899862893842
+          0.4708535200033078,
+          0.49256381498890806
         ],
         "log_loss": [
-          0.6627400307290036,
-          0.6841423608410474
+          0.6637595138005224,
+          0.6856431578872779
         ]
       },
-      "games": 231,
+      "games": 240,
       "interval_method": "percentile block bootstrap",
       "mean": {
-        "accuracy": 0.5887445887445888,
-        "brier": 0.4804962035191513,
-        "log_loss": 0.6734777078522891
+        "accuracy": 0.5791666666666667,
+        "brier": 0.48180839475915926,
+        "log_loss": 0.674797922779118
       },
       "minimum_blocks": 5,
       "uncertainty_status": "available_descriptive"
@@ -365,24 +365,24 @@
         "upper": 0.4
       },
       {
-        "games": 156,
+        "games": 163,
         "lower": 0.4,
-        "mean_probability": 0.5065676059664497,
-        "observed_rate": 0.48717948717948717,
+        "mean_probability": 0.5057832825806768,
+        "observed_rate": 0.4723926380368098,
         "observed_rate_wilson95": [
-          0.409999682575514,
-          0.564975520794676
+          0.39727205313858427,
+          0.548784520187879
         ],
         "upper": 0.6
       },
       {
-        "games": 57,
+        "games": 59,
         "lower": 0.6,
-        "mean_probability": 0.660390497594328,
-        "observed_rate": 0.7368421052631579,
+        "mean_probability": 0.6592580301039862,
+        "observed_rate": 0.711864406779661,
         "observed_rate_wilson95": [
-          0.6102342073651618,
-          0.8335421340202692
+          0.5861915342706008,
+          0.811635003641777
         ],
         "upper": 0.8
       },
@@ -395,7 +395,7 @@
         "upper": 1.0
       }
     ],
-    "games": 231,
+    "games": 240,
     "limitation": "Fixed five bins. Wilson bin intervals assume independent observations; descriptive only."
   },
   "paired_probability_concentration": {
@@ -404,36 +404,36 @@
     "scope": "same_priced_decisive_games",
     "sources": {
       "fixed_elo": {
-        "fraction_home_probability_40_to_60": 0.5714285714285714,
-        "games": 231,
+        "fraction_home_probability_40_to_60": 0.5666666666666667,
+        "games": 240,
         "max_home_probability": 0.8610449484687024,
-        "mean_distance_from_even": 0.10426525287611384,
+        "mean_distance_from_even": 0.10328321737012039,
         "min_home_probability": 0.2274236001607219
       },
       "market": {
-        "fraction_home_probability_40_to_60": 0.6753246753246753,
-        "games": 231,
+        "fraction_home_probability_40_to_60": 0.6791666666666667,
+        "games": 240,
         "max_home_probability": 0.7819063004846527,
-        "mean_distance_from_even": 0.08144300540336387,
+        "mean_distance_from_even": 0.08055229992641971,
         "min_home_probability": 0.28644876973925815
       },
       "model": {
-        "fraction_home_probability_40_to_60": 0.9696969696969697,
-        "games": 231,
+        "fraction_home_probability_40_to_60": 0.9708333333333333,
+        "games": 240,
         "max_home_probability": 0.6528844552935698,
-        "mean_distance_from_even": 0.03709771124499567,
+        "mean_distance_from_even": 0.036694371861712344,
         "min_home_probability": 0.39099203408024097
       }
     }
   },
-  "pending": 14,
+  "pending": 5,
   "probability_policy": "Saved pregame probabilities only; NFL binary metrics condition on no tie.",
   "recorded": 245,
   "report_version": "prospective-review-v2",
   "review_due": true,
   "review_milestone": 100,
   "review_status": "ready_for_human_review",
-  "settled": 231,
+  "settled": 240,
   "sport": "NHL",
   "ties": 0
 }
