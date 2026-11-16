@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-15T22:48:59.165269+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-16T02:44:11.358826+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 245 / 240 / 5 |
-| Started games in retained official schedules / enrolled | 242 / 240 |
+| Recorded / settled / pending | 247 / 240 / 7 |
+| Started games in retained official schedules / enrolled | 247 / 245 |
 | Observed missing started games | 2 |
-| Enrollment-time priced forecasts | 245 / 245 |
+| Enrollment-time priced forecasts | 247 / 247 |
 | Settled with enrollment prices / decisive market-paired | 240 / 240 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -23,15 +23,12 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-15T22:48:59.165269+00:00. Ready: 5 / 5 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-16T02:44:11.358826+00:00. Ready: 2 / 2 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020326 | EDM at PHI | True | False | True | None |
-| 2026020327 | FLA at DAL | True | False | True | None |
-| 2026020328 | CGY at ANA | True | False | True | None |
-| 2026020329 | VAN at VGK | True | False | True | None |
-| 2026020330 | NSH at SJS | True | False | True | None |
+| 2026020331 | MTL at NYR | True | False | True | None |
+| 2026020332 | VAN at UTA | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -286,10 +283,12 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020328 | CGY at ANA | 2026-11-16T01:00:00+00:00 | enrolled | — |
 | 2026020329 | VAN at VGK | 2026-11-16T02:00:00+00:00 | enrolled | — |
 | 2026020330 | NSH at SJS | 2026-11-16T02:00:00+00:00 | enrolled | — |
+| 2026020331 | MTL at NYR | 2026-11-17T00:30:00+00:00 | enrolled | — |
+| 2026020332 | VAN at UTA | 2026-11-17T02:30:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 178. Latest: `20261115T224858027644Z`.
+Audited capture manifests: 179. Latest: `20261116T024410156481Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
