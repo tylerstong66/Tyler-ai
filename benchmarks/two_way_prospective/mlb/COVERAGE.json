@@ -1,8 +1,8 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-11-16T02:44:15.418628+00:00",
-  "capture_count": 177,
+  "as_of_evidence_at": "2026-11-16T11:18:19.477227+00:00",
+  "capture_count": 178,
   "cohort_started_at": "2026-10-11T15:59:30.281973+00:00",
   "completion_note": "Only manifests without an explicit incomplete state are audited; legacy manifests are retained.",
   "decisive_market_paired": 7,
@@ -312,7 +312,7 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "4f217720d156fced88479b25496c3feb9d900c96faa6740c7232f40cc806123f",
+  "input_digest": "c6414a78e872d64523c52078ecc3d53de8a83c84bd4aba218a3f336f34b14736",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -341,8 +341,8 @@
       "to": "2026-11-11T15:12:55.201088+00:00"
     }
   ],
-  "latest_attempted_capture": "20261116T024411529841Z",
-  "latest_capture": "20261116T024411529841Z",
+  "latest_attempted_capture": "20261116T111815759237Z",
+  "latest_capture": "20261116T111815759237Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
@@ -355,7 +355,7 @@
   ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": true,
-  "latest_official_schedule_observed_at": "2026-11-16T02:44:15.345875+00:00",
+  "latest_official_schedule_observed_at": "2026-11-16T11:18:19.422378+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [
     {
@@ -573,7 +573,7 @@
   "official_daily_conflicted_capture_count": 14,
   "pending": 3,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-11-16T02:44:15.418628+00:00",
+    "as_of_evidence_at": "2026-11-16T11:18:19.477227+00:00",
     "games": [],
     "limitation": "Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.",
     "observed_games": 0,
@@ -1392,6 +1392,11 @@
     },
     {
       "capture": "20261116T024411529841Z",
+      "game_id": "849816",
+      "reason": "Final identity differs from saved forecast"
+    },
+    {
+      "capture": "20261116T111815759237Z",
       "game_id": "849816",
       "reason": "Final identity differs from saved forecast"
     }
