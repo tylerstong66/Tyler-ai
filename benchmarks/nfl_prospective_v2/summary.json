@@ -4,47 +4,47 @@
   "availability_records": 158,
   "full_three_outcome_metrics": {
     "v1": {
-      "full_brier": 0.4312439327789637,
-      "full_log_loss": 0.6699496307471214
+      "full_brier": 0.4368082268725879,
+      "full_log_loss": 0.6752372306988826
     },
     "v2": {
-      "full_brier": 0.42350131573836897,
-      "full_log_loss": 0.6622179553564507
+      "full_brier": 0.43010819945886847,
+      "full_log_loss": 0.6687013105304193
     }
   },
   "injury_effect_enabled": false,
   "paired_metrics": {
     "market": {
-      "binary_brier": 0.3964177199601613,
-      "conditional_log_loss": 0.5854895922222266,
-      "correct": 0.7160493827160493
+      "binary_brier": 0.4023255241738873,
+      "conditional_log_loss": 0.5916372486289299,
+      "correct": 0.7073170731707317
     },
     "v1": {
-      "binary_brier": 0.41805644150480387,
-      "conditional_log_loss": 0.6052573736196286,
-      "correct": 0.6666666666666666
+      "binary_brier": 0.4238692477747458,
+      "conditional_log_loss": 0.6113538438335566,
+      "correct": 0.6585365853658537
     },
     "v2": {
-      "binary_brier": 0.41018608980177407,
-      "conditional_log_loss": 0.597430245446357,
-      "correct": 0.7037037037037037
+      "binary_brier": 0.4170602181990821,
+      "conditional_log_loss": 0.6047382173215754,
+      "correct": 0.6951219512195121
     }
   },
-  "paired_priced_decisive_games": 81,
-  "pending": 1,
+  "paired_priced_decisive_games": 82,
+  "pending": 0,
   "recorded": 83,
-  "settled": 82,
+  "settled": 83,
   "state": "collecting",
   "target": 100,
   "week_block_brier_difference": {
     "approximate_95_percent_interval": [
-      -0.009200569600707038,
-      0.038084893124510195
+      -0.007890216748193608,
+      0.038738727169401035
     ],
     "blocks": 6,
     "draws": 2000,
     "limitation": "Descriptive season/week-cluster bootstrap only; five blocks are not proof of significance, calibration or profitable sports betting.",
-    "mean_model_minus_market": 0.013768369841612794,
+    "mean_model_minus_market": 0.01473469402519484,
     "minimum_blocks": 5,
     "seed": 1729,
     "uncertainty_status": "available_descriptive"

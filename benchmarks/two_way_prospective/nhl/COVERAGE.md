@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-16T22:02:09.918386+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-17T04:29:15.165992+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 247 / 245 / 2 |
-| Started games in retained official schedules / enrolled | 247 / 245 |
+| Recorded / settled / pending | 258 / 246 / 12 |
+| Started games in retained official schedules / enrolled | 249 / 247 |
 | Observed missing started games | 2 |
-| Enrollment-time priced forecasts | 247 / 247 |
-| Settled with enrollment prices / decisive market-paired | 245 / 245 |
+| Enrollment-time priced forecasts | 258 / 258 |
+| Settled with enrollment prices / decisive market-paired | 246 / 246 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,12 +23,21 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-16T22:02:09.918386+00:00. Ready: 2 / 2 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-17T04:29:15.165992+00:00. Ready: 11 / 11 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020331 | MTL at NYR | True | False | True | None |
-| 2026020332 | VAN at UTA | True | False | True | None |
+| 2026020333 | LAK at BOS | True | False | True | None |
+| 2026020334 | WSH at TBL | True | False | True | None |
+| 2026020335 | EDM at FLA | True | False | True | None |
+| 2026020336 | CBJ at NYI | True | False | True | None |
+| 2026020337 | BUF at PHI | True | False | True | None |
+| 2026020338 | TOR at CHI | True | False | True | None |
+| 2026020339 | ANA at STL | True | False | True | None |
+| 2026020340 | NSH at MIN | True | False | True | None |
+| 2026020341 | OTT at WPG | True | False | True | None |
+| 2026020342 | DAL at VGK | True | False | True | None |
+| 2026020343 | CGY at SJS | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -285,10 +294,21 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020330 | NSH at SJS | 2026-11-16T02:00:00+00:00 | enrolled | — |
 | 2026020331 | MTL at NYR | 2026-11-17T00:30:00+00:00 | enrolled | — |
 | 2026020332 | VAN at UTA | 2026-11-17T02:30:00+00:00 | enrolled | — |
+| 2026020333 | LAK at BOS | 2026-11-18T00:00:00+00:00 | enrolled | — |
+| 2026020334 | WSH at TBL | 2026-11-18T00:30:00+00:00 | enrolled | — |
+| 2026020335 | EDM at FLA | 2026-11-18T00:00:00+00:00 | enrolled | — |
+| 2026020336 | CBJ at NYI | 2026-11-18T00:00:00+00:00 | enrolled | — |
+| 2026020337 | BUF at PHI | 2026-11-18T00:00:00+00:00 | enrolled | — |
+| 2026020338 | TOR at CHI | 2026-11-18T00:30:00+00:00 | enrolled | — |
+| 2026020339 | ANA at STL | 2026-11-18T01:00:00+00:00 | enrolled | — |
+| 2026020340 | NSH at MIN | 2026-11-18T01:00:00+00:00 | enrolled | — |
+| 2026020341 | OTT at WPG | 2026-11-18T00:00:00+00:00 | enrolled | — |
+| 2026020342 | DAL at VGK | 2026-11-18T03:00:00+00:00 | enrolled | — |
+| 2026020343 | CGY at SJS | 2026-11-18T03:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 181. Latest: `20261116T220208784528Z`.
+Audited capture manifests: 182. Latest: `20261117T042912679433Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
