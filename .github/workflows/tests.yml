@@ -25,6 +25,7 @@ jobs:
       - name: Run legacy reliability, skill, observability, and grounded-chat tests
         run: >-
           python -m unittest -v
+          test_autonomy_policy.py
           test_reliability.py
           test_skill_engine.py
           test_skill_tool_fallback.py
