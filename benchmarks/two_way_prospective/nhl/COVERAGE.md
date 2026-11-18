@@ -2,7 +2,7 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-18T13:58:50.273872+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-18T21:57:22.982083+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
@@ -23,7 +23,7 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-18T13:58:50.273872+00:00. Ready: 3 / 3 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-18T21:57:22.982083+00:00. Ready: 3 / 3 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
@@ -303,7 +303,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 186. Latest: `20261118T135848974644Z`.
+Audited capture manifests: 187. Latest: `20261118T215721639070Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
