@@ -1,6 +1,6 @@
 # Tyler NHL prospective paper test
 
-Recorded: **258** · Settled: **247** · Pending: **11**
+Recorded: **261** · Settled: **256** · Pending: **5**
 
 **NO BET — actual wagers $0.**
 
@@ -8,9 +8,9 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 
 | Model | Paired games | Brier | Log loss | Accuracy |
 |---|---:|---:|---:|---:|
-| model | 247 | 0.4840 | 0.6771 | 57.5% |
-| fixed_elo | 247 | 0.4774 | 0.6706 | 56.7% |
-| market | 247 | 0.4652 | 0.6573 | 58.7% |
+| model | 256 | 0.4842 | 0.6773 | 57.8% |
+| fixed_elo | 256 | 0.4774 | 0.6708 | 56.6% |
+| market | 256 | 0.4652 | 0.6572 | 58.6% |
 
 | Game | Start (Eastern) | Model pick | Win probability |
 |---|---|---|---:|
@@ -272,6 +272,9 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | NSH at MIN | Nov 17 08:00 PM | MIN | 56.0% |
 | DAL at VGK | Nov 17 10:00 PM | VGK | 51.8% |
 | CGY at SJS | Nov 17 10:00 PM | SJS | 52.3% |
+| BOS at DET | Nov 18 07:30 PM | BOS | 52.9% |
+| MTL at NJD | Nov 18 07:30 PM | NJD | 53.4% |
+| COL at UTA | Nov 18 10:00 PM | COL | 52.2% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
 
