@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-18T21:57:21.372852+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-11-19T03:28:19.085119+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 83 / 83 / 0 |
+| Recorded / settled / pending | 84 / 83 / 1 |
 | Started games in retained official schedules / enrolled | 84 / 83 |
 | Observed missing started games | 1 |
-| Enrollment-time priced forecasts | 83 / 83 |
+| Enrollment-time priced forecasts | 84 / 84 |
 | Settled with enrollment prices / decisive market-paired | 83 / 82 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -25,10 +25,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-18T21:57:21.372852+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
+As of retained evidence: 2026-11-19T03:28:19.085119+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
+| 2026_11_IND_HOU | IND at HOU | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -120,10 +121,11 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026_10_SEA_LV | SEA at LV | 2026-11-15T21:05:00+00:00 | enrolled | — |
 | 2026_10_SF_DAL | SF at DAL | 2026-11-15T21:25:00+00:00 | enrolled | — |
 | 2026_10_WAS_NYG | WAS at NYG | 2026-11-13T01:15:00+00:00 | enrolled | — |
+| 2026_11_IND_HOU | IND at HOU | 2026-11-20T01:15:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 188. Latest: `20261118T215718793449Z`.
+Audited capture manifests: 189. Latest: `20261119T032816104033Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
