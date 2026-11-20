@@ -1,6 +1,6 @@
 # Tyler NHL prospective paper test
 
-Recorded: **273** · Settled: **273** · Pending: **0**
+Recorded: **275** · Settled: **273** · Pending: **2**
 
 **NO BET — actual wagers $0.**
 
@@ -287,6 +287,8 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | ANA at COL | Nov 19 09:00 PM | COL | 55.7% |
 | VAN at SEA | Nov 19 09:40 PM | SEA | 57.7% |
 | DAL at VGK | Nov 19 10:00 PM | VGK | 50.6% |
+| EDM at CAR | Nov 21 01:00 PM | CAR | 56.5% |
+| CHI at CGY | Nov 21 03:30 PM | CGY | 56.4% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
 
