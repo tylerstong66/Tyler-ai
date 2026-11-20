@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-19T21:35:19.380762+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-20T03:15:57.403484+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 273 / 261 / 12 |
-| Started games in retained official schedules / enrolled | 263 / 261 |
+| Recorded / settled / pending | 273 / 268 / 5 |
+| Started games in retained official schedules / enrolled | 275 / 273 |
 | Observed missing started games | 2 |
 | Enrollment-time priced forecasts | 273 / 273 |
-| Settled with enrollment prices / decisive market-paired | 261 / 261 |
+| Settled with enrollment prices / decisive market-paired | 268 / 268 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,22 +23,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-19T21:35:19.380762+00:00. Ready: 12 / 12 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-20T03:15:57.403484+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020347 | LAK at TOR | True | False | True | None |
-| 2026020348 | PHI at OTT | True | False | True | None |
-| 2026020349 | EDM at TBL | True | False | True | None |
-| 2026020350 | STL at PIT | True | False | True | None |
-| 2026020351 | BUF at WSH | True | False | True | None |
-| 2026020352 | MTL at CAR | True | False | True | None |
-| 2026020353 | CBJ at CHI | True | False | True | None |
-| 2026020354 | NYI at WPG | True | False | True | None |
-| 2026020355 | MIN at CGY | True | False | True | None |
-| 2026020356 | ANA at COL | True | False | True | None |
-| 2026020357 | VAN at SEA | True | False | True | None |
-| 2026020358 | DAL at VGK | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -324,7 +312,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 190. Latest: `20261119T213518140982Z`.
+Audited capture manifests: 191. Latest: `20261120T031556761277Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

@@ -2,12 +2,12 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-19T21:35:17.991658+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-11-20T03:15:56.555496+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
 | Recorded / settled / pending | 84 / 83 / 1 |
-| Started games in retained official schedules / enrolled | 84 / 83 |
+| Started games in retained official schedules / enrolled | 85 / 84 |
 | Observed missing started games | 1 |
 | Enrollment-time priced forecasts | 84 / 84 |
 | Settled with enrollment prices / decisive market-paired | 83 / 82 |
@@ -25,11 +25,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-19T21:35:17.991658+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-20T03:15:56.555496+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026_11_IND_HOU | IND at HOU | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -125,7 +124,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 191. Latest: `20261119T213513966733Z`.
+Audited capture manifests: 192. Latest: `20261120T031553379648Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
