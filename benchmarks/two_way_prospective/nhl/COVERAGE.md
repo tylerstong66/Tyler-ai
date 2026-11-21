@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-21T17:58:06.938431+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-21T23:16:37.524439+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 288 / 273 / 15 |
-| Started games in retained official schedules / enrolled | 275 / 273 |
+| Recorded / settled / pending | 289 / 274 / 15 |
+| Started games in retained official schedules / enrolled | 279 / 277 |
 | Observed missing started games | 2 |
-| Enrollment-time priced forecasts | 288 / 288 |
-| Settled with enrollment prices / decisive market-paired | 273 / 273 |
+| Enrollment-time priced forecasts | 289 / 289 |
+| Settled with enrollment prices / decisive market-paired | 274 / 274 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,14 +23,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-21T17:58:06.938431+00:00. Ready: 15 / 15 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-21T23:16:37.524439+00:00. Ready: 12 / 12 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020359 | EDM at CAR | True | False | True | None |
-| 2026020360 | CHI at CGY | True | False | True | None |
-| 2026020361 | BUF at FLA | True | False | True | None |
-| 2026020362 | PIT at NSH | True | False | True | None |
 | 2026020363 | WSH at BOS | True | False | True | None |
 | 2026020364 | CBJ at TOR | True | False | True | None |
 | 2026020365 | PHI at MTL | True | False | True | None |
@@ -42,6 +38,7 @@ As of retained evidence: 2026-11-21T17:58:06.938431+00:00. Ready: 15 / 15 observ
 | 2026020371 | MIN at VAN | True | False | True | None |
 | 2026020372 | SEA at SJS | True | False | True | None |
 | 2026020373 | CAR at NYR | True | False | True | None |
+| 2026020374 | BUF at TBL | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -339,10 +336,11 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020371 | MIN at VAN | 2026-11-22T03:00:00+00:00 | enrolled | — |
 | 2026020372 | SEA at SJS | 2026-11-22T03:00:00+00:00 | enrolled | — |
 | 2026020373 | CAR at NYR | 2026-11-22T17:30:00+00:00 | enrolled | — |
+| 2026020374 | BUF at TBL | 2026-11-22T22:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 196. Latest: `20261121T175805986558Z`.
+Audited capture manifests: 197. Latest: `20261121T231636425209Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

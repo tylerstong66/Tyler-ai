@@ -1,12 +1,12 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-11-21T17:58:05.703435+00:00",
-  "capture_count": 197,
+  "as_of_evidence_at": "2026-11-21T23:16:35.857635+00:00",
+  "capture_count": 198,
   "cohort_started_at": "2026-10-11T15:19:59+00:00",
   "completion_note": "Saved NFL manifests before coverage-v1 lack a completion flag; successful workflow corroboration remains required.",
   "decisive_market_paired": 83,
-  "enrollment_priced": 84,
+  "enrollment_priced": 92,
   "followup_quotes_separate_from_original_metrics": [],
   "games": [
     {
@@ -1403,6 +1403,44 @@
       "status": "enrolled"
     },
     {
+      "away": "ARI",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-11-21T23:16:34.544422+00:00",
+      "game_id": "2026_11_ARI_KC",
+      "home": "KC",
+      "kickoff": "2026-11-22T18:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-11-21T23:16:35.869457+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_11_ARI_KC",
+        "priced": true
+      },
+      "lead_hours": 18.723357108055556,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-11-21T23:16:35.914411+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
+      "away": "BAL",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-11-21T23:16:34.544422+00:00",
+      "game_id": "2026_11_BAL_CAR",
+      "home": "CAR",
+      "kickoff": "2026-11-22T18:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-11-21T23:16:35.914712+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_11_BAL_CAR",
+        "priced": true
+      },
+      "lead_hours": 18.72334473416667,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-11-21T23:16:35.958957+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
       "away": "IND",
       "exclusion_reasons": [],
       "first_observed_in_window": "2026-11-19T03:28:17.764346+00:00",
@@ -1418,9 +1456,165 @@
       "recorded_at": "2026-11-19T03:28:19.163107+00:00",
       "started_by_as_of": true,
       "status": "enrolled"
+    },
+    {
+      "away": "JAX",
+      "exclusion_reasons": [
+        "Exact schedule/ESPN team and kickoff match required"
+      ],
+      "first_observed_in_window": "2026-11-21T23:16:34.544422+00:00",
+      "game_id": "2026_11_JAX_NYG",
+      "home": "NYG",
+      "kickoff": "2026-11-22T18:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-11-21T23:16:35.959238+00:00",
+        "decision": "excluded",
+        "game_id": "2026_11_JAX_NYG",
+        "reason": "Exact schedule/ESPN team and kickoff match required"
+      },
+      "lead_hours": null,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": null,
+      "started_by_as_of": false,
+      "status": "awaiting_enrollment"
+    },
+    {
+      "away": "LV",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-11-21T23:16:34.544422+00:00",
+      "game_id": "2026_11_LV_DEN",
+      "home": "DEN",
+      "kickoff": "2026-11-22T21:25:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-11-21T23:16:36.190980+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_11_LV_DEN",
+        "priced": true
+      },
+      "lead_hours": 22.1399346375,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-11-21T23:16:36.235305+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
+      "away": "MIA",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-11-21T23:16:34.544422+00:00",
+      "game_id": "2026_11_MIA_BUF",
+      "home": "BUF",
+      "kickoff": "2026-11-22T18:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-11-21T23:16:35.959260+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_11_MIA_BUF",
+        "priced": true
+      },
+      "lead_hours": 18.723329940555555,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-11-21T23:16:36.012214+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
+      "away": "NO",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-11-21T23:16:34.544422+00:00",
+      "game_id": "2026_11_NO_CHI",
+      "home": "CHI",
+      "kickoff": "2026-11-22T18:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-11-21T23:16:36.012463+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_11_NO_CHI",
+        "priced": true
+      },
+      "lead_hours": 18.72331744194444,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-11-21T23:16:36.057209+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
+      "away": "NYJ",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-11-21T23:16:34.544422+00:00",
+      "game_id": "2026_11_NYJ_LAC",
+      "home": "LAC",
+      "kickoff": "2026-11-22T21:05:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-11-21T23:16:36.146498+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_11_NYJ_LAC",
+        "priced": true
+      },
+      "lead_hours": 21.806613682777776,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-11-21T23:16:36.190742+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
+      "away": "PIT",
+      "exclusion_reasons": [
+        "Exact schedule/ESPN team and kickoff match required"
+      ],
+      "first_observed_in_window": "2026-11-21T23:16:34.544422+00:00",
+      "game_id": "2026_11_PIT_PHI",
+      "home": "PHI",
+      "kickoff": "2026-11-22T21:25:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-11-21T23:16:36.235537+00:00",
+        "decision": "excluded",
+        "game_id": "2026_11_PIT_PHI",
+        "reason": "Exact schedule/ESPN team and kickoff match required"
+      },
+      "lead_hours": null,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": null,
+      "started_by_as_of": false,
+      "status": "awaiting_enrollment"
+    },
+    {
+      "away": "TB",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-11-21T23:16:34.544422+00:00",
+      "game_id": "2026_11_TB_DET",
+      "home": "DET",
+      "kickoff": "2026-11-22T18:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-11-21T23:16:36.057450+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_11_TB_DET",
+        "priced": true
+      },
+      "lead_hours": 18.72330508138889,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-11-21T23:16:36.101707+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
+      "away": "TEN",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-11-21T23:16:34.544422+00:00",
+      "game_id": "2026_11_TEN_DAL",
+      "home": "DAL",
+      "kickoff": "2026-11-22T18:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-11-21T23:16:36.101946+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_11_TEN_DAL",
+        "priced": true
+      },
+      "lead_hours": 18.723292705000002,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-11-21T23:16:36.146262+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
     }
   ],
-  "input_digest": "f68224233c98ce107cb708ea5fb4c879c5ebacf53b63bee849557c12449d88d6",
+  "input_digest": "337cb33b13a23674fb970edc4821d23c0036e54e3fd9292ad6858020745727ed",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -1449,12 +1643,73 @@
       "to": "2026-11-17T14:24:47.232211+00:00"
     }
   ],
-  "latest_attempted_capture": "20261121T175803424108Z",
-  "latest_capture": "20261121T175803424108Z",
-  "latest_enrollment_decisions": [],
+  "latest_attempted_capture": "20261121T231632755946Z",
+  "latest_capture": "20261121T231632755946Z",
+  "latest_enrollment_decisions": [
+    {
+      "checked_at": "2026-11-21T23:16:35.869457+00:00",
+      "decision": "enrolled",
+      "game_id": "2026_11_ARI_KC",
+      "priced": true
+    },
+    {
+      "checked_at": "2026-11-21T23:16:35.914712+00:00",
+      "decision": "enrolled",
+      "game_id": "2026_11_BAL_CAR",
+      "priced": true
+    },
+    {
+      "checked_at": "2026-11-21T23:16:35.959238+00:00",
+      "decision": "excluded",
+      "game_id": "2026_11_JAX_NYG",
+      "reason": "Exact schedule/ESPN team and kickoff match required"
+    },
+    {
+      "checked_at": "2026-11-21T23:16:35.959260+00:00",
+      "decision": "enrolled",
+      "game_id": "2026_11_MIA_BUF",
+      "priced": true
+    },
+    {
+      "checked_at": "2026-11-21T23:16:36.012463+00:00",
+      "decision": "enrolled",
+      "game_id": "2026_11_NO_CHI",
+      "priced": true
+    },
+    {
+      "checked_at": "2026-11-21T23:16:36.057450+00:00",
+      "decision": "enrolled",
+      "game_id": "2026_11_TB_DET",
+      "priced": true
+    },
+    {
+      "checked_at": "2026-11-21T23:16:36.101946+00:00",
+      "decision": "enrolled",
+      "game_id": "2026_11_TEN_DAL",
+      "priced": true
+    },
+    {
+      "checked_at": "2026-11-21T23:16:36.146498+00:00",
+      "decision": "enrolled",
+      "game_id": "2026_11_NYJ_LAC",
+      "priced": true
+    },
+    {
+      "checked_at": "2026-11-21T23:16:36.190980+00:00",
+      "decision": "enrolled",
+      "game_id": "2026_11_LV_DEN",
+      "priced": true
+    },
+    {
+      "checked_at": "2026-11-21T23:16:36.235537+00:00",
+      "decision": "excluded",
+      "game_id": "2026_11_PIT_PHI",
+      "reason": "Exact schedule/ESPN team and kickoff match required"
+    }
+  ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": null,
-  "latest_official_schedule_observed_at": "2026-11-21T17:58:04.850423+00:00",
+  "latest_official_schedule_observed_at": "2026-11-21T23:16:34.544422+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [],
   "minimum_forecast_lead_hours": 1.5221828808333333,
@@ -1482,18 +1737,165 @@
     }
   ],
   "official_daily_conflicted_capture_count": 0,
-  "pending": 0,
+  "pending": 8,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-11-21T17:58:05.703435+00:00",
-    "games": [],
+    "as_of_evidence_at": "2026-11-21T23:16:35.857635+00:00",
+    "games": [
+      {
+        "away": "ARI",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_11_ARI_KC",
+        "home": "KC",
+        "issues": [],
+        "kickoff": "2026-11-22T18:00:00+00:00",
+        "latest_scoreboard_observed_at": "2026-11-21T23:16:35.595583+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "BAL",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_11_BAL_CAR",
+        "home": "CAR",
+        "issues": [],
+        "kickoff": "2026-11-22T18:00:00+00:00",
+        "latest_scoreboard_observed_at": "2026-11-21T23:16:35.595583+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "JAX",
+        "enrolled": false,
+        "enrollment_priced": false,
+        "game_id": "2026_11_JAX_NYG",
+        "home": "NYG",
+        "issues": [
+          "forecast_not_enrolled",
+          "latest_scoreboard_event_missing_or_ambiguous"
+        ],
+        "kickoff": "2026-11-22T18:00:00+00:00",
+        "latest_scoreboard_observed_at": null,
+        "latest_scoreboard_priced": false,
+        "ready": false,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "LV",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_11_LV_DEN",
+        "home": "DEN",
+        "issues": [],
+        "kickoff": "2026-11-22T21:25:00+00:00",
+        "latest_scoreboard_observed_at": "2026-11-21T23:16:35.595583+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "MIA",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_11_MIA_BUF",
+        "home": "BUF",
+        "issues": [],
+        "kickoff": "2026-11-22T18:00:00+00:00",
+        "latest_scoreboard_observed_at": "2026-11-21T23:16:35.595583+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "NO",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_11_NO_CHI",
+        "home": "CHI",
+        "issues": [],
+        "kickoff": "2026-11-22T18:00:00+00:00",
+        "latest_scoreboard_observed_at": "2026-11-21T23:16:35.595583+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "NYJ",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_11_NYJ_LAC",
+        "home": "LAC",
+        "issues": [],
+        "kickoff": "2026-11-22T21:05:00+00:00",
+        "latest_scoreboard_observed_at": "2026-11-21T23:16:35.595583+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "PIT",
+        "enrolled": false,
+        "enrollment_priced": false,
+        "game_id": "2026_11_PIT_PHI",
+        "home": "PHI",
+        "issues": [
+          "forecast_not_enrolled",
+          "latest_scoreboard_event_missing_or_ambiguous"
+        ],
+        "kickoff": "2026-11-22T21:25:00+00:00",
+        "latest_scoreboard_observed_at": null,
+        "latest_scoreboard_priced": false,
+        "ready": false,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "TB",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_11_TB_DET",
+        "home": "DET",
+        "issues": [],
+        "kickoff": "2026-11-22T18:00:00+00:00",
+        "latest_scoreboard_observed_at": "2026-11-21T23:16:35.595583+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "TEN",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_11_TEN_DAL",
+        "home": "DAL",
+        "issues": [],
+        "kickoff": "2026-11-22T18:00:00+00:00",
+        "latest_scoreboard_observed_at": "2026-11-21T23:16:35.595583+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      }
+    ],
     "limitation": "Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.",
-    "observed_games": 0,
-    "ready_games": 0,
-    "status": "no_upcoming_games_observed",
+    "observed_games": 10,
+    "ready_games": 8,
+    "status": "attention",
     "window_hours": 24
   },
   "report_version": "prospective-coverage-v1",
-  "saved": 84,
+  "saved": 92,
   "saved_collector_errors": [
     {
       "capture": "20261011T201726017233Z",
@@ -1576,6 +1978,16 @@
       "capture": "20261109T172957770670Z",
       "game_id": "2026_09_LV_SF",
       "reason": "already_started"
+    },
+    {
+      "capture": "20261121T231632755946Z",
+      "game_id": "2026_11_JAX_NYG",
+      "reason": "Exact schedule/ESPN team and kickoff match required"
+    },
+    {
+      "capture": "20261121T231632755946Z",
+      "game_id": "2026_11_PIT_PHI",
+      "reason": "Exact schedule/ESPN team and kickoff match required"
     }
   ],
   "saved_failed_attempts": [
