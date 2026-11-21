@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-21T02:15:34.644434+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-21T11:01:46.872783+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 285 / 273 / 12 |
+| Recorded / settled / pending | 287 / 273 / 14 |
 | Started games in retained official schedules / enrolled | 275 / 273 |
 | Observed missing started games | 2 |
-| Enrollment-time priced forecasts | 285 / 285 |
+| Enrollment-time priced forecasts | 287 / 287 |
 | Settled with enrollment prices / decisive market-paired | 273 / 273 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -23,7 +23,7 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-21T02:15:34.644434+00:00. Ready: 12 / 12 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-21T11:01:46.872783+00:00. Ready: 14 / 14 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
@@ -39,6 +39,8 @@ As of retained evidence: 2026-11-21T02:15:34.644434+00:00. Ready: 12 / 12 observ
 | 2026020368 | NJD at STL | True | False | True | None |
 | 2026020369 | VGK at WPG | True | False | True | None |
 | 2026020370 | ANA at UTA | True | False | True | None |
+| 2026020371 | MIN at VAN | True | False | True | None |
+| 2026020372 | SEA at SJS | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -333,10 +335,12 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020368 | NJD at STL | 2026-11-22T00:00:00+00:00 | enrolled | — |
 | 2026020369 | VGK at WPG | 2026-11-22T00:00:00+00:00 | enrolled | — |
 | 2026020370 | ANA at UTA | 2026-11-22T02:00:00+00:00 | enrolled | — |
+| 2026020371 | MIN at VAN | 2026-11-22T03:00:00+00:00 | enrolled | — |
+| 2026020372 | SEA at SJS | 2026-11-22T03:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 194. Latest: `20261121T021532311550Z`.
+Audited capture manifests: 195. Latest: `20261121T110145507054Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

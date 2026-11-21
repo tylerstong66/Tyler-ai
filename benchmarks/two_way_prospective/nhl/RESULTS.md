@@ -1,6 +1,6 @@
 # Tyler NHL prospective paper test
 
-Recorded: **285** · Settled: **273** · Pending: **12**
+Recorded: **287** · Settled: **273** · Pending: **14**
 
 **NO BET — actual wagers $0.**
 
@@ -299,6 +299,8 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | NJD at STL | Nov 21 07:00 PM | NJD | 50.1% |
 | VGK at WPG | Nov 21 07:00 PM | WPG | 51.0% |
 | ANA at UTA | Nov 21 09:00 PM | UTA | 52.3% |
+| MIN at VAN | Nov 21 10:00 PM | MIN | 60.8% |
+| SEA at SJS | Nov 21 10:00 PM | SJS | 51.3% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
 
