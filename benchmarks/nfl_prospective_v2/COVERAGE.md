@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-22T15:17:50.023259+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-11-22T21:46:30.658363+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 93 / 84 / 9 |
-| Started games in retained official schedules / enrolled | 85 / 84 |
-| Observed missing started games | 1 |
+| Recorded / settled / pending | 93 / 90 / 3 |
+| Started games in retained official schedules / enrolled | 95 / 92 |
+| Observed missing started games | 3 |
 | Enrollment-time priced forecasts | 93 / 93 |
-| Settled with enrollment prices / decisive market-paired | 84 / 83 |
+| Settled with enrollment prices / decisive market-paired | 90 / 89 |
 | Separate later quotes recorded prospectively | 0 |
 
 A priced NFL tie is excluded only from binary decisive market comparisons.
@@ -25,21 +25,11 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-22T15:17:50.023259+00:00. Ready: 9 / 11 observed games. Status: attention.
+As of retained evidence: 2026-11-22T21:46:30.658363+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026_11_ARI_KC | ARI at KC | True | False | True | None |
-| 2026_11_BAL_CAR | BAL at CAR | True | False | True | None |
-| 2026_11_JAX_NYG | JAX at NYG | False | False | False | forecast_not_enrolled, latest_scoreboard_event_missing_or_ambiguous |
-| 2026_11_LV_DEN | LV at DEN | True | False | True | None |
-| 2026_11_MIA_BUF | MIA at BUF | True | False | True | None |
 | 2026_11_MIN_SF | MIN at SF | True | False | True | None |
-| 2026_11_NO_CHI | NO at CHI | True | False | True | None |
-| 2026_11_NYJ_LAC | NYJ at LAC | True | False | True | None |
-| 2026_11_PIT_PHI | PIT at PHI | False | False | False | forecast_not_enrolled, latest_scoreboard_event_missing_or_ambiguous |
-| 2026_11_TB_DET | TB at DET | True | False | True | None |
-| 2026_11_TEN_DAL | TEN at DAL | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -134,19 +124,19 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026_11_ARI_KC | ARI at KC | 2026-11-22T18:00:00+00:00 | enrolled | — |
 | 2026_11_BAL_CAR | BAL at CAR | 2026-11-22T18:00:00+00:00 | enrolled | — |
 | 2026_11_IND_HOU | IND at HOU | 2026-11-20T01:15:00+00:00 | enrolled | — |
-| 2026_11_JAX_NYG | JAX at NYG | 2026-11-22T18:00:00+00:00 | awaiting enrollment | Exact schedule/ESPN team and kickoff match required |
+| 2026_11_JAX_NYG | JAX at NYG | 2026-11-22T21:25:00+00:00 | missed despite pregame schedule observation | Exact schedule/ESPN team and kickoff match required, already_started |
 | 2026_11_LV_DEN | LV at DEN | 2026-11-22T21:25:00+00:00 | enrolled | — |
 | 2026_11_MIA_BUF | MIA at BUF | 2026-11-22T18:00:00+00:00 | enrolled | — |
 | 2026_11_MIN_SF | MIN at SF | 2026-11-23T01:20:00+00:00 | enrolled | — |
 | 2026_11_NO_CHI | NO at CHI | 2026-11-22T18:00:00+00:00 | enrolled | — |
 | 2026_11_NYJ_LAC | NYJ at LAC | 2026-11-22T21:05:00+00:00 | enrolled | — |
-| 2026_11_PIT_PHI | PIT at PHI | 2026-11-22T21:25:00+00:00 | awaiting enrollment | Exact schedule/ESPN team and kickoff match required |
+| 2026_11_PIT_PHI | PIT at PHI | 2026-11-22T18:00:00+00:00 | missed despite pregame schedule observation | Exact schedule/ESPN team and kickoff match required, already_started |
 | 2026_11_TB_DET | TB at DET | 2026-11-22T18:00:00+00:00 | enrolled | — |
 | 2026_11_TEN_DAL | TEN at DAL | 2026-11-22T18:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 200. Latest: `20261122T151746767086Z`.
+Audited capture manifests: 201. Latest: `20261122T214627389011Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
