@@ -1,11 +1,11 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-11-23T02:45:56.918014+00:00",
-  "capture_count": 202,
+  "as_of_evidence_at": "2026-11-23T12:41:51.897295+00:00",
+  "capture_count": 203,
   "cohort_started_at": "2026-10-11T15:19:59+00:00",
   "completion_note": "Saved NFL manifests before coverage-v1 lack a completion flag; successful workflow corroboration remains required.",
-  "decisive_market_paired": 91,
+  "decisive_market_paired": 92,
   "enrollment_priced": 94,
   "followup_quotes_separate_from_original_metrics": [],
   "games": [
@@ -1444,13 +1444,11 @@
       "home": "WAS",
       "kickoff": "2026-11-24T01:15:00+00:00",
       "latest_saved_decision": {
-        "checked_at": "2026-11-23T02:45:56.922505+00:00",
-        "decision": "enrolled",
-        "game_id": "2026_11_CIN_WAS",
-        "priced": true
+        "decision": "already_enrolled",
+        "game_id": "2026_11_CIN_WAS"
       },
       "lead_hours": 22.48417277916667,
-      "pregame_schedule_observations_in_window": 1,
+      "pregame_schedule_observations_in_window": 2,
       "recorded_at": "2026-11-23T02:45:56.977995+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
@@ -1483,7 +1481,7 @@
       "home": "NYG",
       "kickoff": "2026-11-22T21:25:00+00:00",
       "latest_saved_decision": {
-        "checked_at": "2026-11-23T02:45:56.922472+00:00",
+        "checked_at": "2026-11-23T12:41:51.902631+00:00",
         "decision": "already_started",
         "game_id": "2026_11_JAX_NYG"
       },
@@ -1589,7 +1587,7 @@
       "home": "PHI",
       "kickoff": "2026-11-22T18:00:00+00:00",
       "latest_saved_decision": {
-        "checked_at": "2026-11-23T02:45:56.922423+00:00",
+        "checked_at": "2026-11-23T12:41:51.902568+00:00",
         "decision": "already_started",
         "game_id": "2026_11_PIT_PHI"
       },
@@ -1634,7 +1632,7 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "a389e87a6386950d836664f300b7831f6cd1cd42b3ef38c8e38f4d733fe12679",
+  "input_digest": "3ab186d21fb5094ad3bf6c56062a092b2d5b73e8ad480ab95c12b7fd83cae67c",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -1658,13 +1656,13 @@
       "to": "2026-10-12T17:55:04.347503+00:00"
     },
     {
-      "from": "2026-11-17T04:29:08.447541+00:00",
-      "hours": 9.927440186111111,
-      "to": "2026-11-17T14:24:47.232211+00:00"
+      "from": "2026-11-23T02:45:53.575836+00:00",
+      "hours": 9.932280153055556,
+      "to": "2026-11-23T12:41:49.784387+00:00"
     }
   ],
-  "latest_attempted_capture": "20261123T024553575836Z",
-  "latest_capture": "20261123T024553575836Z",
+  "latest_attempted_capture": "20261123T124149784387Z",
+  "latest_capture": "20261123T124149784387Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
@@ -1683,7 +1681,7 @@
       "game_id": "2026_11_NO_CHI"
     },
     {
-      "checked_at": "2026-11-23T02:45:56.922423+00:00",
+      "checked_at": "2026-11-23T12:41:51.902568+00:00",
       "decision": "already_started",
       "game_id": "2026_11_PIT_PHI"
     },
@@ -1700,7 +1698,7 @@
       "game_id": "2026_11_NYJ_LAC"
     },
     {
-      "checked_at": "2026-11-23T02:45:56.922472+00:00",
+      "checked_at": "2026-11-23T12:41:51.902631+00:00",
       "decision": "already_started",
       "game_id": "2026_11_JAX_NYG"
     },
@@ -1713,15 +1711,13 @@
       "game_id": "2026_11_MIN_SF"
     },
     {
-      "checked_at": "2026-11-23T02:45:56.922505+00:00",
-      "decision": "enrolled",
-      "game_id": "2026_11_CIN_WAS",
-      "priced": true
+      "decision": "already_enrolled",
+      "game_id": "2026_11_CIN_WAS"
     }
   ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": null,
-  "latest_official_schedule_observed_at": "2026-11-23T02:45:55.262578+00:00",
+  "latest_official_schedule_observed_at": "2026-11-23T12:41:50.501842+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [],
   "minimum_forecast_lead_hours": 1.5221828808333333,
@@ -1758,7 +1754,7 @@
       "home": "NYG",
       "kickoff": "2026-11-22T21:25:00+00:00",
       "latest_saved_decision": {
-        "checked_at": "2026-11-23T02:45:56.922472+00:00",
+        "checked_at": "2026-11-23T12:41:51.902631+00:00",
         "decision": "already_started",
         "game_id": "2026_11_JAX_NYG"
       },
@@ -1779,7 +1775,7 @@
       "home": "PHI",
       "kickoff": "2026-11-22T18:00:00+00:00",
       "latest_saved_decision": {
-        "checked_at": "2026-11-23T02:45:56.922423+00:00",
+        "checked_at": "2026-11-23T12:41:51.902568+00:00",
         "decision": "already_started",
         "game_id": "2026_11_PIT_PHI"
       },
@@ -1791,9 +1787,9 @@
     }
   ],
   "official_daily_conflicted_capture_count": 0,
-  "pending": 2,
+  "pending": 1,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-11-23T02:45:56.918014+00:00",
+    "as_of_evidence_at": "2026-11-23T12:41:51.897295+00:00",
     "games": [
       {
         "away": "CIN",
@@ -1803,7 +1799,7 @@
         "home": "WAS",
         "issues": [],
         "kickoff": "2026-11-24T01:15:00+00:00",
-        "latest_scoreboard_observed_at": "2026-11-23T02:45:56.276367+00:00",
+        "latest_scoreboard_observed_at": "2026-11-23T12:41:51.717468+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
@@ -1950,6 +1946,16 @@
       "capture": "20261123T024553575836Z",
       "game_id": "2026_11_JAX_NYG",
       "reason": "already_started"
+    },
+    {
+      "capture": "20261123T124149784387Z",
+      "game_id": "2026_11_PIT_PHI",
+      "reason": "already_started"
+    },
+    {
+      "capture": "20261123T124149784387Z",
+      "game_id": "2026_11_JAX_NYG",
+      "reason": "already_started"
     }
   ],
   "saved_failed_attempts": [
@@ -1964,8 +1970,8 @@
       "observed_at": "2026-10-29T16:07:52.856648+00:00"
     }
   ],
-  "settled": 92,
-  "settled_enrollment_priced": 92,
+  "settled": 93,
+  "settled_enrollment_priced": 93,
   "settled_ties_with_prices": 1,
   "sport": "NFL",
   "started_schedule_games_enrolled": 93,

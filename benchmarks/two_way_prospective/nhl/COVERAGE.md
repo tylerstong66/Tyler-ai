@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-23T02:45:58.006044+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-23T12:41:52.790458+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 298 / 290 / 8 |
+| Recorded / settled / pending | 299 / 292 / 7 |
 | Started games in retained official schedules / enrolled | 294 / 292 |
 | Observed missing started games | 2 |
-| Enrollment-time priced forecasts | 298 / 298 |
-| Settled with enrollment prices / decisive market-paired | 290 / 290 |
+| Enrollment-time priced forecasts | 299 / 299 |
+| Settled with enrollment prices / decisive market-paired | 292 / 292 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,7 +23,7 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-23T02:45:58.006044+00:00. Ready: 6 / 6 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-23T12:41:52.790458+00:00. Ready: 7 / 7 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
@@ -33,6 +33,7 @@ As of retained evidence: 2026-11-23T02:45:58.006044+00:00. Ready: 6 / 6 observed
 | 2026020381 | TOR at NYI | True | False | True | None |
 | 2026020382 | UTA at WPG | True | False | True | None |
 | 2026020383 | ANA at SEA | True | False | True | None |
+| 2026020384 | MIN at SJS | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -340,18 +341,19 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020381 | TOR at NYI | 2026-11-24T00:30:00+00:00 | enrolled | — |
 | 2026020382 | UTA at WPG | 2026-11-24T00:30:00+00:00 | enrolled | — |
 | 2026020383 | ANA at SEA | 2026-11-24T02:40:00+00:00 | enrolled | — |
+| 2026020384 | MIN at SJS | 2026-11-24T03:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 201. Latest: `20261123T024557183615Z`.
+Audited capture manifests: 202. Latest: `20261123T124152083300Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
 | 2026-11-09T06:30:05.998433+00:00 | 2026-11-09T17:30:01.044103+00:00 | 11.00 |
 | 2026-11-16T11:18:14.153332+00:00 | 2026-11-16T22:02:08.784528+00:00 | 10.73 |
 | 2026-10-12T07:21:45.218639+00:00 | 2026-10-12T17:55:07.856333+00:00 | 10.56 |
+| 2026-11-23T02:45:57.183615+00:00 | 2026-11-23T12:41:52.083300+00:00 | 9.93 |
 | 2026-11-17T04:29:12.679433+00:00 | 2026-11-17T14:24:50.242812+00:00 | 9.93 |
-| 2026-11-02T06:04:03.744078+00:00 | 2026-11-02T15:54:25.612358+00:00 | 9.84 |
 
 Historical exclusions and collector errors, including resolved ones, are retained in [COVERAGE.json](COVERAGE.json); these are not all current errors.
 
