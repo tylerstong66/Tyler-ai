@@ -120,7 +120,7 @@ Fixed five bins; the upper endpoint belongs to the next bin, except 100%. Wilson
 Latest saved manifest: benchmarks/nfl_prospective_v2/captures/20261123T124149784387Z/manifest.json.
 Manifest completion field: True. Errors: []. Exclusions: [{"game_id": "2026_11_PIT_PHI", "reason": "already_started"}, {"game_id": "2026_11_JAX_NYG", "reason": "already_started"}].
 Optional availability errors: [].
-Newer saved collection failure: null.
+Newer saved collection failure: {"collection_completed": false, "error": "503 Server Error: Backend.max_conn reached for url: https://raw.githubusercontent.com/nflverse/nfldata/624ddaf763ef3053de926c22f5747e51fb6cb990/data/games.csv", "observed_at": "2026-11-24T00:51:05.050321+00:00"}.
 NFL completion must be corroborated with the successful workflow run.
 
 Experimental descriptive results. NFL uncertainty uses season/week blocks; NHL/MLB use Eastern game-date blocks. Blocks can still be dependent. Intervals require at least five blocks and are unavailable below that; five blocks or 100 settled games does not establish a betting edge. Repeated monitoring intervals are not sequential significance tests. No model promotion, forecast changes, wagers, or profits are inferred.

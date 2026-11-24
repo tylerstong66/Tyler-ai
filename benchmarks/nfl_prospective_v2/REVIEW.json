@@ -130,7 +130,11 @@
       }
     ],
     "latest_manifest": "benchmarks/nfl_prospective_v2/captures/20261123T124149784387Z/manifest.json",
-    "newer_saved_collection_failure": null,
+    "newer_saved_collection_failure": {
+      "collection_completed": false,
+      "error": "503 Server Error: Backend.max_conn reached for url: https://raw.githubusercontent.com/nflverse/nfldata/624ddaf763ef3053de926c22f5747e51fb6cb990/data/games.csv",
+      "observed_at": "2026-11-24T00:51:05.050321+00:00"
+    },
     "optional_availability_errors": []
   },
   "conditional_home_calibration": {
