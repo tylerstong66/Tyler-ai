@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-23T12:41:51.897295+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-11-24T10:55:32.890338+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 94 / 93 / 1 |
-| Started games in retained official schedules / enrolled | 96 / 93 |
+| Recorded / settled / pending | 94 / 94 / 0 |
+| Started games in retained official schedules / enrolled | 97 / 94 |
 | Observed missing started games | 3 |
 | Enrollment-time priced forecasts | 94 / 94 |
-| Settled with enrollment prices / decisive market-paired | 93 / 92 |
+| Settled with enrollment prices / decisive market-paired | 94 / 93 |
 | Separate later quotes recorded prospectively | 0 |
 
 A priced NFL tie is excluded only from binary decisive market comparisons.
@@ -25,11 +25,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-23T12:41:51.897295+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-24T10:55:32.890338+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026_11_CIN_WAS | CIN at WAS | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -137,15 +136,15 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 203. Latest: `20261123T124149784387Z`.
+Audited capture manifests: 204. Latest: `20261124T105529946535Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
+| 2026-11-23T12:41:49.784387+00:00 | 2026-11-24T10:55:29.946535+00:00 | 22.23 |
 | 2026-10-29T08:29:41.790494+00:00 | 2026-10-29T21:07:55.700070+00:00 | 12.64 |
 | 2026-11-09T06:29:55.212507+00:00 | 2026-11-09T17:29:57.770670+00:00 | 11.00 |
 | 2026-11-16T11:18:09.368718+00:00 | 2026-11-16T22:02:05.782357+00:00 | 10.73 |
 | 2026-10-12T07:21:42.028391+00:00 | 2026-10-12T17:55:04.347503+00:00 | 10.56 |
-| 2026-11-23T02:45:53.575836+00:00 | 2026-11-23T12:41:49.784387+00:00 | 9.93 |
 
 Historical exclusions and collector errors, including resolved ones, are retained in [COVERAGE.json](COVERAGE.json); these are not all current errors.
 
