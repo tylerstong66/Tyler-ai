@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-25T14:33:55.770390+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-11-25T23:37:40.931721+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 95 / 94 / 1 |
+| Recorded / settled / pending | 97 / 94 / 3 |
 | Started games in retained official schedules / enrolled | 97 / 94 |
 | Observed missing started games | 3 |
-| Enrollment-time priced forecasts | 95 / 95 |
+| Enrollment-time priced forecasts | 97 / 97 |
 | Settled with enrollment prices / decisive market-paired | 94 / 93 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -25,11 +25,13 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-25T14:33:55.770390+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-25T23:37:40.931721+00:00. Ready: 3 / 3 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
+| 2026_12_CHI_DET | CHI at DET | True | False | True | None |
 | 2026_12_GB_LA | GB at LA | True | False | True | None |
+| 2026_12_PHI_DAL | PHI at DAL | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -134,11 +136,13 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026_11_PIT_PHI | PIT at PHI | 2026-11-22T18:00:00+00:00 | missed despite pregame schedule observation | Exact schedule/ESPN team and kickoff match required, already_started |
 | 2026_11_TB_DET | TB at DET | 2026-11-22T18:00:00+00:00 | enrolled | — |
 | 2026_11_TEN_DAL | TEN at DAL | 2026-11-22T18:00:00+00:00 | enrolled | — |
+| 2026_12_CHI_DET | CHI at DET | 2026-11-26T18:00:00+00:00 | enrolled | — |
 | 2026_12_GB_LA | GB at LA | 2026-11-26T01:00:00+00:00 | enrolled | — |
+| 2026_12_PHI_DAL | PHI at DAL | 2026-11-26T21:30:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 207. Latest: `20261125T143352282011Z`.
+Audited capture manifests: 208. Latest: `20261125T233738014465Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

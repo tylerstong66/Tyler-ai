@@ -1,12 +1,12 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-11-25T14:33:55.770390+00:00",
-  "capture_count": 207,
+  "as_of_evidence_at": "2026-11-25T23:37:40.931721+00:00",
+  "capture_count": 208,
   "cohort_started_at": "2026-10-11T15:19:59+00:00",
   "completion_note": "Saved NFL manifests before coverage-v1 lack a completion flag; successful workflow corroboration remains required.",
   "decisive_market_paired": 93,
-  "enrollment_priced": 95,
+  "enrollment_priced": 97,
   "followup_quotes_separate_from_original_metrics": [],
   "games": [
     {
@@ -1632,6 +1632,25 @@
       "status": "enrolled"
     },
     {
+      "away": "CHI",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-11-25T23:37:38.699257+00:00",
+      "game_id": "2026_12_CHI_DET",
+      "home": "DET",
+      "kickoff": "2026-11-26T18:00:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-11-25T23:37:40.933205+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_12_CHI_DET",
+        "priced": true
+      },
+      "lead_hours": 18.371946396111113,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-11-25T23:37:40.992974+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
       "away": "GB",
       "exclusion_reasons": [],
       "first_observed_in_window": "2026-11-25T04:14:43.674480+00:00",
@@ -1643,13 +1662,32 @@
         "game_id": "2026_12_GB_LA"
       },
       "lead_hours": 20.75382678,
-      "pregame_schedule_observations_in_window": 2,
+      "pregame_schedule_observations_in_window": 3,
       "recorded_at": "2026-11-25T04:14:46.223592+00:00",
+      "started_by_as_of": false,
+      "status": "enrolled"
+    },
+    {
+      "away": "PHI",
+      "exclusion_reasons": [],
+      "first_observed_in_window": "2026-11-25T23:37:38.699257+00:00",
+      "game_id": "2026_12_PHI_DAL",
+      "home": "DAL",
+      "kickoff": "2026-11-26T21:30:00+00:00",
+      "latest_saved_decision": {
+        "checked_at": "2026-11-25T23:37:40.993424+00:00",
+        "decision": "enrolled",
+        "game_id": "2026_12_PHI_DAL",
+        "priced": true
+      },
+      "lead_hours": 21.871930064999997,
+      "pregame_schedule_observations_in_window": 1,
+      "recorded_at": "2026-11-25T23:37:41.051766+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
     }
   ],
-  "input_digest": "466b80115fc11368c263f708a501cb6d2695442dc373d48ade51aef69791b944",
+  "input_digest": "acb5cb4f19a4f5c511828db1f6b3d6e94eed081403df2f4434785f1630849ae4",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -1678,17 +1716,29 @@
       "to": "2026-10-12T17:55:04.347503+00:00"
     }
   ],
-  "latest_attempted_capture": "20261125T143352282011Z",
-  "latest_capture": "20261125T143352282011Z",
+  "latest_attempted_capture": "20261125T233738014465Z",
+  "latest_capture": "20261125T233738014465Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
       "game_id": "2026_12_GB_LA"
+    },
+    {
+      "checked_at": "2026-11-25T23:37:40.933205+00:00",
+      "decision": "enrolled",
+      "game_id": "2026_12_CHI_DET",
+      "priced": true
+    },
+    {
+      "checked_at": "2026-11-25T23:37:40.993424+00:00",
+      "decision": "enrolled",
+      "game_id": "2026_12_PHI_DAL",
+      "priced": true
     }
   ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": null,
-  "latest_official_schedule_observed_at": "2026-11-25T14:33:53.106432+00:00",
+  "latest_official_schedule_observed_at": "2026-11-25T23:37:38.699257+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [],
   "minimum_forecast_lead_hours": 1.5221828808333333,
@@ -1758,10 +1808,24 @@
     }
   ],
   "official_daily_conflicted_capture_count": 0,
-  "pending": 1,
+  "pending": 3,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-11-25T14:33:55.770390+00:00",
+    "as_of_evidence_at": "2026-11-25T23:37:40.931721+00:00",
     "games": [
+      {
+        "away": "CHI",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_12_CHI_DET",
+        "home": "DET",
+        "issues": [],
+        "kickoff": "2026-11-26T18:00:00+00:00",
+        "latest_scoreboard_observed_at": "2026-11-25T23:37:40.119862+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
       {
         "away": "GB",
         "enrolled": true,
@@ -1770,7 +1834,21 @@
         "home": "LA",
         "issues": [],
         "kickoff": "2026-11-26T01:00:00+00:00",
-        "latest_scoreboard_observed_at": "2026-11-25T14:33:54.781889+00:00",
+        "latest_scoreboard_observed_at": "2026-11-25T23:37:39.944814+00:00",
+        "latest_scoreboard_priced": true,
+        "ready": true,
+        "saved_vs_latest_official_start": null,
+        "separate_followup_recorded": false
+      },
+      {
+        "away": "PHI",
+        "enrolled": true,
+        "enrollment_priced": true,
+        "game_id": "2026_12_PHI_DAL",
+        "home": "DAL",
+        "issues": [],
+        "kickoff": "2026-11-26T21:30:00+00:00",
+        "latest_scoreboard_observed_at": "2026-11-25T23:37:40.119862+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
@@ -1778,13 +1856,13 @@
       }
     ],
     "limitation": "Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.",
-    "observed_games": 1,
-    "ready_games": 1,
+    "observed_games": 3,
+    "ready_games": 3,
     "status": "ready_as_of_snapshot",
     "window_hours": 24
   },
   "report_version": "prospective-coverage-v1",
-  "saved": 95,
+  "saved": 97,
   "saved_collector_errors": [
     {
       "capture": "20261011T201726017233Z",
