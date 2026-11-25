@@ -1,8 +1,8 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-11-25T04:14:46.162921+00:00",
-  "capture_count": 206,
+  "as_of_evidence_at": "2026-11-25T14:33:55.770390+00:00",
+  "capture_count": 207,
   "cohort_started_at": "2026-10-11T15:19:59+00:00",
   "completion_note": "Saved NFL manifests before coverage-v1 lack a completion flag; successful workflow corroboration remains required.",
   "decisive_market_paired": 93,
@@ -1639,19 +1639,17 @@
       "home": "LA",
       "kickoff": "2026-11-26T01:00:00+00:00",
       "latest_saved_decision": {
-        "checked_at": "2026-11-25T04:14:46.164541+00:00",
-        "decision": "enrolled",
-        "game_id": "2026_12_GB_LA",
-        "priced": true
+        "decision": "already_enrolled",
+        "game_id": "2026_12_GB_LA"
       },
       "lead_hours": 20.75382678,
-      "pregame_schedule_observations_in_window": 1,
+      "pregame_schedule_observations_in_window": 2,
       "recorded_at": "2026-11-25T04:14:46.223592+00:00",
       "started_by_as_of": false,
       "status": "enrolled"
     }
   ],
-  "input_digest": "c828c26ec8ecbb2775e17c88e1195073ea41194b05d2ff7e89f1f0d907cb4914",
+  "input_digest": "466b80115fc11368c263f708a501cb6d2695442dc373d48ade51aef69791b944",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -1680,19 +1678,17 @@
       "to": "2026-10-12T17:55:04.347503+00:00"
     }
   ],
-  "latest_attempted_capture": "20261125T041441916083Z",
-  "latest_capture": "20261125T041441916083Z",
+  "latest_attempted_capture": "20261125T143352282011Z",
+  "latest_capture": "20261125T143352282011Z",
   "latest_enrollment_decisions": [
     {
-      "checked_at": "2026-11-25T04:14:46.164541+00:00",
-      "decision": "enrolled",
-      "game_id": "2026_12_GB_LA",
-      "priced": true
+      "decision": "already_enrolled",
+      "game_id": "2026_12_GB_LA"
     }
   ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": null,
-  "latest_official_schedule_observed_at": "2026-11-25T04:14:43.674480+00:00",
+  "latest_official_schedule_observed_at": "2026-11-25T14:33:53.106432+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [],
   "minimum_forecast_lead_hours": 1.5221828808333333,
@@ -1764,7 +1760,7 @@
   "official_daily_conflicted_capture_count": 0,
   "pending": 1,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-11-25T04:14:46.162921+00:00",
+    "as_of_evidence_at": "2026-11-25T14:33:55.770390+00:00",
     "games": [
       {
         "away": "GB",
@@ -1774,7 +1770,7 @@
         "home": "LA",
         "issues": [],
         "kickoff": "2026-11-26T01:00:00+00:00",
-        "latest_scoreboard_observed_at": "2026-11-25T04:14:45.068323+00:00",
+        "latest_scoreboard_observed_at": "2026-11-25T14:33:54.781889+00:00",
         "latest_scoreboard_priced": true,
         "ready": true,
         "saved_vs_latest_official_start": null,
