@@ -2,14 +2,14 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-26T08:18:13.144312+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-26T18:59:57.613442+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 314 / 314 / 0 |
+| Recorded / settled / pending | 317 / 314 / 3 |
 | Started games in retained official schedules / enrolled | 316 / 314 |
 | Observed missing started games | 2 |
-| Enrollment-time priced forecasts | 314 / 314 |
+| Enrollment-time priced forecasts | 317 / 317 |
 | Settled with enrollment prices / decisive market-paired | 314 / 314 |
 | Separate later quotes recorded prospectively | 0 |
 
@@ -23,10 +23,13 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-26T08:18:13.144312+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
+As of retained evidence: 2026-11-26T18:59:57.613442+00:00. Ready: 3 / 3 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
+| 2026020400 | TOR at BOS | True | False | True | None |
+| 2026020401 | CGY at NJD | True | False | True | None |
+| 2026020402 | UTA at NSH | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -350,18 +353,21 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020397 | MTL at COL | 2026-11-26T02:30:00+00:00 | enrolled | — |
 | 2026020398 | SJS at ANA | 2026-11-26T03:00:00+00:00 | enrolled | — |
 | 2026020399 | CHI at SEA | 2026-11-26T02:40:00+00:00 | enrolled | — |
+| 2026020400 | TOR at BOS | 2026-11-27T18:00:00+00:00 | enrolled | — |
+| 2026020401 | CGY at NJD | 2026-11-27T18:00:00+00:00 | enrolled | — |
+| 2026020402 | UTA at NSH | 2026-11-27T18:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 209. Latest: `20261126T081811868307Z`.
+Audited capture manifests: 210. Latest: `20261126T185956271349Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
 | 2026-11-23T12:41:52.083300+00:00 | 2026-11-24T00:51:05.185182+00:00 | 12.15 |
 | 2026-11-09T06:30:05.998433+00:00 | 2026-11-09T17:30:01.044103+00:00 | 11.00 |
 | 2026-11-16T11:18:14.153332+00:00 | 2026-11-16T22:02:08.784528+00:00 | 10.73 |
+| 2026-11-26T08:18:11.868307+00:00 | 2026-11-26T18:59:56.271349+00:00 | 10.70 |
 | 2026-10-12T07:21:45.218639+00:00 | 2026-10-12T17:55:07.856333+00:00 | 10.56 |
-| 2026-11-25T04:14:46.381217+00:00 | 2026-11-25T14:33:55.897209+00:00 | 10.32 |
 
 Historical exclusions and collector errors, including resolved ones, are retained in [COVERAGE.json](COVERAGE.json); these are not all current errors.
 

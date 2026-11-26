@@ -1,8 +1,8 @@
 {
   "NO_BET": true,
   "actual_wagers": 0,
-  "as_of_evidence_at": "2026-11-26T08:18:17.382980+00:00",
-  "capture_count": 207,
+  "as_of_evidence_at": "2026-11-26T19:00:00.921167+00:00",
+  "capture_count": 208,
   "cohort_started_at": "2026-10-11T15:59:30.281973+00:00",
   "completion_note": "Only manifests without an explicit incomplete state are audited; legacy manifests are retained.",
   "decisive_market_paired": 7,
@@ -312,7 +312,7 @@
       "status": "enrolled"
     }
   ],
-  "input_digest": "d7dfffb4ec39e381659ed944196caf56b957958d941af0869c3932a5dbc62dbc",
+  "input_digest": "43b67c5e5882fdbd2fd06c9eb5d535c6aea6ef70023f1373f7b83909b320d4b1",
   "input_integrity": "verified",
   "largest_capture_intervals": [
     {
@@ -336,13 +336,13 @@
       "to": "2026-11-16T22:02:10.055460+00:00"
     },
     {
-      "from": "2026-10-12T07:21:47.631288+00:00",
-      "hours": 10.555993372777777,
-      "to": "2026-10-12T17:55:09.207430+00:00"
+      "from": "2026-11-26T08:18:13.297726+00:00",
+      "hours": 10.695678696944444,
+      "to": "2026-11-26T18:59:57.741035+00:00"
     }
   ],
-  "latest_attempted_capture": "20261126T081813297726Z",
-  "latest_capture": "20261126T081813297726Z",
+  "latest_attempted_capture": "20261126T185957741035Z",
+  "latest_capture": "20261126T185957741035Z",
   "latest_enrollment_decisions": [
     {
       "decision": "already_enrolled",
@@ -355,7 +355,7 @@
   ],
   "latest_official_daily_conflicts": [],
   "latest_official_schedule_complete": true,
-  "latest_official_schedule_observed_at": "2026-11-26T08:18:17.106204+00:00",
+  "latest_official_schedule_observed_at": "2026-11-26T19:00:00.845936+00:00",
   "limitation": "Coverage is limited to retained official schedule snapshots since each cohort began; it cannot prove that a source returned every game or recover uncaptured runs. Capture gaps are observed intervals, not proof of scheduler failure. Later archived pregame prices are evidence only: they never backfill saved forecasts or enrollment-time market metrics. New follow-up quotes must be recorded before start, remain separate, and are not added to existing scored comparisons. NO BET / actual wagers $0.",
   "market_gaps": [
     {
@@ -573,7 +573,7 @@
   "official_daily_conflicted_capture_count": 14,
   "pending": 3,
   "pregame_readiness": {
-    "as_of_evidence_at": "2026-11-26T08:18:17.382980+00:00",
+    "as_of_evidence_at": "2026-11-26T19:00:00.921167+00:00",
     "games": [],
     "limitation": "Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.",
     "observed_games": 0,
@@ -1542,6 +1542,11 @@
     },
     {
       "capture": "20261126T081813297726Z",
+      "game_id": "849816",
+      "reason": "Final identity differs from saved forecast"
+    },
+    {
+      "capture": "20261126T185957741035Z",
       "game_id": "849816",
       "reason": "Final identity differs from saved forecast"
     }

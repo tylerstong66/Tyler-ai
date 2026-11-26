@@ -1,6 +1,6 @@
 # Tyler NHL prospective paper test
 
-Recorded: **314** · Settled: **314** · Pending: **0**
+Recorded: **317** · Settled: **314** · Pending: **3**
 
 **NO BET — actual wagers $0.**
 
@@ -328,6 +328,9 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 | MTL at COL | Nov 25 09:30 PM | COL | 52.1% |
 | CHI at SEA | Nov 25 09:40 PM | SEA | 55.4% |
 | SJS at ANA | Nov 25 10:00 PM | ANA | 52.7% |
+| TOR at BOS | Nov 27 01:00 PM | BOS | 59.3% |
+| CGY at NJD | Nov 27 01:00 PM | NJD | 58.1% |
+| UTA at NSH | Nov 27 01:00 PM | NSH | 54.3% |
 
 All eligible regular-season and playoff games are enrolled before start, including games without odds (unpriced games are excluded only from paired market metrics). First review after 100 settled games; enrollment continues. Unknown starters/lineups stay unknown. Delays or source conflicts can leave coverage gaps. These are experimental forecasts, not betting recommendations.
 
