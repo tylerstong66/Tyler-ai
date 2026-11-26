@@ -4,15 +4,15 @@
 
 | Sport | Settled | Recorded | Pending | Market-paired | 100-game review | Report |
 |---|---:|---:|---:|---:|---|---|
-| NFL | 94 | 97 | 3 | 93 | collecting | [Review](../nfl_prospective_v2/REVIEW.md) |
-| NHL | 300 | 314 | 14 | 300 | ready_for_human_review | [Review](nhl/REVIEW.md) |
+| NFL | 95 | 98 | 3 | 94 | collecting | [Review](../nfl_prospective_v2/REVIEW.md) |
+| NHL | 314 | 314 | 0 | 314 | ready_for_human_review | [Review](nhl/REVIEW.md) |
 | MLB | 12 | 15 | 3 | 7 | collecting | [Review](mlb/REVIEW.md) |
 
 ## First-100-enrolled checkpoints
 
 | Sport | Status | Selected | Settled in window | Pending in window |
 |---|---|---:|---:|---:|
-| NFL | collecting_forecasts | 97 | 94 | 3 |
+| NFL | collecting_forecasts | 98 | 95 | 3 |
 | NHL | preserved | 100 | 100 | 0 |
 | MLB | collecting_forecasts | 15 | 12 | 3 |
 

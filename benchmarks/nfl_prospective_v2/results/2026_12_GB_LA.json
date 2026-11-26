@@ -1,0 +1,80 @@
+{
+  "away_score": 13,
+  "event_id": "401873079",
+  "game_id": "2026_12_GB_LA",
+  "home_score": 26,
+  "outcome": "home",
+  "prediction_sha256": "59fc7cb95734bc0d097772a271184c70aea35b3a8f1e3006c741f1958d268847",
+  "scores": {
+    "market": {
+      "binary_brier": 0.40381874415279223,
+      "conditional_log_loss": 0.5966436540445249,
+      "correct": true
+    },
+    "v1": {
+      "binary_brier": 0.2615141185796815,
+      "conditional_log_loss": 0.448795646175609,
+      "correct": true,
+      "full_brier": 0.2622643839983092,
+      "full_log_loss": 0.45244814175718334
+    },
+    "v2": {
+      "binary_brier": 0.25374209218922217,
+      "conditional_log_loss": 0.4403510387516224,
+      "correct": true,
+      "full_brier": 0.2545095933702077,
+      "full_log_loss": 0.4440035343331967
+    }
+  },
+  "season": 2026,
+  "source_snapshots": [
+    {
+      "commit": "cf1ff9a31f7c030099b028c94ef7f75afb82a924",
+      "path": "benchmarks/nfl_prospective_v2/snapshots/c4a29b05ff867312f4957cef2fbcf55c6e2cfc40198ed359c5c055ca8542997c.csv",
+      "response_sha256": "631afe1b51e4a28df4846350f2b024edb8eaef308d8adcb7c520dc5f5f66026e",
+      "retrieved_at": "2026-11-26T08:18:09.179745+00:00",
+      "sha256": "c4a29b05ff867312f4957cef2fbcf55c6e2cfc40198ed359c5c055ca8542997c",
+      "source_url": "https://raw.githubusercontent.com/nflverse/nfldata/cf1ff9a31f7c030099b028c94ef7f75afb82a924/data/games.csv"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/f27f6ae1d97cd606b34f25e653b3e1f590c61b8c4b3a7b4e120fe51e82467064.csv",
+      "release_digest": "sha256:f27f6ae1d97cd606b34f25e653b3e1f590c61b8c4b3a7b4e120fe51e82467064",
+      "response_sha256": "f27f6ae1d97cd606b34f25e653b3e1f590c61b8c4b3a7b4e120fe51e82467064",
+      "retrieved_at": "2026-11-26T08:18:10.226295+00:00",
+      "sha256": "f27f6ae1d97cd606b34f25e653b3e1f590c61b8c4b3a7b4e120fe51e82467064",
+      "source_url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2025.csv",
+      "updated_at": "2026-11-25T18:47:26Z"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/65c80a6eb0636b3ac53dec779aae16d82d7b6488d8bf0811bb1e8bed7ca3417c.csv",
+      "release_digest": "sha256:65c80a6eb0636b3ac53dec779aae16d82d7b6488d8bf0811bb1e8bed7ca3417c",
+      "response_sha256": "65c80a6eb0636b3ac53dec779aae16d82d7b6488d8bf0811bb1e8bed7ca3417c",
+      "retrieved_at": "2026-11-26T08:18:10.433175+00:00",
+      "sha256": "65c80a6eb0636b3ac53dec779aae16d82d7b6488d8bf0811bb1e8bed7ca3417c",
+      "source_url": "https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_2026.csv",
+      "updated_at": "2026-11-26T06:12:39Z"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/e727f0069b33e349c91b2b680f03bf170d9f0bde2102d8fc013e8953523d9eed.json",
+      "response_sha256": "0272cd23ac283c8178944d0854827c49d3d4442b8e1b6ea4f3ea94e8ca314364",
+      "retrieved_at": "2026-11-26T08:18:10.783169+00:00",
+      "sha256": "e727f0069b33e349c91b2b680f03bf170d9f0bde2102d8fc013e8953523d9eed",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=20261125"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/a63a5bc668a7a0c7996dff09374b7ba0ff113e9eba4d4b4d6fef579291e16ffa.json",
+      "response_sha256": "81264cb856594b4e764156c51f51ce59b8d483622839039a6045e03af271043e",
+      "retrieved_at": "2026-11-26T08:18:10.935837+00:00",
+      "sha256": "a63a5bc668a7a0c7996dff09374b7ba0ff113e9eba4d4b4d6fef579291e16ffa",
+      "source_url": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=20261126"
+    },
+    {
+      "path": "benchmarks/nfl_prospective_v2/snapshots/332519e7360c023349c43b6798960ed1c64fa7e83f2dcdaae7950df939c3b560.json",
+      "retrieved_at": "2026-11-26T08:18:11.574943+00:00",
+      "sha256": "332519e7360c023349c43b6798960ed1c64fa7e83f2dcdaae7950df939c3b560",
+      "source_url": "https://www.nfl.com/news/nfl-week-12-injury-report-player-statuses-for-all-15-games"
+    }
+  ],
+  "verified_at": "2026-11-26T08:18:11.647477+00:00",
+  "week": 12
+}

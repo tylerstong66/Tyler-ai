@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-25T23:37:42.018164+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-26T08:18:13.144312+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 314 / 300 / 14 |
-| Started games in retained official schedules / enrolled | 302 / 300 |
+| Recorded / settled / pending | 314 / 314 / 0 |
+| Started games in retained official schedules / enrolled | 316 / 314 |
 | Observed missing started games | 2 |
 | Enrollment-time priced forecasts | 314 / 314 |
-| Settled with enrollment prices / decisive market-paired | 300 / 300 |
+| Settled with enrollment prices / decisive market-paired | 314 / 314 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,24 +23,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-25T23:37:42.018164+00:00. Ready: 14 / 14 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-26T08:18:13.144312+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020386 | WPG at BOS | True | False | True | None |
-| 2026020387 | NYR at BUF | True | False | True | None |
-| 2026020388 | CAR at TBL | True | False | True | None |
-| 2026020389 | OTT at FLA | True | False | True | None |
-| 2026020390 | STL at NYI | True | False | True | None |
-| 2026020391 | CGY at PIT | True | False | True | None |
-| 2026020392 | PHI at WSH | True | False | True | None |
-| 2026020393 | NJD at CBJ | True | False | True | None |
-| 2026020394 | VAN at DET | True | False | True | None |
-| 2026020395 | NSH at DAL | True | False | True | None |
-| 2026020396 | UTA at MIN | True | False | True | None |
-| 2026020397 | MTL at COL | True | False | True | None |
-| 2026020398 | SJS at ANA | True | False | True | None |
-| 2026020399 | CHI at SEA | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -367,7 +353,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 208. Latest: `20261125T233741254823Z`.
+Audited capture manifests: 209. Latest: `20261126T081811868307Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

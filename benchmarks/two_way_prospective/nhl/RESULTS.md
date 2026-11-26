@@ -1,6 +1,6 @@
 # Tyler NHL prospective paper test
 
-Recorded: **314** · Settled: **300** · Pending: **14**
+Recorded: **314** · Settled: **314** · Pending: **0**
 
 **NO BET — actual wagers $0.**
 
@@ -8,9 +8,9 @@ Frozen team-Elo logistic model versus fixed Elo and timestamped market odds. No 
 
 | Model | Paired games | Brier | Log loss | Accuracy |
 |---|---:|---:|---:|---:|
-| model | 300 | 0.4866 | 0.6797 | 57.7% |
-| fixed_elo | 300 | 0.4846 | 0.6787 | 56.7% |
-| market | 300 | 0.4703 | 0.6626 | 57.3% |
+| model | 314 | 0.4876 | 0.6807 | 57.6% |
+| fixed_elo | 314 | 0.4872 | 0.6815 | 56.7% |
+| market | 314 | 0.4715 | 0.6638 | 57.6% |
 
 | Game | Start (Eastern) | Model pick | Win probability |
 |---|---|---|---:|
