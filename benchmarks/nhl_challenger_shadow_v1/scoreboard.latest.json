@@ -279,9 +279,9 @@
       "uncertainty_status": "available_descriptive"
     }
   },
-  "as_of_utc": "2026-11-26T19:00:00.997765+00:00",
+  "as_of_utc": "2026-11-27T02:10:29.987783+00:00",
   "candidate": "ridge_recipe",
-  "enrolled": 280,
+  "enrolled": 292,
   "first_100_enrolled": {
     "preserved_checkpoint": {
       "checkpoint_sha256": "28eb5d6562aa3072ef84202cb1b6fd279174a01e8d8fe267e123b07cff9fca0d",
@@ -296,9 +296,9 @@
     "status": "ready_for_human_review",
     "target": 100
   },
-  "input_digest": "5ee646e29febb196877a6038896a93763318f51649f1f07bfde552a8b3cf091c",
+  "input_digest": "11119a9cb084c98b1d6db9d08bea7cf8f87f54908afc60abb4b64dfa876fcf1b",
   "limitation": "Research only; all results are descriptive. No candidate selection, model promotion, bets, odds backfills or claims of an edge.",
-  "newly_enrolled": 3,
+  "newly_enrolled": 12,
   "paired_challenger_minus_baseline": {
     "fixed_elo": {
       "blocks": 39,
@@ -385,7 +385,7 @@
       "uncertainty_status": "available_descriptive"
     }
   },
-  "pending": 3,
+  "pending": 15,
   "promotion_allowed": false,
   "recent_verified_game_casebook": {
     "NO_BET": true,
@@ -2269,10 +2269,10 @@
   "scored": 277,
   "selection_warning": "2025 retrospective model selection was not blind; only post-activation NHL shadow games are prospective.",
   "source_enrollment_coverage": {
-    "eligible_saved_primary_forecasts_since_activation": 280,
+    "eligible_saved_primary_forecasts_since_activation": 292,
     "missed_started_source_forecasts": [],
     "note": "Only hash-verified saved primary forecasts; no upstream schedule completeness claim or retrospective repair.",
-    "shadow_enrolled": 280,
+    "shadow_enrolled": 292,
     "unseen_official_schedule_not_measured": true
   },
   "source_report": "benchmarks/two_way_challenger_v1/nhl_report.json",
@@ -2343,14 +2343,266 @@
         "shadow_forecast_sha256": "4c1d883c07bdd6765c2ef2caadb613e599a327277dfb2a01544c4c0e120733c3",
         "source_forecast_sha256": "4f17425d817ad8dc15bf3cb7d0bb5e2e22bfb77f1ca124dba7e21a61b3d159f6",
         "source_generated_at_utc": "2026-11-26T18:59:57.636557+00:00"
+      },
+      {
+        "archived_forecast_recorded_at_utc": "2026-11-27T02:10:29.987783+00:00",
+        "away": "DAL",
+        "event_id": "401892798",
+        "game_id": "2026020403",
+        "home": "STL",
+        "home_win_probabilities": {
+          "challenger": 0.5356514280095784,
+          "fixed_elo": 0.5185683125397224,
+          "original_model": 0.5036222178474573,
+          "saved_market": 0.43650793650793646
+        },
+        "live_market_quote": false,
+        "result_eligible_to_score_now": false,
+        "saved_market_observed_at_utc": "2026-11-27T02:10:23.826346+00:00",
+        "saved_market_provider": "DraftKings",
+        "scheduled_start_utc": "2026-11-27T19:00:00+00:00",
+        "shadow_forecast_sha256": "81fa84eeab875b139417a020d5950ee0a54a175b93e169b00cc4cff51bb0d0f2",
+        "source_forecast_sha256": "29c44fc2d5bd17b85657a005ac6477948763d05010e3968fb1320f6d656934aa",
+        "source_generated_at_utc": "2026-11-27T02:10:25.535098+00:00"
+      },
+      {
+        "archived_forecast_recorded_at_utc": "2026-11-27T02:10:29.987783+00:00",
+        "away": "OTT",
+        "event_id": "401892799",
+        "game_id": "2026020404",
+        "home": "TBL",
+        "home_win_probabilities": {
+          "challenger": 0.5758296627614412,
+          "fixed_elo": 0.594168667469404,
+          "original_model": 0.5306523607396251,
+          "saved_market": 0.5634920634920635
+        },
+        "live_market_quote": false,
+        "result_eligible_to_score_now": false,
+        "saved_market_observed_at_utc": "2026-11-27T02:10:23.826346+00:00",
+        "saved_market_provider": "DraftKings",
+        "scheduled_start_utc": "2026-11-27T20:00:00+00:00",
+        "shadow_forecast_sha256": "fb03b66647e91d467de2406d043ea993d4e386b7f3f3db5dc471606abb58128e",
+        "source_forecast_sha256": "9e6abde6888e81d4bbbcef739a1fc671e4ed763f27bb3eb22d19a1fb5930d14e",
+        "source_generated_at_utc": "2026-11-27T02:10:25.550274+00:00"
+      },
+      {
+        "archived_forecast_recorded_at_utc": "2026-11-27T02:10:29.987783+00:00",
+        "away": "VAN",
+        "event_id": "401892800",
+        "game_id": "2026020405",
+        "home": "PHI",
+        "home_win_probabilities": {
+          "challenger": 0.6571148452941833,
+          "fixed_elo": 0.7371327351060981,
+          "original_model": 0.5871102492222309,
+          "saved_market": 0.6690070210631895
+        },
+        "live_market_quote": false,
+        "result_eligible_to_score_now": false,
+        "saved_market_observed_at_utc": "2026-11-27T02:10:23.826346+00:00",
+        "saved_market_provider": "DraftKings",
+        "scheduled_start_utc": "2026-11-27T20:00:00+00:00",
+        "shadow_forecast_sha256": "b1744612462758984f7e2c28f9fde0925d65659355f8fcb0473457f076f78558",
+        "source_forecast_sha256": "722136f67f5080a0397dd1e271777ff8b4fb0383ec2b3e2e42c3cb66a20e3b9a",
+        "source_generated_at_utc": "2026-11-27T02:10:25.564993+00:00"
+      },
+      {
+        "archived_forecast_recorded_at_utc": "2026-11-27T02:10:29.987783+00:00",
+        "away": "FLA",
+        "event_id": "401892801",
+        "game_id": "2026020406",
+        "home": "WSH",
+        "home_win_probabilities": {
+          "challenger": 0.5540986916450283,
+          "fixed_elo": 0.5534301018668831,
+          "original_model": 0.5159845652149961,
+          "saved_market": 0.4956702459300312
+        },
+        "live_market_quote": false,
+        "result_eligible_to_score_now": false,
+        "saved_market_observed_at_utc": "2026-11-27T02:10:23.826346+00:00",
+        "saved_market_provider": "DraftKings",
+        "scheduled_start_utc": "2026-11-27T20:00:00+00:00",
+        "shadow_forecast_sha256": "132425a7c2433a6cbc6700bf23eb7227de932f512c9516e18f00a7828790a77e",
+        "source_forecast_sha256": "be0bcc0070553d0bbb52927d1194222408b632d71c4354bbd8040a193a9ce8dc",
+        "source_generated_at_utc": "2026-11-27T02:10:25.579457+00:00"
+      },
+      {
+        "archived_forecast_recorded_at_utc": "2026-11-27T02:10:29.987783+00:00",
+        "away": "DET",
+        "event_id": "401892802",
+        "game_id": "2026020407",
+        "home": "CBJ",
+        "home_win_probabilities": {
+          "challenger": 0.5799859293972065,
+          "fixed_elo": 0.6018890481467601,
+          "original_model": 0.5334732370275934,
+          "saved_market": 0.5427435387673957
+        },
+        "live_market_quote": false,
+        "result_eligible_to_score_now": false,
+        "saved_market_observed_at_utc": "2026-11-27T02:10:23.826346+00:00",
+        "saved_market_provider": "DraftKings",
+        "scheduled_start_utc": "2026-11-27T20:00:00+00:00",
+        "shadow_forecast_sha256": "c2bb27b21bf83e93c9e24425aba496083e13db706485cd8ad2c8c67cd6565ffd",
+        "source_forecast_sha256": "570906285f75d47e8e09316154f936bc8d388fb8648057005691625fef191594",
+        "source_generated_at_utc": "2026-11-27T02:10:25.593995+00:00"
+      },
+      {
+        "archived_forecast_recorded_at_utc": "2026-11-27T02:10:29.987783+00:00",
+        "away": "COL",
+        "event_id": "401892803",
+        "game_id": "2026020408",
+        "home": "MIN",
+        "home_win_probabilities": {
+          "challenger": 0.5839242632226881,
+          "fixed_elo": 0.6091774665269689,
+          "original_model": 0.5361513299395688,
+          "saved_market": 0.5427435387673957
+        },
+        "live_market_quote": false,
+        "result_eligible_to_score_now": false,
+        "saved_market_observed_at_utc": "2026-11-27T02:10:23.826346+00:00",
+        "saved_market_provider": "DraftKings",
+        "scheduled_start_utc": "2026-11-27T21:00:00+00:00",
+        "shadow_forecast_sha256": "6d6ec5dd00764a147f3b55b232010b4cef128125c326cfdcc5dd5f65c5bdf927",
+        "source_forecast_sha256": "7c5e085dd82d77146ba0902c6ef9cb648b4580b703bd30b7aca9cd06bcfc3701",
+        "source_generated_at_utc": "2026-11-27T02:10:25.608669+00:00"
+      },
+      {
+        "archived_forecast_recorded_at_utc": "2026-11-27T02:10:29.987783+00:00",
+        "away": "LAK",
+        "event_id": "401892804",
+        "game_id": "2026020409",
+        "home": "ANA",
+        "home_win_probabilities": {
+          "challenger": 0.585441052677809,
+          "fixed_elo": 0.6119769486206993,
+          "original_model": 0.5371841334148318,
+          "saved_market": 0.4891657638136511
+        },
+        "live_market_quote": false,
+        "result_eligible_to_score_now": false,
+        "saved_market_observed_at_utc": "2026-11-27T02:10:23.826346+00:00",
+        "saved_market_provider": "DraftKings",
+        "scheduled_start_utc": "2026-11-27T21:00:00+00:00",
+        "shadow_forecast_sha256": "f74aa3513a6f7e99823e47d3d8eaacb0c1966caa8e1d7a9c899e72be0cc80a89",
+        "source_forecast_sha256": "0d49567d248dd8664d9d81653307ae6f8a32a5de7e654da17de89dc30156f883",
+        "source_generated_at_utc": "2026-11-27T02:10:25.623106+00:00"
+      },
+      {
+        "archived_forecast_recorded_at_utc": "2026-11-27T02:10:29.987783+00:00",
+        "away": "VGK",
+        "event_id": "401892805",
+        "game_id": "2026020410",
+        "home": "SJS",
+        "home_win_probabilities": {
+          "challenger": 0.4874936612322589,
+          "fixed_elo": 0.4281844613753498,
+          "original_model": 0.47158798056563456,
+          "saved_market": 0.35527082119976705
+        },
+        "live_market_quote": false,
+        "result_eligible_to_score_now": false,
+        "saved_market_observed_at_utc": "2026-11-27T02:10:23.826346+00:00",
+        "saved_market_provider": "DraftKings",
+        "scheduled_start_utc": "2026-11-27T21:00:00+00:00",
+        "shadow_forecast_sha256": "53c3a39bcc1655941f9e847bd3c2f352f84a6274efff1f4534a20275114a9bef",
+        "source_forecast_sha256": "f1855448de2ad4d68d071488fefae2fc6e7fc6579df214f4f8f23eb0f0aedae0",
+        "source_generated_at_utc": "2026-11-27T02:10:25.637640+00:00"
+      },
+      {
+        "archived_forecast_recorded_at_utc": "2026-11-27T02:10:29.987783+00:00",
+        "away": "NYR",
+        "event_id": "401892806",
+        "game_id": "2026020411",
+        "home": "CHI",
+        "home_win_probabilities": {
+          "challenger": 0.5075335998279772,
+          "fixed_elo": 0.46551880038134985,
+          "original_model": 0.4848897807497862,
+          "saved_market": 0.39076376554174075
+        },
+        "live_market_quote": false,
+        "result_eligible_to_score_now": false,
+        "saved_market_observed_at_utc": "2026-11-27T02:10:23.826346+00:00",
+        "saved_market_provider": "DraftKings",
+        "scheduled_start_utc": "2026-11-27T22:30:00+00:00",
+        "shadow_forecast_sha256": "04d750650b741b5a2d014ea750598bb905ec2064faabf778566934a1ad54356e",
+        "source_forecast_sha256": "70b82bab04d45663d9d28495a79c4e5b46434c0bf3bcada68f4c48ce2cf9e40f",
+        "source_generated_at_utc": "2026-11-27T02:10:25.652209+00:00"
+      },
+      {
+        "archived_forecast_recorded_at_utc": "2026-11-27T02:10:29.987783+00:00",
+        "away": "WPG",
+        "event_id": "401892807",
+        "game_id": "2026020412",
+        "home": "NYI",
+        "home_win_probabilities": {
+          "challenger": 0.5526279238003753,
+          "fixed_elo": 0.550656274062127,
+          "original_model": 0.5149962466814472,
+          "saved_market": 0.551441114716549
+        },
+        "live_market_quote": false,
+        "result_eligible_to_score_now": false,
+        "saved_market_observed_at_utc": "2026-11-27T02:10:23.826346+00:00",
+        "saved_market_provider": "DraftKings",
+        "scheduled_start_utc": "2026-11-28T00:30:00+00:00",
+        "shadow_forecast_sha256": "d48f0ffb703398d89ae086f5d5a187dbbbb13687a177881594b4a09bc9408a7e",
+        "source_forecast_sha256": "6e4b822ab630f071d4eb0a7998df8397d48b95a1b63e7ee210ec102cb2a2faf6",
+        "source_generated_at_utc": "2026-11-27T02:10:25.666798+00:00"
+      },
+      {
+        "archived_forecast_recorded_at_utc": "2026-11-27T02:10:29.987783+00:00",
+        "away": "PIT",
+        "event_id": "401892808",
+        "game_id": "2026020413",
+        "home": "BUF",
+        "home_win_probabilities": {
+          "challenger": 0.6313938996554718,
+          "fixed_elo": 0.6941332911980976,
+          "original_model": 0.5689043957969989,
+          "saved_market": 0.5829926410466066
+        },
+        "live_market_quote": false,
+        "result_eligible_to_score_now": false,
+        "saved_market_observed_at_utc": "2026-11-27T02:10:23.826346+00:00",
+        "saved_market_provider": "DraftKings",
+        "scheduled_start_utc": "2026-11-28T01:00:00+00:00",
+        "shadow_forecast_sha256": "987cccd268a0bda51451ab04c6c713b01c420be88973213f2ef285e6e2b83019",
+        "source_forecast_sha256": "d28318ed1528a0102f4b48be14a39f0aacfd1e6a880014d88a309bd3d234b728",
+        "source_generated_at_utc": "2026-11-27T02:10:25.681413+00:00"
+      },
+      {
+        "archived_forecast_recorded_at_utc": "2026-11-27T02:10:29.987783+00:00",
+        "away": "SEA",
+        "event_id": "401892809",
+        "game_id": "2026020414",
+        "home": "EDM",
+        "home_win_probabilities": {
+          "challenger": 0.6226174070809134,
+          "fixed_elo": 0.6789120128861682,
+          "original_model": 0.5627739136928721,
+          "saved_market": 0.6574752261956054
+        },
+        "live_market_quote": false,
+        "result_eligible_to_score_now": false,
+        "saved_market_observed_at_utc": "2026-11-27T02:10:23.826346+00:00",
+        "saved_market_provider": "DraftKings",
+        "scheduled_start_utc": "2026-11-28T01:00:00+00:00",
+        "shadow_forecast_sha256": "3269aed971d02c308ca0369edcdeae6fb9eaf327baad4579822f4925aade2f5b",
+        "source_forecast_sha256": "9a86e550faee719aab2ad00ec37aefa23240671ee062785deb563bd3510f2ae3",
+        "source_generated_at_utc": "2026-11-27T02:10:25.695935+00:00"
       }
     ],
     "probability_convention": "probability of home team winning including overtime or shootout",
     "quote_warning": "Market probability is a saved pregame quote from the original forecast, NOT current odds or a verified closing line.",
     "scope": "earliest_future_frozen_nhl_challenger_games",
     "selection": "scheduled_start_utc ascending, then game_id; never based on result or model confidence",
-    "shown": 3,
-    "total_future_enrolled": 3
+    "shown": 15,
+    "total_future_enrolled": 15
   },
   "version": "nhl-forward-challenger-shadow-v1"
 }
