@@ -2,12 +2,12 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-27T10:52:26.120525+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-27T19:57:42.472495+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
 | Recorded / settled / pending | 329 / 314 / 15 |
-| Started games in retained official schedules / enrolled | 316 / 314 |
+| Started games in retained official schedules / enrolled | 320 / 318 |
 | Observed missing started games | 2 |
 | Enrollment-time priced forecasts | 329 / 329 |
 | Settled with enrollment prices / decisive market-paired | 314 / 314 |
@@ -23,14 +23,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-27T10:52:26.120525+00:00. Ready: 15 / 15 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-27T19:57:42.472495+00:00. Ready: 11 / 11 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020400 | TOR at BOS | True | False | True | None |
-| 2026020401 | CGY at NJD | True | False | True | None |
-| 2026020402 | UTA at NSH | True | False | True | None |
-| 2026020403 | DAL at STL | True | False | True | None |
 | 2026020404 | OTT at TBL | True | False | True | None |
 | 2026020405 | VAN at PHI | True | False | True | None |
 | 2026020406 | FLA at WSH | True | False | True | None |
@@ -383,7 +379,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 212. Latest: `20261127T105225171994Z`.
+Audited capture manifests: 213. Latest: `20261127T195741920068Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
