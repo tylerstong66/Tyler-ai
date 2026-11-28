@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-27T19:57:42.472495+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-28T02:41:33.769132+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 329 / 314 / 15 |
-| Started games in retained official schedules / enrolled | 320 / 318 |
+| Recorded / settled / pending | 341 / 326 / 15 |
+| Started games in retained official schedules / enrolled | 331 / 329 |
 | Observed missing started games | 2 |
-| Enrollment-time priced forecasts | 329 / 329 |
-| Settled with enrollment prices / decisive market-paired | 314 / 314 |
+| Enrollment-time priced forecasts | 341 / 341 |
+| Settled with enrollment prices / decisive market-paired | 326 / 326 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,21 +23,22 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-27T19:57:42.472495+00:00. Ready: 11 / 11 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-28T02:41:33.769132+00:00. Ready: 12 / 12 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026020404 | OTT at TBL | True | False | True | None |
-| 2026020405 | VAN at PHI | True | False | True | None |
-| 2026020406 | FLA at WSH | True | False | True | None |
-| 2026020407 | DET at CBJ | True | False | True | None |
-| 2026020408 | COL at MIN | True | False | True | None |
-| 2026020409 | LAK at ANA | True | False | True | None |
-| 2026020410 | VGK at SJS | True | False | True | None |
-| 2026020411 | NYR at CHI | True | False | True | None |
-| 2026020412 | WPG at NYI | True | False | True | None |
-| 2026020413 | PIT at BUF | True | False | True | None |
-| 2026020414 | SEA at EDM | True | False | True | None |
+| 2026020415 | MTL at VGK | True | False | True | None |
+| 2026020416 | TBL at FLA | True | False | True | None |
+| 2026020417 | NSH at DET | True | False | True | None |
+| 2026020418 | WPG at NJD | True | False | True | None |
+| 2026020419 | CGY at NYR | True | False | True | None |
+| 2026020420 | TOR at PIT | True | False | True | None |
+| 2026020421 | OTT at CAR | True | False | True | None |
+| 2026020422 | WSH at STL | True | False | True | None |
+| 2026020423 | NYI at PHI | True | False | True | None |
+| 2026020424 | UTA at DAL | True | False | True | None |
+| 2026020425 | SJS at COL | True | False | True | None |
+| 2026020426 | ANA at LAK | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -376,10 +377,22 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020412 | WPG at NYI | 2026-11-28T00:30:00+00:00 | enrolled | — |
 | 2026020413 | PIT at BUF | 2026-11-28T01:00:00+00:00 | enrolled | — |
 | 2026020414 | SEA at EDM | 2026-11-28T01:00:00+00:00 | enrolled | — |
+| 2026020415 | MTL at VGK | 2026-11-28T21:00:00+00:00 | enrolled | — |
+| 2026020416 | TBL at FLA | 2026-11-28T23:00:00+00:00 | enrolled | — |
+| 2026020417 | NSH at DET | 2026-11-29T00:00:00+00:00 | enrolled | — |
+| 2026020418 | WPG at NJD | 2026-11-29T00:00:00+00:00 | enrolled | — |
+| 2026020419 | CGY at NYR | 2026-11-29T00:00:00+00:00 | enrolled | — |
+| 2026020420 | TOR at PIT | 2026-11-29T00:00:00+00:00 | enrolled | — |
+| 2026020421 | OTT at CAR | 2026-11-29T00:00:00+00:00 | enrolled | — |
+| 2026020422 | WSH at STL | 2026-11-29T00:00:00+00:00 | enrolled | — |
+| 2026020423 | NYI at PHI | 2026-11-29T00:30:00+00:00 | enrolled | — |
+| 2026020424 | UTA at DAL | 2026-11-29T01:00:00+00:00 | enrolled | — |
+| 2026020425 | SJS at COL | 2026-11-29T02:00:00+00:00 | enrolled | — |
+| 2026020426 | ANA at LAK | 2026-11-29T02:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 213. Latest: `20261127T195741920068Z`.
+Audited capture manifests: 214. Latest: `20261128T024132513084Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|

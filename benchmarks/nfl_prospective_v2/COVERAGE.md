@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-27T19:57:41.713579+00:00**; cohort began 2026-10-11T15:19:59+00:00.
+Evidence through **2026-11-28T02:41:32.366207+00:00**; cohort began 2026-10-11T15:19:59+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 99 / 98 / 1 |
-| Started games in retained official schedules / enrolled | 101 / 98 |
+| Recorded / settled / pending | 99 / 99 / 0 |
+| Started games in retained official schedules / enrolled | 102 / 99 |
 | Observed missing started games | 3 |
 | Enrollment-time priced forecasts | 99 / 99 |
-| Settled with enrollment prices / decisive market-paired | 98 / 97 |
+| Settled with enrollment prices / decisive market-paired | 99 / 98 |
 | Separate later quotes recorded prospectively | 0 |
 
 A priced NFL tie is excluded only from binary decisive market comparisons.
@@ -25,11 +25,10 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-27T19:57:41.713579+00:00. Ready: 1 / 1 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-28T02:41:32.366207+00:00. Ready: 0 / 0 observed games. Status: no_upcoming_games_observed.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
-| 2026_12_DEN_PIT | DEN at PIT | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -142,7 +141,7 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 
 ## Capture freshness
 
-Audited capture manifests: 213. Latest: `20261127T195737504961Z`.
+Audited capture manifests: 214. Latest: `20261128T024129817867Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
