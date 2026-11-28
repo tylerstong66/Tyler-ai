@@ -28,24 +28,24 @@
               "upper": 0.4
             },
             {
-              "games": 210,
+              "games": 211,
               "lower": 0.4,
-              "mean_probability": 0.5366895666145283,
-              "observed_rate": 0.4857142857142857,
+              "mean_probability": 0.5367651038523759,
+              "observed_rate": 0.4834123222748815,
               "observed_rate_wilson95": [
-                0.4189827637032563,
-                0.5529590663184374
+                0.4168861890640926,
+                0.5505316452848997
               ],
               "upper": 0.6
             },
             {
-              "games": 77,
+              "games": 79,
               "lower": 0.6,
-              "mean_probability": 0.6375537026357825,
-              "observed_rate": 0.5714285714285714,
+              "mean_probability": 0.6372866634138182,
+              "observed_rate": 0.5569620253164557,
               "observed_rate_wilson95": [
-                0.46010532061427006,
-                0.6759634757739535
+                0.44731912948308383,
+                0.6613221248854566
               ],
               "upper": 0.8
             },
@@ -58,13 +58,13 @@
               "upper": 1.0
             }
           ],
-          "games": 289,
+          "games": 292,
           "limitation": "Fixed five bins. Wilson bin intervals assume independent observations; descriptive only."
         },
         "spread": {
-          "games": 289,
-          "mean_distance_from_even": 0.0727062591436205,
-          "share_between_40_and_60_percent": 0.726643598615917
+          "games": 292,
+          "mean_distance_from_even": 0.07300941138028454,
+          "share_between_40_and_60_percent": 0.7226027397260274
         }
       },
       "fixed_elo": {
@@ -90,24 +90,24 @@
               "upper": 0.4
             },
             {
-              "games": 159,
+              "games": 160,
               "lower": 0.4,
-              "mean_probability": 0.5145990747976177,
-              "observed_rate": 0.48427672955974843,
+              "mean_probability": 0.5148244322930209,
+              "observed_rate": 0.48125,
               "observed_rate_wilson95": [
-                0.4078892583593847,
-                0.5614060302224652
+                0.4051814515477462,
+                0.5581977807711853
               ],
               "upper": 0.6
             },
             {
-              "games": 110,
+              "games": 112,
               "lower": 0.6,
-              "mean_probability": 0.6708334043324603,
-              "observed_rate": 0.5818181818181818,
+              "mean_probability": 0.6711135694701331,
+              "observed_rate": 0.5714285714285714,
               "observed_rate_wilson95": [
-                0.4884056896895063,
-                0.6697089390798849
+                0.478911377409721,
+                0.659208430152144
               ],
               "upper": 0.8
             },
@@ -123,13 +123,13 @@
               "upper": 1.0
             }
           ],
-          "games": 289,
+          "games": 292,
           "limitation": "Fixed five bins. Wilson bin intervals assume independent observations; descriptive only."
         },
         "spread": {
-          "games": 289,
-          "mean_distance_from_even": 0.10641878027884714,
-          "share_between_40_and_60_percent": 0.5501730103806228
+          "games": 292,
+          "mean_distance_from_even": 0.10677646944771649,
+          "share_between_40_and_60_percent": 0.547945205479452
         }
       },
       "model": {
@@ -155,13 +155,13 @@
               "upper": 0.4
             },
             {
-              "games": 279,
+              "games": 282,
               "lower": 0.4,
-              "mean_probability": 0.5201488742119588,
-              "observed_rate": 0.5017921146953405,
+              "mean_probability": 0.5204546470259143,
+              "observed_rate": 0.49645390070921985,
               "observed_rate_wilson95": [
-                0.4434979369701568,
-                0.5600376126065194
+                0.43853937738388793,
+                0.5544637369710013
               ],
               "upper": 0.6
             },
@@ -185,13 +185,13 @@
               "upper": 1.0
             }
           ],
-          "games": 289,
+          "games": 292,
           "limitation": "Fixed five bins. Wilson bin intervals assume independent observations; descriptive only."
         },
         "spread": {
-          "games": 289,
-          "mean_distance_from_even": 0.03785893555276007,
-          "share_between_40_and_60_percent": 0.9653979238754326
+          "games": 292,
+          "mean_distance_from_even": 0.0379722840099965,
+          "share_between_40_and_60_percent": 0.9657534246575342
         }
       }
     }
@@ -202,24 +202,24 @@
       "bootstrap_draws": 2000,
       "ci95": {
         "accuracy": [
-          0.5033991079875659,
-          0.6171114589447596
+          0.49432553041572064,
+          0.6156720076090137
         ],
         "brier": [
-          0.4750231591171888,
-          0.5125809805468079
+          0.4755405039327179,
+          0.5171114085983477
         ],
         "log_loss": [
-          0.6677478886659441,
-          0.706237884397124
+          0.6682621259821936,
+          0.7110716902185967
         ]
       },
-      "games": 289,
+      "games": 292,
       "interval_method": "percentile block bootstrap",
       "mean": {
-        "accuracy": 0.5605536332179931,
-        "brier": 0.49437325454474834,
-        "log_loss": 0.6876200313045545
+        "accuracy": 0.5547945205479452,
+        "brier": 0.4967715314794682,
+        "log_loss": 0.6900653292706761
       },
       "minimum_blocks": 5,
       "uncertainty_status": "available_descriptive"
@@ -229,24 +229,24 @@
       "bootstrap_draws": 2000,
       "ci95": {
         "accuracy": [
-          0.5,
-          0.6148698122809002
+          0.4878851323407775,
+          0.6118432554287817
         ],
         "brier": [
-          0.4692503578206017,
-          0.5229896111181082
+          0.4700339913856514,
+          0.530546087502121
         ],
         "log_loss": [
-          0.6618796952891927,
-          0.7202079472555377
+          0.6631480642729339,
+          0.7273291991742695
         ]
       },
-      "games": 289,
+      "games": 292,
       "interval_method": "percentile block bootstrap",
       "mean": {
-        "accuracy": 0.5570934256055363,
-        "brier": 0.4969374385609637,
-        "log_loss": 0.6917503254876318
+        "accuracy": 0.5513698630136986,
+        "brier": 0.5003659229548897,
+        "log_loss": 0.6953303327663034
       },
       "minimum_blocks": 5,
       "uncertainty_status": "available_descriptive"
@@ -256,32 +256,32 @@
       "bootstrap_draws": 2000,
       "ci95": {
         "accuracy": [
-          0.5052195811915686,
-          0.6164050624960743
+          0.4916387959866221,
+          0.6148698122809002
         ],
         "brier": [
-          0.48073200244679726,
-          0.500365149416819
+          0.48103922422803513,
+          0.5027777776123245
         ],
         "log_loss": [
-          0.6737283620156704,
-          0.6935625382725021
+          0.6740737404881694,
+          0.695959955640856
         ]
       },
-      "games": 289,
+      "games": 292,
       "interval_method": "percentile block bootstrap",
       "mean": {
-        "accuracy": 0.5605536332179931,
-        "brier": 0.49096302804245556,
-        "log_loss": 0.68407786561729
+        "accuracy": 0.5547945205479452,
+        "brier": 0.49212154366932287,
+        "log_loss": 0.6852425755628458
       },
       "minimum_blocks": 5,
       "uncertainty_status": "available_descriptive"
     }
   },
-  "as_of_utc": "2026-11-28T02:41:36.684247+00:00",
+  "as_of_utc": "2026-11-28T11:45:32.615521+00:00",
   "candidate": "ridge_recipe",
-  "enrolled": 304,
+  "enrolled": 305,
   "first_100_enrolled": {
     "preserved_checkpoint": {
       "checkpoint_sha256": "28eb5d6562aa3072ef84202cb1b6fd279174a01e8d8fe267e123b07cff9fca0d",
@@ -296,34 +296,34 @@
     "status": "ready_for_human_review",
     "target": 100
   },
-  "input_digest": "57fc2b3c2abdb6efcd59518f81dec8beccb005dd881940d4d0e1b2fc1e06fd4a",
+  "input_digest": "df502ada4676033f36edb12d209620b8d1fe949805e28b3e4d400dbd66df5d02",
   "limitation": "Research only; all results are descriptive. No candidate selection, model promotion, bets, odds backfills or claims of an edge.",
-  "newly_enrolled": 12,
+  "newly_enrolled": 1,
   "paired_challenger_minus_baseline": {
     "fixed_elo": {
       "blocks": 40,
       "bootstrap_draws": 2000,
       "ci95": {
         "accuracy": [
-          -0.025,
-          0.03309128771434772
+          -0.024735802820291218,
+          0.03249391775231516
         ],
         "brier": [
-          -0.012947545213642775,
-          0.008129870305753743
+          -0.014671656351594235,
+          0.007497340527474157
         ],
         "log_loss": [
-          -0.015953357490025386,
-          0.007991140131346232
+          -0.0178885947654107,
+          0.007230381667585736
         ]
       },
       "direction": "challenger minus baseline: lower Brier/log loss and higher accuracy favor challenger",
-      "games": 289,
+      "games": 292,
       "interval_method": "percentile block bootstrap",
       "mean": {
-        "accuracy": 0.0034602076124567475,
-        "brier": -0.0025641840162153877,
-        "log_loss": -0.004130294183077233
+        "accuracy": 0.003424657534246575,
+        "brier": -0.003594391475421522,
+        "log_loss": -0.005265003495627299
       },
       "minimum_blocks": 5,
       "uncertainty_status": "available_descriptive"
@@ -333,25 +333,25 @@
       "bootstrap_draws": 2000,
       "ci95": {
         "accuracy": [
-          -0.07256094517430021,
-          0.04594183201957051
+          -0.07143530997304581,
+          0.045775319858079776
         ],
         "brier": [
-          0.006208191961166994,
-          0.02860498772924317
+          0.0063041701327839475,
+          0.0284814293009686
         ],
         "log_loss": [
-          0.006480195049349285,
-          0.029597149157281066
+          0.00651362713216205,
+          0.029586691843960122
         ]
       },
       "direction": "challenger minus baseline: lower Brier/log loss and higher accuracy favor challenger",
-      "games": 289,
+      "games": 292,
       "interval_method": "percentile block bootstrap",
       "mean": {
-        "accuracy": -0.01384083044982699,
-        "brier": 0.01780738730943448,
-        "log_loss": 0.018522304686834606
+        "accuracy": -0.0136986301369863,
+        "brier": 0.017730372499480885,
+        "log_loss": 0.018431695687183
       },
       "minimum_blocks": 5,
       "uncertainty_status": "available_descriptive"
@@ -361,37 +361,217 @@
       "bootstrap_draws": 2000,
       "ci95": {
         "accuracy": [
-          -0.029522419401825595,
-          0.030425338536455168
+          -0.02925683519301407,
+          0.029915169660678642
         ],
         "brier": [
-          -0.006974752630761247,
-          0.013347560874795786
+          -0.006542258357551289,
+          0.015440583003441595
         ],
         "log_loss": [
-          -0.0071973774025124275,
-          0.013904971701797808
+          -0.006718846777838449,
+          0.015807849322734106
         ]
       },
       "direction": "challenger minus baseline: lower Brier/log loss and higher accuracy favor challenger",
-      "games": 289,
+      "games": 292,
       "interval_method": "percentile block bootstrap",
       "mean": {
         "accuracy": 0.0,
-        "brier": 0.003410226502292791,
-        "log_loss": 0.003542165687264506
+        "brier": 0.0046499878101452525,
+        "log_loss": 0.004822753707830255
       },
       "minimum_blocks": 5,
       "uncertainty_status": "available_descriptive"
     }
   },
-  "pending": 15,
+  "pending": 13,
   "promotion_allowed": false,
   "recent_verified_game_casebook": {
     "NO_BET": true,
     "actual_wagers": 0,
     "caveat": "Descriptive game-level audit, not independent evidence of profitability or a wagering signal.",
     "games": [
+      {
+        "away": "WPG",
+        "challenger_forecast_sha256": "d48f0ffb703398d89ae086f5d5a187dbbbb13687a177881594b4a09bc9408a7e",
+        "challenger_minus_baseline": {
+          "fixed_elo": {
+            "accuracy": 0.0,
+            "brier": 0.004350579999858106,
+            "log_loss": 0.004397497871363343
+          },
+          "market": {
+            "accuracy": 0.0,
+            "brier": 0.0026206383281665024,
+            "log_loss": 0.002649333104958629
+          },
+          "model": {
+            "accuracy": 0.0,
+            "brier": 0.08035297613587089,
+            "log_loss": 0.08076599610151536
+          }
+        },
+        "event_id": "401892807",
+        "final_verified_at_utc": "2026-11-28T11:45:29.151216+00:00",
+        "game_id": "2026020412",
+        "home": "NYI",
+        "home_win_probabilities": {
+          "candidate": 0.5526279238003753,
+          "fixed_elo": 0.550656274062127,
+          "market": 0.551441114716549,
+          "model": 0.5149962466814472
+        },
+        "live_odds": false,
+        "original_forecast_sha256": "6e4b822ab630f071d4eb0a7998df8397d48b95a1b63e7ee210ec102cb2a2faf6",
+        "proper_scores": {
+          "candidate": {
+            "accuracy": 0.0,
+            "brier": 0.6107952443278268,
+            "log_loss": 0.8043646453749738
+          },
+          "fixed_elo": {
+            "accuracy": 0.0,
+            "brier": 0.6064446643279687,
+            "log_loss": 0.7999671475036104
+          },
+          "market": {
+            "accuracy": 0.0,
+            "brier": 0.6081746059996603,
+            "log_loss": 0.8017153122700151
+          },
+          "model": {
+            "accuracy": 0.0,
+            "brier": 0.530442268191956,
+            "log_loss": 0.7235986492734584
+          }
+        },
+        "saved_market_observed_at_utc": "2026-11-27T02:10:23.826346+00:00",
+        "saved_market_provider": "DraftKings",
+        "scheduled_start_utc": "2026-11-28T00:30:00+00:00",
+        "verified_winner": "WPG",
+        "verified_winner_side": "away"
+      },
+      {
+        "away": "PIT",
+        "challenger_forecast_sha256": "987cccd268a0bda51451ab04c6c713b01c420be88973213f2ef285e6e2b83019",
+        "challenger_minus_baseline": {
+          "fixed_elo": {
+            "accuracy": 0.0,
+            "brier": -0.16632553885471812,
+            "log_loss": -0.1865791802342719
+          },
+          "market": {
+            "accuracy": 0.0,
+            "brier": 0.11755567401529277,
+            "log_loss": 0.12337527387514913
+          },
+          "model": {
+            "accuracy": 0.0,
+            "brier": 0.15001208992999104,
+            "log_loss": 0.15660128986377586
+          }
+        },
+        "event_id": "401892808",
+        "final_verified_at_utc": "2026-11-28T11:45:29.150328+00:00",
+        "game_id": "2026020413",
+        "home": "BUF",
+        "home_win_probabilities": {
+          "candidate": 0.6313938996554718,
+          "fixed_elo": 0.6941332911980976,
+          "market": 0.5829926410466066,
+          "model": 0.5689043957969989
+        },
+        "live_odds": false,
+        "original_forecast_sha256": "d28318ed1528a0102f4b48be14a39f0aacfd1e6a880014d88a309bd3d234b728",
+        "proper_scores": {
+          "candidate": {
+            "accuracy": 0.0,
+            "brier": 0.7973165130442879,
+            "log_loss": 0.9980266838439499
+          },
+          "fixed_elo": {
+            "accuracy": 0.0,
+            "brier": 0.963642051899006,
+            "log_loss": 1.1846058640782218
+          },
+          "market": {
+            "accuracy": 0.0,
+            "brier": 0.6797608390289951,
+            "log_loss": 0.8746514099688008
+          },
+          "model": {
+            "accuracy": 0.0,
+            "brier": 0.6473044231142968,
+            "log_loss": 0.841425393980174
+          }
+        },
+        "saved_market_observed_at_utc": "2026-11-27T02:10:23.826346+00:00",
+        "saved_market_provider": "DraftKings",
+        "scheduled_start_utc": "2026-11-28T01:00:00+00:00",
+        "verified_winner": "PIT",
+        "verified_winner_side": "away"
+      },
+      {
+        "away": "SEA",
+        "challenger_forecast_sha256": "3269aed971d02c308ca0369edcdeae6fb9eaf327baad4579822f4925aade2f5b",
+        "challenger_minus_baseline": {
+          "fixed_elo": {
+            "accuracy": 0.0,
+            "brier": -0.14653817128197755,
+            "log_loss": -0.1615443194509424
+          },
+          "market": {
+            "accuracy": 0.0,
+            "brier": -0.08924247492160531,
+            "log_loss": -0.09691552081787347
+          },
+          "model": {
+            "accuracy": 0.0,
+            "brier": 0.14187591533393518,
+            "log_loss": 0.14719091310170096
+          }
+        },
+        "event_id": "401892809",
+        "final_verified_at_utc": "2026-11-28T11:45:29.148022+00:00",
+        "game_id": "2026020414",
+        "home": "EDM",
+        "home_win_probabilities": {
+          "candidate": 0.6226174070809134,
+          "fixed_elo": 0.6789120128861682,
+          "market": 0.6574752261956054,
+          "model": 0.5627739136928721
+        },
+        "live_odds": false,
+        "original_forecast_sha256": "9a86e550faee719aab2ad00ec37aefa23240671ee062785deb563bd3510f2ae3",
+        "proper_scores": {
+          "candidate": {
+            "accuracy": 0.0,
+            "brier": 0.7753048712003197,
+            "log_loss": 0.9744957708022318
+          },
+          "fixed_elo": {
+            "accuracy": 0.0,
+            "brier": 0.9218430424822972,
+            "log_loss": 1.1360400902531742
+          },
+          "market": {
+            "accuracy": 0.0,
+            "brier": 0.864547346121925,
+            "log_loss": 1.0714112916201053
+          },
+          "model": {
+            "accuracy": 0.0,
+            "brier": 0.6334289558663845,
+            "log_loss": 0.8273048577005309
+          }
+        },
+        "saved_market_observed_at_utc": "2026-11-27T02:10:23.826346+00:00",
+        "saved_market_provider": "DraftKings",
+        "scheduled_start_utc": "2026-11-28T01:00:00+00:00",
+        "verified_winner": "SEA",
+        "verified_winner_side": "away"
+      },
       {
         "away": "NYR",
         "challenger_forecast_sha256": "04d750650b741b5a2d014ea750598bb905ec2064faabf778566934a1ad54356e",
@@ -1711,193 +1891,13 @@
         "scheduled_start_utc": "2026-11-26T00:30:00+00:00",
         "verified_winner": "DET",
         "verified_winner_side": "home"
-      },
-      {
-        "away": "CAR",
-        "challenger_forecast_sha256": "98ab11a31168de5644180b5366e41551b4e51fb243fb6188b1ac23272ff6c8ff",
-        "challenger_minus_baseline": {
-          "fixed_elo": {
-            "accuracy": 0.0,
-            "brier": 0.09884878997615804,
-            "log_loss": 0.09931487095762737
-          },
-          "market": {
-            "accuracy": 0.0,
-            "brier": 0.07233437050247288,
-            "log_loss": 0.07252983108199618
-          },
-          "model": {
-            "accuracy": 0.0,
-            "brier": 0.035979757962449566,
-            "log_loss": 0.03601198738055711
-          }
-        },
-        "event_id": "401892783",
-        "final_verified_at_utc": "2026-11-26T08:18:13.179414+00:00",
-        "game_id": "2026020388",
-        "home": "TBL",
-        "home_win_probabilities": {
-          "candidate": 0.4952278834942563,
-          "fixed_elo": 0.44252261140208604,
-          "market": 0.4572564612326044,
-          "model": 0.4767187615449762
-        },
-        "live_odds": false,
-        "original_forecast_sha256": "63457eaa7d3e4b7a598524867a4bcf333c4396b9ca5151d15e5d39a5355f6f8c",
-        "proper_scores": {
-          "candidate": {
-            "accuracy": 1.0,
-            "brier": 0.49050131318040135,
-            "log_loss": 0.6836482059967758
-          },
-          "fixed_elo": {
-            "accuracy": 1.0,
-            "brier": 0.3916525232042433,
-            "log_loss": 0.5843333350391484
-          },
-          "market": {
-            "accuracy": 1.0,
-            "brier": 0.4181669426779285,
-            "log_loss": 0.6111183749147796
-          },
-          "model": {
-            "accuracy": 1.0,
-            "brier": 0.4545215552179518,
-            "log_loss": 0.6476362186162187
-          }
-        },
-        "saved_market_observed_at_utc": "2026-11-25T04:14:47.799189+00:00",
-        "saved_market_provider": "DraftKings",
-        "scheduled_start_utc": "2026-11-26T00:00:00+00:00",
-        "verified_winner": "CAR",
-        "verified_winner_side": "away"
-      },
-      {
-        "away": "OTT",
-        "challenger_forecast_sha256": "7a85c8c3952259ee803849d1030d1cff79d0dc864b7d66f726b40f07e4d6473f",
-        "challenger_minus_baseline": {
-          "fixed_elo": {
-            "accuracy": 0.0,
-            "brier": -0.032032567183880645,
-            "log_loss": -0.03213137606796701
-          },
-          "market": {
-            "accuracy": 0.0,
-            "brier": 0.012779739564948212,
-            "log_loss": 0.012859263650397024
-          },
-          "model": {
-            "accuracy": 0.0,
-            "brier": -0.061626130099841026,
-            "log_loss": -0.061742216997528354
-          }
-        },
-        "event_id": "401892784",
-        "final_verified_at_utc": "2026-11-26T08:18:13.178724+00:00",
-        "game_id": "2026020389",
-        "home": "FLA",
-        "home_win_probabilities": {
-          "candidate": 0.5358089389901629,
-          "fixed_elo": 0.5188663130549072,
-          "market": 0.5427435387673957,
-          "model": 0.503727487995397
-        },
-        "live_odds": false,
-        "original_forecast_sha256": "1279d68dd6bf53dceec5944d799887fac815a3fb928f741a4a2935ac7fb5531b",
-        "proper_scores": {
-          "candidate": {
-            "accuracy": 1.0,
-            "brier": 0.4309466822428766,
-            "log_loss": 0.6239776385651764
-          },
-          "fixed_elo": {
-            "accuracy": 1.0,
-            "brier": 0.4629792494267572,
-            "log_loss": 0.6561090146331434
-          },
-          "market": {
-            "accuracy": 1.0,
-            "brier": 0.41816694267792837,
-            "log_loss": 0.6111183749147794
-          },
-          "model": {
-            "accuracy": 1.0,
-            "brier": 0.4925728123427176,
-            "log_loss": 0.6857198555627048
-          }
-        },
-        "saved_market_observed_at_utc": "2026-11-25T04:14:47.799189+00:00",
-        "saved_market_provider": "DraftKings",
-        "scheduled_start_utc": "2026-11-26T00:00:00+00:00",
-        "verified_winner": "FLA",
-        "verified_winner_side": "home"
-      },
-      {
-        "away": "PHI",
-        "challenger_forecast_sha256": "ed04c9a31d22db1650c1d19695d7db0ad50e68c324d84ce1f79412c8079d1b1c",
-        "challenger_minus_baseline": {
-          "fixed_elo": {
-            "accuracy": 0.0,
-            "brier": 0.03728906619020683,
-            "log_loss": 0.03861745045144249
-          },
-          "market": {
-            "accuracy": 0.0,
-            "brier": 0.02020458377993206,
-            "log_loss": 0.020839907764200305
-          },
-          "model": {
-            "accuracy": 0.0,
-            "brier": -0.0829414835031656,
-            "log_loss": -0.08411017248137931
-          }
-        },
-        "event_id": "401892787",
-        "final_verified_at_utc": "2026-11-26T08:18:13.178093+00:00",
-        "game_id": "2026020392",
-        "home": "WSH",
-        "home_win_probabilities": {
-          "candidate": 0.5811319435402917,
-          "fixed_elo": 0.6040127329986102,
-          "market": 0.593369754159424,
-          "model": 0.5342520096941736
-        },
-        "live_odds": false,
-        "original_forecast_sha256": "46f16944e0426e0ff95c0a3f5f19e70ed291a8ee1d6d0eb98e4acd5c7445f96b",
-        "proper_scores": {
-          "candidate": {
-            "accuracy": 1.0,
-            "brier": 0.3509008974446667,
-            "log_loss": 0.5427774505974414
-          },
-          "fixed_elo": {
-            "accuracy": 1.0,
-            "brier": 0.31361183125445985,
-            "log_loss": 0.5041600001459989
-          },
-          "market": {
-            "accuracy": 1.0,
-            "brier": 0.3306963136647346,
-            "log_loss": 0.5219375428332411
-          },
-          "model": {
-            "accuracy": 1.0,
-            "brier": 0.4338423809478323,
-            "log_loss": 0.6268876230788207
-          }
-        },
-        "saved_market_observed_at_utc": "2026-11-25T04:14:47.799189+00:00",
-        "saved_market_provider": "DraftKings",
-        "scheduled_start_utc": "2026-11-26T00:00:00+00:00",
-        "verified_winner": "WSH",
-        "verified_winner_side": "home"
       }
     ],
     "proper_score_interpretation": "challenger minus baseline: lower Brier/log loss favors challenger; positive accuracy difference favors challenger",
     "scope": "all_already_verified_nhl_challenger_finals",
     "selection": "latest final verified_at UTC first, then game_id; not chosen by performance",
     "shown": 25,
-    "total_settled_shadow_games": 289
+    "total_settled_shadow_games": 292
   },
   "same_game_priced": {
     "candidate": {
@@ -1905,24 +1905,24 @@
       "bootstrap_draws": 2000,
       "ci95": {
         "accuracy": [
-          0.5033991079875659,
-          0.6171114589447596
+          0.49432553041572064,
+          0.6156720076090137
         ],
         "brier": [
-          0.4750231591171888,
-          0.5125809805468079
+          0.4755405039327179,
+          0.5171114085983477
         ],
         "log_loss": [
-          0.6677478886659441,
-          0.706237884397124
+          0.6682621259821936,
+          0.7110716902185967
         ]
       },
-      "games": 289,
+      "games": 292,
       "interval_method": "percentile block bootstrap",
       "mean": {
-        "accuracy": 0.5605536332179931,
-        "brier": 0.49437325454474834,
-        "log_loss": 0.6876200313045545
+        "accuracy": 0.5547945205479452,
+        "brier": 0.4967715314794682,
+        "log_loss": 0.6900653292706761
       },
       "minimum_blocks": 5,
       "uncertainty_status": "available_descriptive"
@@ -1932,24 +1932,24 @@
       "bootstrap_draws": 2000,
       "ci95": {
         "accuracy": [
-          0.5,
-          0.6148698122809002
+          0.4878851323407775,
+          0.6118432554287817
         ],
         "brier": [
-          0.4692503578206017,
-          0.5229896111181082
+          0.4700339913856514,
+          0.530546087502121
         ],
         "log_loss": [
-          0.6618796952891927,
-          0.7202079472555377
+          0.6631480642729339,
+          0.7273291991742695
         ]
       },
-      "games": 289,
+      "games": 292,
       "interval_method": "percentile block bootstrap",
       "mean": {
-        "accuracy": 0.5570934256055363,
-        "brier": 0.4969374385609637,
-        "log_loss": 0.6917503254876318
+        "accuracy": 0.5513698630136986,
+        "brier": 0.5003659229548897,
+        "log_loss": 0.6953303327663034
       },
       "minimum_blocks": 5,
       "uncertainty_status": "available_descriptive"
@@ -1959,24 +1959,24 @@
       "bootstrap_draws": 2000,
       "ci95": {
         "accuracy": [
-          0.5219498842798647,
-          0.6271201204748125
+          0.5126562375607038,
+          0.625
         ],
         "brier": [
-          0.45738028959727073,
-          0.4945707808106406
+          0.45877611077449726,
+          0.5003959725010015
         ],
         "log_loss": [
-          0.6487628752534815,
-          0.6879087439846749
+          0.6504498469748212,
+          0.69354122436712
         ]
       },
-      "games": 289,
+      "games": 292,
       "interval_method": "percentile block bootstrap",
       "mean": {
-        "accuracy": 0.5743944636678201,
-        "brier": 0.47656586723531386,
-        "log_loss": 0.6690977266177199
+        "accuracy": 0.5684931506849316,
+        "brier": 0.47904115897998734,
+        "log_loss": 0.6716336335834932
       },
       "minimum_blocks": 5,
       "uncertainty_status": "available_descriptive"
@@ -1986,24 +1986,24 @@
       "bootstrap_draws": 2000,
       "ci95": {
         "accuracy": [
-          0.5052195811915686,
-          0.6164050624960743
+          0.4916387959866221,
+          0.6148698122809002
         ],
         "brier": [
-          0.48073200244679726,
-          0.500365149416819
+          0.48103922422803513,
+          0.5027777776123245
         ],
         "log_loss": [
-          0.6737283620156704,
-          0.6935625382725021
+          0.6740737404881694,
+          0.695959955640856
         ]
       },
-      "games": 289,
+      "games": 292,
       "interval_method": "percentile block bootstrap",
       "mean": {
-        "accuracy": 0.5605536332179931,
-        "brier": 0.49096302804245556,
-        "log_loss": 0.68407786561729
+        "accuracy": 0.5547945205479452,
+        "brier": 0.49212154366932287,
+        "log_loss": 0.6852425755628458
       },
       "minimum_blocks": 5,
       "uncertainty_status": "available_descriptive"
@@ -2035,24 +2035,24 @@
               "upper": 0.4
             },
             {
-              "games": 210,
+              "games": 211,
               "lower": 0.4,
-              "mean_probability": 0.5366895666145283,
-              "observed_rate": 0.4857142857142857,
+              "mean_probability": 0.5367651038523759,
+              "observed_rate": 0.4834123222748815,
               "observed_rate_wilson95": [
-                0.4189827637032563,
-                0.5529590663184374
+                0.4168861890640926,
+                0.5505316452848997
               ],
               "upper": 0.6
             },
             {
-              "games": 77,
+              "games": 79,
               "lower": 0.6,
-              "mean_probability": 0.6375537026357825,
-              "observed_rate": 0.5714285714285714,
+              "mean_probability": 0.6372866634138182,
+              "observed_rate": 0.5569620253164557,
               "observed_rate_wilson95": [
-                0.46010532061427006,
-                0.6759634757739535
+                0.44731912948308383,
+                0.6613221248854566
               ],
               "upper": 0.8
             },
@@ -2065,13 +2065,13 @@
               "upper": 1.0
             }
           ],
-          "games": 289,
+          "games": 292,
           "limitation": "Fixed five bins. Wilson bin intervals assume independent observations; descriptive only."
         },
         "spread": {
-          "games": 289,
-          "mean_distance_from_even": 0.0727062591436205,
-          "share_between_40_and_60_percent": 0.726643598615917
+          "games": 292,
+          "mean_distance_from_even": 0.07300941138028454,
+          "share_between_40_and_60_percent": 0.7226027397260274
         }
       },
       "fixed_elo": {
@@ -2097,24 +2097,24 @@
               "upper": 0.4
             },
             {
-              "games": 159,
+              "games": 160,
               "lower": 0.4,
-              "mean_probability": 0.5145990747976177,
-              "observed_rate": 0.48427672955974843,
+              "mean_probability": 0.5148244322930209,
+              "observed_rate": 0.48125,
               "observed_rate_wilson95": [
-                0.4078892583593847,
-                0.5614060302224652
+                0.4051814515477462,
+                0.5581977807711853
               ],
               "upper": 0.6
             },
             {
-              "games": 110,
+              "games": 112,
               "lower": 0.6,
-              "mean_probability": 0.6708334043324603,
-              "observed_rate": 0.5818181818181818,
+              "mean_probability": 0.6711135694701331,
+              "observed_rate": 0.5714285714285714,
               "observed_rate_wilson95": [
-                0.4884056896895063,
-                0.6697089390798849
+                0.478911377409721,
+                0.659208430152144
               ],
               "upper": 0.8
             },
@@ -2130,13 +2130,13 @@
               "upper": 1.0
             }
           ],
-          "games": 289,
+          "games": 292,
           "limitation": "Fixed five bins. Wilson bin intervals assume independent observations; descriptive only."
         },
         "spread": {
-          "games": 289,
-          "mean_distance_from_even": 0.10641878027884714,
-          "share_between_40_and_60_percent": 0.5501730103806228
+          "games": 292,
+          "mean_distance_from_even": 0.10677646944771649,
+          "share_between_40_and_60_percent": 0.547945205479452
         }
       },
       "market": {
@@ -2162,24 +2162,24 @@
               "upper": 0.4
             },
             {
-              "games": 198,
+              "games": 200,
               "lower": 0.4,
-              "mean_probability": 0.5096789509608581,
-              "observed_rate": 0.45454545454545453,
+              "mean_probability": 0.5102543302300654,
+              "observed_rate": 0.45,
               "observed_rate_wilson95": [
-                0.38671236022932576,
-                0.5241087361640059
+                0.3826406840224836,
+                0.5192438486152432
               ],
               "upper": 0.6
             },
             {
-              "games": 68,
+              "games": 69,
               "lower": 0.6,
-              "mean_probability": 0.6561837808740044,
-              "observed_rate": 0.6911764705882353,
+              "mean_probability": 0.6562024974728681,
+              "observed_rate": 0.6811594202898551,
               "observed_rate_wilson95": [
-                0.5736318830649045,
-                0.7882761353244803
+                0.5641587428411312,
+                0.779052395496169
               ],
               "upper": 0.8
             },
@@ -2192,13 +2192,13 @@
               "upper": 1.0
             }
           ],
-          "games": 289,
+          "games": 292,
           "limitation": "Fixed five bins. Wilson bin intervals assume independent observations; descriptive only."
         },
         "spread": {
-          "games": 289,
-          "mean_distance_from_even": 0.07998663774509837,
-          "share_between_40_and_60_percent": 0.6851211072664359
+          "games": 292,
+          "mean_distance_from_even": 0.08016454551469929,
+          "share_between_40_and_60_percent": 0.684931506849315
         }
       },
       "model": {
@@ -2224,13 +2224,13 @@
               "upper": 0.4
             },
             {
-              "games": 279,
+              "games": 282,
               "lower": 0.4,
-              "mean_probability": 0.5201488742119588,
-              "observed_rate": 0.5017921146953405,
+              "mean_probability": 0.5204546470259143,
+              "observed_rate": 0.49645390070921985,
               "observed_rate_wilson95": [
-                0.4434979369701568,
-                0.5600376126065194
+                0.43853937738388793,
+                0.5544637369710013
               ],
               "upper": 0.6
             },
@@ -2254,25 +2254,25 @@
               "upper": 1.0
             }
           ],
-          "games": 289,
+          "games": 292,
           "limitation": "Fixed five bins. Wilson bin intervals assume independent observations; descriptive only."
         },
         "spread": {
-          "games": 289,
-          "mean_distance_from_even": 0.03785893555276007,
-          "share_between_40_and_60_percent": 0.9653979238754326
+          "games": 292,
+          "mean_distance_from_even": 0.0379722840099965,
+          "share_between_40_and_60_percent": 0.9657534246575342
         }
       }
     }
   },
-  "same_game_priced_count": 289,
-  "scored": 289,
+  "same_game_priced_count": 292,
+  "scored": 292,
   "selection_warning": "2025 retrospective model selection was not blind; only post-activation NHL shadow games are prospective.",
   "source_enrollment_coverage": {
-    "eligible_saved_primary_forecasts_since_activation": 304,
+    "eligible_saved_primary_forecasts_since_activation": 305,
     "missed_started_source_forecasts": [],
     "note": "Only hash-verified saved primary forecasts; no upstream schedule completeness claim or retrospective repair.",
-    "shadow_enrolled": 304,
+    "shadow_enrolled": 305,
     "unseen_official_schedule_not_measured": true
   },
   "source_report": "benchmarks/two_way_challenger_v1/nhl_report.json",
@@ -2532,14 +2532,35 @@
         "shadow_forecast_sha256": "bc939d8f2c361b8fb39f021f91d769bfb6c1fb2ae2260b7c52a8862d6827d9cc",
         "source_forecast_sha256": "7a9c0efb6d849229f1c09192e0b9bbda47bd8a205b3b8c9228d7d774267a0f8f",
         "source_generated_at_utc": "2026-11-28T02:41:33.951878+00:00"
+      },
+      {
+        "archived_forecast_recorded_at_utc": "2026-11-28T11:45:32.615521+00:00",
+        "away": "EDM",
+        "event_id": "401892822",
+        "game_id": "2026020427",
+        "home": "SEA",
+        "home_win_probabilities": {
+          "challenger": 0.5028938752542599,
+          "fixed_elo": 0.4568252710697275,
+          "original_model": 0.4818076316337669,
+          "saved_market": 0.3962430290578221
+        },
+        "live_market_quote": false,
+        "result_eligible_to_score_now": false,
+        "saved_market_observed_at_utc": "2026-11-28T11:45:28.893686+00:00",
+        "saved_market_provider": "Draft Kings",
+        "scheduled_start_utc": "2026-11-29T03:00:00+00:00",
+        "shadow_forecast_sha256": "80cadd3d45a43304393197d0324b79d285f58e4c1ab68579133e70b6b295a53e",
+        "source_forecast_sha256": "2b1075ec6150c5ff3f4d2c93a3b830237907147801377312a286994231b1ef80",
+        "source_generated_at_utc": "2026-11-28T11:45:29.114340+00:00"
       }
     ],
     "probability_convention": "probability of home team winning including overtime or shootout",
     "quote_warning": "Market probability is a saved pregame quote from the original forecast, NOT current odds or a verified closing line.",
     "scope": "earliest_future_frozen_nhl_challenger_games",
     "selection": "scheduled_start_utc ascending, then game_id; never based on result or model confidence",
-    "shown": 12,
-    "total_future_enrolled": 12
+    "shown": 13,
+    "total_future_enrolled": 13
   },
   "version": "nhl-forward-challenger-shadow-v1"
 }

@@ -2,15 +2,15 @@
 
 **NO BET — actual wagers $0.**
 
-Evidence through **2026-11-28T02:41:33.769132+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
+Evidence through **2026-11-28T11:45:29.112732+00:00**; cohort began 2026-10-11T15:58:51.144676+00:00.
 
 | Coverage | Games |
 |---|---:|
-| Recorded / settled / pending | 341 / 326 / 15 |
+| Recorded / settled / pending | 342 / 329 / 13 |
 | Started games in retained official schedules / enrolled | 331 / 329 |
 | Observed missing started games | 2 |
-| Enrollment-time priced forecasts | 341 / 341 |
-| Settled with enrollment prices / decisive market-paired | 326 / 326 |
+| Enrollment-time priced forecasts | 342 / 342 |
+| Settled with enrollment prices / decisive market-paired | 329 / 329 |
 | Separate later quotes recorded prospectively | 0 |
 
 ## Missing enrollment-time prices
@@ -23,7 +23,7 @@ Later archived pairs explain timing gaps; they are not retrospectively inserted 
 
 ## Next 24-hour pregame readiness
 
-As of retained evidence: 2026-11-28T02:41:33.769132+00:00. Ready: 12 / 12 observed games. Status: ready_as_of_snapshot.
+As of retained evidence: 2026-11-28T11:45:29.112732+00:00. Ready: 13 / 13 observed games. Status: ready_as_of_snapshot.
 
 | Game | Matchup | Enrollment priced | Separate follow-up | Latest pair | Issues |
 |---|---|---|---|---|---|
@@ -39,6 +39,7 @@ As of retained evidence: 2026-11-28T02:41:33.769132+00:00. Ready: 12 / 12 observ
 | 2026020424 | UTA at DAL | True | False | True | None |
 | 2026020425 | SJS at COL | True | False | True | None |
 | 2026020426 | ANA at LAK | True | False | True | None |
+| 2026020427 | EDM at SEA | True | False | True | None |
 
 Latest audited capture only; source changes after retrieval are unknown. This does not certify future collection or wagering readiness.
 
@@ -389,10 +390,11 @@ Latest audited capture only; source changes after retrieval are unknown. This do
 | 2026020424 | UTA at DAL | 2026-11-29T01:00:00+00:00 | enrolled | — |
 | 2026020425 | SJS at COL | 2026-11-29T02:00:00+00:00 | enrolled | — |
 | 2026020426 | ANA at LAK | 2026-11-29T02:00:00+00:00 | enrolled | — |
+| 2026020427 | EDM at SEA | 2026-11-29T03:00:00+00:00 | enrolled | — |
 
 ## Capture freshness
 
-Audited capture manifests: 214. Latest: `20261128T024132513084Z`.
+Audited capture manifests: 215. Latest: `20261128T114527940167Z`.
 
 | From (UTC) | To (UTC) | Hours between audited captures |
 |---|---|---:|
